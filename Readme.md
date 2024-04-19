@@ -46,7 +46,6 @@ Trainers the Training Center is working with.
 
 #### Open trainings
 Trainings anyone can join.
-Trainings anyone can join.
 1. Trainings' harmonogram.
 2. Payment.
 3. Resignation.
