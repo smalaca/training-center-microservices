@@ -21,7 +21,7 @@ Below you can find a link to articles that explains used tools and techniques, h
 
 ## Business 
 ### Brief description
-Our goal is to create software for the institution that provides structured training, education, and skill development in various fields.
+Institution that provides structured training and education in various fields.
 
 ### High-level requirements
 #### Trainings
