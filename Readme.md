@@ -17,7 +17,7 @@ Below you can find a link to articles that explains used tools and techniques, h
 - Spring Boot
 
 ## Artefacts
-- [Big Picture Event Storming](https://miro.com/welcomeonboard/dmxHSlg5bEpkWllBN1FDSXRFTDdLOTB1dUtjUkp3MmhnOWN0dVYxeWI2elh1emlweU9JRElXS3RrQ1ZJVW1RMHwzMDc0NDU3MzUyMzk0NTMzNjg2fDI=?share_link_id=851419207400) 
+- [Big Picture Event Storming](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) 
 
 ## Business 
 ### Brief description
