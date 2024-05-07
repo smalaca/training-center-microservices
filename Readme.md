@@ -71,7 +71,7 @@ Trainings organized for employees of other companies:
 ### Articles
 List of the articles that explains how the project evolved and explains how decisions were made:
 1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
-2. Event Storming - How sticky notes can help you understand the Business?
+2. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
 3. Types of Event Storming Sessions - what would be the best for you?
 
 ### Books worth reading
