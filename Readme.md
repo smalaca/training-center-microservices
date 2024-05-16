@@ -10,7 +10,7 @@ The purpose of this repository is to show how to build and maintain the project 
 Below you can find a link to articles that explains used tools and techniques, how the project was developed, and how the decision were made:
 1. [Technology](#technology)
 2. [Artefacts](#artefacts)
-3. [Business](#business-)
+3. [Business](#business)
    1. [Brief description](#brief-description)
    2. [High-level requirements](#high-level-requirements)
 4. [Education](#education)
@@ -27,7 +27,7 @@ Below you can find a link to articles that explains used tools and techniques, h
 ## Artefacts
 - [Big Picture Event Storming](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) 
 
-## Business 
+## Business
 ### Brief description
 Institution that provides structured training and education in various fields.
 
@@ -71,8 +71,9 @@ Trainings organized for employees of other companies:
 ### Articles
 List of the articles that explains how the project evolved and explains how decisions were made:
 1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
-2. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
-3. Types of Event Storming Sessions - what would be the best for you?
+2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
+3. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
+4. Types of Event Storming Sessions - what would be the best for you?
 
 ### Books worth reading
 - **Domain-Driven Design**
