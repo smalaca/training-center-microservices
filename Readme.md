@@ -10,7 +10,7 @@ The purpose of this repository is to show how to build and maintain the project 
 Below you can find a link to articles that explains used tools and techniques, how the project was developed, and how the decision were made:
 1. [Technology](#technology)
 2. [Artefacts](#artefacts)
-3. [Business](#business-)
+3. [Business](#business)
    1. [Brief description](#brief-description)
    2. [High-level requirements](#high-level-requirements)
 4. [Education](#education)
@@ -27,7 +27,7 @@ Below you can find a link to articles that explains used tools and techniques, h
 ## Artefacts
 - [Big Picture Event Storming](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) 
 
-## Business 
+## Business
 ### Brief description
 Institution that provides structured training and education in various fields.
 
