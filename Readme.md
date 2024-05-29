@@ -70,11 +70,13 @@ Trainings organized for employees of other companies:
 ## Education
 ### Articles
 List of the articles that explains how the project evolved and explains how decisions were made:
-1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
-2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
-3. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
-4. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
-5. Types of Event Storming Sessions - what would be the best for you?
+1. **Introduction**
+   1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
+   2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
+2. **Event Storming**
+   1. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
+   2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
+   3. [Event Storming Workshops: A Closer Look at Different Approaches]()
 
 ### Books worth reading
 - **Domain-Driven Design**
