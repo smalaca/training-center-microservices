@@ -76,7 +76,8 @@ List of the articles that explains how the project evolved and explains how deci
 2. **Event Storming**
    1. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
    2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
-   3. [Event Storming Workshops: A Closer Look at Different Approaches]()
+   3. [Event Storming Workshops: A Closer Look at Different Approaches](https://letstalkaboutjava.blogspot.com/2024/05/event-storming-workshops-closer-look-at.html)
+   4. [Event Storming Workshops: Tips and Tricks]()
 
 ### Books worth reading
 - **Domain-Driven Design**
