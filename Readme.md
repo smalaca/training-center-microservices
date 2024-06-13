@@ -78,6 +78,7 @@ List of the articles that explains how the project evolved and explains how deci
    2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
    3. [Event Storming Workshops: A Closer Look at Different Approaches](https://letstalkaboutjava.blogspot.com/2024/05/event-storming-workshops-closer-look-at.html)
    4. [Event Storming Workshops: Tips and Tricks](https://letstalkaboutjava.blogspot.com/2024/06/event-storming-workshops-tips-and-tricks.html)
+   5. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
 
 ### Books worth reading
 - **Domain-Driven Design**
