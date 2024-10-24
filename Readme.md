@@ -85,6 +85,47 @@ List of the articles that explains how the project evolved and explains how deci
 3. **Big Picture Event Storming**
    1. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
    2. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
+   3. Enforcing Timelines
+4. **Domain-Driven Design Introduction**
+   1. Domain-Driven Design for dummies
+5. **Discovering Language Boundaries**
+   1. Ubiquitous Language demystified
+   2. Discovering Language Boundaries
+   3. Domain and Subdomains
+6. **Architecture Decision Record**
+   1. What ADR is?
+   2. Monolith or Microservices?
+7. **Defining initial Bounded Contexts**
+   1. Problem and Solution Space
+   2. What Bounded Context is?
+   3. Defining Bounded Contexts
+8. **Process Level Event Storming**
+   1. What is the goal of it?
+   2. Process Level Example: Releasing Training Program
+   3. Process Level Example: Purchase Open and Dedicated Training
+   4. Updating Bounded Contexts
+9. **Defining Context Mapping**
+   1. What context maps are?
+   2. Team collaboration and context maps
+   3. Architecture and context maps
+   4. Made decision and ADRs
+10. **Design Level Event Storming**
+    1. Why we need it?
+    2. Open Training Purchase
+11. **Architecture of the Code**
+    1. Short story about the architecture types.
+    2. How to pick the right architecture for your context?
+    3. Open Training Purchase and Decision
+12. **Command Query Responsibility Segregation** 
+    1. CQRS for dummies
+    2. Data Model vs. Domain Model
+    3. Anemic Domain Model - where to use it?
+    4. Trainings Catalogue and Decision
+13. **Design Level - how to convert sticky notes into code?**
+    1. Port and Adapters in details
+    2. Port and Adapters - various implementation 
+    3. Application layer - what is that
+    4. ...
 
 ### Books worth reading
 - **Domain-Driven Design**
