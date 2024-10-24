@@ -112,6 +112,10 @@ List of the articles that explains how the project evolved and explains how deci
    - [Developer Testing: Building Quality into Software](https://www.oreilly.com/library/view/developer-testing-building/9780134291109/) by Alexander Tarlinder
 
 ### Resources
+- **Architecture Decision Record**
+  - [Architecture decision record](https://github.com/joelparkerhenderson/architecture-decision-record) (ADR) by Joel Parker Henderson
 - **Event Storming**
   - [Awesome EventStorming](https://github.com/mariuszgil/awesome-eventstorming) by Mariusz Gil
   - [Introducing Event Storming](https://ziobrando.blogspot.com/2013/11/introducing-event-storming.html) by Alberto Brandolini
+- **Testing**
+  - [ArchUnit](https://www.archunit.org/)
