@@ -25,7 +25,7 @@ Below you can find a link to articles that explains used tools and techniques, h
 - Spring Boot
 
 ## Artefacts
-- [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254)
+- [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) covers:
   - Big Picture Event Storming
   - Bounded Contexts
   - Core Domains, Supporting and Generic subdomains
