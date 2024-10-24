@@ -10,7 +10,7 @@ The purpose of this repository is to show how to build and maintain the project 
 Below you can find a link to articles that explains used tools and techniques, how the project was developed, and how the decision were made:
 1. [Technology](#technology)
 2. [Artefacts](#artefacts)
-3. [Business](#business)
+3. [Business Overview](#business-overview)
    1. [Brief description](#brief-description)
    2. [High-level requirements](#high-level-requirements)
 4. [Education](#education)
@@ -25,9 +25,13 @@ Below you can find a link to articles that explains used tools and techniques, h
 - Spring Boot
 
 ## Artefacts
-- [Big Picture Event Storming](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) 
+- [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254)
+  - Big Picture Event Storming
+  - Bounded Contexts
+  - Core Domains, Supporting and Generic subdomains
+  - Process Level Event Storming
 
-## Business
+## Business Overview
 ### Brief description
 Institution that provides structured training and education in various fields.
 
@@ -73,13 +77,14 @@ List of the articles that explains how the project evolved and explains how deci
 1. **Introduction**
    1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
    2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
-2. **Event Storming**
+2. **Event Storming Introduction**
    1. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
    2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
    3. [Event Storming Workshops: A Closer Look at Different Approaches](https://letstalkaboutjava.blogspot.com/2024/05/event-storming-workshops-closer-look-at.html)
    4. [Event Storming Workshops: Tips and Tricks](https://letstalkaboutjava.blogspot.com/2024/06/event-storming-workshops-tips-and-tricks.html)
-   5. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
-   6. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
+3. **Big Picture Event Storming**
+   1. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
+   2. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
 
 ### Books worth reading
 - **Domain-Driven Design**
