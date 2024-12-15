@@ -31,7 +31,6 @@ Below you can find a link to articles that explains used tools and techniques, h
   - Core Domains, Supporting and Generic subdomains
   - Process Level Event Storming
 - [Architecture Decision Record](/documentation/architecture-decision-record)
-- Application Design
 
 ## Business Overview
 ### Brief description

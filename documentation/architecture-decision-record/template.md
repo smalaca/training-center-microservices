@@ -10,6 +10,14 @@ In each ADR file, write these sections:
 
 What is the status, such as proposed, accepted, rejected, deprecated, superseded, etc.?
 
+## Date
+
+Date when decision was made.
+
+## Decision
+
+What is the change that we're proposing and/or doing?
+
 ## Context
 
 What is the issue that we're seeing that is motivating this decision or change?
@@ -18,9 +26,9 @@ What is the issue that we're seeing that is motivating this decision or change?
 
 List of solutions with their pros and cons.
 
-## Decision
+## Decision Rationale
 
-What is the change that we're proposing and/or doing?
+Why solution was chosen.
 
 ## Consequences
 
