@@ -10,7 +10,7 @@ The purpose of this repository is to show how to build and maintain the project 
 Below you can find a link to articles that explains used tools and techniques, how the project was developed, and how the decision were made:
 1. [Technology](#technology)
 2. [Artefacts](#artefacts)
-3. [Business](#business)
+3. [Business Overview](#business-overview)
    1. [Brief description](#brief-description)
    2. [High-level requirements](#high-level-requirements)
 4. [Education](#education)
@@ -25,9 +25,14 @@ Below you can find a link to articles that explains used tools and techniques, h
 - Spring Boot
 
 ## Artefacts
-- [Big Picture Event Storming](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) 
+- [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) covers:
+  - Big Picture Event Storming
+  - Bounded Contexts
+  - Core Domains, Supporting and Generic subdomains
+  - Process Level Event Storming
+- [Architecture Decision Record](/documentation/architecture-decision-record)
 
-## Business
+## Business Overview
 ### Brief description
 Institution that provides structured training and education in various fields.
 
@@ -73,13 +78,55 @@ List of the articles that explains how the project evolved and explains how deci
 1. **Introduction**
    1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
    2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
-2. **Event Storming**
+2. **Event Storming Introduction**
    1. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
    2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
    3. [Event Storming Workshops: A Closer Look at Different Approaches](https://letstalkaboutjava.blogspot.com/2024/05/event-storming-workshops-closer-look-at.html)
    4. [Event Storming Workshops: Tips and Tricks](https://letstalkaboutjava.blogspot.com/2024/06/event-storming-workshops-tips-and-tricks.html)
-   5. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
-   6. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
+3. **Big Picture Event Storming**
+   1. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
+   2. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
+   3. Enforcing Timelines
+4. **Domain-Driven Design Introduction**
+   1. Domain-Driven Design for dummies
+5. **Discovering Language Boundaries**
+   1. Ubiquitous Language demystified
+   2. Discovering Language Boundaries
+   3. Domain and Subdomains
+6. **Architecture Decision Record**
+   1. What ADR is?
+   2. Monolith or Microservices?
+7. **Defining initial Bounded Contexts**
+   1. Problem and Solution Space
+   2. What Bounded Context is?
+   3. Defining Bounded Contexts
+8. **Process Level Event Storming**
+   1. What is the goal of it?
+   2. Process Level Example: Releasing Training Program
+   3. Process Level Example: Purchase Open and Dedicated Training
+   4. Updating Bounded Contexts
+9. **Defining Context Mapping**
+   1. What context maps are?
+   2. Team collaboration and context maps
+   3. Architecture and context maps
+   4. Made decision and ADRs
+10. **Design Level Event Storming**
+    1. Why we need it?
+    2. Open Training Purchase
+11. **Architecture of the Code**
+    1. Short story about the architecture types.
+    2. How to pick the right architecture for your context?
+    3. Open Training Purchase and Decision
+12. **Command Query Responsibility Segregation** 
+    1. CQRS for dummies
+    2. Data Model vs. Domain Model
+    3. Anemic Domain Model - where to use it?
+    4. Trainings Catalogue and Decision
+13. **Design Level - how to convert sticky notes into code?**
+    1. Port and Adapters in details
+    2. Port and Adapters - various implementation 
+    3. Application layer - what is that
+    4. ...
 
 ### Books worth reading
 - **Domain-Driven Design**
@@ -107,6 +154,10 @@ List of the articles that explains how the project evolved and explains how deci
    - [Developer Testing: Building Quality into Software](https://www.oreilly.com/library/view/developer-testing-building/9780134291109/) by Alexander Tarlinder
 
 ### Resources
+- **Architecture Decision Record**
+  - [Architecture decision record](https://github.com/joelparkerhenderson/architecture-decision-record) (ADR) by Joel Parker Henderson
 - **Event Storming**
   - [Awesome EventStorming](https://github.com/mariuszgil/awesome-eventstorming) by Mariusz Gil
   - [Introducing Event Storming](https://ziobrando.blogspot.com/2013/11/introducing-event-storming.html) by Alberto Brandolini
+- **Testing**
+  - [ArchUnit](https://www.archunit.org/)
