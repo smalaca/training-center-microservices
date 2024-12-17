@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>open-trainings</module>
         <module>annotations</module>
+        <module>open-trainings</module>
     </modules>
 </project>
