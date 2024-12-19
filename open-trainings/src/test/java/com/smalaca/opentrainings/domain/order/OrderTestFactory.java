@@ -1,9 +1,9 @@
 package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
@@ -25,11 +25,19 @@ public class OrderTestFactory {
         return new OrderTestFactory(clock, orderFactory);
     }
 
-    public Order orderCreatedAt(UUID orderId, UUID trainingId, UUID participantId, LocalDateTime creationDateTime) {
-        given(clock.now()).willReturn(creationDateTime);
-        Order order = orderFactory.create(trainingId, participantId);
+    public Order orderCreatedAt(OrderTestDto.OrderTestDtoBuilder builder) {
+        return orderCreatedAt(builder.build());
+    }
 
-        return assignId(order, orderId);
+    private Order orderCreatedAt(OrderTestDto orderDto) {
+        given(clock.now()).willReturn(orderDto.getCreationDateTime());
+        CreateOrderCommand command = new CreateOrderCommand(
+                orderDto.getTrainingId(),
+                orderDto.getParticipantId(),
+                Price.of(orderDto.getAmount(), orderDto.getCurrency()));
+        Order order = orderFactory.create(command);
+
+        return assignId(order, orderDto.getOrderId());
     }
 
     private Order assignId(Order order, UUID orderId) {

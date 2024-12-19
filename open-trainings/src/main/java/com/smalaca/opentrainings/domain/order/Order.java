@@ -7,7 +7,11 @@ import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -37,6 +41,13 @@ public class Order {
     @Column(name = "PARTICIPANT_ID")
     private UUID participantId;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+    })
+    private Price price;
+
     @Column(name = "CREATION_DATE_TIME")
     private LocalDateTime creationDateTime;
 
@@ -44,9 +55,10 @@ public class Order {
     @Column(name = "STATUS")
     private OrderStatus status = INITIATED;
 
-    Order(UUID trainingId, UUID participantId, LocalDateTime creationDateTime) {
+    Order(UUID trainingId, UUID participantId, Price price, LocalDateTime creationDateTime) {
         this.trainingId = trainingId;
         this.participantId = participantId;
+        this.price = price;
         this.creationDateTime = creationDateTime;
     }
 
@@ -59,8 +71,21 @@ public class Order {
             return OrderRejectedEvent.expired(orderId);
         }
 
-        status = CONFIRMED;
-        return TrainingPurchasedEvent.create(orderId, trainingId, participantId);
+        if (paymentGateway.pay(paymentRequest()).isSuccessful()) {
+            status = CONFIRMED;
+            return TrainingPurchasedEvent.create(orderId, trainingId, participantId);
+        } else {
+            status = REJECTED;
+            return OrderRejectedEvent.paymentFailed(orderId);
+        }
+    }
+
+    private PaymentRequest paymentRequest() {
+        return PaymentRequest.builder()
+                .orderId(orderId)
+                .participantId(participantId)
+                .price(price.amount(), price.currencyCode())
+                .build();
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {

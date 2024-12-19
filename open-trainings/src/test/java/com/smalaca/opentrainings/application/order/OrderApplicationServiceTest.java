@@ -4,22 +4,29 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
+import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
 import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion.assertThatTrainingPurchasedEvent;
+import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.failed;
+import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.successful;
 import static java.time.LocalDateTime.now;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -27,10 +34,13 @@ import static org.mockito.Mockito.mock;
 
 class OrderApplicationServiceTest {
     private static final Faker FAKER = new Faker();
+    private static final String CURRENCY = FAKER.currency().code();
+    private static final BigDecimal AMOUNT = BigDecimal.valueOf(FAKER.number().numberBetween(100L, 3000L));
     private static final UUID ORDER_ID = UUID.randomUUID();
     private static final UUID TRAINING_ID = UUID.randomUUID();
     private static final UUID PARTICIPANT_ID = UUID.randomUUID();
     private static final LocalDateTime NOW = now();
+    private static final int ONE_MINUTE = 1;
 
     private final OrderTestFactory orderFactory = OrderTestFactory.orderTestFactory();
 
@@ -48,7 +58,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {
-        givenOrderCreatedAt(minutes);
+        givenOrderCreatedAgoMinutes(minutes);
 
         service.confirm(ORDER_ID);
 
@@ -59,7 +69,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldPublishOrderRejectedWhenOlderThanTenMinutes(int minutes) {
-        givenOrderCreatedAt(minutes);
+        givenOrderCreatedAgoMinutes(minutes);
 
         service.confirm(ORDER_ID);
 
@@ -69,41 +79,29 @@ class OrderApplicationServiceTest {
                 .hasReason("Order expired");
     }
 
-//    @Test
-//    void shouldRejectOrderWhenPaymentFailed() {
-//
-//        BigDecimal price = BigDecimal.valueOf(FAKER.number().numberBetween(100l, 3000l)); // to order
-//        String currency = FAKER.currency().toString();
-//
-//        PaymentDto.builder()
-//                .withOrderId(ORDER_ID)
-//                .withPrice(price)
-//                .withPersonalData(PersonalData.builder()
-//                        .withEmailAddress()
-//                        .withFirstname()
-//                        .withSurname()
-//                        .build())
-//        //        new PaymentDto()
-////        given(paymentGateway.pa).willReturn();
-//        givenOrder();
-//
-//        service.confirm(ORDER_ID);
-//
-//        Order actual = thenOrderSaved();
-//        assertThatOrder(actual).isRejected();
-//    }
-//
-//    @Test
-//    void shouldPublishOrderRejectedWhenPaymentFailed() {
-//        givenOrder();
-//
-//        service.confirm(ORDER_ID);
-//
-//        OrderRejectedEvent actual = thenOrderRejectedEventPublished();
-//        assertThatOrderRejectedEvent(actual)
-//                .hasId(ORDER_ID)
-//                .hasReason("Could not complete payment.");
-//    }
+    @Test
+    void shouldRejectOrderWhenPaymentFailed() {
+        givenPayment(failed());
+        givenOrder();
+
+        service.confirm(ORDER_ID);
+
+        Order actual = thenOrderSaved();
+        assertThatOrder(actual).isRejected();
+    }
+
+    @Test
+    void shouldPublishOrderRejectedWhenPaymentFailed() {
+        givenPayment(failed());
+        givenOrder();
+
+        service.confirm(ORDER_ID);
+
+        OrderRejectedEvent actual = thenOrderRejectedEventPublished();
+        assertThatOrderRejectedEvent(actual)
+                .hasOrderId(ORDER_ID)
+                .hasReason("Could not complete payment.");
+    }
 
     private OrderRejectedEvent thenOrderRejectedEventPublished() {
         ArgumentCaptor<OrderRejectedEvent> captor = ArgumentCaptor.forClass(OrderRejectedEvent.class);
@@ -115,7 +113,8 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldConfirmOrder(int minutes) {
-        givenOrderCreatedAt(minutes);
+        givenPayment(successful());
+        givenOrderCreatedAgoMinutes(minutes);
 
         service.confirm(ORDER_ID);
 
@@ -126,7 +125,8 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldPublishTrainingPurchasedWhenOrderConfirmed(int minutes) {
-        givenOrderCreatedAt(minutes);
+        givenPayment(successful());
+        givenOrderCreatedAgoMinutes(minutes);
 
         service.confirm(ORDER_ID);
 
@@ -135,6 +135,15 @@ class OrderApplicationServiceTest {
                 .hasOrderId(ORDER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
+    }
+
+    private void givenPayment(PaymentResponse paymentResponse) {
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .orderId(ORDER_ID)
+                .participantId(PARTICIPANT_ID)
+                .price(AMOUNT, CURRENCY)
+                .build();
+        given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);
     }
 
     private TrainingPurchasedEvent thenTrainingPurchasedEventPublished() {
@@ -151,14 +160,20 @@ class OrderApplicationServiceTest {
         return captor.getValue();
     }
 
-    private void givenOrderCreatedAt(int minutes) {
-        LocalDateTime creationDateTime = moreThanMinutesAgo(minutes);
-        Order order = orderFactory.orderCreatedAt(ORDER_ID, TRAINING_ID, PARTICIPANT_ID, creationDateTime);
+    private void givenOrder() {
+        givenOrderCreatedAgoMinutes(ONE_MINUTE);
+    }
+
+    private void givenOrderCreatedAgoMinutes(int minutes) {
+        Order order = orderFactory.orderCreatedAt(OrderTestDto.builder()
+                .orderId(ORDER_ID)
+                .trainingId(TRAINING_ID)
+                .participantId(PARTICIPANT_ID)
+                .amount(AMOUNT)
+                .currency(CURRENCY)
+                .creationDateTime(NOW.minusMinutes(minutes)));
 
         given(orderRepository.findById(ORDER_ID)).willReturn(order);
     }
 
-    private LocalDateTime moreThanMinutesAgo(int minutes) {
-        return NOW.minusMinutes(minutes);
-    }
 }

@@ -12,4 +12,8 @@ public record OrderRejectedEvent(EventId eventId, UUID orderId, String reason) i
     public static OrderRejectedEvent expired(UUID orderId) {
         return new OrderRejectedEvent(newEventId(), orderId, "Order expired");
     }
+
+    public static OrderRejectedEvent paymentFailed(UUID orderId) {
+        return new OrderRejectedEvent(newEventId(), orderId, "Could not complete payment.");
+    }
 }
