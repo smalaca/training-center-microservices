@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @SecondaryAdapter
-public class FakePaymentGateway implements PaymentGateway {
+public class PaymentGatewayRestClient implements PaymentGateway {
     @Override
     public PaymentResponse pay(PaymentRequest paymentRequest) {
         return null;
