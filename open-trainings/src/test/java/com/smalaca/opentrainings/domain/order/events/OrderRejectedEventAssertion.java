@@ -15,7 +15,7 @@ public class OrderRejectedEventAssertion {
         return new OrderRejectedEventAssertion(actual);
     }
 
-    public OrderRejectedEventAssertion hasId(UUID expected) {
+    public OrderRejectedEventAssertion hasOrderId(UUID expected) {
         assertThat(actual.orderId()).isEqualTo(expected);
         return this;
     }

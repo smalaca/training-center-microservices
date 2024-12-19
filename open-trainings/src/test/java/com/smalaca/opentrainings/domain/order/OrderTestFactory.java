@@ -25,9 +25,9 @@ public class OrderTestFactory {
         return new OrderTestFactory(clock, orderFactory);
     }
 
-    public Order orderCreatedAt(UUID orderId, LocalDateTime creationDateTime) {
+    public Order orderCreatedAt(UUID orderId, UUID trainingId, UUID participantId, LocalDateTime creationDateTime) {
         given(clock.now()).willReturn(creationDateTime);
-        Order order = orderFactory.create();
+        Order order = orderFactory.create(trainingId, participantId);
 
         return assignId(order, orderId);
     }

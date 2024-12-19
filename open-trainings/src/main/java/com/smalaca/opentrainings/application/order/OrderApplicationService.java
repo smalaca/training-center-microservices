@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.PrimaryAdapter;
+import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
@@ -17,11 +18,14 @@ public class OrderApplicationService {
     private final OrderRepository orderRepository;
     private final PaymentGateway paymentGateway;
     private final EventRegistry eventRegistry;
+    private final Clock clock;
 
-    OrderApplicationService(OrderRepository orderRepository, EventRegistry eventRegistry, PaymentGateway paymentGateway) {
+    OrderApplicationService(
+            OrderRepository orderRepository, EventRegistry eventRegistry, PaymentGateway paymentGateway, Clock clock) {
         this.orderRepository = orderRepository;
         this.eventRegistry = eventRegistry;
         this.paymentGateway = paymentGateway;
+        this.clock = clock;
     }
 
     @Transactional
@@ -30,7 +34,7 @@ public class OrderApplicationService {
     public void confirm(UUID orderId) {
         Order order = orderRepository.findById(orderId);
 
-        OrderEvent event = order.confirm(paymentGateway);
+        OrderEvent event = order.confirm(paymentGateway, clock);
 
         orderRepository.save(order);
         eventRegistry.publish(event);
