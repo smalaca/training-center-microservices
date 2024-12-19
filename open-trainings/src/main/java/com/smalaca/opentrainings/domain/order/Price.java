@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.domain.order;
 
+import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.domaindrivendesign.ValueObject;
 import jakarta.persistence.Embeddable;
 
@@ -19,6 +20,7 @@ public class Price {
 
     private Price() {}
 
+    @Factory
     static Price of(BigDecimal amount, String currency) {
         return new Price(amount, Currency.getInstance(currency));
     }
