@@ -11,7 +11,6 @@ import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,6 +21,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
+import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
 import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion.assertThatTrainingPurchasedEvent;
@@ -33,12 +35,11 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class OrderApplicationServiceTest {
-    private static final Faker FAKER = new Faker();
-    private static final String CURRENCY = FAKER.currency().code();
-    private static final BigDecimal AMOUNT = BigDecimal.valueOf(FAKER.number().numberBetween(100L, 3000L));
-    private static final UUID ORDER_ID = UUID.randomUUID();
-    private static final UUID TRAINING_ID = UUID.randomUUID();
-    private static final UUID PARTICIPANT_ID = UUID.randomUUID();
+    private static final String CURRENCY = randomCurrency();
+    private static final BigDecimal AMOUNT = randomAmount();
+    private static final UUID ORDER_ID = randomId();
+    private static final UUID TRAINING_ID = randomId();
+    private static final UUID PARTICIPANT_ID = randomId();
     private static final LocalDateTime NOW = now();
     private static final int ONE_MINUTE = 1;
 
