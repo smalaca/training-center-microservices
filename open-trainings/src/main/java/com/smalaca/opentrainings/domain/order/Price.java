@@ -44,7 +44,7 @@ public class Price {
 
     @Override
     public int hashCode() {
-        int result = amount.hashCode();
+        int result = amount.stripTrailingZeros().hashCode();
         result = 31 * result + currency.hashCode();
         return result;
     }
