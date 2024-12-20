@@ -18,11 +18,11 @@ public class JpaOrderRepository implements OrderRepository {
 
     @Override
     public Order findById(UUID orderId) {
-        return repository.findById(orderId).get();
+        return repository.findById(orderId).orElseThrow(() -> new OrderDoesNotExistException(orderId));
     }
 
     @Override
-    public void save(Order order) {
-        repository.save(order);
+    public UUID save(Order order) {
+        return repository.save(order).orderId();
     }
 }

@@ -64,6 +64,10 @@ public class Order {
 
     private Order() {}
 
+    public UUID orderId() {
+        return orderId;
+    }
+
     @PrimaryPort
     public OrderEvent confirm(PaymentGateway paymentGateway, Clock clock) {
         if (isOlderThan10Minutes(clock)) {
