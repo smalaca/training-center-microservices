@@ -32,4 +32,20 @@ public class Price {
     String currencyCode() {
         return currency.getCurrencyCode();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Price price = (Price) o;
+        return amount.compareTo(price.amount) == 0 && currency.equals(price.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = amount.hashCode();
+        result = 31 * result + currency.hashCode();
+        return result;
+    }
 }

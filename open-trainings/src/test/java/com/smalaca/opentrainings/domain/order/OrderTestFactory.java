@@ -29,7 +29,7 @@ public class OrderTestFactory {
         return orderCreatedAt(builder.build());
     }
 
-    private Order orderCreatedAt(OrderTestDto orderDto) {
+    public Order orderCreatedAt(OrderTestDto orderDto) {
         given(clock.now()).willReturn(orderDto.getCreationDateTime());
         CreateOrderCommand command = new CreateOrderCommand(
                 orderDto.getTrainingId(),

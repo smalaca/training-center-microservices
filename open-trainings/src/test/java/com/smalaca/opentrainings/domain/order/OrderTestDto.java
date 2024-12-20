@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.domain.order;
 
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
-@Getter(AccessLevel.PACKAGE)
+@Getter
 public class OrderTestDto {
     private final UUID orderId;
     private final UUID trainingId;
