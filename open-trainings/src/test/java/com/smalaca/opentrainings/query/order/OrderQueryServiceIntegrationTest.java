@@ -6,11 +6,11 @@ import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.JpaOrderRepository;
 import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
@@ -18,7 +18,6 @@ import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RepositoryTest
 @Import({JpaOrderRepository.class, OrderQueryService.class})
@@ -37,11 +36,10 @@ class OrderQueryServiceIntegrationTest {
     @Test
     void shouldFindNoOrderDtoWhenDoesNotExist() {
         UUID orderId = randomId();
-        Executable executable = () -> queryService.findById(orderId);
 
-        RuntimeException actual = assertThrows(OrderDtoDoesNotExistException.class, executable);
+        Optional<OrderDto> actual = queryService.findById(orderId);
 
-        assertThat(actual).hasMessage("Order with id " + orderId + " does not exist.");
+        assertThat(actual).isEmpty();
     }
 
     @Test
@@ -49,9 +47,11 @@ class OrderQueryServiceIntegrationTest {
         OrderTestDto dto = randomOrderDto();
         UUID orderId = givenOrder(dto);
 
-        OrderDto actual = queryService.findById(orderId);
+        Optional<OrderDto> actual = queryService.findById(orderId);
 
-        assertThatInitiatedOrderHasDataEqualTo(actual, dto);
+        assertThat(actual)
+                .isPresent()
+                .satisfies(orderDto -> assertThatInitiatedOrderHasDataEqualTo(orderDto.get(), dto));
     }
 
     @Test

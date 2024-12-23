@@ -27,6 +27,11 @@ public class OrderRestController {
         applicationService.confirm(orderId);
     }
 
+    @GetMapping("{orderId}")
+    public OrderDto findById(@PathVariable UUID orderId) {
+        return queryService.findById(orderId).get();
+    }
+
     @GetMapping
     public Iterable<OrderDto> findAll() {
         return queryService.findAll();
