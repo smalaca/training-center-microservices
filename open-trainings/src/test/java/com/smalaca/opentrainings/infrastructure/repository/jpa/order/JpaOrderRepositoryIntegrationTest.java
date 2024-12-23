@@ -4,13 +4,11 @@ import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
+import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.UUID;
@@ -23,9 +21,8 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DataJpaTest
+@RepositoryTest
 @Import(JpaOrderRepository.class)
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
 class JpaOrderRepositoryIntegrationTest {
     @Autowired
     private OrderRepository repository;
