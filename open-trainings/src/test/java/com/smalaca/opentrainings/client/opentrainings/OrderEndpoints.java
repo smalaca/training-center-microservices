@@ -20,23 +20,24 @@ public class OrderEndpoints {
         this.objectMapper = objectMapper;
     }
 
-    public MockHttpServletResponse findAll() {
+    public RestOrderTestResponse findAll() {
         return performSafe(get("/order"));
     }
 
-    public MockHttpServletResponse findById(UUID orderId) {
+    public RestOrderTestResponse findById(UUID orderId) {
         return performSafe(get("/order/" + orderId));
     }
 
-    public MockHttpServletResponse confirm(UUID orderId) {
+    public RestOrderTestResponse confirm(UUID orderId) {
         RequestBuilder request = put("/order/confirm/" + orderId).contentType(APPLICATION_JSON);
 
         return performSafe(request);
     }
 
-    private MockHttpServletResponse performSafe(RequestBuilder request) {
+    private RestOrderTestResponse performSafe(RequestBuilder request) {
         try {
-            return mockMvc.perform(request).andReturn().getResponse();
+            MockHttpServletResponse response = mockMvc.perform(request).andReturn().getResponse();
+            return new RestOrderTestResponse(response, objectMapper);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
