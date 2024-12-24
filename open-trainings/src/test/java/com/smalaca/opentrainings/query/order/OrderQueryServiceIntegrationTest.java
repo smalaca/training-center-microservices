@@ -77,8 +77,8 @@ class OrderQueryServiceIntegrationTest {
                 .anySatisfy(orderDto -> assertThatInitiatedOrderHasDataEqualTo(orderDto, orderIdFive, dtoFive));
     }
 
-    private UUID givenOrder(OrderTestDto dtoFive) {
-        return transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoFive)));
+    private UUID givenOrder(OrderTestDto dto) {
+        return transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dto)));
     }
 
     private void assertThatInitiatedOrderHasDataEqualTo(OrderDto order, UUID orderId, OrderTestDto dto) {

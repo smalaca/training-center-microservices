@@ -26,6 +26,7 @@
         <datafaker.version>2.3.0</datafaker.version>
         <equalsverifier.version>3.16.1</equalsverifier.version>
         <awaitility.version>4.2.2</awaitility.version>
+        <jackson-datatype-jsr310.version>2.18.1</jackson-datatype-jsr310.version>
     </properties>
 
     <dependencies>
@@ -62,6 +63,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson-datatype-jsr310.version}</version>
         </dependency>
 
         <dependency>

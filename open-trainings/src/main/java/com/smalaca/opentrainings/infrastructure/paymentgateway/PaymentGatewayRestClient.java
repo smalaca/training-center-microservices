@@ -11,6 +11,6 @@ import org.springframework.stereotype.Service;
 public class PaymentGatewayRestClient implements PaymentGateway {
     @Override
     public PaymentResponse pay(PaymentRequest paymentRequest) {
-        return null;
+        return PaymentResponse.successful();
     }
 }
