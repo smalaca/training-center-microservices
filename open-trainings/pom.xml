@@ -25,7 +25,6 @@
         <assertj-core.version>3.26.3</assertj-core.version>
         <datafaker.version>2.3.0</datafaker.version>
         <equalsverifier.version>3.16.1</equalsverifier.version>
-        <awaitility.version>4.2.2</awaitility.version>
     </properties>
 
     <dependencies>
@@ -113,13 +112,6 @@
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
             <version>${equalsverifier.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
 
