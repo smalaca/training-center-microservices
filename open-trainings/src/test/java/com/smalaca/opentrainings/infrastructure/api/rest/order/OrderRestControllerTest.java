@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Lists;
+import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
@@ -13,10 +14,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.UnsupportedEncodingException;
@@ -31,10 +30,9 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SystemTest
+@Import(OpenTrainingsTestClient.class)
 class OrderRestControllerTest {
     @Autowired
     private OrderRepository repository;
@@ -46,7 +44,7 @@ class OrderRestControllerTest {
     private TransactionTemplate transactionTemplate;
 
     @Autowired
-    private MockMvc mockMvc;
+    private OpenTrainingsTestClient client;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -63,52 +61,42 @@ class OrderRestControllerTest {
     }
 
     @Test
-    void shouldNotFindNotExistingOrder() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.get("/order/" + UUID.randomUUID());
+    void shouldNotFindNotExistingOrder() {
+        MockHttpServletResponse actual = client.orders().findById(UUID.randomUUID());
 
-        mockMvc.perform(request)
-                .andExpect(status().is(NOT_FOUND.value()));
+        assertThat(actual.getStatus()).isEqualTo(NOT_FOUND.value());
     }
 
     @Test
-    void shouldFindExistingOrder() throws Exception {
+    void shouldFindExistingOrder() {
         OrderTestDto dto = randomOrderDto();
         UUID orderId = givenOrder(dto);
 
-        RequestBuilder request = MockMvcRequestBuilders.get("/order/" + orderId);
+        MockHttpServletResponse actual = client.orders().findById(orderId);
+        ResponseOrderTestDto order = asOrder(actual);
 
-        MockHttpServletResponse response = mockMvc.perform(request)
-                .andExpect(status().is(OK.value()))
-                .andReturn()
-                .getResponse();
-
-        ResponseOrderTestDto order = asOrder(response);
-
+        assertThat(actual.getStatus()).isEqualTo(OK.value());
         assertThatInitiatedOrderHasDataEqualTo(order, orderId, dto);
     }
 
     @Test
-    void shouldRecognizeConfirmedOrderDoesNotExist() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders.put("/order/confirm/" + UUID.randomUUID())
-                .contentType(APPLICATION_JSON);
+    void shouldRecognizeConfirmedOrderDoesNotExist() {
+        MockHttpServletResponse actual = client.orders().confirm(UUID.randomUUID());
 
-        mockMvc.perform(request)
-                .andExpect(status().is(NOT_FOUND.value()));
+        assertThat(actual.getStatus()).isEqualTo(NOT_FOUND.value());
     }
 
     @Test
-    void shouldProcessOrderConfirmationSuccessfully() throws Exception {
+    void shouldProcessOrderConfirmationSuccessfully() {
         UUID orderId = givenOrder(randomOrderDto());
 
-        RequestBuilder request = MockMvcRequestBuilders.put("/order/confirm/" + orderId)
-                .contentType(APPLICATION_JSON);
+        MockHttpServletResponse actual = client.orders().confirm(orderId);
 
-        mockMvc.perform(request)
-                .andExpect(status().is(OK.value()));
+        assertThat(actual.getStatus()).isEqualTo(OK.value());
     }
 
     @Test
-    void shouldFindAllOrders() throws Exception {
+    void shouldFindAllOrders() {
         OrderTestDto dtoOne = randomOrderDto();
         UUID orderIdOne = givenOrder(dtoOne);
         OrderTestDto dtoTwo = randomOrderDto();
@@ -118,13 +106,9 @@ class OrderRestControllerTest {
         OrderTestDto dtoFour = randomOrderDto();
         UUID orderIdFour = givenOrder(dtoFour);
 
-        RequestBuilder request = MockMvcRequestBuilders.get("/order");
+        MockHttpServletResponse response = client.orders().findAll();
 
-        MockHttpServletResponse response = mockMvc.perform(request)
-                .andExpect(status().is(OK.value()))
-                .andReturn()
-                .getResponse();
-
+        assertThat(response.getStatus()).isEqualTo(OK.value());
         List<ResponseOrderTestDto> actual = asOrders(response);
 
         assertThat(actual)
