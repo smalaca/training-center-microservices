@@ -11,3 +11,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+services:
+  payment-gateway:
+    url: http://localhost:9010
