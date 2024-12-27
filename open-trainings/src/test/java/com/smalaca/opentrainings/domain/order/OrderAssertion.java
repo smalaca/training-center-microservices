@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CONFIRMED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.REJECTED;
@@ -30,6 +31,10 @@ public class OrderAssertion {
 
     public OrderAssertion isInitiated() {
         return hasStatus(INITIATED);
+    }
+
+    public OrderAssertion isCancelled() {
+        return hasStatus(CANCELLED);
     }
 
     private OrderAssertion hasStatus(OrderStatus expected) {

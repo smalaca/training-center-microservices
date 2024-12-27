@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.architecture.portsandadapters.PrimaryPort;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
@@ -20,8 +21,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CONFIRMED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.REJECTED;
@@ -96,5 +99,19 @@ public class Order {
         LocalDateTime now = clock.now();
         LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
         return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
+    }
+
+    @PrimaryPort
+    public Optional<OrderCancelledEvent> cancel() {
+        if (isNotInFinalState()) {
+            status = CANCELLED;
+            return Optional.of(OrderCancelledEvent.create(orderId, trainingId, participantId));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isNotInFinalState() {
+        return status == INITIATED;
     }
 }
