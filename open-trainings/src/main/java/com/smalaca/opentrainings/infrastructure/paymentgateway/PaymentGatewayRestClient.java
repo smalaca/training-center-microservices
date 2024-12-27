@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @SecondaryAdapter
-public class PaymentGatewayRestClient implements PaymentGateway {
+class PaymentGatewayRestClient implements PaymentGateway {
     private final RestClient client;
 
     PaymentGatewayRestClient(RestClient client) {
