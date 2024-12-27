@@ -10,9 +10,9 @@ import java.util.UUID;
 @Repository
 @SecondaryAdapter
 public class JpaOrderRepository implements OrderRepository {
-    private final SpringCrudRepository repository;
+    private final SpringOrderCrudRepository repository;
 
-    JpaOrderRepository(SpringCrudRepository repository) {
+    JpaOrderRepository(SpringOrderCrudRepository repository) {
         this.repository = repository;
     }
 

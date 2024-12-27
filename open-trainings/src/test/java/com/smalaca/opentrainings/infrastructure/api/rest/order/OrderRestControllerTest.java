@@ -5,7 +5,7 @@ import com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
-import com.smalaca.opentrainings.infrastructure.repository.jpa.order.SpringCrudRepository;
+import com.smalaca.opentrainings.infrastructure.repository.jpa.order.SpringOrderCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class OrderRestControllerTest {
     private OrderRepository repository;
 
     @Autowired
-    private SpringCrudRepository springCrudRepository;
+    private SpringOrderCrudRepository springOrderCrudRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -40,7 +40,7 @@ class OrderRestControllerTest {
 
     @AfterEach
     void deleteOrders() {
-        transactionTemplate.executeWithoutResult(transactionStatus -> springCrudRepository.deleteAll());
+        transactionTemplate.executeWithoutResult(transactionStatus -> springOrderCrudRepository.deleteAll());
     }
 
     @Test
