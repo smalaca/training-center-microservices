@@ -5,11 +5,16 @@ import com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
+import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.SpringOrderCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -20,6 +25,8 @@ import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static java.time.LocalDateTime.now;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
@@ -36,7 +43,15 @@ class OrderRestControllerTest {
     @Autowired
     private OpenTrainingsTestClient client;
 
+    @MockBean
+    private PaymentGateway paymentGateway;
+
     private final OrderTestFactory factory = OrderTestFactory.orderTestFactory();
+
+    @BeforeEach
+    void initiatePaymentGateway() {
+        given(paymentGateway.pay(any(PaymentRequest.class))).willReturn(PaymentResponse.successful());
+    }
 
     @AfterEach
     void deleteOrders() {
