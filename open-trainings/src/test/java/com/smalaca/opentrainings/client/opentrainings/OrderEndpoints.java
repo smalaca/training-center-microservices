@@ -7,7 +7,6 @@ import org.springframework.test.web.servlet.RequestBuilder;
 
 import java.util.UUID;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
@@ -29,9 +28,11 @@ public class OrderEndpoints {
     }
 
     public RestOrderTestResponse confirm(UUID orderId) {
-        RequestBuilder request = put("/order/confirm/" + orderId).contentType(APPLICATION_JSON);
+        return performSafe(put("/order/" + orderId + "/confirm"));
+    }
 
-        return performSafe(request);
+    public RestOrderTestResponse cancel(UUID orderId) {
+        return performSafe(put("/order/" + orderId + "/cancel"));
     }
 
     private RestOrderTestResponse performSafe(RequestBuilder request) {

@@ -78,7 +78,7 @@ class OrderRestControllerTest {
     }
 
     @Test
-    void shouldRecognizeConfirmedOrderDoesNotExist() {
+    void shouldRecognizeOrderToConfirmDoesNotExist() {
         RestOrderTestResponse actual = client.orders().confirm(UUID.randomUUID());
 
         assertThatOrderResponse(actual).notFound();
@@ -91,6 +91,36 @@ class OrderRestControllerTest {
         RestOrderTestResponse actual = client.orders().confirm(orderId);
 
         assertThatOrderResponse(actual).isOk();
+    }
+
+    @Test
+    void shouldRecognizeOrderToCancelDoesNotExist() {
+        RestOrderTestResponse actual = client.orders().cancel(UUID.randomUUID());
+
+        assertThatOrderResponse(actual).notFound();
+    }
+
+    @Test
+    void shouldRecognizeOrderCannotBeCancelled() {
+        UUID orderId = givenOrder(randomOrderDto());
+        client.orders().confirm(orderId);
+
+        RestOrderTestResponse actual = client.orders().cancel(orderId);
+
+        assertThatOrderResponse(actual)
+                .isOk()
+                .withMessage("Order: " + orderId + " already CONFIRMED");
+    }
+
+    @Test
+    void shouldProcessOrderCancellation() {
+        UUID orderId = givenOrder(randomOrderDto());
+
+        RestOrderTestResponse actual = client.orders().cancel(orderId);
+
+        assertThatOrderResponse(actual)
+                .isOk()
+                .withoutMessage();
     }
 
     @Test

@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
 import com.smalaca.opentrainings.application.order.OrderApplicationService;
+import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
+import com.smalaca.opentrainings.infrastructure.repository.jpa.order.OrderDoesNotExistException;
 import com.smalaca.opentrainings.query.order.OrderDto;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +26,25 @@ public class OrderRestController {
         this.queryService = queryService;
     }
 
-    @PutMapping("confirm/{orderId}")
+    @PutMapping("{orderId}/confirm")
     public ResponseEntity<Void> confirm(@PathVariable UUID orderId) {
         try {
             applicationService.confirm(orderId);
             return ResponseEntity.ok().build();
-        } catch (RuntimeException exception) {
+        } catch (OrderDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<String> cancelOrder(@PathVariable UUID orderId) {
+        try {
+            applicationService.cancel(orderId);
+            return ResponseEntity.ok().build();
+        } catch (OrderDoesNotExistException exception) {
+            return ResponseEntity.notFound().build();
+        } catch (OrderInFinalStateException exception) {
+            return ResponseEntity.ok().body(exception.getMessage());
         }
     }
 

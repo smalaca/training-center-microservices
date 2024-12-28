@@ -69,4 +69,14 @@ public class RestOrderTestResponseAssertion {
         assertThat(order.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expectedOrder.getAmount());
         assertThat(order.priceCurrency()).isEqualTo(expectedOrder.getCurrency());
     }
+
+    public RestOrderTestResponseAssertion withMessage(String expected) {
+        assertThat(actual.asString()).isEqualTo(expected);
+        return this;
+    }
+
+    public RestOrderTestResponseAssertion withoutMessage() {
+        assertThat(actual.asString()).isEmpty();
+        return this;
+    }
 }
