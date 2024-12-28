@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,18 @@ public class OrderApplicationService {
         Order order = orderRepository.findById(orderId);
 
         OrderEvent event = order.confirm(paymentGateway, clock);
+
+        orderRepository.save(order);
+        eventRegistry.publish(event);
+    }
+
+    @Transactional
+    @PrimaryAdapter
+    @CommandOperation
+    public void cancel(UUID orderId) {
+        Order order = orderRepository.findById(orderId);
+
+        OrderCancelledEvent event = order.cancel();
 
         orderRepository.save(order);
         eventRegistry.publish(event);

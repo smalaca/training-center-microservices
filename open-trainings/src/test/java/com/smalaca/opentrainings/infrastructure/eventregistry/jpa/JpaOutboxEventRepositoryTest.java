@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.eventregistry.jpa;
 
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
@@ -59,20 +60,33 @@ class JpaOutboxEventRepositoryTest {
     }
 
     @Test
+    void shouldPublishOrderCancelled() {
+        OrderCancelledEvent event = randomOrderCancelledEvent();
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> repository.publish(event));
+
+        assertThat(repository.findAll())
+                .hasSize(1)
+                .anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
+    }
+
+    @Test
     void shouldFindAllEvents() {
         TrainingPurchasedEvent eventOne = saved(randomTrainingPurchasedEvent());
         OrderRejectedEvent eventTwo = saved(randomOrderRejectedEvent());
         TrainingPurchasedEvent eventThree = saved(randomTrainingPurchasedEvent());
         TrainingPurchasedEvent eventFour = saved(randomTrainingPurchasedEvent());
-        OrderRejectedEvent eventFive = saved(randomOrderRejectedEvent());
+        OrderCancelledEvent eventFive = saved(randomOrderCancelledEvent());
+        OrderRejectedEvent eventSix = saved(randomOrderRejectedEvent());
 
         assertThat(repository.findAll())
-                .hasSize(5)
+                .hasSize(6)
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventOne))
                 .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventTwo))
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventThree))
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventFour))
-                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventFive));
+                .anySatisfy(actual -> assertOrderCancelledEventSaved(actual, eventFive))
+                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventSix));
     }
 
     private <T extends OrderEvent> T saved(T event) {
@@ -90,6 +104,10 @@ class JpaOutboxEventRepositoryTest {
         return new TrainingPurchasedEvent(newEventId(), randomId(), randomId(), randomId());
     }
 
+    private OrderCancelledEvent randomOrderCancelledEvent() {
+        return new OrderCancelledEvent(newEventId(), randomId(), randomId(), randomId());
+    }
+
     private void assertOrderRejectedEventSaved(OutboxEvent actual, OrderRejectedEvent expected) {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
@@ -103,6 +121,16 @@ class JpaOutboxEventRepositoryTest {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
         assertThat(actual.getType()).isEqualTo("TrainingPurchasedEvent");
+        assertThat(actual.getPayload())
+                .contains("\"orderId\" : \"" + expected.orderId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
+                .contains("\"participantId\" : \"" + expected.participantId());
+    }
+
+    private void assertOrderCancelledEventSaved(OutboxEvent actual, OrderCancelledEvent expected) {
+        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
+        assertThat(actual.getType()).isEqualTo("OrderCancelledEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"trainingId\" : \"" + expected.trainingId())

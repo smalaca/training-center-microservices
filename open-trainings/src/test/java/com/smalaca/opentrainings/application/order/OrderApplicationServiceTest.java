@@ -3,9 +3,11 @@ package com.smalaca.opentrainings.application.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
+import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
@@ -25,11 +27,14 @@ import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
+import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
 import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion.assertThatTrainingPurchasedEvent;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.failed;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.successful;
 import static java.time.LocalDateTime.now;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -138,6 +143,45 @@ class OrderApplicationServiceTest {
                 .hasParticipantId(PARTICIPANT_ID);
     }
 
+    private TrainingPurchasedEvent thenTrainingPurchasedEventPublished() {
+        ArgumentCaptor<TrainingPurchasedEvent> captor = ArgumentCaptor.forClass(TrainingPurchasedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+
+        return captor.getValue();
+    }
+
+    @Test
+    void shouldInterruptOrderCancellationIfOrderAlreadyConfirmed() {
+        givenPayment(successful());
+        Order order = givenOrder();
+        order.confirm(paymentGateway, clock);
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
+    }
+
+    @Test
+    void shouldInterruptOrderCancellationIfOrderAlreadyRejected() {
+        givenPayment(failed());
+        Order order = givenOrder();
+        order.confirm(paymentGateway, clock);
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
+    }
+
+    @Test
+    void shouldCancelOrder() {
+        givenOrder();
+
+        service.cancel(ORDER_ID);
+
+        Order actual = thenOrderSaved();
+        assertThatOrder(actual).isCancelled();
+    }
+
     private void givenPayment(PaymentResponse paymentResponse) {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(ORDER_ID)
@@ -147,8 +191,21 @@ class OrderApplicationServiceTest {
         given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);
     }
 
-    private TrainingPurchasedEvent thenTrainingPurchasedEventPublished() {
-        ArgumentCaptor<TrainingPurchasedEvent> captor = ArgumentCaptor.forClass(TrainingPurchasedEvent.class);
+    @Test
+    void shouldPublishOrderCancelledEventWhenOrderCancelled() {
+        givenOrder();
+
+        service.cancel(ORDER_ID);
+
+        OrderCancelledEvent actual = thenOrderCancelledEventPublished();
+        assertThatOrderCancelledEvent(actual)
+                .hasOrderId(ORDER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID);
+    }
+
+    private OrderCancelledEvent thenOrderCancelledEventPublished() {
+        ArgumentCaptor<OrderCancelledEvent> captor = ArgumentCaptor.forClass(OrderCancelledEvent.class);
         then(eventRegistry).should().publish(captor.capture());
 
         return captor.getValue();
@@ -161,11 +218,11 @@ class OrderApplicationServiceTest {
         return captor.getValue();
     }
 
-    private void givenOrder() {
-        givenOrderCreatedAgoMinutes(ONE_MINUTE);
+    private Order givenOrder() {
+        return givenOrderCreatedAgoMinutes(ONE_MINUTE);
     }
 
-    private void givenOrderCreatedAgoMinutes(int minutes) {
+    private Order givenOrderCreatedAgoMinutes(int minutes) {
         Order order = orderFactory.orderCreatedAt(OrderTestDto.builder()
                 .orderId(ORDER_ID)
                 .trainingId(TRAINING_ID)
@@ -175,6 +232,8 @@ class OrderApplicationServiceTest {
                 .creationDateTime(NOW.minusMinutes(minutes)));
 
         given(orderRepository.findById(ORDER_ID)).willReturn(order);
+
+        return order;
     }
 
 }
