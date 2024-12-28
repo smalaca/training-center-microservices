@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.application.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
+import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
@@ -32,11 +33,11 @@ import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEve
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.failed;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.successful;
 import static java.time.LocalDateTime.now;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 
 class OrderApplicationServiceTest {
     private static final String CURRENCY = randomCurrency();
@@ -150,27 +151,25 @@ class OrderApplicationServiceTest {
     }
 
     @Test
-    void shouldIgnoreOrderCancellationIfOrderAlreadyConfirmed() {
+    void shouldInterruptOrderCancellationIfOrderAlreadyConfirmed() {
         givenPayment(successful());
         Order order = givenOrder();
         order.confirm(paymentGateway, clock);
 
-        service.cancel(ORDER_ID);
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
-        then(orderRepository).should(never()).save(any());
-        then(eventRegistry).should(never()).publish(any());
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
     }
 
     @Test
-    void shouldIgnoreOrderCancellationIfOrderAlreadyRejected() {
+    void shouldInterruptOrderCancellationIfOrderAlreadyRejected() {
         givenPayment(failed());
         Order order = givenOrder();
         order.confirm(paymentGateway, clock);
 
-        service.cancel(ORDER_ID);
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
-        then(orderRepository).should(never()).save(any());
-        then(eventRegistry).should(never()).publish(any());
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
     }
 
     @Test

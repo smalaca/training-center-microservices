@@ -21,7 +21,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
@@ -102,16 +101,16 @@ public class Order {
     }
 
     @PrimaryPort
-    public Optional<OrderCancelledEvent> cancel() {
-        if (isNotInFinalState()) {
-            status = CANCELLED;
-            return Optional.of(OrderCancelledEvent.create(orderId, trainingId, participantId));
+    public OrderCancelledEvent cancel() {
+        if (isInFinalState()) {
+            throw new OrderInFinalStateException(orderId, status);
         }
 
-        return Optional.empty();
+        status = CANCELLED;
+        return OrderCancelledEvent.create(orderId, trainingId, participantId);
     }
 
-    private boolean isNotInFinalState() {
-        return status == INITIATED;
+    private boolean isInFinalState() {
+        return status != INITIATED;
     }
 }

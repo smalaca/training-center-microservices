@@ -12,7 +12,6 @@ import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -48,12 +47,10 @@ public class OrderApplicationService {
     public void cancel(UUID orderId) {
         Order order = orderRepository.findById(orderId);
 
-        Optional<OrderCancelledEvent> event = order.cancel();
+        OrderCancelledEvent event = order.cancel();
 
-        event.ifPresent(found -> {
-            orderRepository.save(order);
-            eventRegistry.publish(found);
-        });
+        orderRepository.save(order);
+        eventRegistry.publish(event);
     }
 }
 
