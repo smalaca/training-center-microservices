@@ -26,7 +26,7 @@ public class GivenOrderFactory {
         return new GivenOrderFactory(orderRepository, clock, orderFactory);
     }
 
-    public static GivenOrderFactory create() {
+    public static GivenOrderFactory withoutPersistence() {
         return create(NO_REPOSITORY);
     }
 

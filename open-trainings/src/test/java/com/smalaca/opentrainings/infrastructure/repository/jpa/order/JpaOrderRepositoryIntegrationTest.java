@@ -28,7 +28,7 @@ class JpaOrderRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private final GivenOrderFactory given = GivenOrderFactory.create();
+    private final GivenOrderFactory given = GivenOrderFactory.withoutPersistence();
 
     @Test
     void shouldFindNoOrderWhenDoesNotExist() {
