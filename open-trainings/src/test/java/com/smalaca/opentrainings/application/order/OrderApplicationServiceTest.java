@@ -63,7 +63,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.confirm(ORDER_ID);
 
@@ -74,7 +74,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldPublishOrderRejectedWhenOlderThanTenMinutes(int minutes) {
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.confirm(ORDER_ID);
 
@@ -87,7 +87,7 @@ class OrderApplicationServiceTest {
     @Test
     void shouldRejectOrderWhenPaymentFailed() {
         givenPayment(failed());
-        givenOrder().initiated(ORDER_ID);
+        givenOrder().initiated();
 
         service.confirm(ORDER_ID);
 
@@ -98,7 +98,7 @@ class OrderApplicationServiceTest {
     @Test
     void shouldPublishOrderRejectedWhenPaymentFailed() {
         givenPayment(failed());
-        givenOrder().initiated(ORDER_ID);
+        givenOrder().initiated();
 
         service.confirm(ORDER_ID);
 
@@ -119,7 +119,7 @@ class OrderApplicationServiceTest {
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldConfirmOrder(int minutes) {
         givenPayment(successful());
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.confirm(ORDER_ID);
 
@@ -131,7 +131,7 @@ class OrderApplicationServiceTest {
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldPublishTrainingPurchasedWhenOrderConfirmed(int minutes) {
         givenPayment(successful());
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.confirm(ORDER_ID);
 
@@ -151,7 +151,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyConfirmed() {
-        givenOrder().confirmed(ORDER_ID);
+        givenOrder().confirmed();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -160,7 +160,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyRejected() {
-        givenOrder().rejected(ORDER_ID);
+        givenOrder().rejected();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -169,7 +169,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyTerminated() {
-        givenOrder().createdMinutesAgo(20).terminated(ORDER_ID);
+        givenOrder().createdMinutesAgo(20).terminated();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -178,7 +178,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldCancelOrder() {
-        givenOrder().initiated(ORDER_ID);
+        givenOrder().initiated();
 
         service.cancel(ORDER_ID);
 
@@ -197,7 +197,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldPublishOrderCancelledEventWhenOrderCancelled() {
-        givenOrder().initiated(ORDER_ID);
+        givenOrder().initiated();
 
         service.cancel(ORDER_ID);
 
@@ -217,7 +217,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyConfirmed() {
-        givenOrder().confirmed(ORDER_ID);
+        givenOrder().confirmed();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -226,7 +226,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyRejected() {
-        givenOrder().rejected(ORDER_ID);
+        givenOrder().rejected();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -235,7 +235,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyCancelled() {
-        givenOrder().cancelled(ORDER_ID);
+        givenOrder().cancelled();
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -245,7 +245,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldInterruptOrderTerminationIfOrderTooNew(int minutes) {
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         OrderTerminationNotYetPermittedException actual = assertThrows(OrderTerminationNotYetPermittedException.class, () -> service.terminate(ORDER_ID));
 
@@ -255,7 +255,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {11, 13, 20, 100})
     void shouldTerminateOrder(int minutes) {
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.terminate(ORDER_ID);
 
@@ -266,7 +266,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {11, 13, 20, 100})
     void shouldPublishOrderTerminatedEventWhenOrderTerminated(int minutes) {
-        givenOrder().createdMinutesAgo(minutes).initiated(ORDER_ID);
+        givenOrder().createdMinutesAgo(minutes).initiated();
 
         service.terminate(ORDER_ID);
 
@@ -292,7 +292,8 @@ class OrderApplicationServiceTest {
     }
 
     private GivenOrder givenOrder() {
-        return given.order()
+        return given
+                .order(ORDER_ID)
                 .trainingId(TRAINING_ID)
                 .participantId(PARTICIPANT_ID)
                 .amount(AMOUNT)

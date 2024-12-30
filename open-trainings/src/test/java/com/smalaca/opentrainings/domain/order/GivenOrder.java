@@ -4,7 +4,6 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,11 +14,9 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOrder {
-    private final OrderRepository orderRepository;
     private final Clock clock;
     private final OrderFactory orderFactory;
 
-    private UUID orderId;
     private UUID trainingId = randomId();
     private UUID participantId = randomId();
     private BigDecimal amount = randomAmount();
@@ -27,8 +24,7 @@ public class GivenOrder {
     private LocalDateTime creationDateTime = LocalDateTime.now();
     private Order order;
 
-    GivenOrder(OrderRepository orderRepository, Clock clock, OrderFactory orderFactory) {
-        this.orderRepository = orderRepository;
+    GivenOrder(Clock clock, OrderFactory orderFactory) {
         this.clock = clock;
         this.orderFactory = orderFactory;
     }
@@ -59,121 +55,60 @@ public class GivenOrder {
     }
 
     public GivenOrder terminated() {
-        terminatedOrder();
-        saveOrder();
-        return this;
-    }
-
-    public GivenOrder terminated(UUID orderId) {
-        terminatedOrder();
-        fakeSaveOrder(orderId);
-        return this;
-    }
-
-    private void terminatedOrder() {
-        initiateOrder();
+        initiated();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.terminate(clock);
+
+        return this;
     }
 
     public GivenOrder cancelled() {
-        initiateOrder();
-        order.cancel();
-        saveOrder();
-        return this;
-    }
-
-    public GivenOrder cancelled(UUID orderId) {
-        initiateOrder();
+        initiated();
         order.cancel();
 
-        fakeSaveOrder(orderId);
         return this;
     }
 
     public GivenOrder rejected() {
-        rejectedOrder();
-        saveOrder();
-        return this;
-    }
-
-    public GivenOrder rejected(UUID orderId) {
-        rejectedOrder();
-        fakeSaveOrder(orderId);
-        return this;
-    }
-
-    private void rejectedOrder() {
-        initiateOrder();
+        initiated();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.confirm(paymentRequest -> PaymentResponse.failed(), clock);
+
+        return this;
     }
 
     public GivenOrder confirmed() {
-        confirmedOrder();
-        saveOrder();
-        return this;
-    }
-
-    public GivenOrder confirmed(UUID orderId) {
-        confirmedOrder();
-        fakeSaveOrder(orderId);
-        return this;
-    }
-
-    private void confirmedOrder() {
-        initiateOrder();
+        initiated();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.confirm(paymentRequest -> PaymentResponse.successful(), clock);
+
+        return this;
     }
 
     public GivenOrder initiated() {
-        initiateOrder();
-        saveOrder();
-        return this;
-    }
-
-    private void saveOrder() {
-        orderId = orderRepository.save(order);
-    }
-
-    public GivenOrder initiated(UUID orderId) {
-        initiateOrder();
-        fakeSaveOrder(orderId);
-        return this;
-    }
-
-    private void initiateOrder() {
         given(clock.now()).willReturn(creationDateTime);
         CreateOrderCommand command = new CreateOrderCommand(trainingId, participantId, Price.of(amount, currency));
         order = orderFactory.create(command);
-    }
 
-    private void fakeSaveOrder(UUID orderId) {
-        withOrderId(orderId);
-        given(orderRepository.findById(this.orderId)).willReturn(order);
-    }
-
-    private GivenOrder withOrderId(UUID orderId) {
-        this.orderId = orderId;
-        try {
-            Field orderIdField = order.getClass().getDeclaredField("orderId");
-            orderIdField.setAccessible(true);
-            orderIdField.set(order, this.orderId);
-            return this;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return this;
     }
 
     public OrderTestDto getDto() {
         return OrderTestDto.builder()
-                .orderId(orderId)
+                .orderId(getOrderId())
                 .trainingId(trainingId)
                 .participantId(participantId)
                 .amount(amount)
                 .currency(currency)
                 .creationDateTime(creationDateTime)
                 .build();
+    }
+
+    protected Order getOrder() {
+        return order;
+    }
+
+    protected UUID getOrderId() {
+        return null;
     }
 }

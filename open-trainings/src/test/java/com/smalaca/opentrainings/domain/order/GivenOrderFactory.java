@@ -2,6 +2,8 @@ package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
 
+import java.util.UUID;
+
 import static org.mockito.Mockito.mock;
 
 public class GivenOrderFactory {
@@ -23,6 +25,10 @@ public class GivenOrderFactory {
     }
 
     public GivenOrder order() {
-        return new GivenOrder(orderRepository, clock, orderFactory);
+        return new GivenOrderWithRepository(orderRepository, clock, orderFactory);
+    }
+
+    public GivenOrder order(UUID orderId) {
+        return new GivenOrderWithMockRepository(orderRepository, clock, orderFactory, orderId);
     }
 }
