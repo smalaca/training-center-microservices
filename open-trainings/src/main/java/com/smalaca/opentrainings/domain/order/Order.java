@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
@@ -94,15 +95,9 @@ public class Order {
                 .build();
     }
 
-    private boolean isOlderThan10Minutes(Clock clock) {
-        LocalDateTime now = clock.now();
-        LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
-        return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
-    }
-
     @PrimaryPort
     public OrderCancelledEvent cancel() {
-        if (isInFinalState()) {
+        if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);
         }
 
@@ -110,7 +105,27 @@ public class Order {
         return OrderCancelledEvent.create(orderId, trainingId, participantId);
     }
 
-    private boolean isInFinalState() {
-        return status != INITIATED;
+    @PrimaryPort
+    public OrderTerminatedEvent terminate(Clock clock) {
+        if (status.isFinal()) {
+            throw new OrderInFinalStateException(orderId, status);
+        }
+
+        if (isNewerThan10Minutes(clock)) {
+            throw new OrderTerminationNotYetPermittedException(orderId);
+        }
+
+        status = OrderStatus.TERMINATED;
+        return OrderTerminatedEvent.create(orderId, trainingId, participantId);
+    }
+
+    private boolean isNewerThan10Minutes(Clock clock) {
+        return !isOlderThan10Minutes(clock);
+    }
+
+    private boolean isOlderThan10Minutes(Clock clock) {
+        LocalDateTime now = clock.now();
+        LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
+        return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
     }
 }

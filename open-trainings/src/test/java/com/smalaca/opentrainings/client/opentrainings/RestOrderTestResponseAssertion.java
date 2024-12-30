@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -41,9 +40,28 @@ public class RestOrderTestResponseAssertion {
         return this;
     }
 
-    public RestOrderTestResponseAssertion containsInitiatedOrder(UUID expectedOrderId, OrderTestDto expectedOrder) {
-        assertThat(getOrders()).anySatisfy(order -> hasInitiatedOrder(order, expectedOrderId, expectedOrder));
+    public RestOrderTestResponseAssertion containsCancelledOrder(OrderTestDto expected) {
+        return containsOrder(expected, "CANCELLED");
+    }
 
+    public RestOrderTestResponseAssertion containsRejectedOrder(OrderTestDto expected) {
+        return containsOrder(expected, "REJECTED");
+    }
+
+    public RestOrderTestResponseAssertion containsTerminatedOrder(OrderTestDto expected) {
+        return containsOrder(expected, "TERMINATED");
+    }
+
+    public RestOrderTestResponseAssertion containsConfirmedOrder(OrderTestDto expected) {
+        return containsOrder(expected, "CONFIRMED");
+    }
+
+    public RestOrderTestResponseAssertion containsInitiatedOrder(OrderTestDto expected) {
+        return containsOrder(expected, "INITIATED");
+    }
+
+    private RestOrderTestResponseAssertion containsOrder(OrderTestDto expected, String expectedStatus) {
+        assertThat(getOrders()).anySatisfy(order -> isSameAsOrder(order, expected, expectedStatus));
         return this;
     }
 
@@ -55,19 +73,19 @@ public class RestOrderTestResponseAssertion {
         return orders;
     }
 
-    public RestOrderTestResponseAssertion hasInitiatedOrder(UUID expectedOrderId, OrderTestDto expectedOrder) {
-        hasInitiatedOrder(actual.asOrder(), expectedOrderId, expectedOrder);
+    public RestOrderTestResponseAssertion hasInitiatedOrder(OrderTestDto expected) {
+        isSameAsOrder(actual.asOrder(), expected, "INITIATED");
         return this;
     }
 
-    private void hasInitiatedOrder(RestOrderTestDto order, UUID expectedOrderId, OrderTestDto expectedOrder) {
-        assertThat(order.orderId()).isEqualTo(expectedOrderId);
-        assertThat(order.status()).isEqualTo("INITIATED");
-        assertThat(order.trainingId()).isEqualTo(expectedOrder.getTrainingId());
-        assertThat(order.participantId()).isEqualTo(expectedOrder.getParticipantId());
-        assertThat(order.creationDateTime()).isEqualToIgnoringNanos(expectedOrder.getCreationDateTime());
-        assertThat(order.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expectedOrder.getAmount());
-        assertThat(order.priceCurrency()).isEqualTo(expectedOrder.getCurrency());
+    private void isSameAsOrder(RestOrderTestDto actual, OrderTestDto expected, String expectedStatus) {
+        assertThat(actual.orderId()).isEqualTo(expected.getOrderId());
+        assertThat(actual.status()).isEqualTo(expectedStatus);
+        assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
+        assertThat(actual.participantId()).isEqualTo(expected.getParticipantId());
+        assertThat(actual.creationDateTime()).isEqualToIgnoringNanos(expected.getCreationDateTime());
+        assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getAmount());
+        assertThat(actual.priceCurrency()).isEqualTo(expected.getCurrency());
     }
 
     public RestOrderTestResponseAssertion withMessage(String expected) {
