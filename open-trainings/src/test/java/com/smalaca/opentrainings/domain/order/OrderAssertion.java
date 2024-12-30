@@ -8,6 +8,7 @@ import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CONFIRMED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.order.OrderStatus.TERMINATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderAssertion {
@@ -35,6 +36,10 @@ public class OrderAssertion {
 
     public OrderAssertion isCancelled() {
         return hasStatus(CANCELLED);
+    }
+
+    public OrderAssertion isTerminated() {
+        return hasStatus(TERMINATED);
     }
 
     private OrderAssertion hasStatus(OrderStatus expected) {

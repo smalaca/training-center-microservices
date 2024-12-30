@@ -8,6 +8,7 @@ import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,18 @@ public class OrderApplicationService {
         Order order = orderRepository.findById(orderId);
 
         OrderCancelledEvent event = order.cancel();
+
+        orderRepository.save(order);
+        eventRegistry.publish(event);
+    }
+
+    @Transactional
+    @PrimaryAdapter
+    @CommandOperation
+    public void terminate(UUID orderId) {
+        Order order = orderRepository.findById(orderId);
+
+        OrderTerminatedEvent event = order.terminate(clock);
 
         orderRepository.save(order);
         eventRegistry.publish(event);

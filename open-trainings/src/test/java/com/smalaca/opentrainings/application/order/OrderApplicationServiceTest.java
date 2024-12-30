@@ -5,10 +5,12 @@ import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
+import com.smalaca.opentrainings.domain.order.OrderTerminationNotYetPermittedException;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
@@ -29,6 +31,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
+import static com.smalaca.opentrainings.domain.order.events.OrderTerminatedEventAssertion.assertThatOrderTerminatedEvent;
 import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion.assertThatTrainingPurchasedEvent;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.failed;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.successful;
@@ -206,6 +209,59 @@ class OrderApplicationServiceTest {
 
     private OrderCancelledEvent thenOrderCancelledEventPublished() {
         ArgumentCaptor<OrderCancelledEvent> captor = ArgumentCaptor.forClass(OrderCancelledEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+
+        return captor.getValue();
+    }
+
+    @Test
+    void shouldInterruptOrderTerminationIfOrderAlreadyConfirmed() {
+        givenPayment(successful());
+        Order order = givenOrder();
+        order.confirm(paymentGateway, clock);
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3, 9, 10})
+    void shouldInterruptOrderTerminationIfOrderTooRecent(int minutes) {
+        givenOrderCreatedAgoMinutes(minutes);
+
+        OrderTerminationNotYetPermittedException actual = assertThrows(OrderTerminationNotYetPermittedException.class, () -> service.terminate(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order with id " + ORDER_ID + " cannot be terminated yet.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {11, 13, 20, 100})
+    void shouldTerminateOrder(int minutes) {
+        givenOrderCreatedAgoMinutes(minutes);
+
+        service.terminate(ORDER_ID);
+
+        Order actual = thenOrderSaved();
+        assertThatOrder(actual).isTerminated();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {11, 13, 20, 100})
+    void shouldPublishOrderTerminatedEventWhenOrderTerminated(int minutes) {
+        givenOrderCreatedAgoMinutes(minutes);
+
+        service.terminate(ORDER_ID);
+
+        OrderTerminatedEvent actual = thenOrderTerminatedEventPublished();
+        assertThatOrderTerminatedEvent(actual)
+                .hasOrderId(ORDER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID);
+    }
+
+    private OrderTerminatedEvent thenOrderTerminatedEventPublished() {
+        ArgumentCaptor<OrderTerminatedEvent> captor = ArgumentCaptor.forClass(OrderTerminatedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
 
         return captor.getValue();
