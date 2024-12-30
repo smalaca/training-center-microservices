@@ -1,9 +1,10 @@
 package com.smalaca.opentrainings.infrastructure.repository.jpa.order;
 
-import com.smalaca.opentrainings.domain.order.Order;
+import com.smalaca.opentrainings.domain.order.GivenOrder;
+import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
+import com.smalaca.opentrainings.domain.order.OrderAssertion;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
-import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -13,11 +14,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
-import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -30,7 +28,7 @@ class JpaOrderRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private final OrderTestFactory factory = OrderTestFactory.orderTestFactory();
+    private final GivenOrderFactory given = GivenOrderFactory.create();
 
     @Test
     void shouldFindNoOrderWhenDoesNotExist() {
@@ -44,50 +42,38 @@ class JpaOrderRepositoryIntegrationTest {
 
     @Test
     void shouldSaveOrder() {
-        OrderTestDto dto = randomOrderDto();
-        Order order = factory.orderCreatedAt(dto);
+        GivenOrder order = given.order().initiated();
 
-        UUID orderId = transactionTemplate.execute(transactionStatus -> repository.save(order));
+        UUID orderId = transactionTemplate.execute(transactionStatus -> repository.save(order.getOrder()));
 
-        assertThatInitiatedOrderHasDataEqualTo(orderId, dto);
+        assertThatOrderHasDataEqualTo(orderId, order.getDto());
     }
 
     @Test
     void shouldFindOrderById() {
-        OrderTestDto dtoOne = randomOrderDto();
-        UUID orderIdOne = transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoOne)));
-        OrderTestDto dtoTwo = randomOrderDto();
-        UUID orderIdTwo = transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoTwo)));
-        OrderTestDto dtoThree = randomOrderDto();
-        UUID orderIdThree = transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoThree)));
-        OrderTestDto dtoFour = randomOrderDto();
-        UUID orderIdFour = transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoFour)));
-        OrderTestDto dtoFive = randomOrderDto();
-        UUID orderIdFive = transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dtoFive)));
+        GivenOrder orderOne = given.order().initiated();
+        UUID orderIdOne = transactionTemplate.execute(transactionStatus -> repository.save(orderOne.getOrder()));
+        GivenOrder orderTwo = given.order().rejected();
+        UUID orderIdTwo = transactionTemplate.execute(transactionStatus -> repository.save(orderTwo.getOrder()));
+        GivenOrder orderThree = given.order().createdMinutesAgo(20).terminated();
+        UUID orderIdThree = transactionTemplate.execute(transactionStatus -> repository.save(orderThree.getOrder()));
+        GivenOrder orderFour = given.order().confirmed();
+        UUID orderIdFour = transactionTemplate.execute(transactionStatus -> repository.save(orderFour.getOrder()));
+        GivenOrder orderFive = given.order().cancelled();
+        UUID orderIdFive = transactionTemplate.execute(transactionStatus -> repository.save(orderFive.getOrder()));
 
-        assertThatInitiatedOrderHasDataEqualTo(orderIdOne, dtoOne);
-        assertThatInitiatedOrderHasDataEqualTo(orderIdTwo, dtoTwo);
-        assertThatInitiatedOrderHasDataEqualTo(orderIdThree, dtoThree);
-        assertThatInitiatedOrderHasDataEqualTo(orderIdFour, dtoFour);
-        assertThatInitiatedOrderHasDataEqualTo(orderIdFive, dtoFive);
+        assertThatOrderHasDataEqualTo(orderIdOne, orderOne.getDto()).isInitiated();
+        assertThatOrderHasDataEqualTo(orderIdTwo, orderTwo.getDto()).isRejected();
+        assertThatOrderHasDataEqualTo(orderIdThree, orderThree.getDto()).isTerminated();
+        assertThatOrderHasDataEqualTo(orderIdFour, orderFour.getDto()).isConfirmed();
+        assertThatOrderHasDataEqualTo(orderIdFive, orderFive.getDto()).isCancelled();
     }
 
-    private OrderTestDto randomOrderDto() {
-        return OrderTestDto.builder()
-                .trainingId(randomId())
-                .participantId(randomId())
-                .amount(randomAmount())
-                .currency(randomCurrency())
-                .creationDateTime(now())
-                .build();
-    }
-
-    private void assertThatInitiatedOrderHasDataEqualTo(UUID orderId, OrderTestDto dto) {
-        assertThatOrder(repository.findById(orderId))
-                .isInitiated()
-                .hasTrainingId(dto.getTrainingId())
-                .hasParticipantId(dto.getParticipantId())
-                .hasCreationDateTime(dto.getCreationDateTime())
-                .hasPrice(dto.getAmount(), dto.getCurrency());
+    private OrderAssertion assertThatOrderHasDataEqualTo(UUID orderId, OrderTestDto expected) {
+        return assertThatOrder(repository.findById(orderId))
+                .hasTrainingId(expected.getTrainingId())
+                .hasParticipantId(expected.getParticipantId())
+                .hasCreationDateTime(expected.getCreationDateTime())
+                .hasPrice(expected.getAmount(), expected.getCurrency());
     }
 }

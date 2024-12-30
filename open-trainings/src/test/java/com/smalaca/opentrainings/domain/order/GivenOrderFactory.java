@@ -7,6 +7,8 @@ import java.util.UUID;
 import static org.mockito.Mockito.mock;
 
 public class GivenOrderFactory {
+    private static final OrderRepository NO_REPOSITORY = null;
+
     private final Clock clock;
     private final OrderRepository orderRepository;
     private final OrderFactory orderFactory;
@@ -24,8 +26,20 @@ public class GivenOrderFactory {
         return new GivenOrderFactory(orderRepository, clock, orderFactory);
     }
 
+    public static GivenOrderFactory create() {
+        return create(NO_REPOSITORY);
+    }
+
     public GivenOrder order() {
-        return new GivenOrderWithRepository(orderRepository, clock, orderFactory);
+        if (hasNoRepository()) {
+            return new GivenOrder(clock, orderFactory);
+        } else {
+            return new GivenOrderWithRepository(orderRepository, clock, orderFactory);
+        }
+    }
+
+    private boolean hasNoRepository() {
+        return NO_REPOSITORY == orderRepository;
     }
 
     public GivenOrder order(UUID orderId) {

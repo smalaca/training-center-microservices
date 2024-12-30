@@ -104,7 +104,7 @@ public class GivenOrder {
                 .build();
     }
 
-    protected Order getOrder() {
+    public Order getOrder() {
         return order;
     }
 
