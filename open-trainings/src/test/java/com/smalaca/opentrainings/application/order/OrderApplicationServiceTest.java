@@ -176,6 +176,16 @@ class OrderApplicationServiceTest {
     }
 
     @Test
+    void shouldInterruptOrderCancellationIfOrderAlreadyTerminated() {
+        Order order = givenOrderCreatedAgoMinutes(20);
+        order.terminate(clock);
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already TERMINATED");
+    }
+
+    @Test
     void shouldCancelOrder() {
         givenOrder();
 
@@ -225,9 +235,30 @@ class OrderApplicationServiceTest {
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
     }
 
+    @Test
+    void shouldInterruptOrderTerminationIfOrderAlreadyRejected() {
+        givenPayment(failed());
+        Order order = givenOrder();
+        order.confirm(paymentGateway, clock);
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
+    }
+
+    @Test
+    void shouldInterruptOrderTerminationIfOrderAlreadyCancelled() {
+        Order order = givenOrder();
+        order.cancel();
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CANCELLED");
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
-    void shouldInterruptOrderTerminationIfOrderTooRecent(int minutes) {
+    void shouldInterruptOrderTerminationIfOrderTooNew(int minutes) {
         givenOrderCreatedAgoMinutes(minutes);
 
         OrderTerminationNotYetPermittedException actual = assertThrows(OrderTerminationNotYetPermittedException.class, () -> service.terminate(ORDER_ID));
@@ -291,5 +322,4 @@ class OrderApplicationServiceTest {
 
         return order;
     }
-
 }
