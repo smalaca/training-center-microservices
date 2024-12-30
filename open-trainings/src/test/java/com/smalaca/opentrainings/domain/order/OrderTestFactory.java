@@ -25,10 +25,6 @@ public class OrderTestFactory {
         return new OrderTestFactory(clock, orderFactory);
     }
 
-    public Order orderCreatedAt(OrderTestDto.OrderTestDtoBuilder builder) {
-        return orderCreatedAt(builder.build());
-    }
-
     public Order orderCreatedAt(OrderTestDto orderDto) {
         given(clock.now()).willReturn(orderDto.getCreationDateTime());
         CreateOrderCommand command = new CreateOrderCommand(

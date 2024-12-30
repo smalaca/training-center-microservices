@@ -2,12 +2,12 @@ package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.order.GivenOrder;
+import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTerminationNotYetPermittedException;
-import com.smalaca.opentrainings.domain.order.OrderTestDto;
-import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
@@ -22,7 +22,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
@@ -48,26 +47,23 @@ class OrderApplicationServiceTest {
     private static final UUID ORDER_ID = randomId();
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
-    private static final LocalDateTime NOW = now();
-    private static final int ONE_MINUTE = 1;
-
-    private final OrderTestFactory orderFactory = OrderTestFactory.orderTestFactory();
 
     private final OrderRepository orderRepository = mock(OrderRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
     private final Clock clock = mock(Clock.class);
     private final OrderApplicationService service = new OrderApplicationService(orderRepository, eventRegistry, paymentGateway, clock);
+    private final GivenOrderFactory given = GivenOrderFactory.create();
 
     @BeforeEach
     void givenNow() {
-        given(clock.now()).willReturn(NOW);
+        given(clock.now()).willReturn(now());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.confirm(ORDER_ID);
 
@@ -78,7 +74,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldPublishOrderRejectedWhenOlderThanTenMinutes(int minutes) {
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.confirm(ORDER_ID);
 
@@ -91,7 +87,7 @@ class OrderApplicationServiceTest {
     @Test
     void shouldRejectOrderWhenPaymentFailed() {
         givenPayment(failed());
-        givenOrder();
+        existing(givenOrder().initiated());
 
         service.confirm(ORDER_ID);
 
@@ -102,7 +98,7 @@ class OrderApplicationServiceTest {
     @Test
     void shouldPublishOrderRejectedWhenPaymentFailed() {
         givenPayment(failed());
-        givenOrder();
+        existing(givenOrder().initiated());
 
         service.confirm(ORDER_ID);
 
@@ -123,7 +119,7 @@ class OrderApplicationServiceTest {
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldConfirmOrder(int minutes) {
         givenPayment(successful());
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.confirm(ORDER_ID);
 
@@ -135,7 +131,7 @@ class OrderApplicationServiceTest {
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldPublishTrainingPurchasedWhenOrderConfirmed(int minutes) {
         givenPayment(successful());
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.confirm(ORDER_ID);
 
@@ -155,9 +151,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyConfirmed() {
-        givenPayment(successful());
-        Order order = givenOrder();
-        order.confirm(paymentGateway, clock);
+        existing(givenOrder().confirmed());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -166,9 +160,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyRejected() {
-        givenPayment(failed());
-        Order order = givenOrder();
-        order.confirm(paymentGateway, clock);
+        existing(givenOrder().rejected());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -177,8 +169,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderCancellationIfOrderAlreadyTerminated() {
-        Order order = givenOrderCreatedAgoMinutes(20);
-        order.terminate(clock);
+        existing(givenOrder().createdMinutesAgo(20).terminated());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.cancel(ORDER_ID));
 
@@ -187,7 +178,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldCancelOrder() {
-        givenOrder();
+        existing(givenOrder().initiated());
 
         service.cancel(ORDER_ID);
 
@@ -206,7 +197,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldPublishOrderCancelledEventWhenOrderCancelled() {
-        givenOrder();
+        existing(givenOrder().initiated());
 
         service.cancel(ORDER_ID);
 
@@ -226,9 +217,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyConfirmed() {
-        givenPayment(successful());
-        Order order = givenOrder();
-        order.confirm(paymentGateway, clock);
+        existing(givenOrder().confirmed());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -237,9 +226,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyRejected() {
-        givenPayment(failed());
-        Order order = givenOrder();
-        order.confirm(paymentGateway, clock);
+        existing(givenOrder().rejected());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -248,8 +235,7 @@ class OrderApplicationServiceTest {
 
     @Test
     void shouldInterruptOrderTerminationIfOrderAlreadyCancelled() {
-        Order order = givenOrder();
-        order.cancel();
+        existing(givenOrder().cancelled());
 
         OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.terminate(ORDER_ID));
 
@@ -259,7 +245,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldInterruptOrderTerminationIfOrderTooNew(int minutes) {
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         OrderTerminationNotYetPermittedException actual = assertThrows(OrderTerminationNotYetPermittedException.class, () -> service.terminate(ORDER_ID));
 
@@ -269,7 +255,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {11, 13, 20, 100})
     void shouldTerminateOrder(int minutes) {
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.terminate(ORDER_ID);
 
@@ -280,7 +266,7 @@ class OrderApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {11, 13, 20, 100})
     void shouldPublishOrderTerminatedEventWhenOrderTerminated(int minutes) {
-        givenOrderCreatedAgoMinutes(minutes);
+        existing(givenOrder().createdMinutesAgo(minutes).initiated());
 
         service.terminate(ORDER_ID);
 
@@ -305,21 +291,16 @@ class OrderApplicationServiceTest {
         return captor.getValue();
     }
 
-    private Order givenOrder() {
-        return givenOrderCreatedAgoMinutes(ONE_MINUTE);
-    }
-
-    private Order givenOrderCreatedAgoMinutes(int minutes) {
-        Order order = orderFactory.orderCreatedAt(OrderTestDto.builder()
+    private GivenOrder givenOrder() {
+        return given.order()
                 .orderId(ORDER_ID)
                 .trainingId(TRAINING_ID)
                 .participantId(PARTICIPANT_ID)
                 .amount(AMOUNT)
-                .currency(CURRENCY)
-                .creationDateTime(NOW.minusMinutes(minutes)));
+                .currency(CURRENCY);
+    }
 
+    private void existing(Order order) {
         given(orderRepository.findById(ORDER_ID)).willReturn(order);
-
-        return order;
     }
 }
