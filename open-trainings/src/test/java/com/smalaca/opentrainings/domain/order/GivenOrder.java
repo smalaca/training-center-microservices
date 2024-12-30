@@ -58,68 +58,115 @@ public class GivenOrder {
         return this;
     }
 
+    public GivenOrder terminated() {
+        terminatedOrder();
+        saveOrder();
+        return this;
+    }
+
     public GivenOrder terminated(UUID orderId) {
-        order = createOrder();
+        terminatedOrder();
+        fakeSaveOrder(orderId);
+        return this;
+    }
+
+    private void terminatedOrder() {
+        initiateOrder();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.terminate(clock);
+    }
 
-        return mockedSave(orderId);
+    public GivenOrder cancelled() {
+        initiateOrder();
+        order.cancel();
+        saveOrder();
+        return this;
     }
 
     public GivenOrder cancelled(UUID orderId) {
-        order = createOrder();
+        initiateOrder();
         order.cancel();
 
-        return mockedSave(orderId);
+        fakeSaveOrder(orderId);
+        return this;
+    }
+
+    public GivenOrder rejected() {
+        rejectedOrder();
+        saveOrder();
+        return this;
     }
 
     public GivenOrder rejected(UUID orderId) {
-        order = createOrder();
+        rejectedOrder();
+        fakeSaveOrder(orderId);
+        return this;
+    }
+
+    private void rejectedOrder() {
+        initiateOrder();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.confirm(paymentRequest -> PaymentResponse.failed(), clock);
+    }
 
-        return mockedSave(orderId);
+    public GivenOrder confirmed() {
+        confirmedOrder();
+        saveOrder();
+        return this;
     }
 
     public GivenOrder confirmed(UUID orderId) {
-        order = createOrder();
+        confirmedOrder();
+        fakeSaveOrder(orderId);
+        return this;
+    }
+
+    private void confirmedOrder() {
+        initiateOrder();
         given(clock.now()).willReturn(LocalDateTime.now());
         order.confirm(paymentRequest -> PaymentResponse.successful(), clock);
+    }
 
-        return mockedSave(orderId);
+    public GivenOrder initiated() {
+        initiateOrder();
+        saveOrder();
+        return this;
+    }
+
+    private void saveOrder() {
+        orderId = orderRepository.save(order);
     }
 
     public GivenOrder initiated(UUID orderId) {
-        order = createOrder();
-
-        return mockedSave(orderId);
+        initiateOrder();
+        fakeSaveOrder(orderId);
+        return this;
     }
 
-    private Order createOrder() {
+    private void initiateOrder() {
         given(clock.now()).willReturn(creationDateTime);
         CreateOrderCommand command = new CreateOrderCommand(trainingId, participantId, Price.of(amount, currency));
-        return orderFactory.create(command);
+        order = orderFactory.create(command);
     }
 
-    private GivenOrder mockedSave(UUID orderId) {
-        this.orderId = orderId;
+    private void fakeSaveOrder(UUID orderId) {
+        withOrderId(orderId);
         given(orderRepository.findById(this.orderId)).willReturn(order);
-
-        return orderWithId();
     }
 
-    private GivenOrder orderWithId() {
+    private GivenOrder withOrderId(UUID orderId) {
+        this.orderId = orderId;
         try {
             Field orderIdField = order.getClass().getDeclaredField("orderId");
             orderIdField.setAccessible(true);
-            orderIdField.set(order, orderId);
+            orderIdField.set(order, this.orderId);
             return this;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public OrderTestDto asDto() {
+    public OrderTestDto getDto() {
         return OrderTestDto.builder()
                 .orderId(orderId)
                 .trainingId(trainingId)

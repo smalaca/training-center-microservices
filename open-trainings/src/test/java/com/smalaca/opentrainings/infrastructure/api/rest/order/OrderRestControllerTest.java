@@ -2,9 +2,9 @@ package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponse;
+import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
-import com.smalaca.opentrainings.domain.order.OrderTestFactory;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
@@ -21,10 +21,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponseAssertion.assertThatOrderResponse;
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
-import static com.smalaca.opentrainings.data.Random.randomId;
-import static java.time.LocalDateTime.now;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -46,11 +42,12 @@ class OrderRestControllerTest {
     @MockBean
     private PaymentGateway paymentGateway;
 
-    private final OrderTestFactory factory = OrderTestFactory.orderTestFactory();
+    private GivenOrderFactory given;
 
     @BeforeEach
-    void initiatePaymentGateway() {
+    void init() {
         given(paymentGateway.pay(any(PaymentRequest.class))).willReturn(PaymentResponse.successful());
+        given = GivenOrderFactory.create(repository);
     }
 
     @AfterEach
@@ -67,14 +64,13 @@ class OrderRestControllerTest {
 
     @Test
     void shouldFindExistingOrder() {
-        OrderTestDto dto = randomOrderDto();
-        UUID orderId = givenOrder(dto);
+        OrderTestDto dto = given.order().initiated().getDto();
 
-        RestOrderTestResponse actual = client.orders().findById(orderId);
+        RestOrderTestResponse actual = client.orders().findById(dto.getOrderId());
 
         assertThatOrderResponse(actual)
                 .isOk()
-                .hasInitiatedOrder(orderId, dto);
+                .hasInitiatedOrder(dto);
     }
 
     @Test
@@ -86,7 +82,7 @@ class OrderRestControllerTest {
 
     @Test
     void shouldProcessOrderConfirmationSuccessfully() {
-        UUID orderId = givenOrder(randomOrderDto());
+        UUID orderId = given.order().initiated().getDto().getOrderId();
 
         RestOrderTestResponse actual = client.orders().confirm(orderId);
 
@@ -102,8 +98,7 @@ class OrderRestControllerTest {
 
     @Test
     void shouldRecognizeOrderCannotBeCancelled() {
-        UUID orderId = givenOrder(randomOrderDto());
-        client.orders().confirm(orderId);
+        UUID orderId = given.order().confirmed().getDto().getOrderId();
 
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
@@ -114,7 +109,7 @@ class OrderRestControllerTest {
 
     @Test
     void shouldProcessOrderCancellation() {
-        UUID orderId = givenOrder(randomOrderDto());
+        UUID orderId = given.order().initiated().getDto().getOrderId();
 
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
@@ -125,37 +120,21 @@ class OrderRestControllerTest {
 
     @Test
     void shouldFindAllOrders() {
-        OrderTestDto dtoOne = randomOrderDto();
-        UUID orderIdOne = givenOrder(dtoOne);
-        OrderTestDto dtoTwo = randomOrderDto();
-        UUID orderIdTwo = givenOrder(dtoTwo);
-        OrderTestDto dtoThree = randomOrderDto();
-        UUID orderIdThree = givenOrder(dtoThree);
-        OrderTestDto dtoFour = randomOrderDto();
-        UUID orderIdFour = givenOrder(dtoFour);
+        OrderTestDto dtoOne = given.order().initiated().getDto();
+        OrderTestDto dtoTwo = given.order().confirmed().getDto();
+        OrderTestDto dtoThree = given.order().cancelled().getDto();
+        OrderTestDto dtoFour = given.order().createdMinutesAgo(13).terminated().getDto();
+        OrderTestDto dtoFive = given.order().rejected().getDto();
 
         RestOrderTestResponse actual = client.orders().findAll();
 
         assertThatOrderResponse(actual)
                 .isOk()
-                .hasOrders(4)
-                .containsInitiatedOrder(orderIdOne, dtoOne)
-                .containsInitiatedOrder(orderIdTwo, dtoTwo)
-                .containsInitiatedOrder(orderIdThree, dtoThree)
-                .containsInitiatedOrder(orderIdFour, dtoFour);
-    }
-
-    private UUID givenOrder(OrderTestDto dto) {
-        return transactionTemplate.execute(transactionStatus -> repository.save(factory.orderCreatedAt(dto)));
-    }
-
-    private OrderTestDto randomOrderDto() {
-        return OrderTestDto.builder()
-                .trainingId(randomId())
-                .participantId(randomId())
-                .amount(randomAmount())
-                .currency(randomCurrency())
-                .creationDateTime(now())
-                .build();
+                .hasOrders(5)
+                .containsInitiatedOrder(dtoOne)
+                .containsConfirmedOrder(dtoTwo)
+                .containsCancelledOrder(dtoThree)
+                .containsTerminatedOrder(dtoFour)
+                .containsRejectedOrder(dtoFive);
     }
 }
