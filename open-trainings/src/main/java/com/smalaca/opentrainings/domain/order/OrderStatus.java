@@ -4,5 +4,9 @@ import com.smalaca.domaindrivendesign.ValueObject;
 
 @ValueObject
 enum OrderStatus {
-    INITIATED, CONFIRMED, CANCELLED, TERMINATED, REJECTED
+    INITIATED, CONFIRMED, CANCELLED, TERMINATED, REJECTED;
+
+    boolean isFinal() {
+        return this != INITIATED;
+    }
 }

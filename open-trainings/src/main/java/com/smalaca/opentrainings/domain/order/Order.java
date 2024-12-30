@@ -97,7 +97,7 @@ public class Order {
 
     @PrimaryPort
     public OrderCancelledEvent cancel() {
-        if (isInFinalState()) {
+        if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);
         }
 
@@ -107,7 +107,7 @@ public class Order {
 
     @PrimaryPort
     public OrderTerminatedEvent terminate(Clock clock) {
-        if (isInFinalState()) {
+        if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);
         }
 
@@ -117,10 +117,6 @@ public class Order {
 
         status = OrderStatus.TERMINATED;
         return OrderTerminatedEvent.create(orderId, trainingId, participantId);
-    }
-
-    private boolean isInFinalState() {
-        return status != INITIATED;
     }
 
     private boolean isNewerThan10Minutes(Clock clock) {
