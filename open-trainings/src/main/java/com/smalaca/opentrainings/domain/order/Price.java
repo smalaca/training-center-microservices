@@ -21,7 +21,7 @@ public class Price {
     private Price() {}
 
     @Factory
-    static Price of(BigDecimal amount, String currency) {
+    public static Price of(BigDecimal amount, String currency) {
         return new Price(amount, Currency.getInstance(currency));
     }
 
