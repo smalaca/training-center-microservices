@@ -18,7 +18,7 @@ class ScheduledOrdersTermination {
 
     @DrivingAdapter
     @Scheduled(fixedRateString = "${scheduled.order.termination.rate}")
-    public void terminateOldOrders() {
+    void terminateOrders() {
         queryService.findAllToTerminate().forEach(dto -> {
             applicationService.terminate(dto.getOrderId());
         });
