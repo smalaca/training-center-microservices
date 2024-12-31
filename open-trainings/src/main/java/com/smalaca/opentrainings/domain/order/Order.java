@@ -1,6 +1,6 @@
 package com.smalaca.opentrainings.domain.order;
 
-import com.smalaca.architecture.portsandadapters.PrimaryPort;
+import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
@@ -71,7 +71,7 @@ public class Order {
         return orderId;
     }
 
-    @PrimaryPort
+    @DrivingPort
     public OrderEvent confirm(PaymentGateway paymentGateway, Clock clock) {
         if (isOlderThan10Minutes(clock)) {
             status = REJECTED;
@@ -95,7 +95,7 @@ public class Order {
                 .build();
     }
 
-    @PrimaryPort
+    @DrivingPort
     public OrderCancelledEvent cancel() {
         if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);
@@ -105,7 +105,7 @@ public class Order {
         return OrderCancelledEvent.create(orderId, trainingId, participantId);
     }
 
-    @PrimaryPort
+    @DrivingPort
     public OrderTerminatedEvent terminate(Clock clock) {
         if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);

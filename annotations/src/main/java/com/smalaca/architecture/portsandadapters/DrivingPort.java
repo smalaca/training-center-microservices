@@ -1,4 +1,4 @@
 package com.smalaca.architecture.portsandadapters;
 
-public @interface SecondaryPort {
+public @interface DrivingPort {
 }

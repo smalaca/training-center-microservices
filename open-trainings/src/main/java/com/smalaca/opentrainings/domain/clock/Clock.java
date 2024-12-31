@@ -1,10 +1,10 @@
 package com.smalaca.opentrainings.domain.clock;
 
-import com.smalaca.architecture.portsandadapters.SecondaryPort;
+import com.smalaca.architecture.portsandadapters.DrivenPort;
 
 import java.time.LocalDateTime;
 
-@SecondaryPort
+@DrivenPort
 public interface Clock {
     LocalDateTime now();
 }

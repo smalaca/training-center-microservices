@@ -1,12 +1,12 @@
 package com.smalaca.opentrainings.domain.order;
 
-import com.smalaca.architecture.portsandadapters.SecondaryPort;
+import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.domaindrivendesign.DomainRepository;
 
 import java.util.UUID;
 
 @DomainRepository
-@SecondaryPort
+@DrivenPort
 public interface OrderRepository {
     Order findById(UUID orderId);
 
