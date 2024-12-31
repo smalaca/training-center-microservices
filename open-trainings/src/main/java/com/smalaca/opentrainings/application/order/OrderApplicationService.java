@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.architecture.cqrs.CommandOperation;
-import com.smalaca.architecture.portsandadapters.DrivingAdapter;
+import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
@@ -33,7 +33,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @DrivingAdapter
+    @DrivingPort
     @CommandOperation
     public void confirm(UUID orderId) {
         Order order = orderRepository.findById(orderId);
@@ -45,7 +45,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @DrivingAdapter
+    @DrivingPort
     @CommandOperation
     public void cancel(UUID orderId) {
         Order order = orderRepository.findById(orderId);
@@ -57,7 +57,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @DrivingAdapter
+    @DrivingPort
     @CommandOperation
     public void terminate(UUID orderId) {
         Order order = orderRepository.findById(orderId);
