@@ -15,3 +15,8 @@ spring:
 services:
   payment-gateway:
     url: http://localhost:9010
+
+scheduled:
+  order:
+    termination:
+      rate: 60000
