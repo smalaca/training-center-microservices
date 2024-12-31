@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
+import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.OrderDoesNotExistException;
@@ -27,6 +28,7 @@ public class OrderRestController {
     }
 
     @PutMapping("{orderId}/confirm")
+    @DrivingAdapter
     public ResponseEntity<Void> confirm(@PathVariable UUID orderId) {
         try {
             applicationService.confirm(orderId);
@@ -37,6 +39,7 @@ public class OrderRestController {
     }
 
     @PutMapping("/{orderId}/cancel")
+    @DrivingAdapter
     public ResponseEntity<String> cancelOrder(@PathVariable UUID orderId) {
         try {
             applicationService.cancel(orderId);

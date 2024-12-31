@@ -1,8 +1,8 @@
 package com.smalaca.opentrainings.domain.paymentgateway;
 
-import com.smalaca.architecture.portsandadapters.SecondaryPort;
+import com.smalaca.architecture.portsandadapters.DrivenPort;
 
-@SecondaryPort
+@DrivenPort
 public interface PaymentGateway {
     PaymentResponse pay(PaymentRequest paymentRequest);
 }

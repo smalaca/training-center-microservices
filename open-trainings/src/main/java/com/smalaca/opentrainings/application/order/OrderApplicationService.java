@@ -1,7 +1,8 @@
 package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.architecture.cqrs.CommandOperation;
-import com.smalaca.architecture.portsandadapters.PrimaryAdapter;
+import com.smalaca.architecture.portsandadapters.DrivingPort;
+import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
+@ApplicationLayer
 public class OrderApplicationService {
     private final OrderRepository orderRepository;
     private final PaymentGateway paymentGateway;
@@ -31,7 +33,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @PrimaryAdapter
+    @DrivingPort
     @CommandOperation
     public void confirm(UUID orderId) {
         Order order = orderRepository.findById(orderId);
@@ -43,7 +45,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @PrimaryAdapter
+    @DrivingPort
     @CommandOperation
     public void cancel(UUID orderId) {
         Order order = orderRepository.findById(orderId);
@@ -55,7 +57,7 @@ public class OrderApplicationService {
     }
 
     @Transactional
-    @PrimaryAdapter
+    @DrivingPort
     @CommandOperation
     public void terminate(UUID orderId) {
         Order order = orderRepository.findById(orderId);

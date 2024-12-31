@@ -1,6 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.repository.jpa.order;
 
-import com.smalaca.architecture.portsandadapters.SecondaryAdapter;
+import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import org.springframework.stereotype.Repository;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-@SecondaryAdapter
+@DrivenAdapter
 public class JpaOrderRepository implements OrderRepository {
     private final SpringOrderCrudRepository repository;
 

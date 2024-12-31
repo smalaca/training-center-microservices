@@ -1,9 +1,9 @@
 package com.smalaca.opentrainings.domain.eventregistry;
 
-import com.smalaca.architecture.portsandadapters.SecondaryPort;
+import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 
-@SecondaryPort
+@DrivenPort
 public interface EventRegistry {
     void publish(OrderEvent event);
 }
