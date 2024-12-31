@@ -60,6 +60,42 @@ class OrderApplicationServiceTest {
         given(clock.now()).willReturn(now());
     }
 
+    @Test
+    void shouldInterruptOrderConfirmationIfOrderAlreadyConfirmed() {
+        givenOrder().confirmed();
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
+    }
+
+    @Test
+    void shouldInterruptOrderConfirmationIfOrderAlreadyRejected() {
+        givenOrder().rejected();
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
+    }
+
+    @Test
+    void shouldInterruptOrderConfirmationIfOrderAlreadyTerminated() {
+        givenOrder().createdMinutesAgo(20).terminated();
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already TERMINATED");
+    }
+
+    @Test
+    void shouldInterruptOrderConfirmationIfOrderAlreadyCancelled() {
+        givenOrder().cancelled();
+
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+
+        assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CANCELLED");
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {

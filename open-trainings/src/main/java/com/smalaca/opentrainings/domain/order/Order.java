@@ -71,6 +71,10 @@ public class Order {
     }
 
     public OrderEvent confirm(PaymentGateway paymentGateway, Clock clock) {
+        if (status.isFinal()) {
+            throw new OrderInFinalStateException(orderId, status);
+        }
+
         if (isOlderThan10Minutes(clock)) {
             status = REJECTED;
             return OrderRejectedEvent.expired(orderId);
