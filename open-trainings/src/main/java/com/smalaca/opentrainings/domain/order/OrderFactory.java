@@ -8,12 +8,8 @@ import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
 public class OrderFactory {
     private final Clock clock;
 
-    private OrderFactory(Clock clock) {
+    public OrderFactory(Clock clock) {
         this.clock = clock;
-    }
-
-    public static OrderFactory createOrderFactory(Clock clock) {
-        return new OrderFactory(clock);
     }
 
     public Order create(CreateOrderCommand command) {

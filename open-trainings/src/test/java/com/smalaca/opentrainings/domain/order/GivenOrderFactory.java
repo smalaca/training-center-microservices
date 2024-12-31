@@ -21,7 +21,7 @@ public class GivenOrderFactory {
 
     public static GivenOrderFactory create(OrderRepository orderRepository) {
         Clock clock = mock(Clock.class);
-        OrderFactory orderFactory = OrderFactory.createOrderFactory(clock);
+        OrderFactory orderFactory = new OrderFactory(clock);
 
         return new GivenOrderFactory(orderRepository, clock, orderFactory);
     }
