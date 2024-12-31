@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
-class OrderRestControllerTest {
+class OrderRestControllerSystemTest {
     @Autowired
     private OrderRepository repository;
 
