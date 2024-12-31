@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.query.order;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
+import com.smalaca.opentrainings.infrastructure.clock.localdatetime.LocalDateTimeClock;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.JpaOrderRepository;
 import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,7 @@ import static com.smalaca.opentrainings.query.order.OrderDtoAssertion.assertThat
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
-@Import({JpaOrderRepository.class, OrderQueryService.class})
+@Import({JpaOrderRepository.class, OrderQueryService.class, LocalDateTimeClock.class})
 class OrderQueryServiceIntegrationTest {
     @Autowired
     private OrderRepository repository;
@@ -28,7 +29,7 @@ class OrderQueryServiceIntegrationTest {
     private OrderQueryService queryService;
 
     @Autowired
-    private TransactionTemplate transactionTemplate;
+    private TransactionTemplate transaction;
 
     private GivenOrderFactory given;
 
@@ -48,7 +49,7 @@ class OrderQueryServiceIntegrationTest {
 
     @Test
     void shouldFindOrderDtoById() {
-        OrderTestDto dto = transactionTemplate.execute(transactionStatus -> given.order().initiated().getDto());
+        OrderTestDto dto = transaction.execute(status -> given.order().initiated().getDto());
 
         Optional<OrderDto> actual = queryService.findById(dto.getOrderId());
 
@@ -59,11 +60,11 @@ class OrderQueryServiceIntegrationTest {
 
     @Test
     void shouldFindAllOrders() {
-        OrderTestDto dtoOne = transactionTemplate.execute(transactionStatus -> given.order().initiated().getDto());
-        OrderTestDto dtoTwo = transactionTemplate.execute(transactionStatus -> given.order().createdMinutesAgo(17).terminated().getDto());
-        OrderTestDto dtoThree = transactionTemplate.execute(transactionStatus -> given.order().cancelled().getDto());
-        OrderTestDto dtoFour = transactionTemplate.execute(transactionStatus -> given.order().confirmed().getDto());
-        OrderTestDto dtoFive = transactionTemplate.execute(transactionStatus -> given.order().rejected().getDto());
+        OrderTestDto dtoOne = transaction.execute(status -> given.order().initiated().getDto());
+        OrderTestDto dtoTwo = transaction.execute(status -> given.order().createdMinutesAgo(17).terminated().getDto());
+        OrderTestDto dtoThree = transaction.execute(status -> given.order().cancelled().getDto());
+        OrderTestDto dtoFour = transaction.execute(status -> given.order().confirmed().getDto());
+        OrderTestDto dtoFive = transaction.execute(status -> given.order().rejected().getDto());
 
         Iterable<OrderDto> actual = queryService.findAll();
 
@@ -83,5 +84,29 @@ class OrderQueryServiceIntegrationTest {
                 .hasCreationDateTime(dto.getCreationDateTime())
                 .hasPriceAmount(dto.getAmount())
                 .hasPriceCurrency(dto.getCurrency());
+    }
+
+    @Test
+    void shouldFindAllOrderForTermination() {
+        transaction.execute(status -> given.order().initiated());
+        transaction.execute(status -> given.order().createdMinutesAgo(9).initiated());
+        transaction.execute(status -> given.order().cancelled());
+        transaction.execute(status -> given.order().createdMinutesAgo(13).cancelled());
+        transaction.execute(status -> given.order().confirmed());
+        transaction.execute(status -> given.order().createdMinutesAgo(21).confirmed());
+        transaction.execute(status -> given.order().rejected());
+        transaction.execute(status -> given.order().createdMinutesAgo(17).rejected());
+        transaction.execute(status -> given.order().createdMinutesAgo(17).terminated());
+
+        OrderTestDto dtoOne = transaction.execute(status -> given.order().createdMinutesAgo(17).initiated().getDto());
+        OrderTestDto dtoTwo = transaction.execute(status -> given.order().createdMinutesAgo(11).initiated().getDto());
+        OrderTestDto dtoThree = transaction.execute(status -> given.order().createdMinutesAgo(22).initiated().getDto());
+
+        Iterable<OrderDto> actual = queryService.findAllToTerminate();
+
+        assertThat(actual).hasSize(3)
+                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoOne.getOrderId()))
+                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoTwo.getOrderId()))
+                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoThree.getOrderId()));
     }
 }
