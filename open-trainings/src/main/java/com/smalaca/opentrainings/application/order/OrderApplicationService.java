@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.PrimaryAdapter;
+import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.Order;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
+@ApplicationLayer
 public class OrderApplicationService {
     private final OrderRepository orderRepository;
     private final PaymentGateway paymentGateway;
