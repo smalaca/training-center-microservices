@@ -45,6 +45,7 @@ class OrderApplicationServiceTest {
     private static final String CURRENCY = randomCurrency();
     private static final BigDecimal AMOUNT = randomAmount();
     private static final UUID ORDER_ID = randomId();
+    private static final UUID OFFER_ID = randomId();
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
 
@@ -174,6 +175,7 @@ class OrderApplicationServiceTest {
         TrainingPurchasedEvent actual = thenTrainingPurchasedEventPublished();
         assertThatTrainingPurchasedEvent(actual)
                 .hasOrderId(ORDER_ID)
+                .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
     }
@@ -240,6 +242,7 @@ class OrderApplicationServiceTest {
         OrderCancelledEvent actual = thenOrderCancelledEventPublished();
         assertThatOrderCancelledEvent(actual)
                 .hasOrderId(ORDER_ID)
+                .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
     }
@@ -309,6 +312,7 @@ class OrderApplicationServiceTest {
         OrderTerminatedEvent actual = thenOrderTerminatedEventPublished();
         assertThatOrderTerminatedEvent(actual)
                 .hasOrderId(ORDER_ID)
+                .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
     }
@@ -330,6 +334,7 @@ class OrderApplicationServiceTest {
     private GivenOrder givenOrder() {
         return given
                 .order(ORDER_ID)
+                .offerId(OFFER_ID)
                 .trainingId(TRAINING_ID)
                 .participantId(PARTICIPANT_ID)
                 .amount(AMOUNT)

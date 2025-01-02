@@ -79,6 +79,7 @@ class OrderQueryServiceIntegrationTest {
     private OrderDtoAssertion assertThatOrderHasDataEqualTo(OrderDto order, OrderTestDto dto) {
         return assertThatOrder(order)
                 .hasOrderId(dto.getOrderId())
+                .hasOfferId(dto.getOfferId())
                 .hasTrainingId(dto.getTrainingId())
                 .hasParticipantId(dto.getParticipantId())
                 .hasCreationDateTime(dto.getCreationDateTime())

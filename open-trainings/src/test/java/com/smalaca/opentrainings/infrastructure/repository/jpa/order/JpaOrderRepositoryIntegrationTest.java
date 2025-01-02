@@ -71,6 +71,8 @@ class JpaOrderRepositoryIntegrationTest {
 
     private OrderAssertion assertThatOrderHasDataEqualTo(UUID orderId, OrderTestDto expected) {
         return assertThatOrder(repository.findById(orderId))
+                .hasOrderId(orderId)
+                .hasOfferId(expected.getOfferId())
                 .hasTrainingId(expected.getTrainingId())
                 .hasParticipantId(expected.getParticipantId())
                 .hasCreationDateTime(expected.getCreationDateTime())

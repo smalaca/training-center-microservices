@@ -20,6 +20,11 @@ public class OrderCancelledEventAssertion {
         return this;
     }
 
+    public OrderCancelledEventAssertion hasOfferId(UUID expected) {
+        assertThat(actual.offerId()).isEqualTo(expected);
+        return this;
+    }
+
     public OrderCancelledEventAssertion hasTrainingId(UUID expected) {
         assertThat(actual.trainingId()).isEqualTo(expected);
         return this;

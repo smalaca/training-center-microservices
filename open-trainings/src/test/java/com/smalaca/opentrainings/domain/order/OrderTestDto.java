@@ -11,6 +11,7 @@ import java.util.UUID;
 @Getter
 public class OrderTestDto {
     private final UUID orderId;
+    private final UUID offerId;
     private final UUID trainingId;
     private final UUID participantId;
     private final BigDecimal amount;

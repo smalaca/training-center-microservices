@@ -49,6 +49,16 @@ public class OrderAssertion {
         return this;
     }
 
+    public OrderAssertion hasOrderId(UUID expected) {
+        assertThat(actual.orderId()).isEqualTo(expected);
+        return this;
+    }
+
+    public OrderAssertion hasOfferId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("offerId", expected);
+        return this;
+    }
+
     public OrderAssertion hasTrainingId(UUID expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainingId", expected);
         return this;

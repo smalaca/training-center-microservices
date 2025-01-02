@@ -41,6 +41,9 @@ public class Order {
     @Column(name = "TRAINING_ID")
     private UUID trainingId;
 
+    @Column(name = "OFFER_ID")
+    private UUID offerId;
+
     @Column(name = "PARTICIPANT_ID")
     private UUID participantId;
 
@@ -58,7 +61,8 @@ public class Order {
     @Column(name = "STATUS")
     private OrderStatus status = INITIATED;
 
-    Order(UUID trainingId, UUID participantId, Price price, LocalDateTime creationDateTime) {
+    Order(UUID offerId, UUID trainingId, UUID participantId, Price price, LocalDateTime creationDateTime) {
+        this.offerId = offerId;
         this.trainingId = trainingId;
         this.participantId = participantId;
         this.price = price;
@@ -83,7 +87,7 @@ public class Order {
 
         if (paymentGateway.pay(paymentRequest()).isSuccessful()) {
             status = CONFIRMED;
-            return TrainingPurchasedEvent.create(orderId, trainingId, participantId);
+            return TrainingPurchasedEvent.create(orderId, offerId, trainingId, participantId);
         } else {
             status = REJECTED;
             return OrderRejectedEvent.paymentFailed(orderId);
@@ -104,7 +108,7 @@ public class Order {
         }
 
         status = CANCELLED;
-        return OrderCancelledEvent.create(orderId, trainingId, participantId);
+        return OrderCancelledEvent.create(orderId, offerId, trainingId, participantId);
     }
 
     public OrderTerminatedEvent terminate(Clock clock) {
@@ -117,7 +121,7 @@ public class Order {
         }
 
         status = OrderStatus.TERMINATED;
-        return OrderTerminatedEvent.create(orderId, trainingId, participantId);
+        return OrderTerminatedEvent.create(orderId, offerId, trainingId, participantId);
     }
 
     private boolean isNewerThan10Minutes(Clock clock) {

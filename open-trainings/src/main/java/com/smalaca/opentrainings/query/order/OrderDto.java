@@ -18,6 +18,9 @@ public class OrderDto {
     @Column(name = "ORDER_ID")
     private UUID orderId;
 
+    @Column(name = "OFFER_ID")
+    private UUID offerId;
+
     @Column(name = "TRAINING_ID")
     private UUID trainingId;
 
