@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
+import com.smalaca.opentrainings.domain.price.Price;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
