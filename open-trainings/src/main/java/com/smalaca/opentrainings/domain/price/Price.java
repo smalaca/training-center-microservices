@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.domain.order;
+package com.smalaca.opentrainings.domain.price;
 
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.domaindrivendesign.ValueObject;
@@ -25,11 +25,11 @@ public class Price {
         return new Price(amount, Currency.getInstance(currency));
     }
 
-    BigDecimal amount() {
+    public BigDecimal amount() {
         return amount;
     }
 
-    String currencyCode() {
+    public String currencyCode() {
         return currency.getCurrencyCode();
     }
 

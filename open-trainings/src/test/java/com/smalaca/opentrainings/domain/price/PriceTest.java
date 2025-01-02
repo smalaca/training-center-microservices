@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.domain.order;
+package com.smalaca.opentrainings.domain.price;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;

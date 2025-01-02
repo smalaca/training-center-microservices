@@ -5,7 +5,7 @@ import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
-import com.smalaca.opentrainings.domain.order.Price;
+import com.smalaca.opentrainings.domain.price.Price;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

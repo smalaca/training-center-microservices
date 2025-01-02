@@ -3,7 +3,7 @@ package com.smalaca.opentrainings.domain.offer;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderFactory;
-import com.smalaca.opentrainings.domain.order.Price;
+import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;

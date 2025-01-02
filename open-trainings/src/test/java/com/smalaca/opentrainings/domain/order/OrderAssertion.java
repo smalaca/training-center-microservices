@@ -1,5 +1,7 @@
 package com.smalaca.opentrainings.domain.order;
 
+import com.smalaca.opentrainings.domain.price.Price;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
