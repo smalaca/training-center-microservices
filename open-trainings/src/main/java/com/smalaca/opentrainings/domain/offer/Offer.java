@@ -1,10 +1,13 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderFactory;
+import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
+import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
+import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -30,9 +33,6 @@ public class Offer {
     @Column(name = "TRAINING_ID")
     private UUID trainingId;
 
-    @Column(name = "PARTICIPANT_ID")
-    private UUID participantId;
-
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
@@ -44,16 +44,25 @@ public class Offer {
     @Column(name = "STATUS")
     private OfferStatus status;
 
-    public Offer(UUID trainingId, UUID participantId, Price price) {
+    public Offer(UUID trainingId, Price price) {
         this.trainingId = trainingId;
-        this.participantId = participantId;
         this.price = price;
     }
 
     private Offer() {}
 
-    public Order accept(OrderFactory orderFactory) {
+    public Order accept(AcceptOfferDomainCommand command, OrderFactory orderFactory, PersonalDataManagement personalDataManagement) {
+        PersonalDataResponse response = personalDataManagement.save(command.asPersonalDataRequest());
+
+        if (response.isFailed()) {
+            throw new MissingParticipantException();
+        }
+
+        return accept(response.participantId(), orderFactory);
+    }
+
+    private Order accept(UUID participantId, OrderFactory orderFactory) {
         status = OfferStatus.ACCEPTED;
-        return orderFactory.create(new CreateOrderCommand(trainingId, participantId, price));
+        return orderFactory.create(new CreateOrderDomainCommand(trainingId, participantId, price));
     }
 }
