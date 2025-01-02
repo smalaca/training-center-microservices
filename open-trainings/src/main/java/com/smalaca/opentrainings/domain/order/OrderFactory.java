@@ -2,7 +2,7 @@ package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
+import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 
 @Factory
 public class OrderFactory {
@@ -12,7 +12,7 @@ public class OrderFactory {
         this.clock = clock;
     }
 
-    public Order create(CreateOrderCommand command) {
+    public Order create(CreateOrderDomainCommand command) {
         return new Order(command.trainingId(), command.participantId(), command.price(), clock.now());
     }
 }

@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderCommand;
+import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.price.Price;
 
@@ -88,7 +88,7 @@ public class GivenOrder {
 
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
-        CreateOrderCommand command = new CreateOrderCommand(trainingId, participantId, Price.of(amount, currency));
+        CreateOrderDomainCommand command = new CreateOrderDomainCommand(trainingId, participantId, Price.of(amount, currency));
         order = orderFactory.create(command);
 
         return this;
