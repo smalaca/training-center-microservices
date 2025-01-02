@@ -13,6 +13,6 @@ public class OrderFactory {
     }
 
     public Order create(CreateOrderDomainCommand command) {
-        return new Order(command.trainingId(), command.participantId(), command.price(), clock.now());
+        return new Order(command.offerId(), command.trainingId(), command.participantId(), command.price(), clock.now());
     }
 }

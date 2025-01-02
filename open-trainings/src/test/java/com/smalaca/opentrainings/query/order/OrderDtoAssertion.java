@@ -27,6 +27,11 @@ public class OrderDtoAssertion {
         return this;
     }
 
+    public OrderDtoAssertion hasOfferId(UUID expected) {
+        assertThat(actual.getOfferId()).isEqualTo(expected);
+        return this;
+    }
+
     public OrderDtoAssertion hasTrainingId(UUID expected) {
         assertThat(actual.getTrainingId()).isEqualTo(expected);
         return this;

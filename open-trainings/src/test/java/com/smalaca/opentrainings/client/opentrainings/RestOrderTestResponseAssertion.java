@@ -81,6 +81,7 @@ public class RestOrderTestResponseAssertion {
     private void isSameAsOrder(RestOrderTestDto actual, OrderTestDto expected, String expectedStatus) {
         assertThat(actual.orderId()).isEqualTo(expected.getOrderId());
         assertThat(actual.status()).isEqualTo(expectedStatus);
+        assertThat(actual.offerId()).isEqualTo(expected.getOfferId());
         assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
         assertThat(actual.participantId()).isEqualTo(expected.getParticipantId());
         assertThat(actual.creationDateTime()).isEqualToIgnoringNanos(expected.getCreationDateTime());

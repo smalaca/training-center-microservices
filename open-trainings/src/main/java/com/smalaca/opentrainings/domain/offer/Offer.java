@@ -63,6 +63,6 @@ public class Offer {
 
     private Order accept(UUID participantId, OrderFactory orderFactory) {
         status = OfferStatus.ACCEPTED;
-        return orderFactory.create(new CreateOrderDomainCommand(trainingId, participantId, price));
+        return orderFactory.create(new CreateOrderDomainCommand(offerId, trainingId, participantId, price));
     }
 }

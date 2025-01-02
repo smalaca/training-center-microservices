@@ -20,6 +20,11 @@ public class TrainingPurchasedEventAssertion {
         return this;
     }
 
+    public TrainingPurchasedEventAssertion hasOfferId(UUID expected) {
+        assertThat(actual.offerId()).isEqualTo(expected);
+        return this;
+    }
+
     public TrainingPurchasedEventAssertion hasTrainingId(UUID expected) {
         assertThat(actual.trainingId()).isEqualTo(expected);
         return this;

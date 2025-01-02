@@ -4,5 +4,5 @@ import com.smalaca.opentrainings.domain.price.Price;
 
 import java.util.UUID;
 
-public record CreateOrderDomainCommand(UUID trainingId, UUID participantId, Price price) {
+public record CreateOrderDomainCommand(UUID offerId, UUID trainingId, UUID participantId, Price price) {
 }

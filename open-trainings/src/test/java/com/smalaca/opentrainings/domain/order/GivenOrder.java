@@ -18,6 +18,7 @@ public class GivenOrder {
     private final Clock clock;
     private final OrderFactory orderFactory;
 
+    private UUID offerId = randomId();
     private UUID trainingId = randomId();
     private UUID participantId = randomId();
     private BigDecimal amount = randomAmount();
@@ -28,6 +29,11 @@ public class GivenOrder {
     GivenOrder(Clock clock, OrderFactory orderFactory) {
         this.clock = clock;
         this.orderFactory = orderFactory;
+    }
+
+    public GivenOrder offerId(UUID offerId) {
+        this.offerId = offerId;
+        return this;
     }
 
     public GivenOrder trainingId(UUID trainingId) {
@@ -88,7 +94,7 @@ public class GivenOrder {
 
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
-        CreateOrderDomainCommand command = new CreateOrderDomainCommand(trainingId, participantId, Price.of(amount, currency));
+        CreateOrderDomainCommand command = new CreateOrderDomainCommand(offerId, trainingId, participantId, Price.of(amount, currency));
         order = orderFactory.create(command);
 
         return this;
@@ -97,6 +103,7 @@ public class GivenOrder {
     public OrderTestDto getDto() {
         return OrderTestDto.builder()
                 .orderId(getOrderId())
+                .offerId(offerId)
                 .trainingId(trainingId)
                 .participantId(participantId)
                 .amount(amount)
