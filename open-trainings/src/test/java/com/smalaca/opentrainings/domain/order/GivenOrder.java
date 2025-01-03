@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
+import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
 
 import java.math.BigDecimal;
@@ -79,7 +80,7 @@ public class GivenOrder {
     public GivenOrder rejected() {
         initiated();
         given(clock.now()).willReturn(LocalDateTime.now());
-        order.confirm(paymentRequest -> PaymentResponse.failed(), clock);
+        order.confirm(paymentMethod(), paymentRequest -> PaymentResponse.failed(), clock);
 
         return this;
     }
@@ -87,9 +88,13 @@ public class GivenOrder {
     public GivenOrder confirmed() {
         initiated();
         given(clock.now()).willReturn(LocalDateTime.now());
-        order.confirm(paymentRequest -> PaymentResponse.successful(), clock);
+        order.confirm(paymentMethod(), paymentRequest -> PaymentResponse.successful(), clock);
 
         return this;
+    }
+
+    private PaymentMethod paymentMethod() {
+        return PaymentMethod.CREDIT_CARD;
     }
 
     public GivenOrder initiated() {

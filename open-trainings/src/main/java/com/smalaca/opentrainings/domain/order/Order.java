@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
+import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -75,7 +76,7 @@ public class Order {
         return orderId;
     }
 
-    public OrderEvent confirm(PaymentGateway paymentGateway, Clock clock) {
+    public OrderEvent confirm(PaymentMethod paymentMethod, PaymentGateway paymentGateway, Clock clock) {
         if (status.isFinal()) {
             throw new OrderInFinalStateException(orderId, status);
         }
@@ -85,7 +86,7 @@ public class Order {
             return OrderRejectedEvent.expired(orderId);
         }
 
-        if (paymentGateway.pay(paymentRequest()).isSuccessful()) {
+        if (paymentGateway.pay(paymentRequestWith(paymentMethod)).isSuccessful()) {
             status = CONFIRMED;
             return TrainingPurchasedEvent.create(orderId, offerId, trainingId, participantId);
         } else {
@@ -94,11 +95,12 @@ public class Order {
         }
     }
 
-    private PaymentRequest paymentRequest() {
+    private PaymentRequest paymentRequestWith(PaymentMethod paymentMethod) {
         return PaymentRequest.builder()
                 .orderId(orderId)
                 .participantId(participantId)
                 .price(price.amount(), price.currencyCode())
+                .paymentMethod(paymentMethod)
                 .build();
     }
 

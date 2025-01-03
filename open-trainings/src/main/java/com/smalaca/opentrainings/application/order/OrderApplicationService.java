@@ -40,7 +40,7 @@ public class OrderApplicationService {
         Order order = orderRepository.findById(command.orderId());
         PaymentMethod paymentMethod = PaymentMethod.of(command.paymentMethod());
 
-        OrderEvent event = order.confirm(paymentGateway, clock);
+        OrderEvent event = order.confirm(paymentMethod, paymentGateway, clock);
 
         orderRepository.save(order);
         eventRegistry.publish(event);
