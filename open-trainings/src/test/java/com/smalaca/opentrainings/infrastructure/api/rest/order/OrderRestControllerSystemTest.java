@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
+import com.smalaca.opentrainings.client.opentrainings.RestConfirmOrderTestCommand;
 import com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
@@ -27,6 +28,9 @@ import static org.mockito.BDDMockito.given;
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
 class OrderRestControllerSystemTest {
+    private static final String VALID_PAYMENT_METHOD = "CREDIT_CARD";
+    private static final String UNSUPPORTED_PAYMENT_METHOD = "NOT SUPPORTED";
+
     @Autowired
     private OrderRepository repository;
 
@@ -75,18 +79,50 @@ class OrderRestControllerSystemTest {
 
     @Test
     void shouldRecognizeOrderToConfirmDoesNotExist() {
-        RestOrderTestResponse actual = client.orders().confirm(UUID.randomUUID());
+        RestOrderTestResponse actual = client.orders().confirm(confirmOrderCommand(UUID.randomUUID()));
 
         assertThatOrderResponse(actual).notFound();
+    }
+
+    @Test
+    void shouldRecognizeOrderCannotBeConfirmed() {
+        UUID orderId = given.order().cancelled().getDto().getOrderId();
+
+        RestOrderTestResponse actual = client.orders().confirm(confirmOrderCommand(orderId));
+
+        assertThatOrderResponse(actual)
+                .isConflict()
+                .withMessage("Order: " + orderId + " already CANCELLED");
+    }
+
+    @Test
+    void shouldRejectUnsupportedPaymentForOrderConfirmation() {
+        UUID orderId = given.order().initiated().getDto().getOrderId();
+
+        RestOrderTestResponse actual = client.orders().confirm(confirmOrderCommand(orderId, UNSUPPORTED_PAYMENT_METHOD));
+
+        assertThatOrderResponse(actual)
+                .isOk()
+                .withMessage("Unsupported payment method: NOT SUPPORTED");
     }
 
     @Test
     void shouldProcessOrderConfirmationSuccessfully() {
         UUID orderId = given.order().initiated().getDto().getOrderId();
 
-        RestOrderTestResponse actual = client.orders().confirm(orderId);
+        RestOrderTestResponse actual = client.orders().confirm(confirmOrderCommand(orderId));
 
-        assertThatOrderResponse(actual).isOk();
+        assertThatOrderResponse(actual)
+                .isOk()
+                .withoutMessage();
+    }
+
+    private RestConfirmOrderTestCommand confirmOrderCommand(UUID orderId) {
+        return new RestConfirmOrderTestCommand(orderId, VALID_PAYMENT_METHOD);
+    }
+
+    private RestConfirmOrderTestCommand confirmOrderCommand(UUID orderId, String paymentMethod) {
+        return new RestConfirmOrderTestCommand(orderId, paymentMethod);
     }
 
     @Test
@@ -103,7 +139,7 @@ class OrderRestControllerSystemTest {
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
         assertThatOrderResponse(actual)
-                .isOk()
+                .isConflict()
                 .withMessage("Order: " + orderId + " already CONFIRMED");
     }
 
@@ -113,9 +149,7 @@ class OrderRestControllerSystemTest {
 
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
-        assertThatOrderResponse(actual)
-                .isOk()
-                .withoutMessage();
+        assertThatOrderResponse(actual).isOk();
     }
 
     @Test

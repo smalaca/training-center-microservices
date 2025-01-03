@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -28,6 +29,10 @@ public class RestOrderTestResponseAssertion {
 
     public RestOrderTestResponseAssertion isOk() {
         return hasStatus(OK);
+    }
+
+    public RestOrderTestResponseAssertion isConflict() {
+        return hasStatus(CONFLICT);
     }
 
     private RestOrderTestResponseAssertion hasStatus(HttpStatus expected) {

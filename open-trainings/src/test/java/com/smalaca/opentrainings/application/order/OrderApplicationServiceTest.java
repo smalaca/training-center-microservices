@@ -15,6 +15,8 @@ import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
+import com.smalaca.opentrainings.domain.paymentmethod.UnsupportedPaymentMethodException;
+import com.smalaca.opentrainings.domain.price.Price;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +36,7 @@ import static com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent
 import static com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion.assertThatTrainingPurchasedEvent;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.failed;
 import static com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse.successful;
+import static com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod.CREDIT_CARD;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,7 +68,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyConfirmed() {
         givenOrder().confirmed();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(confirmOrderCommand()));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
     }
@@ -74,7 +77,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyRejected() {
         givenOrder().rejected();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(confirmOrderCommand()));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
     }
@@ -83,7 +86,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyTerminated() {
         givenOrder().createdMinutesAgo(20).terminated();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(confirmOrderCommand()));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already TERMINATED");
     }
@@ -92,9 +95,19 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyCancelled() {
         givenOrder().cancelled();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(confirmOrderCommand()));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CANCELLED");
+    }
+
+    @Test
+    void shouldInterruptOrderConfirmationIfUnsupportedPaymentMethodGiven() {
+        givenOrder().initiated();
+        ConfirmOrderCommand command = new ConfirmOrderCommand(ORDER_ID, "UNSUPPORTED");
+
+        UnsupportedPaymentMethodException actual = assertThrows(UnsupportedPaymentMethodException.class, () -> service.confirm(command));
+
+        assertThat(actual).hasMessage("Unsupported payment method: UNSUPPORTED");
     }
 
     @ParameterizedTest
@@ -102,7 +115,7 @@ class OrderApplicationServiceTest {
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isRejected();
@@ -113,7 +126,7 @@ class OrderApplicationServiceTest {
     void shouldPublishOrderRejectedWhenOlderThanTenMinutes(int minutes) {
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         OrderRejectedEvent actual = thenOrderRejectedEventPublished();
         assertThatOrderRejectedEvent(actual)
@@ -126,7 +139,7 @@ class OrderApplicationServiceTest {
         givenPayment(failed());
         givenOrder().initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isRejected();
@@ -137,7 +150,7 @@ class OrderApplicationServiceTest {
         givenPayment(failed());
         givenOrder().initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         OrderRejectedEvent actual = thenOrderRejectedEventPublished();
         assertThatOrderRejectedEvent(actual)
@@ -158,7 +171,7 @@ class OrderApplicationServiceTest {
         givenPayment(successful());
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isConfirmed();
@@ -170,7 +183,7 @@ class OrderApplicationServiceTest {
         givenPayment(successful());
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(confirmOrderCommand());
 
         TrainingPurchasedEvent actual = thenTrainingPurchasedEventPublished();
         assertThatTrainingPurchasedEvent(actual)
@@ -178,6 +191,10 @@ class OrderApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
+    }
+
+    private ConfirmOrderCommand confirmOrderCommand() {
+        return new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD");
     }
 
     private TrainingPurchasedEvent thenTrainingPurchasedEventPublished() {
@@ -228,7 +245,8 @@ class OrderApplicationServiceTest {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(ORDER_ID)
                 .participantId(PARTICIPANT_ID)
-                .price(AMOUNT, CURRENCY)
+                .price(Price.of(AMOUNT, CURRENCY))
+                .paymentMethod(CREDIT_CARD)
                 .build();
         given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);
     }
