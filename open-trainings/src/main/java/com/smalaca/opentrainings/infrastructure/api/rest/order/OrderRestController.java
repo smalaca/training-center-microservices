@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.CONFLICT;
+
 @RestController
 @RequestMapping("order")
 public class OrderRestController {
@@ -29,12 +31,14 @@ public class OrderRestController {
 
     @PutMapping("{orderId}/confirm")
     @DrivingAdapter
-    public ResponseEntity<Void> confirm(@PathVariable UUID orderId) {
+    public ResponseEntity<String> confirm(@PathVariable UUID orderId) {
         try {
             applicationService.confirm(orderId);
             return ResponseEntity.ok().build();
         } catch (OrderDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
+        } catch (OrderInFinalStateException exception) {
+            return ResponseEntity.status(CONFLICT).body(exception.getMessage());
         }
     }
 
@@ -47,7 +51,7 @@ public class OrderRestController {
         } catch (OrderDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
         } catch (OrderInFinalStateException exception) {
-            return ResponseEntity.ok().body(exception.getMessage());
+            return ResponseEntity.status(CONFLICT).body(exception.getMessage());
         }
     }
 

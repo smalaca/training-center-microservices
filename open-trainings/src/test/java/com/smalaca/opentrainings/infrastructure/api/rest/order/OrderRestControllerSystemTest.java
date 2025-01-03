@@ -81,6 +81,17 @@ class OrderRestControllerSystemTest {
     }
 
     @Test
+    void shouldRecognizeOrderCannotBeConfirmed() {
+        UUID orderId = given.order().cancelled().getDto().getOrderId();
+
+        RestOrderTestResponse actual = client.orders().cancel(orderId);
+
+        assertThatOrderResponse(actual)
+                .isConflict()
+                .withMessage("Order: " + orderId + " already CANCELLED");
+    }
+
+    @Test
     void shouldProcessOrderConfirmationSuccessfully() {
         UUID orderId = given.order().initiated().getDto().getOrderId();
 
@@ -103,7 +114,7 @@ class OrderRestControllerSystemTest {
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
         assertThatOrderResponse(actual)
-                .isOk()
+                .isConflict()
                 .withMessage("Order: " + orderId + " already CONFIRMED");
     }
 
@@ -113,9 +124,7 @@ class OrderRestControllerSystemTest {
 
         RestOrderTestResponse actual = client.orders().cancel(orderId);
 
-        assertThatOrderResponse(actual)
-                .isOk()
-                .withoutMessage();
+        assertThatOrderResponse(actual).isOk();
     }
 
     @Test
