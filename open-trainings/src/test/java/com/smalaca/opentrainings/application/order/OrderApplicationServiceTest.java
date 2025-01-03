@@ -5,13 +5,18 @@ import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.order.GivenOrder;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.Order;
+import com.smalaca.opentrainings.domain.order.OrderAssertion;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTerminationNotYetPermittedException;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEventAssertion;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
+import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEventAssertion;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
@@ -117,8 +122,7 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        Order actual = thenOrderSaved();
-        assertThatOrder(actual).isRejected();
+        thenOrderSaved().isRejected();
     }
 
     @ParameterizedTest
@@ -128,8 +132,7 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        OrderRejectedEvent actual = thenOrderRejectedEventPublished();
-        assertThatOrderRejectedEvent(actual)
+        thenOrderRejectedEventPublished()
                 .hasOrderId(ORDER_ID)
                 .hasReason("Order expired");
     }
@@ -141,8 +144,7 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        Order actual = thenOrderSaved();
-        assertThatOrder(actual).isRejected();
+        thenOrderSaved().isRejected();
     }
 
     @Test
@@ -152,17 +154,17 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        OrderRejectedEvent actual = thenOrderRejectedEventPublished();
-        assertThatOrderRejectedEvent(actual)
+        thenOrderRejectedEventPublished()
                 .hasOrderId(ORDER_ID)
                 .hasReason("Could not complete payment.");
     }
 
-    private OrderRejectedEvent thenOrderRejectedEventPublished() {
+    private OrderRejectedEventAssertion thenOrderRejectedEventPublished() {
         ArgumentCaptor<OrderRejectedEvent> captor = ArgumentCaptor.forClass(OrderRejectedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
+        OrderRejectedEvent actual = captor.getValue();
 
-        return captor.getValue();
+        return assertThatOrderRejectedEvent(actual);
     }
 
     @ParameterizedTest
@@ -173,8 +175,7 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        Order actual = thenOrderSaved();
-        assertThatOrder(actual).isConfirmed();
+        thenOrderSaved().isConfirmed();
     }
 
     @ParameterizedTest
@@ -185,8 +186,7 @@ class OrderApplicationServiceTest {
 
         service.confirm(confirmOrderCommand());
 
-        TrainingPurchasedEvent actual = thenTrainingPurchasedEventPublished();
-        assertThatTrainingPurchasedEvent(actual)
+        thenTrainingPurchasedEventPublished()
                 .hasOrderId(ORDER_ID)
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
@@ -197,11 +197,12 @@ class OrderApplicationServiceTest {
         return new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD");
     }
 
-    private TrainingPurchasedEvent thenTrainingPurchasedEventPublished() {
+    private TrainingPurchasedEventAssertion thenTrainingPurchasedEventPublished() {
         ArgumentCaptor<TrainingPurchasedEvent> captor = ArgumentCaptor.forClass(TrainingPurchasedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
+        TrainingPurchasedEvent actual = captor.getValue();
 
-        return captor.getValue();
+        return assertThatTrainingPurchasedEvent(actual);
     }
 
     @Test
@@ -237,8 +238,7 @@ class OrderApplicationServiceTest {
 
         service.cancel(ORDER_ID);
 
-        Order actual = thenOrderSaved();
-        assertThatOrder(actual).isCancelled();
+        thenOrderSaved().isCancelled();
     }
 
     private void givenPayment(PaymentResponse paymentResponse) {
@@ -257,19 +257,19 @@ class OrderApplicationServiceTest {
 
         service.cancel(ORDER_ID);
 
-        OrderCancelledEvent actual = thenOrderCancelledEventPublished();
-        assertThatOrderCancelledEvent(actual)
+        thenOrderCancelledEventPublished()
                 .hasOrderId(ORDER_ID)
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
     }
 
-    private OrderCancelledEvent thenOrderCancelledEventPublished() {
+    private OrderCancelledEventAssertion thenOrderCancelledEventPublished() {
         ArgumentCaptor<OrderCancelledEvent> captor = ArgumentCaptor.forClass(OrderCancelledEvent.class);
         then(eventRegistry).should().publish(captor.capture());
+        OrderCancelledEvent actual = captor.getValue();
 
-        return captor.getValue();
+        return assertThatOrderCancelledEvent(actual);
     }
 
     @Test
@@ -316,8 +316,7 @@ class OrderApplicationServiceTest {
 
         service.terminate(ORDER_ID);
 
-        Order actual = thenOrderSaved();
-        assertThatOrder(actual).isTerminated();
+        thenOrderSaved().isTerminated();
     }
 
     @ParameterizedTest
@@ -327,26 +326,27 @@ class OrderApplicationServiceTest {
 
         service.terminate(ORDER_ID);
 
-        OrderTerminatedEvent actual = thenOrderTerminatedEventPublished();
-        assertThatOrderTerminatedEvent(actual)
+        thenOrderTerminatedEventPublished()
                 .hasOrderId(ORDER_ID)
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID);
     }
 
-    private OrderTerminatedEvent thenOrderTerminatedEventPublished() {
+    private OrderTerminatedEventAssertion thenOrderTerminatedEventPublished() {
         ArgumentCaptor<OrderTerminatedEvent> captor = ArgumentCaptor.forClass(OrderTerminatedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
+        OrderTerminatedEvent actual = captor.getValue();
 
-        return captor.getValue();
+        return assertThatOrderTerminatedEvent(actual);
     }
 
-    private Order thenOrderSaved() {
+    private OrderAssertion thenOrderSaved() {
         ArgumentCaptor<Order> captor = ArgumentCaptor.forClass(Order.class);
         then(orderRepository).should().save(captor.capture());
+        Order actual = captor.getValue();
 
-        return captor.getValue();
+        return assertThatOrder(actual);
     }
 
     private GivenOrder givenOrder() {

@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.Offer;
+import com.smalaca.opentrainings.domain.offer.OfferAssertion;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
@@ -82,7 +83,7 @@ class OfferApplicationServiceTest {
 
         service.accept(acceptOfferCommand());
 
-        assertThatOffer(thenOfferUpdated()).isRejected();
+        thenOfferUpdated().isRejected();
     }
 
     @Test
@@ -113,13 +114,15 @@ class OfferApplicationServiceTest {
 
         service.accept(acceptOfferCommand());
 
-        assertThatOffer(thenOfferUpdated()).isAccepted();
+        thenOfferUpdated().isAccepted();
     }
 
-    private Offer thenOfferUpdated() {
+    private OfferAssertion thenOfferUpdated() {
         ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
         then(offerRepository).should().save(captor.capture());
-        return captor.getValue();
+        Offer actual = captor.getValue();
+
+        return assertThatOffer(actual);
     }
 
     @Test
