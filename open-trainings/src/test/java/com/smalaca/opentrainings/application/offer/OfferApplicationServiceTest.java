@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.offer.GivenOffer;
+import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -9,9 +11,11 @@ import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
-import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
@@ -23,6 +27,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse.failed;
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,48 +56,86 @@ class OfferApplicationServiceTest {
     private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
             offerRepository, orderRepository, clock, personalDataManagement);
 
+    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
+
+    @BeforeEach
+    void givenNow() {
+        given(clock.now()).willReturn(now());
+    }
+
     @Test
     void shouldInterruptOfferAcceptanceIfCouldNotRetrieveParticipantId() {
-        givenOffer();
+        givenInitiatedOffer();
         givenParticipant(failed());
 
         assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommand()));
 
         then(offerRepository).should(never()).save(any());
-        then(orderRepository).should(never()).save(any());
+        thenOrderWasNotInitiated();
     }
 
-    @Test
-    void shouldAcceptOffer() {
+    @ParameterizedTest
+    @ValueSource(ints = {13, 20, 100})
+    void shouldRejectOfferWhenOlderThanTenMinutes(int minutes) {
         givenParticipant();
-        givenOffer();
+        givenOffer().createdMinutesAgo(minutes).initiated();
 
         service.accept(acceptOfferCommand());
 
-        assertThatOffer(thenOfferSaved()).isAccepted();
+        assertThatOffer(thenOfferUpdated()).isRejected();
+        thenOrderWasNotInitiated();
     }
 
-    private Offer thenOfferSaved() {
+    @ParameterizedTest
+    @ValueSource(ints = {13, 20, 100})
+    void shouldNotCreateOrderWhenOfferOlderThanTenMinutes(int minutes) {
+        givenParticipant();
+        givenOffer().createdMinutesAgo(minutes).initiated();
+
+        service.accept(acceptOfferCommand());
+
+        assertThatOffer(thenOfferUpdated()).isRejected();
+        thenOrderWasNotInitiated();
+    }
+
+    private UUID thenOrderWasNotInitiated() {
+        return then(orderRepository).should(never()).save(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3, 9, 10})
+    void shouldAcceptOffer(int minutes) {
+        givenParticipant();
+        givenOffer().createdMinutesAgo(minutes).initiated();
+
+        service.accept(acceptOfferCommand());
+
+        assertThatOffer(thenOfferUpdated()).isAccepted();
+    }
+
+    private Offer thenOfferUpdated() {
         ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
         then(offerRepository).should().save(captor.capture());
         return captor.getValue();
     }
 
-    @Test
-    void shouldReturnIdOfOrderCreatedWhenOfferAccepted() {
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3, 9, 10})
+    void shouldReturnIdOfOrderCreatedWhenOfferAccepted(int minutes) {
         givenParticipant();
         given(orderRepository.save(any())).willReturn(ORDER_ID);
-        givenOffer();
+        givenOffer().createdMinutesAgo(minutes).initiated();
 
         UUID actual = service.accept(acceptOfferCommand());
 
         assertThat(actual).isEqualTo(ORDER_ID);
     }
 
-    @Test
-    void shouldCreateOrderWhenOfferAccepted() {
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3, 9, 10})
+    void shouldCreateOrderWhenOfferAccepted(int minutes) {
         givenParticipant();
-        givenOffer();
+        givenOffer().createdMinutesAgo(minutes).initiated();
 
         service.accept(acceptOfferCommand());
 
@@ -120,9 +163,12 @@ class OfferApplicationServiceTest {
         given(personalDataManagement.save(request)).willReturn(response);
     }
 
-    private void givenOffer() {
-        Offer offer = new Offer(TRAINING_ID, Price.of(AMOUNT, CURRENCY));
-        given(offerRepository.findById(OFFER_ID)).willReturn(offer);
+    private void givenInitiatedOffer() {
+        givenOffer().initiated();
+    }
+
+    private GivenOffer givenOffer() {
+        return given.offer(OFFER_ID).trainingId(TRAINING_ID).amount(AMOUNT).currency(CURRENCY).initiated();
     }
 
     private Order thenOrderSaved() {

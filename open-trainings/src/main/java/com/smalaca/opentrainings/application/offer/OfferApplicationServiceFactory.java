@@ -13,6 +13,7 @@ public class OfferApplicationServiceFactory {
     @Bean
     public OfferApplicationService offerApplicationService(
             OfferRepository offerRepository, OrderRepository orderRepository, Clock clock, PersonalDataManagement personalDataManagement) {
-        return new OfferApplicationService(offerRepository, orderRepository, new OrderFactory(clock), personalDataManagement);
+        return new OfferApplicationService(
+                offerRepository, orderRepository, new OrderFactory(clock), personalDataManagement, clock);
     }
 }

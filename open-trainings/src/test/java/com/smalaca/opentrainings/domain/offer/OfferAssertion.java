@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OfferAssertion {
@@ -16,6 +17,11 @@ public class OfferAssertion {
 
     public OfferAssertion isAccepted() {
         assertThat(actual).extracting("status").isEqualTo(ACCEPTED);
+        return this;
+    }
+
+    public OfferAssertion isRejected() {
+        assertThat(actual).extracting("status").isEqualTo(REJECTED);
         return this;
     }
 }
