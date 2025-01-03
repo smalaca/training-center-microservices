@@ -3,6 +3,9 @@ package com.smalaca.opentrainings.domain.offer;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -56,18 +59,20 @@ public class Offer {
 
     private Offer() {}
 
-    public void accept(AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement, Clock clock) {
+    public OfferEvent accept(AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement, Clock clock) {
         if (isOlderThan10Minutes(clock)) {
             status = REJECTED;
-        } else {
-            PersonalDataResponse response = personalDataManagement.save(command.asPersonalDataRequest());
-
-            if (response.isFailed()) {
-                throw new MissingParticipantException();
-            }
-
-            status = OfferStatus.ACCEPTED;
+            return OfferRejectedEvent.expired(offerId);
         }
+
+        PersonalDataResponse response = personalDataManagement.save(command.asPersonalDataRequest());
+
+        if (response.isFailed()) {
+            throw new MissingParticipantException();
+        }
+
+        status = OfferStatus.ACCEPTED;
+        return OfferAcceptedEvent.create(offerId, trainingId, response.participantId(), price);
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {

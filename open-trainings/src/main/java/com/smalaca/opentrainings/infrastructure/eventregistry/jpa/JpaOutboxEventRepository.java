@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +17,11 @@ public class JpaOutboxEventRepository implements EventRegistry {
     JpaOutboxEventRepository(SpringOutboxEventCrudRepository repository, ObjectMapper objectMapper) {
         this.repository = repository;
         this.objectMapper = objectMapper;
+    }
+
+    @Override
+    public void publish(OfferEvent event) {
+
     }
 
     @Override

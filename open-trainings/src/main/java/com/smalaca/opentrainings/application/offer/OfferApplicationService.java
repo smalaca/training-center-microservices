@@ -7,6 +7,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,9 @@ public class OfferApplicationService {
     public void accept(AcceptOfferCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        offer.accept(command.asDomainCommand(), personalDataManagement, clock);
+        OfferEvent event = offer.accept(command.asDomainCommand(), personalDataManagement, clock);
 
         offerRepository.save(offer);
+        eventRegistry.publish(event);
     }
 }

@@ -7,6 +7,10 @@ import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
@@ -24,6 +28,8 @@ import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
+import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
 import static com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse.failed;
 import static java.time.LocalDateTime.now;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -79,6 +85,26 @@ class OfferApplicationServiceTest {
         assertThatOffer(thenOfferUpdated()).isRejected();
     }
 
+    @Test
+    void shouldPublishOfferRejectedEventWhenOlderThanTenMinutes() {
+        givenParticipant();
+        givenOffer().createdMinutesAgo(42).initiated();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferRejectedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasReason("Offer expired");
+    }
+
+    private OfferRejectedEventAssertion thenOfferRejectedEventPublished() {
+        ArgumentCaptor<OfferRejectedEvent> captor = ArgumentCaptor.forClass(OfferRejectedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        OfferRejectedEvent actual = captor.getValue();
+
+        return assertThatOfferRejectedEvent(actual);
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldAcceptOffer(int minutes) {
@@ -94,6 +120,28 @@ class OfferApplicationServiceTest {
         ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
         then(offerRepository).should().save(captor.capture());
         return captor.getValue();
+    }
+
+    @Test
+    void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
+        givenParticipant();
+        givenInitiatedOffer();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferAcceptedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasPrice(AMOUNT, CURRENCY);
+    }
+
+    private OfferAcceptedEventAssertion thenOfferAcceptedEventPublished() {
+        ArgumentCaptor<OfferAcceptedEvent> captor = ArgumentCaptor.forClass(OfferAcceptedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        OfferAcceptedEvent actual = captor.getValue();
+
+        return assertThatOfferAcceptedEvent(actual);
     }
 
     private AcceptOfferCommand acceptOfferCommand() {
