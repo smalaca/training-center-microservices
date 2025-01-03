@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
@@ -45,9 +46,10 @@ class OfferApplicationServiceTest {
     private static final String EMAIL = FAKER.internet().emailAddress();
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
+    private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final Clock clock = mock(Clock.class);
     private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
-    private final OfferApplicationService service = new OfferApplicationService(offerRepository, personalDataManagement, clock);
+    private final OfferApplicationService service = new OfferApplicationService(offerRepository, eventRegistry, personalDataManagement, clock);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
