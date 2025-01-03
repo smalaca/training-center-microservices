@@ -16,6 +16,7 @@ import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.UnsupportedPaymentMethodException;
+import com.smalaca.opentrainings.domain.price.Price;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -244,7 +245,7 @@ class OrderApplicationServiceTest {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(ORDER_ID)
                 .participantId(PARTICIPANT_ID)
-                .price(AMOUNT, CURRENCY)
+                .price(Price.of(AMOUNT, CURRENCY))
                 .paymentMethod(CREDIT_CARD)
                 .build();
         given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);

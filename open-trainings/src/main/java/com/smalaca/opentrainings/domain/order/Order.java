@@ -99,7 +99,7 @@ public class Order {
         return PaymentRequest.builder()
                 .orderId(orderId)
                 .participantId(participantId)
-                .price(price.amount(), price.currencyCode())
+                .price(price)
                 .paymentMethod(paymentMethod)
                 .build();
     }

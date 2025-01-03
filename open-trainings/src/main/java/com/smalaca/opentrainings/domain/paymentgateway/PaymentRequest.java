@@ -1,12 +1,11 @@
 package com.smalaca.opentrainings.domain.paymentgateway;
 
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
+import com.smalaca.opentrainings.domain.price.Price;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-public record PaymentRequest(
-        UUID orderId, UUID participantId, BigDecimal amount, String currency, PaymentMethod paymentMethod) {
+public record PaymentRequest(UUID orderId, UUID participantId, Price price, PaymentMethod paymentMethod) {
 
     public static PaymentRequestBuilder builder() {
         return new PaymentRequestBuilder();
@@ -15,8 +14,7 @@ public record PaymentRequest(
     public static class PaymentRequestBuilder {
         private UUID orderId;
         private UUID participantId;
-        private BigDecimal amount;
-        private String currency;
+        private Price price;
         private PaymentMethod paymentMethod;
 
         public PaymentRequestBuilder orderId(UUID orderId) {
@@ -29,9 +27,8 @@ public record PaymentRequest(
             return this;
         }
 
-        public PaymentRequestBuilder price(BigDecimal amount, String currency) {
-            this.amount = amount;
-            this.currency = currency;
+        public PaymentRequestBuilder price(Price price) {
+            this.price = price;
             return this;
         }
 
@@ -41,7 +38,7 @@ public record PaymentRequest(
         }
 
         public PaymentRequest build() {
-            return new PaymentRequest(orderId, participantId, amount, currency, paymentMethod);
+            return new PaymentRequest(orderId, participantId, price, paymentMethod);
         }
     }
 }
