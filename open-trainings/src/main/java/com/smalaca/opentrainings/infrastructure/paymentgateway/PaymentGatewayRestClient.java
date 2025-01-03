@@ -22,8 +22,17 @@ class PaymentGatewayRestClient implements PaymentGateway {
                 .post()
                 .uri("/payment")
                 .contentType(APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(asRestPaymentRequest(paymentRequest))
                 .retrieve()
                 .body(PaymentResponse.class);
+    }
+
+    private RestPaymentRequest asRestPaymentRequest(PaymentRequest request) {
+        return new RestPaymentRequest(
+                request.orderId(),
+                request.participantId(),
+                request.paymentMethod().name(),
+                request.price().amount(),
+                request.price().currencyCode());
     }
 }
