@@ -4,10 +4,10 @@ import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderFactory;
+import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -19,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @AggregateRoot
@@ -40,13 +41,17 @@ public class Offer {
     })
     private Price price;
 
+    @Column(name = "CREATION_DATE_TIME")
+    private LocalDateTime creationDateTime;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
     private OfferStatus status;
 
-    public Offer(UUID trainingId, Price price) {
+    public Offer(UUID trainingId, Price price, LocalDateTime creationDateTime) {
         this.trainingId = trainingId;
         this.price = price;
+        this.creationDateTime = creationDateTime;
     }
 
     private Offer() {}

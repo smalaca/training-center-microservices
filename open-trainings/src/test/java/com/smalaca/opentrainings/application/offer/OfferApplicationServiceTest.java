@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
@@ -121,7 +122,7 @@ class OfferApplicationServiceTest {
     }
 
     private void givenOffer() {
-        Offer offer = new Offer(TRAINING_ID, Price.of(AMOUNT, CURRENCY));
+        Offer offer = new Offer(TRAINING_ID, Price.of(AMOUNT, CURRENCY), LocalDateTime.now());
         given(offerRepository.findById(OFFER_ID)).willReturn(offer);
     }
 
