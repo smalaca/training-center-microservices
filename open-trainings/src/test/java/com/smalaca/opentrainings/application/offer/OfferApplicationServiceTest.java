@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.offer.GivenOffer;
+import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -9,13 +11,11 @@ import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
-import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
@@ -51,6 +51,8 @@ class OfferApplicationServiceTest {
     private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
     private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
             offerRepository, orderRepository, clock, personalDataManagement);
+
+    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
     @Test
     void shouldInterruptOfferAcceptanceIfCouldNotRetrieveParticipantId() {
@@ -121,9 +123,8 @@ class OfferApplicationServiceTest {
         given(personalDataManagement.save(request)).willReturn(response);
     }
 
-    private void givenOffer() {
-        Offer offer = new Offer(TRAINING_ID, Price.of(AMOUNT, CURRENCY), LocalDateTime.now());
-        given(offerRepository.findById(OFFER_ID)).willReturn(offer);
+    private GivenOffer givenOffer() {
+        return given.offer(OFFER_ID).trainingId(TRAINING_ID).amount(AMOUNT).currency(CURRENCY).initiated();
     }
 
     private Order thenOrderSaved() {
