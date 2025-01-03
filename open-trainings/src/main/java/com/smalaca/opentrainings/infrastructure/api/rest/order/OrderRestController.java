@@ -1,8 +1,10 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
 import com.smalaca.architecture.portsandadapters.DrivingAdapter;
+import com.smalaca.opentrainings.application.order.ConfirmOrderCommand;
 import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
+import com.smalaca.opentrainings.domain.paymentmethod.UnsupportedPaymentMethodException;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.OrderDoesNotExistException;
 import com.smalaca.opentrainings.query.order.OrderDto;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,10 +34,12 @@ public class OrderRestController {
 
     @PutMapping("{orderId}/confirm")
     @DrivingAdapter
-    public ResponseEntity<String> confirm(@PathVariable UUID orderId) {
+    public ResponseEntity<String> confirm(@RequestBody ConfirmOrderCommand command) {
         try {
-            applicationService.confirm(orderId);
+            applicationService.confirm(command);
             return ResponseEntity.ok().build();
+        } catch (UnsupportedPaymentMethodException exception) {
+            return ResponseEntity.ok().body(exception.getMessage());
         } catch (OrderDoesNotExistException exception) {
             return ResponseEntity.notFound().build();
         } catch (OrderInFinalStateException exception) {

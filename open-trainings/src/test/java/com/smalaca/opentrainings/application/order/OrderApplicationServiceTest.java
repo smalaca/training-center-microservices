@@ -65,7 +65,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyConfirmed() {
         givenOrder().confirmed();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD")));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CONFIRMED");
     }
@@ -74,7 +74,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyRejected() {
         givenOrder().rejected();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD")));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already REJECTED");
     }
@@ -83,7 +83,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyTerminated() {
         givenOrder().createdMinutesAgo(20).terminated();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD")));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already TERMINATED");
     }
@@ -92,7 +92,7 @@ class OrderApplicationServiceTest {
     void shouldInterruptOrderConfirmationIfOrderAlreadyCancelled() {
         givenOrder().cancelled();
 
-        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(ORDER_ID));
+        OrderInFinalStateException actual = assertThrows(OrderInFinalStateException.class, () -> service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD")));
 
         assertThat(actual).hasMessage("Order: " + ORDER_ID + " already CANCELLED");
     }
@@ -102,7 +102,7 @@ class OrderApplicationServiceTest {
     void shouldRejectOrderWhenOlderThanTenMinutes(int minutes) {
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isRejected();
@@ -113,7 +113,7 @@ class OrderApplicationServiceTest {
     void shouldPublishOrderRejectedWhenOlderThanTenMinutes(int minutes) {
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         OrderRejectedEvent actual = thenOrderRejectedEventPublished();
         assertThatOrderRejectedEvent(actual)
@@ -126,7 +126,7 @@ class OrderApplicationServiceTest {
         givenPayment(failed());
         givenOrder().initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isRejected();
@@ -137,7 +137,7 @@ class OrderApplicationServiceTest {
         givenPayment(failed());
         givenOrder().initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         OrderRejectedEvent actual = thenOrderRejectedEventPublished();
         assertThatOrderRejectedEvent(actual)
@@ -158,7 +158,7 @@ class OrderApplicationServiceTest {
         givenPayment(successful());
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         Order actual = thenOrderSaved();
         assertThatOrder(actual).isConfirmed();
@@ -170,7 +170,7 @@ class OrderApplicationServiceTest {
         givenPayment(successful());
         givenOrder().createdMinutesAgo(minutes).initiated();
 
-        service.confirm(ORDER_ID);
+        service.confirm(new ConfirmOrderCommand(ORDER_ID, "CREDIT_CARD"));
 
         TrainingPurchasedEvent actual = thenTrainingPurchasedEventPublished();
         assertThatTrainingPurchasedEvent(actual)

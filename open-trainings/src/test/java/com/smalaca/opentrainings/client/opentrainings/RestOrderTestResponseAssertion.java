@@ -98,4 +98,9 @@ public class RestOrderTestResponseAssertion {
         assertThat(actual.asString()).isEqualTo(expected);
         return this;
     }
+
+    public RestOrderTestResponseAssertion withoutMessage() {
+        assertThat(actual.asString()).isEmpty();
+        return this;
+    }
 }

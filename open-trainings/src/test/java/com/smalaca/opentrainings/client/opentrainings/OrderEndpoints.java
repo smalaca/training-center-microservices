@@ -1,9 +1,12 @@
 package com.smalaca.opentrainings.client.opentrainings;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.UUID;
 
@@ -27,8 +30,19 @@ public class OrderEndpoints {
         return performSafe(get("/order/" + orderId));
     }
 
-    public RestOrderTestResponse confirm(UUID orderId) {
-        return performSafe(put("/order/" + orderId + "/confirm"));
+    public RestOrderTestResponse confirm(RestConfirmOrderTestCommand command) {
+        MockHttpServletRequestBuilder request = put("/order/" + command.orderId() + "/confirm")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJson(command));
+        return performSafe(request);
+    }
+
+    private String asJson(Object command) {
+        try {
+            return objectMapper.writeValueAsString(command);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public RestOrderTestResponse cancel(UUID orderId) {

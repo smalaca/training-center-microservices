@@ -11,6 +11,7 @@ import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
+import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +36,9 @@ public class OrderApplicationService {
     @Transactional
     @DrivingPort
     @CommandOperation
-    public void confirm(UUID orderId) {
-        Order order = orderRepository.findById(orderId);
+    public void confirm(ConfirmOrderCommand command) {
+        Order order = orderRepository.findById(command.orderId());
+        PaymentMethod paymentMethod = PaymentMethod.of(command.paymentMethod());
 
         OrderEvent event = order.confirm(paymentGateway, clock);
 
