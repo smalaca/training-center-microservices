@@ -3,9 +3,9 @@ package com.smalaca.opentrainings.domain.offer;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
-import com.smalaca.opentrainings.domain.order.Order;
-import com.smalaca.opentrainings.domain.order.OrderFactory;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -21,7 +21,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
@@ -60,11 +59,10 @@ public class Offer {
 
     private Offer() {}
 
-    public Optional<Order> accept(
-            AcceptOfferDomainCommand command, OrderFactory orderFactory, PersonalDataManagement personalDataManagement, Clock clock) {
+    public OfferEvent accept(AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement, Clock clock) {
         if (isOlderThan10Minutes(clock)) {
             status = REJECTED;
-            return Optional.empty();
+            return OfferRejectedEvent.expired(offerId);
         }
 
         PersonalDataResponse response = personalDataManagement.save(command.asPersonalDataRequest());
@@ -73,22 +71,13 @@ public class Offer {
             throw new MissingParticipantException();
         }
 
-        return accept(response.participantId(), orderFactory);
+        status = OfferStatus.ACCEPTED;
+        return OfferAcceptedEvent.create(offerId, trainingId, response.participantId(), price);
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {
         LocalDateTime now = clock.now();
         LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
         return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
-    }
-
-    private Optional<Order> accept(UUID participantId, OrderFactory orderFactory) {
-        status = OfferStatus.ACCEPTED;
-        CreateOrderDomainCommand command = createOrderCommandWith(participantId);
-        return Optional.of(orderFactory.create(command));
-    }
-
-    private CreateOrderDomainCommand createOrderCommandWith(UUID participantId) {
-        return new CreateOrderDomainCommand(offerId, trainingId, participantId, price);
     }
 }

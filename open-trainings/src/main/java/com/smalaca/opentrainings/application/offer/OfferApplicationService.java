@@ -4,31 +4,23 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
-import com.smalaca.opentrainings.domain.order.Order;
-import com.smalaca.opentrainings.domain.order.OrderFactory;
-import com.smalaca.opentrainings.domain.order.OrderRepository;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @ApplicationLayer
 public class OfferApplicationService {
     private final OfferRepository offerRepository;
-    private final OrderRepository orderRepository;
-    private final OrderFactory orderFactory;
+    private final EventRegistry eventRegistry;
     private final PersonalDataManagement personalDataManagement;
     private final Clock clock;
 
-    OfferApplicationService(
-            OfferRepository offerRepository, OrderRepository orderRepository, OrderFactory orderFactory,
-            PersonalDataManagement personalDataManagement, Clock clock) {
+    OfferApplicationService(OfferRepository offerRepository, EventRegistry eventRegistry, PersonalDataManagement personalDataManagement, Clock clock) {
         this.offerRepository = offerRepository;
-        this.orderRepository = orderRepository;
-        this.orderFactory = orderFactory;
+        this.eventRegistry = eventRegistry;
         this.personalDataManagement = personalDataManagement;
         this.clock = clock;
     }
@@ -36,12 +28,12 @@ public class OfferApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public UUID accept(AcceptOfferCommand command) {
+    public void accept(AcceptOfferCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        Optional<Order> order = offer.accept(command.asDomainCommand(), orderFactory, personalDataManagement, clock);
+        OfferEvent event = offer.accept(command.asDomainCommand(), personalDataManagement, clock);
 
         offerRepository.save(offer);
-        return order.map(orderRepository::save).orElse(null);
+        eventRegistry.publish(event);
     }
 }
