@@ -1,7 +1,11 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
+import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
+import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.offer.DiscountException;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
@@ -37,6 +41,7 @@ import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAs
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
 import static com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse.failed;
 import static java.time.LocalDateTime.now;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -56,13 +61,16 @@ class OfferApplicationServiceTest {
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String NO_DISCOUNT_CODE = null;
+    private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
     private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
+    private final DiscountService discountService = mock(DiscountService.class);
     private final Clock clock = mock(Clock.class);
-    private final OfferApplicationService service = new OfferApplicationService(offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, clock);
+    private final OfferApplicationService service = new OfferApplicationService(
+            offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, discountService, clock);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
@@ -79,6 +87,20 @@ class OfferApplicationServiceTest {
 
         assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommandWithoutDiscount()));
 
+        then(offerRepository).should(never()).save(any());
+    }
+
+    @Test
+    void shouldInterruptOfferAcceptanceIfCannotUseDiscountCode() {
+        givenInitiatedOffer();
+        givenParticipant();
+        givenAvailableTraining();
+        givenDiscount(DiscountResponse.failed("EXPIRED"));
+        AcceptOfferCommand command = acceptOfferCommandWithDiscount(DISCOUNT_CODE);
+
+        DiscountException actual = assertThrows(DiscountException.class, () -> service.accept(command));
+
+        assertThat(actual).hasMessage("Discount Code could not be used because: EXPIRED");
         then(offerRepository).should(never()).save(any());
     }
 
@@ -184,6 +206,41 @@ class OfferApplicationServiceTest {
                 .hasPrice(AMOUNT, CURRENCY);
     }
 
+    @Test
+    void shouldAcceptOfferWithPriceAfterDiscount() {
+        givenInitiatedOffer();
+        givenParticipant();
+        givenAvailableTraining();
+        givenDiscount(DiscountResponse.successful(Price.of(randomAmount(), randomCurrency())));
+
+        service.accept(acceptOfferCommandWithoutDiscount());
+
+        thenOfferUpdated().isAccepted();
+    }
+
+    @Test
+    void shouldPublishOfferAcceptedEventWithPriceAfterDiscount() {
+        BigDecimal newAmount = randomAmount();
+        String newCurrency = randomCurrency();
+        givenInitiatedOffer();
+        givenParticipant();
+        givenAvailableTraining();
+        givenDiscount(DiscountResponse.successful(Price.of(newAmount, newCurrency)));
+
+        service.accept(acceptOfferCommandWithDiscount(DISCOUNT_CODE));
+
+        thenOfferAcceptedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasPrice(newAmount, newCurrency);
+    }
+
+    private void givenDiscount(DiscountResponse response) {
+        DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, Price.of(AMOUNT, CURRENCY), DISCOUNT_CODE);
+        given(discountService.calculatePriceFor(dto)).willReturn(response);
+    }
+
     private void givenAvailableTrainingWithPriceChanged() {
         BigDecimal newPrice = AMOUNT.add(randomAmount());
         given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(Price.of(newPrice, CURRENCY));
@@ -234,7 +291,11 @@ class OfferApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
-        return new AcceptOfferCommand(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, NO_DISCOUNT_CODE);
+        return acceptOfferCommandWithDiscount(NO_DISCOUNT_CODE);
+    }
+
+    private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
+        return new AcceptOfferCommand(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
     }
 
     private void givenParticipant() {

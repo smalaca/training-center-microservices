@@ -10,4 +10,8 @@ public record AcceptOfferDomainCommand(String firstName, String lastName, String
                 .email(email)
                 .build();
     }
+
+    public boolean hasDiscountCode() {
+        return discountCode != null ;
+    }
 }
