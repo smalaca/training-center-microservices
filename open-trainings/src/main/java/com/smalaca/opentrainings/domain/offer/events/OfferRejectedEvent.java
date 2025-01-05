@@ -12,4 +12,8 @@ public record OfferRejectedEvent(EventId eventId, UUID offerId, String reason) i
     public static OfferRejectedEvent expired(UUID offerId) {
         return new OfferRejectedEvent(newEventId(), offerId, "Offer expired");
     }
+
+    public static OfferEvent trainingNoLongerAvailable(UUID offerId) {
+        return new OfferRejectedEvent(newEventId(), offerId, "Training no longer available");
+    }
 }
