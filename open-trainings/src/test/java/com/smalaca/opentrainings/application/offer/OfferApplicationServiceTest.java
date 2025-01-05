@@ -55,6 +55,7 @@ class OfferApplicationServiceTest {
     private static final String FIRST_NAME = FAKER.name().firstName();
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
+    private static final String NO_DISCOUNT_CODE = null;
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -76,7 +77,7 @@ class OfferApplicationServiceTest {
         givenParticipant(failed());
         givenAvailableTraining();
 
-        assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommand()));
+        assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommandWithoutDiscount()));
 
         then(offerRepository).should(never()).save(any());
     }
@@ -88,7 +89,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTrainingWithPriceChanged();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferUpdated().isRejected();
     }
@@ -99,7 +100,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTrainingWithPriceChanged();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
@@ -112,7 +113,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenNotAvailableTraining();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferUpdated().isRejected();
     }
@@ -123,7 +124,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenNotAvailableTraining();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
@@ -137,7 +138,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTraining();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferUpdated().isAccepted();
     }
@@ -148,7 +149,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTraining();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferAcceptedEventPublished()
                 .hasOfferId(OFFER_ID)
@@ -163,7 +164,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTrainingWithSamePrice();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferUpdated().isAccepted();
     }
@@ -174,7 +175,7 @@ class OfferApplicationServiceTest {
         givenParticipant();
         givenAvailableTrainingWithSamePrice();
 
-        service.accept(acceptOfferCommand());
+        service.accept(acceptOfferCommandWithoutDiscount());
 
         thenOfferAcceptedEventPublished()
                 .hasOfferId(OFFER_ID)
@@ -232,8 +233,8 @@ class OfferApplicationServiceTest {
         return assertThatOfferAcceptedEvent(actual);
     }
 
-    private AcceptOfferCommand acceptOfferCommand() {
-        return new AcceptOfferCommand(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL);
+    private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
+        return new AcceptOfferCommand(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, NO_DISCOUNT_CODE);
     }
 
     private void givenParticipant() {
