@@ -15,6 +15,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
+import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
@@ -82,10 +83,10 @@ class OfferApplicationServiceTest {
 
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
-    void shouldRejectOfferWhenOlderThanTenMinutes(int minutes) {
+    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
         givenOffer().createdMinutesAgo(minutes).initiated();
         givenParticipant();
-        givenAvailableTraining();
+        givenAvailableTrainingWithPriceChanged();
 
         service.accept(acceptOfferCommand());
 
@@ -93,10 +94,10 @@ class OfferApplicationServiceTest {
     }
 
     @Test
-    void shouldPublishOfferRejectedEventWhenOlderThanTenMinutes() {
+    void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
         givenOffer().createdMinutesAgo(42).initiated();
         givenParticipant();
-        givenAvailableTraining();
+        givenAvailableTrainingWithPriceChanged();
 
         service.accept(acceptOfferCommand());
 
@@ -154,6 +155,43 @@ class OfferApplicationServiceTest {
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasPrice(AMOUNT, CURRENCY);
+    }
+
+    @Test
+    void shouldAcceptExpiredOfferWhenTrainingPriceDidNotChanged() {
+        givenOffer().createdMinutesAgo(16).initiated();
+        givenParticipant();
+        givenAvailableTrainingWithSamePrice();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferUpdated().isAccepted();
+    }
+
+    @Test
+    void shouldPublishOfferAcceptedEventWhenExpiredOfferAndTrainingPriceDidNotChanged() {
+        givenOffer().createdMinutesAgo(120).initiated();
+        givenParticipant();
+        givenAvailableTrainingWithSamePrice();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferAcceptedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasPrice(AMOUNT, CURRENCY);
+    }
+
+    private void givenAvailableTrainingWithPriceChanged() {
+        BigDecimal newPrice = AMOUNT.add(randomAmount());
+        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(Price.of(newPrice, CURRENCY));
+        givenAvailableTraining();
+    }
+
+    private void givenAvailableTrainingWithSamePrice() {
+        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(Price.of(AMOUNT, CURRENCY));
+        givenAvailableTraining();
     }
 
     private void givenAvailableTraining() {

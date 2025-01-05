@@ -65,7 +65,7 @@ public class Offer {
     public OfferEvent accept(
             AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
             TrainingOfferCatalogue trainingOfferCatalogue, Clock clock) {
-        if (isOlderThan10Minutes(clock)) {
+        if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             status = REJECTED;
             return OfferRejectedEvent.expired(offerId);
         }
@@ -85,6 +85,15 @@ public class Offer {
 
         status = OfferStatus.ACCEPTED;
         return OfferAcceptedEvent.create(offerId, trainingId, response.participantId(), price);
+    }
+
+    private boolean isOfferNotAvailable(Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
+        return isOlderThan10Minutes(clock) && trainingPriceChanged(trainingOfferCatalogue);
+    }
+
+    private boolean trainingPriceChanged(TrainingOfferCatalogue trainingOfferCatalogue) {
+        Price currentPrice = trainingOfferCatalogue.priceFor(trainingId);
+        return price.differentThan(currentPrice);
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {
