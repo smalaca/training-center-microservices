@@ -2,6 +2,9 @@ package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
+import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
+import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
@@ -64,7 +67,7 @@ public class Offer {
 
     public OfferEvent accept(
             AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
-            TrainingOfferCatalogue trainingOfferCatalogue, Clock clock) {
+            TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             status = REJECTED;
             return OfferRejectedEvent.expired(offerId);
@@ -76,6 +79,21 @@ public class Offer {
             throw new MissingParticipantException();
         }
 
+        if (command.hasDiscountCode()) {
+            DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, price, command.discountCode());
+            DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
+
+            if (discount.isFailed()) {
+                throw new DiscountException(discount.failureReason());
+            }
+
+            return accept(discount.newPrice(), response, trainingOfferCatalogue);
+        }
+
+        return accept(price, response, trainingOfferCatalogue);
+    }
+
+    private OfferEvent accept(Price price, PersonalDataResponse response, TrainingOfferCatalogue trainingOfferCatalogue) {
         TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, response.participantId()));
 
         if (booking.isFailed()) {
