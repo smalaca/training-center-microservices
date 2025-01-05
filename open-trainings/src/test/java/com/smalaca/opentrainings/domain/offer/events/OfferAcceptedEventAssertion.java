@@ -33,8 +33,23 @@ public class OfferAcceptedEventAssertion {
         return this;
     }
 
-    public OfferAcceptedEventAssertion hasPrice(BigDecimal amount, String currency) {
-        assertThat(actual.price()).isEqualTo(Price.of(amount, currency));
+    public OfferAcceptedEventAssertion hasTrainingPrice(BigDecimal amount, String currency) {
+        assertThat(actual.trainingPrice()).isEqualTo(Price.of(amount, currency));
+        return this;
+    }
+
+    public OfferAcceptedEventAssertion hasFinalPrice(BigDecimal amount, String currency) {
+        assertThat(actual.finalPrice()).isEqualTo(Price.of(amount, currency));
+        return this;
+    }
+
+    public OfferAcceptedEventAssertion hasNoDiscountCode() {
+        assertThat(actual.discountCode()).isNull();
+        return this;
+    }
+
+    public OfferAcceptedEventAssertion hasDiscountCode(String expected) {
+        assertThat(actual.discountCode()).isEqualTo(expected);
         return this;
     }
 }
