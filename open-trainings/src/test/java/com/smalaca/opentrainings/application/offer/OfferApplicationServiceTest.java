@@ -177,7 +177,9 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasPrice(AMOUNT, CURRENCY);
+                .hasTrainingPrice(AMOUNT, CURRENCY)
+                .hasFinalPrice(AMOUNT, CURRENCY)
+                .hasNoDiscountCode();
     }
 
     @Test
@@ -203,7 +205,9 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasPrice(AMOUNT, CURRENCY);
+                .hasTrainingPrice(AMOUNT, CURRENCY)
+                .hasFinalPrice(AMOUNT, CURRENCY)
+                .hasNoDiscountCode();
     }
 
     @Test
@@ -233,7 +237,9 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasPrice(newAmount, newCurrency);
+                .hasTrainingPrice(AMOUNT, CURRENCY)
+                .hasFinalPrice(newAmount, newCurrency)
+                .hasDiscountCode(DISCOUNT_CODE);
     }
 
     private void givenDiscount(DiscountResponse response) {

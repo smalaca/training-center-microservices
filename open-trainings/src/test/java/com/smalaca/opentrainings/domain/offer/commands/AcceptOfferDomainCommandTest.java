@@ -20,14 +20,14 @@ class AcceptOfferDomainCommandTest {
     void shouldRecognizeHasDiscountCode() {
         AcceptOfferDomainCommand actual = new AcceptOfferDomainCommand(FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
 
-        assertThat(actual.hasDiscountCode()).isTrue();
+        assertThat(actual.hasNoDiscountCode()).isFalse();
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    void shouldRecognizeDoesNotHaveDiscountCode(String discountCode) {
+    void shouldRecognizeHasNoDiscountCode(String discountCode) {
         AcceptOfferDomainCommand actual = new AcceptOfferDomainCommand(FIRST_NAME, LAST_NAME, EMAIL, discountCode);
 
-        assertThat(actual.hasDiscountCode()).isFalse();
+        assertThat(actual.hasNoDiscountCode()).isTrue();
     }
 }

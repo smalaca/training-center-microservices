@@ -12,7 +12,7 @@ public record AcceptOfferDomainCommand(String firstName, String lastName, String
                 .build();
     }
 
-    public boolean hasDiscountCode() {
-        return !Strings.isNullOrEmpty(discountCode);
+    public boolean hasNoDiscountCode() {
+        return Strings.isNullOrEmpty(discountCode);
     }
 }

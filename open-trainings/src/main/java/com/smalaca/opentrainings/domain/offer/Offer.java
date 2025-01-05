@@ -6,7 +6,6 @@ import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
-import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
@@ -30,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 
 @AggregateRoot
 @Entity
@@ -79,21 +79,8 @@ public class Offer {
             throw new MissingParticipantException();
         }
 
-        if (command.hasDiscountCode()) {
-            DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, price, command.discountCode());
-            DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
+        Price finalPrice = finalPrice(command, discountService, response);
 
-            if (discount.isFailed()) {
-                throw new DiscountException(discount.failureReason());
-            }
-
-            return accept(discount.newPrice(), response, trainingOfferCatalogue);
-        }
-
-        return accept(price, response, trainingOfferCatalogue);
-    }
-
-    private OfferEvent accept(Price price, PersonalDataResponse response, TrainingOfferCatalogue trainingOfferCatalogue) {
         TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, response.participantId()));
 
         if (booking.isFailed()) {
@@ -102,7 +89,30 @@ public class Offer {
         }
 
         status = OfferStatus.ACCEPTED;
-        return OfferAcceptedEvent.create(offerId, trainingId, response.participantId(), price);
+
+        return offerAcceptedEventBuilder()
+                .withOfferId(offerId)
+                .withTrainingId(trainingId)
+                .withParticipantId(response.participantId())
+                .withTrainingPrice(price)
+                .withFinalPrice(finalPrice)
+                .withDiscountCode(command.discountCode())
+                .build();
+    }
+
+    private Price finalPrice(AcceptOfferDomainCommand command, DiscountService discountService, PersonalDataResponse response) {
+        if (command.hasNoDiscountCode()) {
+            return price;
+        }
+
+        DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, price, command.discountCode());
+        DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
+
+        if (discount.isFailed()) {
+            throw new DiscountException(discount.failureReason());
+        }
+
+        return discount.newPrice();
     }
 
     private boolean isOfferNotAvailable(Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {

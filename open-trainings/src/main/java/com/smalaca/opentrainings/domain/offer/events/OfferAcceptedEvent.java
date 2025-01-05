@@ -7,8 +7,54 @@ import com.smalaca.opentrainings.domain.price.Price;
 import java.util.UUID;
 
 @DomainEvent
-public record OfferAcceptedEvent(EventId eventId, UUID offerId, UUID trainingId, UUID participantId, Price price) implements OfferEvent {
-    public static OfferAcceptedEvent create(UUID offerId, UUID trainingId, UUID participantId, Price price) {
-        return new OfferAcceptedEvent(EventId.newEventId(), offerId, trainingId, participantId, price);
+public record OfferAcceptedEvent(
+        EventId eventId, UUID offerId, UUID trainingId, UUID participantId,
+        Price trainingPrice, Price finalPrice, String discountCode) implements OfferEvent {
+
+    public static OfferAcceptedEvent.Builder offerAcceptedEventBuilder() {
+        return new OfferAcceptedEvent.Builder();
+    }
+
+    public static class Builder {
+        private UUID offerId;
+        private UUID trainingId;
+        private UUID participantId;
+        private Price trainingPrice;
+        private Price finalPrice;
+        private String discountCode;
+
+        public Builder withOfferId(UUID offerId) {
+            this.offerId = offerId;
+            return this;
+        }
+
+        public Builder withTrainingId(UUID trainingId) {
+            this.trainingId = trainingId;
+            return this;
+        }
+
+        public Builder withParticipantId(UUID participantId) {
+            this.participantId = participantId;
+            return this;
+        }
+
+        public Builder withTrainingPrice(Price trainingPrice) {
+            this.trainingPrice = trainingPrice;
+            return this;
+        }
+
+        public Builder withFinalPrice(Price finalPrice) {
+            this.finalPrice = finalPrice;
+            return this;
+        }
+
+        public Builder withDiscountCode(String discountCode) {
+            this.discountCode = discountCode;
+            return this;
+        }
+
+        public OfferAcceptedEvent build() {
+            return new OfferAcceptedEvent(EventId.newEventId(), offerId, trainingId, participantId, trainingPrice, finalPrice, discountCode);
+        }
     }
 }
