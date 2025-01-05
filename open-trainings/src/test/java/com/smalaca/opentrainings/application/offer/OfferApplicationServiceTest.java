@@ -15,6 +15,9 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,9 +57,10 @@ class OfferApplicationServiceTest {
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final Clock clock = mock(Clock.class);
     private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
-    private final OfferApplicationService service = new OfferApplicationService(offerRepository, eventRegistry, personalDataManagement, clock);
+    private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
+    private final Clock clock = mock(Clock.class);
+    private final OfferApplicationService service = new OfferApplicationService(offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, clock);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
@@ -69,6 +73,7 @@ class OfferApplicationServiceTest {
     void shouldInterruptOfferAcceptanceIfCouldNotRetrieveParticipantId() {
         givenInitiatedOffer();
         givenParticipant(failed());
+        givenAvailableTraining();
 
         assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommand()));
 
@@ -78,8 +83,9 @@ class OfferApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOfferWhenOlderThanTenMinutes(int minutes) {
-        givenParticipant();
         givenOffer().createdMinutesAgo(minutes).initiated();
+        givenParticipant();
+        givenAvailableTraining();
 
         service.accept(acceptOfferCommand());
 
@@ -88,8 +94,9 @@ class OfferApplicationServiceTest {
 
     @Test
     void shouldPublishOfferRejectedEventWhenOlderThanTenMinutes() {
-        givenParticipant();
         givenOffer().createdMinutesAgo(42).initiated();
+        givenParticipant();
+        givenAvailableTraining();
 
         service.accept(acceptOfferCommand());
 
@@ -98,23 +105,69 @@ class OfferApplicationServiceTest {
                 .hasReason("Offer expired");
     }
 
-    private OfferRejectedEventAssertion thenOfferRejectedEventPublished() {
-        ArgumentCaptor<OfferRejectedEvent> captor = ArgumentCaptor.forClass(OfferRejectedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        OfferRejectedEvent actual = captor.getValue();
+    @Test
+    void shouldRejectOfferWhenTrainingNoLongerAvailable() {
+        givenInitiatedOffer();
+        givenParticipant();
+        givenNotAvailableTraining();
 
-        return assertThatOfferRejectedEvent(actual);
+        service.accept(acceptOfferCommand());
+
+        thenOfferUpdated().isRejected();
+    }
+
+    @Test
+    void shouldPublishOfferRejectedEventWhenTrainingNoLongerAvailable() {
+        givenInitiatedOffer();
+        givenParticipant();
+        givenNotAvailableTraining();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferRejectedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasReason("Training no longer available");
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldAcceptOffer(int minutes) {
-        givenParticipant();
         givenOffer().createdMinutesAgo(minutes).initiated();
+        givenParticipant();
+        givenAvailableTraining();
 
         service.accept(acceptOfferCommand());
 
         thenOfferUpdated().isAccepted();
+    }
+
+    @Test
+    void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
+        givenInitiatedOffer();
+        givenParticipant();
+        givenAvailableTraining();
+
+        service.accept(acceptOfferCommand());
+
+        thenOfferAcceptedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasPrice(AMOUNT, CURRENCY);
+    }
+
+    private void givenAvailableTraining() {
+        givenTraining(TrainingBookingResponse.successful(TRAINING_ID, PARTICIPANT_ID));
+    }
+
+    private void givenNotAvailableTraining() {
+        givenTraining(TrainingBookingResponse.failed(TRAINING_ID, PARTICIPANT_ID));
+    }
+
+    private void givenTraining(TrainingBookingResponse response) {
+        TrainingBookingDto dto = new TrainingBookingDto(TRAINING_ID, PARTICIPANT_ID);
+
+        given(trainingOfferCatalogue.book(dto)).willReturn(response);
     }
 
     private OfferAssertion thenOfferUpdated() {
@@ -125,18 +178,12 @@ class OfferApplicationServiceTest {
         return assertThatOffer(actual);
     }
 
-    @Test
-    void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
-        givenParticipant();
-        givenInitiatedOffer();
+    private OfferRejectedEventAssertion thenOfferRejectedEventPublished() {
+        ArgumentCaptor<OfferRejectedEvent> captor = ArgumentCaptor.forClass(OfferRejectedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        OfferRejectedEvent actual = captor.getValue();
 
-        service.accept(acceptOfferCommand());
-
-        thenOfferAcceptedEventPublished()
-                .hasOfferId(OFFER_ID)
-                .hasTrainingId(TRAINING_ID)
-                .hasParticipantId(PARTICIPANT_ID)
-                .hasPrice(AMOUNT, CURRENCY);
+        return assertThatOfferRejectedEvent(actual);
     }
 
     private OfferAcceptedEventAssertion thenOfferAcceptedEventPublished() {

@@ -9,6 +9,9 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -59,7 +62,9 @@ public class Offer {
 
     private Offer() {}
 
-    public OfferEvent accept(AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement, Clock clock) {
+    public OfferEvent accept(
+            AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
+            TrainingOfferCatalogue trainingOfferCatalogue, Clock clock) {
         if (isOlderThan10Minutes(clock)) {
             status = REJECTED;
             return OfferRejectedEvent.expired(offerId);
@@ -69,6 +74,13 @@ public class Offer {
 
         if (response.isFailed()) {
             throw new MissingParticipantException();
+        }
+
+        TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, response.participantId()));
+
+        if (booking.isFailed()) {
+            status = REJECTED;
+            return OfferRejectedEvent.trainingNoLongerAvailable(offerId);
         }
 
         status = OfferStatus.ACCEPTED;
