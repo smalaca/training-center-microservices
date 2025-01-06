@@ -3,7 +3,6 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
 
 @Factory
 public class OrderFactory {
@@ -17,12 +16,6 @@ public class OrderFactory {
 
     public static OrderFactory orderFactory(Clock clock) {
         return new OrderFactory(new OrderNumberFactory(clock), clock);
-    }
-
-    // to remove
-    public Order create(CreateOrderDomainCommand command) {
-
-        return new Order(command.offerId(), command.trainingId(), command.participantId(), command.price(), clock.now());
     }
 
     public Order create(OfferAcceptedEvent event) {
