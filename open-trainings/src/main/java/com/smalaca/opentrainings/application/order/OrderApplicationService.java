@@ -5,6 +5,7 @@ import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.order.Order;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
@@ -13,11 +14,9 @@ import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Service
 @ApplicationLayer
 public class OrderApplicationService {
     private final OrderRepository orderRepository;
