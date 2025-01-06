@@ -50,10 +50,10 @@ public class Order {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+            @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
     })
-    private Price price;
+    private Price trainingPrice;
 
     @Column(name = "CREATION_DATE_TIME")
     private LocalDateTime creationDateTime;
@@ -62,11 +62,11 @@ public class Order {
     @Column(name = "STATUS")
     private OrderStatus status = INITIATED;
 
-    Order(UUID offerId, UUID trainingId, UUID participantId, Price price, LocalDateTime creationDateTime) {
+    Order(UUID offerId, UUID trainingId, UUID participantId, Price trainingPrice, LocalDateTime creationDateTime) {
         this.offerId = offerId;
         this.trainingId = trainingId;
         this.participantId = participantId;
-        this.price = price;
+        this.trainingPrice = trainingPrice;
         this.creationDateTime = creationDateTime;
     }
 
@@ -99,7 +99,7 @@ public class Order {
         return PaymentRequest.builder()
                 .orderId(orderId)
                 .participantId(participantId)
-                .price(price)
+                .price(trainingPrice)
                 .paymentMethod(paymentMethod)
                 .build();
     }

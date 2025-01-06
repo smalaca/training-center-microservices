@@ -76,8 +76,8 @@ public class OrderAssertion {
         return this;
     }
 
-    public OrderAssertion hasPrice(BigDecimal amount, String currency) {
-        assertThat(actual).hasFieldOrPropertyWithValue("price", Price.of(amount, currency));
+    public OrderAssertion hasTrainingPrice(BigDecimal amount, String currency) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingPrice", Price.of(amount, currency));
         return this;
     }
 }
