@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -156,6 +157,7 @@ public class Order {
         return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
     }
 
+    @Factory
     static class Builder {
         private UUID offerId;
         private UUID trainingId;
