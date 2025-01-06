@@ -7,11 +7,13 @@ import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.smalaca.opentrainings.domain.order.OrderFactory.orderFactory;
+
 @Configuration
 public class OrderApplicationServiceFactory {
     @Bean
     public OrderApplicationService orderApplicationService(
             OrderRepository orderRepository, EventRegistry eventRegistry, PaymentGateway paymentGateway, Clock clock) {
-        return new OrderApplicationService(orderRepository, eventRegistry, paymentGateway, clock);
+        return new OrderApplicationService(orderFactory(clock), orderRepository, eventRegistry, paymentGateway, clock);
     }
 }

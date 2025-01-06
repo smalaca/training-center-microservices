@@ -77,7 +77,33 @@ public class OrderAssertion {
     }
 
     public OrderAssertion hasTrainingPrice(BigDecimal amount, String currency) {
-        assertThat(actual).hasFieldOrPropertyWithValue("trainingPrice", Price.of(amount, currency));
+        return hasTrainingPrice(Price.of(amount, currency));
+    }
+
+    public OrderAssertion hasTrainingPrice(Price expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingPrice", expected);
+        return this;
+    }
+
+    public OrderAssertion hasFinalPrice(Price expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("finalPrice", expected);
+        return this;
+    }
+
+    public OrderAssertion hasDiscountCode(String expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("discountCode", expected);
+        return this;
+    }
+
+    public OrderAssertion hasNoDiscountCode() {
+        assertThat(actual).extracting("discountCode").isNull();
+        return this;
+    }
+
+    public OrderAssertion hasOrderNumberStartingWith(String expected) {
+        assertThat(actual).extracting("orderNumber").satisfies(field -> {
+            assertThat(((OrderNumber) field).value()).startsWith(expected);
+        });
         return this;
     }
 }

@@ -7,6 +7,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.order.Order;
+import com.smalaca.opentrainings.domain.order.OrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -19,17 +20,29 @@ import java.util.UUID;
 
 @ApplicationLayer
 public class OrderApplicationService {
+    private final OrderFactory orderFactory;
     private final OrderRepository orderRepository;
     private final PaymentGateway paymentGateway;
     private final EventRegistry eventRegistry;
     private final Clock clock;
 
     OrderApplicationService(
-            OrderRepository orderRepository, EventRegistry eventRegistry, PaymentGateway paymentGateway, Clock clock) {
+            OrderFactory orderFactory, OrderRepository orderRepository, EventRegistry eventRegistry,
+            PaymentGateway paymentGateway, Clock clock) {
+        this.orderFactory = orderFactory;
         this.orderRepository = orderRepository;
         this.eventRegistry = eventRegistry;
         this.paymentGateway = paymentGateway;
         this.clock = clock;
+    }
+
+    @Transactional
+    @DrivingPort
+    @CommandOperation
+    void initiate(OfferAcceptedEvent event) {
+        Order order = orderFactory.create(event);
+
+        orderRepository.save(order);
     }
 
     @Transactional
