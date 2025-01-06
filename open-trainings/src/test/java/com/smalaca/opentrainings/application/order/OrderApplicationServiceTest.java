@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.application.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.order.GivenOrder;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.Order;
@@ -22,6 +23,7 @@ import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.UnsupportedPaymentMethodException;
 import com.smalaca.opentrainings.domain.price.Price;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,11 +31,15 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
@@ -50,23 +56,80 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class OrderApplicationServiceTest {
+    private static final Faker FAKER = new Faker();
+    private static final String DISCOUNT_CODE = FAKER.code().toString();
     private static final String CURRENCY = randomCurrency();
     private static final BigDecimal AMOUNT = randomAmount();
     private static final UUID ORDER_ID = randomId();
     private static final UUID OFFER_ID = randomId();
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
+    private static final Price TRAINING_PRICE = Price.of(randomAmount(), randomCurrency());
+    private static final Price FINAL_PRICE = Price.of(randomAmount(), randomCurrency());
 
     private final OrderRepository orderRepository = mock(OrderRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
     private final Clock clock = mock(Clock.class);
-    private final OrderApplicationService service = new OrderApplicationService(orderRepository, eventRegistry, paymentGateway, clock);
+    private final OrderApplicationService service = new OrderApplicationServiceFactory().orderApplicationService(orderRepository, eventRegistry, paymentGateway, clock);
     private final GivenOrderFactory given = GivenOrderFactory.create(orderRepository);
 
     @BeforeEach
     void givenNow() {
         given(clock.now()).willReturn(now());
+    }
+
+    @Test
+    void shouldInitiateOrderWithDiscountCode() {
+        LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
+        given(clock.now()).willReturn(creationDateTime);
+        OfferAcceptedEvent event = offerAcceptedEventBuilder()
+                .withOfferId(OFFER_ID)
+                .withParticipantId(PARTICIPANT_ID)
+                .withTrainingId(TRAINING_ID)
+                .withTrainingPrice(TRAINING_PRICE)
+                .withFinalPrice(FINAL_PRICE)
+                .withDiscountCode(DISCOUNT_CODE)
+                .build();
+
+        service.initiate(event);
+
+        thenOrderSaved()
+                .isInitiated()
+                .hasOrderNumberStartingWith("ORD/2024/11/" + PARTICIPANT_ID + "/")
+                .hasOfferId(OFFER_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasCreationDateTime(creationDateTime)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasDiscountCode(DISCOUNT_CODE);
+    }
+
+    @Test
+    void shouldInitiateOrderWithoutDiscountCode() {
+        LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2011, 9, 1), LocalTime.now());
+        given(clock.now()).willReturn(creationDateTime);
+        OfferAcceptedEvent event = offerAcceptedEventBuilder()
+                .withOfferId(OFFER_ID)
+                .withParticipantId(PARTICIPANT_ID)
+                .withTrainingId(TRAINING_ID)
+                .withTrainingPrice(TRAINING_PRICE)
+                .withFinalPrice(TRAINING_PRICE)
+                .build();
+
+        service.initiate(event);
+
+        thenOrderSaved()
+                .isInitiated()
+                .hasOrderNumberStartingWith("ORD/2011/09/" + PARTICIPANT_ID + "/")
+                .hasOfferId(OFFER_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasCreationDateTime(creationDateTime)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(TRAINING_PRICE)
+                .hasNoDiscountCode();
     }
 
     @Test

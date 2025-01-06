@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderFactory.orderFactory;
 import static org.mockito.Mockito.mock;
 
 public class GivenOrderFactory {
@@ -21,7 +22,7 @@ public class GivenOrderFactory {
 
     public static GivenOrderFactory create(OrderRepository orderRepository) {
         Clock clock = mock(Clock.class);
-        OrderFactory orderFactory = new OrderFactory(clock);
+        OrderFactory orderFactory = orderFactory(clock);
 
         return new GivenOrderFactory(orderRepository, clock, orderFactory);
     }

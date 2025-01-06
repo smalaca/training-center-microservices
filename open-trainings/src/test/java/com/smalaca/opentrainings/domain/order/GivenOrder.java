@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.order.commands.CreateOrderDomainCommand;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -13,6 +13,7 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOrder {
@@ -99,8 +100,14 @@ public class GivenOrder {
 
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
-        CreateOrderDomainCommand command = new CreateOrderDomainCommand(offerId, trainingId, participantId, Price.of(amount, currency));
-        order = orderFactory.create(command);
+        OfferAcceptedEvent event = offerAcceptedEventBuilder()
+                .withOfferId(offerId)
+                .withTrainingId(trainingId)
+                .withParticipantId(participantId)
+                .withTrainingPrice(Price.of(amount, currency))
+                .build();
+
+        order = orderFactory.create(event);
 
         return this;
     }

@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -50,27 +51,47 @@ public class Order {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+            @AttributeOverride(name = "value", column = @Column(name = "ORDER_NUMBER"))
     })
-    private Price price;
+    private OrderNumber orderNumber;
 
     @Column(name = "CREATION_DATE_TIME")
     private LocalDateTime creationDateTime;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private OrderStatus status = INITIATED;
+    private OrderStatus status;
 
-    Order(UUID offerId, UUID trainingId, UUID participantId, Price price, LocalDateTime creationDateTime) {
-        this.offerId = offerId;
-        this.trainingId = trainingId;
-        this.participantId = participantId;
-        this.price = price;
-        this.creationDateTime = creationDateTime;
-    }
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
+    })
+    private Price trainingPrice;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "FINAL_PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "FINAL_PRICE_CURRENCY"))
+    })
+    private Price finalPrice;
+
+    @Column(name = "DISCOUNT_CODE")
+    private String discountCode;
 
     private Order() {}
+
+    private Order(Builder builder) {
+        offerId = builder.offerId;
+        trainingId = builder.trainingId;
+        participantId = builder.participantId;
+        trainingPrice = builder.trainingPrice;
+        finalPrice = builder.finalPrice;
+        discountCode = builder.discountCode;
+        orderNumber = builder.orderNumber;
+        creationDateTime = builder.creationDateTime;
+        status = builder.status;
+    }
 
     public UUID orderId() {
         return orderId;
@@ -99,7 +120,7 @@ public class Order {
         return PaymentRequest.builder()
                 .orderId(orderId)
                 .participantId(participantId)
-                .price(price)
+                .price(trainingPrice)
                 .paymentMethod(paymentMethod)
                 .build();
     }
@@ -134,5 +155,62 @@ public class Order {
         LocalDateTime now = clock.now();
         LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
         return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
+    }
+
+    @Factory
+    static class Builder {
+        private UUID offerId;
+        private UUID trainingId;
+        private UUID participantId;
+        private Price trainingPrice;
+        private Price finalPrice;
+        private String discountCode;
+        private OrderNumber orderNumber;
+        private LocalDateTime creationDateTime;
+        private OrderStatus status = INITIATED;
+
+        Builder withOfferId(UUID offerId) {
+            this.offerId = offerId;
+            return this;
+        }
+
+        Builder withTrainingId(UUID trainingId) {
+            this.trainingId = trainingId;
+            return this;
+        }
+
+        Builder withParticipantId(UUID participantId) {
+            this.participantId = participantId;
+            return this;
+        }
+
+        Builder withTrainingPrice(Price trainingPrice) {
+            this.trainingPrice = trainingPrice;
+            return this;
+        }
+
+        Builder withFinalPrice(Price finalPrice) {
+            this.finalPrice = finalPrice;
+            return this;
+        }
+
+        Builder withDiscountCode(String discountCode) {
+            this.discountCode = discountCode;
+            return this;
+        }
+
+        Builder withOrderNumber(OrderNumber orderNumber) {
+            this.orderNumber = orderNumber;
+            return this;
+        }
+
+        Builder withCreationDateTime(LocalDateTime creationDateTime) {
+            this.creationDateTime = creationDateTime;
+            return this;
+        }
+
+        Order build() {
+            return new Order(this);
+        }
     }
 }

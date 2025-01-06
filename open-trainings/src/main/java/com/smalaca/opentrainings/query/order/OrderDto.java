@@ -27,10 +27,10 @@ public class OrderDto {
     @Column(name = "PARTICIPANT_ID")
     private UUID participantId;
 
-    @Column(name = "PRICE_AMOUNT")
+    @Column(name = "TRAINING_PRICE_AMOUNT")
     private BigDecimal priceAmount;
 
-    @Column(name = "PRICE_CURRENCY")
+    @Column(name = "TRAINING_PRICE_CURRENCY")
     private String priceCurrency;
 
     @Column(name = "CREATION_DATE_TIME")
