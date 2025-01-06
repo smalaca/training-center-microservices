@@ -59,7 +59,7 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private OrderStatus status = INITIATED; /// must be changed and cannot be initialized here
+    private OrderStatus status;
 
     @Embedded
     @AttributeOverrides({
@@ -77,14 +77,6 @@ public class Order {
 
     @Column(name = "DISCOUNT_CODE")
     private String discountCode;
-
-    Order(UUID offerId, UUID trainingId, UUID participantId, Price trainingPrice, LocalDateTime creationDateTime) {
-        this.offerId = offerId;
-        this.trainingId = trainingId;
-        this.participantId = participantId;
-        this.trainingPrice = trainingPrice;
-        this.creationDateTime = creationDateTime;
-    }
 
     private Order() {}
 
