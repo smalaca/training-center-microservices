@@ -13,6 +13,7 @@ import static com.smalaca.opentrainings.domain.order.OrderStatus.TERMINATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderAssertion {
+    private static final String UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
     private final Order actual;
 
     private OrderAssertion(Order actual) {
@@ -98,6 +99,13 @@ public class OrderAssertion {
     public OrderAssertion hasOrderNumberStartingWith(String expected) {
         assertThat(actual).extracting("orderNumber").satisfies(field -> {
             assertThat(((OrderNumber) field).value()).startsWith(expected);
+        });
+        return this;
+    }
+
+    public OrderAssertion hasValidOrderNumber() {
+        assertThat(actual).extracting("orderNumber").satisfies(field -> {
+            assertThat(((OrderNumber) field).value()).matches("ORD/20[0-9]{2}/[01][0-9]/" + UUID_REGEX + "/" + UUID_REGEX);
         });
         return this;
     }
