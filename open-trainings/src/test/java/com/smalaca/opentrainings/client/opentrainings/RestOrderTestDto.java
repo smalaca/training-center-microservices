@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record RestOrderTestDto(
-        UUID orderId, UUID offerId, UUID trainingId, UUID participantId, BigDecimal priceAmount,
-        String priceCurrency, LocalDateTime creationDateTime, String status) {
+        UUID orderId, UUID offerId, UUID trainingId, UUID participantId,
+        BigDecimal trainingPriceAmount, String trainingPriceCurrency, BigDecimal finalPriceAmount, String finalPriceCurrency,
+        LocalDateTime creationDateTime, String status, String discountCode) {
 }

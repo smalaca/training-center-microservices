@@ -47,13 +47,28 @@ public class OrderDtoAssertion {
         return this;
     }
 
-    public OrderDtoAssertion hasPriceAmount(BigDecimal expected) {
-        assertThat(actual.getPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
+    public OrderDtoAssertion hasTrainingPriceAmount(BigDecimal expected) {
+        assertThat(actual.getTrainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasPriceCurrency(String expected) {
-        assertThat(actual.getPriceCurrency()).isEqualTo(expected);
+    public OrderDtoAssertion hasTrainingPriceCurrency(String expected) {
+        assertThat(actual.getTrainingPriceCurrency()).isEqualTo(expected);
+        return this;
+    }
+
+    public OrderDtoAssertion hasFinalPriceAmount(BigDecimal expected) {
+        assertThat(actual.getFinalPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
+        return this;
+    }
+
+    public OrderDtoAssertion hasFinalPriceCurrency(String expected) {
+        assertThat(actual.getFinalPriceCurrency()).isEqualTo(expected);
+        return this;
+    }
+
+    public OrderDtoAssertion hasDiscountCode(String expected) {
+        assertThat(actual.getDiscountCode()).isEqualTo(expected);
         return this;
     }
 }

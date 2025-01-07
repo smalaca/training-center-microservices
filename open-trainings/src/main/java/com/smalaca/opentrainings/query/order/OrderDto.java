@@ -28,14 +28,23 @@ public class OrderDto {
     private UUID participantId;
 
     @Column(name = "TRAINING_PRICE_AMOUNT")
-    private BigDecimal priceAmount;
+    private BigDecimal trainingPriceAmount;
 
     @Column(name = "TRAINING_PRICE_CURRENCY")
-    private String priceCurrency;
+    private String trainingPriceCurrency;
+
+    @Column(name = "FINAL_PRICE_AMOUNT")
+    private BigDecimal finalPriceAmount;
+
+    @Column(name = "FINAL_PRICE_CURRENCY")
+    private String finalPriceCurrency;
 
     @Column(name = "CREATION_DATE_TIME")
     private LocalDateTime creationDateTime;
 
     @Column(name = "STATUS")
     private String status;
+
+    @Column(name = "DISCOUNT_CODE")
+    private String discountCode;
 }
