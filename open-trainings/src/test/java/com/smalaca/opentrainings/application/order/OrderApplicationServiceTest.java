@@ -304,7 +304,7 @@ class OrderApplicationServiceTest {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(ORDER_ID)
                 .participantId(PARTICIPANT_ID)
-                .price(TRAINING_PRICE)
+                .price(FINAL_PRICE)
                 .paymentMethod(CREDIT_CARD)
                 .build();
         given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);
