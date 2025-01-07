@@ -87,7 +87,8 @@ class OrderQueryServiceIntegrationTest {
                 .hasTrainingPriceCurrency(dto.getTrainingPrice().currencyCode())
                 .hasFinalPriceAmount(dto.getFinalPrice().amount())
                 .hasFinalPriceCurrency(dto.getFinalPrice().currencyCode())
-                .hasDiscountCode(dto.getDiscountCode());
+                .hasDiscountCode(dto.getDiscountCode())
+                .hasValidOrderNumber();
     }
 
     @Test

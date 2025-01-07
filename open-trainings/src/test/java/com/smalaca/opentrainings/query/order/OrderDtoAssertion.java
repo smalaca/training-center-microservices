@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderNumberAssertion.assertThatOrderNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderDtoAssertion {
@@ -69,6 +70,11 @@ public class OrderDtoAssertion {
 
     public OrderDtoAssertion hasDiscountCode(String expected) {
         assertThat(actual.getDiscountCode()).isEqualTo(expected);
+        return this;
+    }
+
+    public OrderDtoAssertion hasValidOrderNumber() {
+        assertThatOrderNumber(actual.getOrderNumber()).isValid();
         return this;
     }
 }

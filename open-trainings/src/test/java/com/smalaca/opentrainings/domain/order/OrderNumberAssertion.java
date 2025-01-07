@@ -12,7 +12,11 @@ public class OrderNumberAssertion {
         this.actual = actual;
     }
 
-    public static OrderNumberAssertion assertThatOrderNumber(OrderNumber actual) {
+    public static OrderNumberAssertion assertThatOrderNumber(String actual) {
+        return assertThatOrderNumber(new OrderNumber(actual));
+    }
+
+    static OrderNumberAssertion assertThatOrderNumber(OrderNumber actual) {
         return new OrderNumberAssertion(actual);
     }
 

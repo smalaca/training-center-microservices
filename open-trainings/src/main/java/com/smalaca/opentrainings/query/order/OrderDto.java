@@ -27,6 +27,9 @@ public class OrderDto {
     @Column(name = "PARTICIPANT_ID")
     private UUID participantId;
 
+    @Column(name = "ORDER_NUMBER")
+    private String orderNumber;
+
     @Column(name = "TRAINING_PRICE_AMOUNT")
     private BigDecimal trainingPriceAmount;
 

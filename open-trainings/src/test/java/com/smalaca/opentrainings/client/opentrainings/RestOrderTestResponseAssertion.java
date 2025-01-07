@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.smalaca.opentrainings.domain.order.OrderNumberAssertion.assertThatOrderNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -89,6 +90,7 @@ public class RestOrderTestResponseAssertion {
         assertThat(actual.offerId()).isEqualTo(expected.getOfferId());
         assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
         assertThat(actual.participantId()).isEqualTo(expected.getParticipantId());
+        assertThatOrderNumber(actual.orderNumber()).isValid();
         assertThat(actual.creationDateTime()).isEqualToIgnoringNanos(expected.getCreationDateTime());
         assertThat(actual.trainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
         assertThat(actual.trainingPriceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
