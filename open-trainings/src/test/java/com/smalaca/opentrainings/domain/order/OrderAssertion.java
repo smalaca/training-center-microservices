@@ -2,10 +2,10 @@ package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.price.Price;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderNumberAssertion.assertThatOrderNumber;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CONFIRMED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.INITIATED;
@@ -76,10 +76,6 @@ public class OrderAssertion {
         return this;
     }
 
-    public OrderAssertion hasTrainingPrice(BigDecimal amount, String currency) {
-        return hasTrainingPrice(Price.of(amount, currency));
-    }
-
     public OrderAssertion hasTrainingPrice(Price expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainingPrice", expected);
         return this;
@@ -103,6 +99,13 @@ public class OrderAssertion {
     public OrderAssertion hasOrderNumberStartingWith(String expected) {
         assertThat(actual).extracting("orderNumber").satisfies(field -> {
             assertThat(((OrderNumber) field).value()).startsWith(expected);
+        });
+        return this;
+    }
+
+    public OrderAssertion hasValidOrderNumber() {
+        assertThat(actual).extracting("orderNumber").satisfies(field -> {
+            assertThatOrderNumber(((OrderNumber) field)).isValid();
         });
         return this;
     }

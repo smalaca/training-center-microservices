@@ -76,6 +76,9 @@ class JpaOrderRepositoryIntegrationTest {
                 .hasTrainingId(expected.getTrainingId())
                 .hasParticipantId(expected.getParticipantId())
                 .hasCreationDateTime(expected.getCreationDateTime())
-                .hasTrainingPrice(expected.getAmount(), expected.getCurrency());
+                .hasTrainingPrice(expected.getTrainingPrice())
+                .hasFinalPrice(expected.getFinalPrice())
+                .hasDiscountCode(expected.getDiscountCode())
+                .hasValidOrderNumber();
     }
 }

@@ -36,6 +36,7 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
@@ -215,7 +216,7 @@ class OfferApplicationServiceTest {
         givenInitiatedOffer();
         givenParticipant();
         givenAvailableTraining();
-        givenDiscount(DiscountResponse.successful(Price.of(randomAmount(), randomCurrency())));
+        givenDiscount(DiscountResponse.successful(randomPrice()));
 
         service.accept(acceptOfferCommandWithoutDiscount());
 

@@ -5,27 +5,28 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
+import net.datafaker.Faker;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOrder {
+    private static final Faker FAKER = new Faker();
     private final Clock clock;
     private final OrderFactory orderFactory;
 
     private UUID offerId = randomId();
     private UUID trainingId = randomId();
     private UUID participantId = randomId();
-    private BigDecimal amount = randomAmount();
-    private String currency = randomCurrency();
+    private Price trainingPrice = randomPrice();
+    private Price finalPrice = randomPrice();
     private LocalDateTime creationDateTime = LocalDateTime.now();
+    private String discountCode = FAKER.code().toString();
     private Order order;
 
     GivenOrder(Clock clock, OrderFactory orderFactory) {
@@ -48,13 +49,18 @@ public class GivenOrder {
         return this;
     }
 
-    public GivenOrder amount(BigDecimal amount) {
-        this.amount = amount;
+    public GivenOrder trainingPrice(Price trainingPrice) {
+        this.trainingPrice = trainingPrice;
         return this;
     }
 
-    public GivenOrder currency(String currency) {
-        this.currency = currency;
+    public GivenOrder finalPrice(Price finalPrice) {
+        this.finalPrice = finalPrice;
+        return this;
+    }
+
+    public GivenOrder discountCode(String discountCode) {
+        this.discountCode = discountCode;
         return this;
     }
 
@@ -104,7 +110,9 @@ public class GivenOrder {
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(participantId)
-                .withTrainingPrice(Price.of(amount, currency))
+                .withTrainingPrice(trainingPrice)
+                .withFinalPrice(finalPrice)
+                .withDiscountCode(discountCode)
                 .build();
 
         order = orderFactory.create(event);
@@ -118,8 +126,9 @@ public class GivenOrder {
                 .offerId(offerId)
                 .trainingId(trainingId)
                 .participantId(participantId)
-                .amount(amount)
-                .currency(currency)
+                .trainingPrice(trainingPrice)
+                .finalPrice(finalPrice)
+                .discountCode(discountCode)
                 .creationDateTime(creationDateTime)
                 .build();
     }

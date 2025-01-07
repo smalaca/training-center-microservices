@@ -30,15 +30,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
@@ -57,15 +55,13 @@ import static org.mockito.Mockito.mock;
 
 class OrderApplicationServiceTest {
     private static final Faker FAKER = new Faker();
-    private static final String DISCOUNT_CODE = FAKER.code().toString();
-    private static final String CURRENCY = randomCurrency();
-    private static final BigDecimal AMOUNT = randomAmount();
     private static final UUID ORDER_ID = randomId();
     private static final UUID OFFER_ID = randomId();
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
-    private static final Price TRAINING_PRICE = Price.of(randomAmount(), randomCurrency());
-    private static final Price FINAL_PRICE = Price.of(randomAmount(), randomCurrency());
+    private static final Price TRAINING_PRICE = randomPrice();
+    private static final Price FINAL_PRICE = randomPrice();
+    private static final String DISCOUNT_CODE = FAKER.code().toString();
 
     private final OrderRepository orderRepository = mock(OrderRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -115,7 +111,7 @@ class OrderApplicationServiceTest {
                 .withParticipantId(PARTICIPANT_ID)
                 .withTrainingId(TRAINING_ID)
                 .withTrainingPrice(TRAINING_PRICE)
-                .withFinalPrice(TRAINING_PRICE)
+                .withFinalPrice(FINAL_PRICE)
                 .build();
 
         service.initiate(event);
@@ -128,7 +124,7 @@ class OrderApplicationServiceTest {
                 .hasTrainingId(TRAINING_ID)
                 .hasCreationDateTime(creationDateTime)
                 .hasTrainingPrice(TRAINING_PRICE)
-                .hasFinalPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
                 .hasNoDiscountCode();
     }
 
@@ -308,7 +304,7 @@ class OrderApplicationServiceTest {
         PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(ORDER_ID)
                 .participantId(PARTICIPANT_ID)
-                .price(Price.of(AMOUNT, CURRENCY))
+                .price(TRAINING_PRICE)
                 .paymentMethod(CREDIT_CARD)
                 .build();
         given(paymentGateway.pay(paymentRequest)).willReturn(paymentResponse);
@@ -418,7 +414,8 @@ class OrderApplicationServiceTest {
                 .offerId(OFFER_ID)
                 .trainingId(TRAINING_ID)
                 .participantId(PARTICIPANT_ID)
-                .amount(AMOUNT)
-                .currency(CURRENCY);
+                .trainingPrice(TRAINING_PRICE)
+                .finalPrice(FINAL_PRICE)
+                .discountCode(DISCOUNT_CODE);
     }
 }

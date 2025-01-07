@@ -83,8 +83,12 @@ class OrderQueryServiceIntegrationTest {
                 .hasTrainingId(dto.getTrainingId())
                 .hasParticipantId(dto.getParticipantId())
                 .hasCreationDateTime(dto.getCreationDateTime())
-                .hasPriceAmount(dto.getAmount())
-                .hasPriceCurrency(dto.getCurrency());
+                .hasTrainingPriceAmount(dto.getTrainingPrice().amount())
+                .hasTrainingPriceCurrency(dto.getTrainingPrice().currencyCode())
+                .hasFinalPriceAmount(dto.getFinalPrice().amount())
+                .hasFinalPriceCurrency(dto.getFinalPrice().currencyCode())
+                .hasDiscountCode(dto.getDiscountCode())
+                .hasValidOrderNumber();
     }
 
     @Test
