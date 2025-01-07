@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
-import static com.smalaca.opentrainings.query.order.OrderDtoAssertion.assertThatOrder;
+import static com.smalaca.opentrainings.query.order.OrderViewAssertion.assertThatOrder;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
@@ -39,23 +39,23 @@ class OrderQueryServiceIntegrationTest {
     }
 
     @Test
-    void shouldFindNoOrderDtoWhenDoesNotExist() {
+    void shouldFindNoorderViewWhenDoesNotExist() {
         UUID orderId = randomId();
 
-        Optional<OrderDto> actual = queryService.findById(orderId);
+        Optional<OrderView> actual = queryService.findById(orderId);
 
         assertThat(actual).isEmpty();
     }
 
     @Test
-    void shouldFindOrderDtoById() {
+    void shouldFindorderViewById() {
         OrderTestDto dto = transaction.execute(status -> given.order().initiated().getDto());
 
-        Optional<OrderDto> actual = queryService.findById(dto.getOrderId());
+        Optional<OrderView> actual = queryService.findById(dto.getOrderId());
 
         assertThat(actual)
                 .isPresent()
-                .satisfies(orderDto -> assertThatOrderHasDataEqualTo(orderDto.get(), dto).hasStatus("INITIATED"));
+                .satisfies(orderView -> assertThatOrderHasDataEqualTo(orderView.get(), dto).hasStatus("INITIATED"));
     }
 
     @Test
@@ -66,17 +66,17 @@ class OrderQueryServiceIntegrationTest {
         OrderTestDto dtoFour = transaction.execute(status -> given.order().confirmed().getDto());
         OrderTestDto dtoFive = transaction.execute(status -> given.order().rejected().getDto());
 
-        Iterable<OrderDto> actual = queryService.findAll();
+        Iterable<OrderView> actual = queryService.findAll();
 
         assertThat(actual).hasSize(5)
-                .anySatisfy(orderDto -> assertThatOrderHasDataEqualTo(orderDto, dtoOne).hasStatus("INITIATED"))
-                .anySatisfy(orderDto -> assertThatOrderHasDataEqualTo(orderDto, dtoTwo).hasStatus("TERMINATED"))
-                .anySatisfy(orderDto -> assertThatOrderHasDataEqualTo(orderDto, dtoThree).hasStatus("CANCELLED"))
-                .anySatisfy(orderDto -> assertThatOrderHasDataEqualTo(orderDto, dtoFour).hasStatus("CONFIRMED"))
-                .anySatisfy(orderDto -> assertThatOrderHasDataEqualTo(orderDto, dtoFive).hasStatus("REJECTED"));
+                .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoOne).hasStatus("INITIATED"))
+                .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoTwo).hasStatus("TERMINATED"))
+                .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoThree).hasStatus("CANCELLED"))
+                .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoFour).hasStatus("CONFIRMED"))
+                .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoFive).hasStatus("REJECTED"));
     }
 
-    private OrderDtoAssertion assertThatOrderHasDataEqualTo(OrderDto order, OrderTestDto dto) {
+    private OrderViewAssertion assertThatOrderHasDataEqualTo(OrderView order, OrderTestDto dto) {
         return assertThatOrder(order)
                 .hasOrderId(dto.getOrderId())
                 .hasOfferId(dto.getOfferId())
@@ -107,11 +107,11 @@ class OrderQueryServiceIntegrationTest {
         OrderTestDto dtoTwo = transaction.execute(status -> given.order().createdMinutesAgo(11).initiated().getDto());
         OrderTestDto dtoThree = transaction.execute(status -> given.order().createdMinutesAgo(22).initiated().getDto());
 
-        Iterable<OrderDto> actual = queryService.findAllToTerminate();
+        Iterable<OrderView> actual = queryService.findAllToTerminate();
 
         assertThat(actual).hasSize(3)
-                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoOne.getOrderId()))
-                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoTwo.getOrderId()))
-                .anySatisfy(orderDto -> assertThatOrder(orderDto).hasOrderId(dtoThree.getOrderId()));
+                .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoOne.getOrderId()))
+                .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoTwo.getOrderId()))
+                .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoThree.getOrderId()));
     }
 }

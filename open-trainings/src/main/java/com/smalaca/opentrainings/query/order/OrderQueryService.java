@@ -10,26 +10,26 @@ import java.util.UUID;
 
 @Service
 public class OrderQueryService {
-    private final OrderDtoRepository repository;
+    private final OrderViewRepository repository;
     private final Clock clock;
 
-    OrderQueryService(OrderDtoRepository repository, Clock clock) {
+    OrderQueryService(OrderViewRepository repository, Clock clock) {
         this.repository = repository;
         this.clock = clock;
     }
 
     @QueryOperation
-    public Iterable<OrderDto> findAll() {
+    public Iterable<OrderView> findAll() {
         return repository.findAll();
     }
 
     @QueryOperation
-    public Optional<OrderDto> findById(UUID orderId) {
+    public Optional<OrderView> findById(UUID orderId) {
         return repository.findById(orderId);
     }
 
     @QueryOperation
-    public List<OrderDto> findAllToTerminate() {
+    public List<OrderView> findAllToTerminate() {
         return repository.findInitiatedOrdersOlderThan(clock.now().minusMinutes(10));
     }
 }

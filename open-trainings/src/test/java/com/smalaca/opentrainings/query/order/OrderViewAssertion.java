@@ -7,73 +7,73 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.domain.order.OrderNumberAssertion.assertThatOrderNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrderDtoAssertion {
-    private final OrderDto actual;
+public class OrderViewAssertion {
+    private final OrderView actual;
 
-    private OrderDtoAssertion(OrderDto actual) {
+    private OrderViewAssertion(OrderView actual) {
         this.actual = actual;
     }
 
-    public static OrderDtoAssertion assertThatOrder(OrderDto actual) {
-        return new OrderDtoAssertion(actual);
+    public static OrderViewAssertion assertThatOrder(OrderView actual) {
+        return new OrderViewAssertion(actual);
     }
 
-    public OrderDtoAssertion hasStatus(String expected) {
+    public OrderViewAssertion hasStatus(String expected) {
         assertThat(actual.getStatus()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasOrderId(UUID expected) {
+    public OrderViewAssertion hasOrderId(UUID expected) {
         assertThat(actual.getOrderId()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasOfferId(UUID expected) {
+    public OrderViewAssertion hasOfferId(UUID expected) {
         assertThat(actual.getOfferId()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasTrainingId(UUID expected) {
+    public OrderViewAssertion hasTrainingId(UUID expected) {
         assertThat(actual.getTrainingId()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasParticipantId(UUID expected) {
+    public OrderViewAssertion hasParticipantId(UUID expected) {
         assertThat(actual.getParticipantId()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasCreationDateTime(LocalDateTime expected) {
+    public OrderViewAssertion hasCreationDateTime(LocalDateTime expected) {
         assertThat(actual.getCreationDateTime()).isEqualToIgnoringNanos(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasTrainingPriceAmount(BigDecimal expected) {
+    public OrderViewAssertion hasTrainingPriceAmount(BigDecimal expected) {
         assertThat(actual.getTrainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasTrainingPriceCurrency(String expected) {
+    public OrderViewAssertion hasTrainingPriceCurrency(String expected) {
         assertThat(actual.getTrainingPriceCurrency()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasFinalPriceAmount(BigDecimal expected) {
+    public OrderViewAssertion hasFinalPriceAmount(BigDecimal expected) {
         assertThat(actual.getFinalPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasFinalPriceCurrency(String expected) {
+    public OrderViewAssertion hasFinalPriceCurrency(String expected) {
         assertThat(actual.getFinalPriceCurrency()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasDiscountCode(String expected) {
+    public OrderViewAssertion hasDiscountCode(String expected) {
         assertThat(actual.getDiscountCode()).isEqualTo(expected);
         return this;
     }
 
-    public OrderDtoAssertion hasValidOrderNumber() {
+    public OrderViewAssertion hasValidOrderNumber() {
         assertThatOrderNumber(actual.getOrderNumber()).isValid();
         return this;
     }
