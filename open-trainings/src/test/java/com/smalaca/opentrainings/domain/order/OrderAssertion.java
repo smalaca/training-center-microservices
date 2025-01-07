@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.price.Price;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.order.OrderNumberAssertion.assertThatOrderNumber;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CANCELLED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.CONFIRMED;
 import static com.smalaca.opentrainings.domain.order.OrderStatus.INITIATED;
@@ -13,7 +14,6 @@ import static com.smalaca.opentrainings.domain.order.OrderStatus.TERMINATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderAssertion {
-    private static final String UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
     private final Order actual;
 
     private OrderAssertion(Order actual) {
@@ -105,7 +105,7 @@ public class OrderAssertion {
 
     public OrderAssertion hasValidOrderNumber() {
         assertThat(actual).extracting("orderNumber").satisfies(field -> {
-            assertThat(((OrderNumber) field).value()).matches("ORD/20[0-9]{2}/[01][0-9]/" + UUID_REGEX + "/" + UUID_REGEX);
+            assertThatOrderNumber(((OrderNumber) field)).isValid();
         });
         return this;
     }
