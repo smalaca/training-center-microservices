@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderAssertion;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
+import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -76,6 +77,6 @@ class JpaOrderRepositoryIntegrationTest {
                 .hasTrainingId(expected.getTrainingId())
                 .hasParticipantId(expected.getParticipantId())
                 .hasCreationDateTime(expected.getCreationDateTime())
-                .hasTrainingPrice(expected.getAmount(), expected.getCurrency());
+                .hasTrainingPrice(Price.of(expected.getAmount(), expected.getCurrency()));
     }
 }

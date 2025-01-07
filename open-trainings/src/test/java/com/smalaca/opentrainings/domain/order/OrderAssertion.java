@@ -2,7 +2,6 @@ package com.smalaca.opentrainings.domain.order;
 
 import com.smalaca.opentrainings.domain.price.Price;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -74,10 +73,6 @@ public class OrderAssertion {
             assertThat((LocalDateTime) actualCreationDateTime).isEqualToIgnoringNanos(expected);
         });
         return this;
-    }
-
-    public OrderAssertion hasTrainingPrice(BigDecimal amount, String currency) {
-        return hasTrainingPrice(Price.of(amount, currency));
     }
 
     public OrderAssertion hasTrainingPrice(Price expected) {
