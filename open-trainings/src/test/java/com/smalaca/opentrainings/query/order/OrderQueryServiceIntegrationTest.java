@@ -39,7 +39,7 @@ class OrderQueryServiceIntegrationTest {
     }
 
     @Test
-    void shouldFindNoorderViewWhenDoesNotExist() {
+    void shouldFindNoOrderViewWhenDoesNotExist() {
         UUID orderId = randomId();
 
         Optional<OrderView> actual = queryService.findById(orderId);
@@ -48,7 +48,7 @@ class OrderQueryServiceIntegrationTest {
     }
 
     @Test
-    void shouldFindorderViewById() {
+    void shouldFindOrderViewById() {
         OrderTestDto dto = transaction.execute(status -> given.order().initiated().getDto());
 
         Optional<OrderView> actual = queryService.findById(dto.getOrderId());
