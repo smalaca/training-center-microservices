@@ -3,13 +3,11 @@ package com.smalaca.opentrainings.domain.offer;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.price.Price;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.mockito.BDDMockito.given;
 
 abstract public class GivenOffer {
@@ -18,8 +16,7 @@ abstract public class GivenOffer {
 
     private UUID trainingId = randomId();
     private LocalDateTime creationDateTime = LocalDateTime.now();
-    private BigDecimal amount = randomAmount();
-    private String currency = randomCurrency();
+    private Price trainingPrice = randomPrice();
     private Offer offer;
 
     protected GivenOffer(Clock clock, OfferFactory offerFactory) {
@@ -32,13 +29,8 @@ abstract public class GivenOffer {
         return this;
     }
 
-    public GivenOffer amount(BigDecimal amount) {
-        this.amount = amount;
-        return this;
-    }
-
-    public GivenOffer currency(String currency) {
-        this.currency = currency;
+    public GivenOffer trainingPrice(Price trainingPrice) {
+        this.trainingPrice = trainingPrice;
         return this;
     }
 
@@ -49,7 +41,7 @@ abstract public class GivenOffer {
 
     public GivenOffer initiated() {
         given(clock.now()).willReturn(creationDateTime);
-        offer = offerFactory.create(trainingId, Price.of(amount, currency));
+        offer = offerFactory.create(trainingId, trainingPrice);
 
         return this;
     }

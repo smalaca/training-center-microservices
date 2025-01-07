@@ -2,7 +2,6 @@ package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.opentrainings.domain.price.Price;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,13 +32,13 @@ public class OfferAcceptedEventAssertion {
         return this;
     }
 
-    public OfferAcceptedEventAssertion hasTrainingPrice(BigDecimal amount, String currency) {
-        assertThat(actual.trainingPrice()).isEqualTo(Price.of(amount, currency));
+    public OfferAcceptedEventAssertion hasTrainingPrice(Price expected) {
+        assertThat(actual.trainingPrice()).isEqualTo(expected);
         return this;
     }
 
-    public OfferAcceptedEventAssertion hasFinalPrice(BigDecimal amount, String currency) {
-        assertThat(actual.finalPrice()).isEqualTo(Price.of(amount, currency));
+    public OfferAcceptedEventAssertion hasFinalPrice(Price expected) {
+        assertThat(actual.finalPrice()).isEqualTo(expected);
         return this;
     }
 

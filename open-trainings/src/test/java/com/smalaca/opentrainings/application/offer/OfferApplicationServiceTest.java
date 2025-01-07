@@ -30,11 +30,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomAmount;
-import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
@@ -56,8 +53,7 @@ class OfferApplicationServiceTest {
     private static final UUID OFFER_ID = randomId();
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
-    private static final BigDecimal AMOUNT = randomAmount();
-    private static final String CURRENCY = randomCurrency();
+    private static final Price TRAINING_PRICE = randomPrice();
     private static final String FIRST_NAME = FAKER.name().firstName();
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
@@ -178,8 +174,8 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasTrainingPrice(AMOUNT, CURRENCY)
-                .hasFinalPrice(AMOUNT, CURRENCY)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(TRAINING_PRICE)
                 .hasNoDiscountCode();
     }
 
@@ -206,8 +202,8 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasTrainingPrice(AMOUNT, CURRENCY)
-                .hasFinalPrice(AMOUNT, CURRENCY)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(TRAINING_PRICE)
                 .hasNoDiscountCode();
     }
 
@@ -225,12 +221,11 @@ class OfferApplicationServiceTest {
 
     @Test
     void shouldPublishOfferAcceptedEventWithPriceAfterDiscount() {
-        BigDecimal newAmount = randomAmount();
-        String newCurrency = randomCurrency();
         givenInitiatedOffer();
         givenParticipant();
         givenAvailableTraining();
-        givenDiscount(DiscountResponse.successful(Price.of(newAmount, newCurrency)));
+        Price newPrice = randomPrice();
+        givenDiscount(DiscountResponse.successful(newPrice));
 
         service.accept(acceptOfferCommandWithDiscount(DISCOUNT_CODE));
 
@@ -238,24 +233,23 @@ class OfferApplicationServiceTest {
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
-                .hasTrainingPrice(AMOUNT, CURRENCY)
-                .hasFinalPrice(newAmount, newCurrency)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(newPrice)
                 .hasDiscountCode(DISCOUNT_CODE);
     }
 
     private void givenDiscount(DiscountResponse response) {
-        DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, Price.of(AMOUNT, CURRENCY), DISCOUNT_CODE);
+        DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, TRAINING_PRICE, DISCOUNT_CODE);
         given(discountService.calculatePriceFor(dto)).willReturn(response);
     }
 
     private void givenAvailableTrainingWithPriceChanged() {
-        BigDecimal newPrice = AMOUNT.add(randomAmount());
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(Price.of(newPrice, CURRENCY));
+        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(randomPrice());
         givenAvailableTraining();
     }
 
     private void givenAvailableTrainingWithSamePrice() {
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(Price.of(AMOUNT, CURRENCY));
+        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(TRAINING_PRICE);
         givenAvailableTraining();
     }
 
@@ -323,6 +317,6 @@ class OfferApplicationServiceTest {
     }
 
     private GivenOffer givenOffer() {
-        return given.offer(OFFER_ID).trainingId(TRAINING_ID).amount(AMOUNT).currency(CURRENCY).initiated();
+        return given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE).initiated();
     }
 }
