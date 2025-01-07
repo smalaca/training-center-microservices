@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.data;
 
+import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 
 import java.math.BigDecimal;
@@ -10,6 +11,10 @@ public class Random {
 
     public static UUID randomId() {
         return UUID.randomUUID();
+    }
+
+    public static Price randomPrice() {
+        return Price.of(randomAmount(), randomCurrency());
     }
 
     public static BigDecimal randomAmount() {

@@ -90,8 +90,8 @@ public class RestOrderTestResponseAssertion {
         assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
         assertThat(actual.participantId()).isEqualTo(expected.getParticipantId());
         assertThat(actual.creationDateTime()).isEqualToIgnoringNanos(expected.getCreationDateTime());
-        assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getAmount());
-        assertThat(actual.priceCurrency()).isEqualTo(expected.getCurrency());
+        assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
+        assertThat(actual.priceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
     }
 
     public RestOrderTestResponseAssertion withMessage(String expected) {
