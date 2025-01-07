@@ -6,7 +6,7 @@ import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.OrderInFinalStateException;
 import com.smalaca.opentrainings.domain.paymentmethod.UnsupportedPaymentMethodException;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.OrderDoesNotExistException;
-import com.smalaca.opentrainings.query.order.OrderDto;
+import com.smalaca.opentrainings.query.order.OrderView;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,8 +61,8 @@ public class OrderRestController {
     }
 
     @GetMapping("{orderId}")
-    public ResponseEntity<OrderDto> findById(@PathVariable UUID orderId) {
-        Optional<OrderDto> found = queryService.findById(orderId);
+    public ResponseEntity<OrderView> findById(@PathVariable UUID orderId) {
+        Optional<OrderView> found = queryService.findById(orderId);
 
         return found
                 .map(ResponseEntity::ok)
@@ -70,7 +70,7 @@ public class OrderRestController {
     }
 
     @GetMapping
-    public Iterable<OrderDto> findAll() {
+    public Iterable<OrderView> findAll() {
         return queryService.findAll();
     }
 }

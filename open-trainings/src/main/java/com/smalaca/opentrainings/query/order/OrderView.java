@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "ORDERS")
 @Getter
-public class OrderDto {
+public class OrderView {
     @Id
     @Column(name = "ORDER_ID")
     private UUID orderId;

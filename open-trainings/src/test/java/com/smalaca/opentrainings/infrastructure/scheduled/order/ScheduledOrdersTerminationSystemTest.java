@@ -4,7 +4,7 @@ import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
-import com.smalaca.opentrainings.query.order.OrderDto;
+import com.smalaca.opentrainings.query.order.OrderView;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +16,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Duration;
 
-import static com.smalaca.opentrainings.query.order.OrderDtoAssertion.assertThatOrder;
+import static com.smalaca.opentrainings.query.order.OrderViewAssertion.assertThatOrder;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
@@ -71,7 +71,7 @@ class ScheduledOrdersTerminationSystemTest {
     }
 
     private void assertThatOrderIsTerminated(OrderTestDto dtoOne) {
-        OrderDto actual = service.findById(dtoOne.getOrderId()).get();
+        OrderView actual = service.findById(dtoOne.getOrderId()).get();
 
         assertThatOrder(actual).hasStatus("TERMINATED");
     }

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface OrderDtoRepository extends CrudRepository<OrderDto, UUID> {
-    @Query("SELECT o FROM OrderDto o WHERE o.creationDateTime < :tenMinutesAgo AND o.status = 'INITIATED'")
-    List<OrderDto> findInitiatedOrdersOlderThan(@Param("tenMinutesAgo") LocalDateTime tenMinutesAgo);
+public interface OrderViewRepository extends CrudRepository<OrderView, UUID> {
+    @Query("SELECT o FROM OrderView o WHERE o.creationDateTime < :tenMinutesAgo AND o.status = 'INITIATED'")
+    List<OrderView> findInitiatedOrdersOlderThan(@Param("tenMinutesAgo") LocalDateTime tenMinutesAgo);
 }
