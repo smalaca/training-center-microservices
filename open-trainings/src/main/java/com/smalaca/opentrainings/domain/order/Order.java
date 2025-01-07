@@ -120,7 +120,7 @@ public class Order {
         return PaymentRequest.builder()
                 .orderId(orderId)
                 .participantId(participantId)
-                .price(trainingPrice)
+                .price(finalPrice)
                 .paymentMethod(paymentMethod)
                 .build();
     }
