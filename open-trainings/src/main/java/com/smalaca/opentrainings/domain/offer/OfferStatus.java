@@ -4,5 +4,9 @@ import com.smalaca.domaindrivendesign.ValueObject;
 
 @ValueObject
 enum OfferStatus {
-    INITIATED, ACCEPTED, REJECTED
+    INITIATED, ACCEPTED, REJECTED, DECLINED;
+
+    boolean isFinal() {
+        return !this.equals(INITIATED);
+    }
 }

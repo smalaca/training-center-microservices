@@ -12,6 +12,7 @@ import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
+import com.smalaca.opentrainings.domain.offer.OfferInFinalStateException;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
@@ -278,6 +279,33 @@ class OfferApplicationServiceTest {
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasFinalPrice(newPrice)
                 .hasDiscountCode(DISCOUNT_CODE);
+    }
+
+    @Test
+    void shouldInterruptDecliningIfOfferRejected() {
+        givenOffer().rejected();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already REJECTED");
+    }
+
+    @Test
+    void shouldInterruptDecliningIfOfferAccepted() {
+        givenOffer().accepted();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already ACCEPTED");
+    }
+
+    @Test
+    void shouldDeclineOffer() {
+        givenInitiatedOffer();
+
+        service.decline(OFFER_ID);
+
+        thenOfferSaved().isDeclined();
     }
 
     private void givenDiscount(DiscountResponse response) {
