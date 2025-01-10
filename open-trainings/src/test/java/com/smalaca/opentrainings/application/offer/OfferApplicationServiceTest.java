@@ -22,6 +22,7 @@ import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRespo
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -244,13 +245,18 @@ class OfferApplicationServiceTest {
     }
 
     private void givenAvailableTrainingWithPriceChanged() {
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(randomPrice());
+        given(trainingOfferCatalogue.detailsOf(TRAINING_ID)).willReturn(trainingDto(randomPrice()));
         givenAvailableTraining();
     }
 
     private void givenAvailableTrainingWithSamePrice() {
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(TRAINING_PRICE);
+        given(trainingOfferCatalogue.detailsOf(TRAINING_ID)).willReturn(trainingDto(TRAINING_PRICE));
         givenAvailableTraining();
+    }
+
+    private TrainingDto trainingDto(Price price) {
+        int dummyAvailability = FAKER.number().numberBetween(1, 42);
+        return new TrainingDto(dummyAvailability, price);
     }
 
     private void givenAvailableTraining() {

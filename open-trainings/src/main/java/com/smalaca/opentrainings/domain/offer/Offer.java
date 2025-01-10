@@ -13,6 +13,7 @@ import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRespo
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -120,8 +121,8 @@ public class Offer {
     }
 
     private boolean trainingPriceChanged(TrainingOfferCatalogue trainingOfferCatalogue) {
-        Price currentPrice = trainingOfferCatalogue.priceFor(trainingId);
-        return price.differentThan(currentPrice);
+        TrainingDto trainingDto = trainingOfferCatalogue.detailsOf(trainingId);
+        return price.differentThan(trainingDto.price());
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {
