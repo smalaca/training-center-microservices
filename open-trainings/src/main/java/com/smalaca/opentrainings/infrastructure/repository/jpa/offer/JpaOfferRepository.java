@@ -16,7 +16,7 @@ public class JpaOfferRepository implements OfferRepository {
     }
 
     @Override
-    public void save(Offer offer) {
-
+    public UUID save(Offer offer) {
+        return null;
     }
 }

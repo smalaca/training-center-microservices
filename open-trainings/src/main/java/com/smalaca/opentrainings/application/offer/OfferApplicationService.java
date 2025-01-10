@@ -7,14 +7,18 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.Offer;
+import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @ApplicationLayer
 public class OfferApplicationService {
+    private final OfferFactory offerFactory;
     private final OfferRepository offerRepository;
     private final EventRegistry eventRegistry;
     private final PersonalDataManagement personalDataManagement;
@@ -23,14 +27,25 @@ public class OfferApplicationService {
     private final Clock clock;
 
     OfferApplicationService(
-            OfferRepository offerRepository, EventRegistry eventRegistry, PersonalDataManagement personalDataManagement,
-            TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
+            OfferFactory offerFactory, OfferRepository offerRepository, EventRegistry eventRegistry,
+            PersonalDataManagement personalDataManagement, TrainingOfferCatalogue trainingOfferCatalogue,
+            DiscountService discountService, Clock clock) {
+        this.offerFactory = offerFactory;
         this.offerRepository = offerRepository;
         this.eventRegistry = eventRegistry;
         this.personalDataManagement = personalDataManagement;
         this.trainingOfferCatalogue = trainingOfferCatalogue;
         this.discountService = discountService;
         this.clock = clock;
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public UUID chooseTraining(UUID trainingId) {
+        Offer offer = offerFactory.create(trainingId);
+
+        return offerRepository.save(offer);
     }
 
     @Transactional
