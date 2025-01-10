@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
@@ -13,6 +14,7 @@ import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRespo
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
@@ -28,6 +30,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 
@@ -45,10 +48,16 @@ public class Offer {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+            @AttributeOverride(name = "value", column = @Column(name = "OFFER_NUMBER")),
     })
-    private Price price;
+    private OfferNumber offerNumber;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
+    })
+    private Price trainingPrice;
 
     @Column(name = "CREATION_DATE_TIME")
     private LocalDateTime creationDateTime;
@@ -57,13 +66,21 @@ public class Offer {
     @Column(name = "STATUS")
     private OfferStatus status;
 
-    public Offer(UUID trainingId, Price price, LocalDateTime creationDateTime) {
+    private Offer(UUID trainingId, OfferNumber offerNumber, Price trainingPrice, LocalDateTime creationDateTime) {
         this.trainingId = trainingId;
-        this.price = price;
+        this.offerNumber = offerNumber;
+        this.trainingPrice = trainingPrice;
         this.creationDateTime = creationDateTime;
     }
 
     private Offer() {}
+
+    @Factory
+    static Offer initiate(UUID trainingId, OfferNumber offerNumber, Price trainingPrice, LocalDateTime creationDateTime) {
+        Offer offer = new Offer(trainingId, offerNumber, trainingPrice, creationDateTime);
+        offer.status = INITIATED;
+        return offer;
+    }
 
     public OfferEvent accept(
             AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
@@ -94,7 +111,7 @@ public class Offer {
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(response.participantId())
-                .withTrainingPrice(price)
+                .withTrainingPrice(trainingPrice)
                 .withFinalPrice(finalPrice)
                 .withDiscountCode(command.discountCode())
                 .build();
@@ -102,10 +119,10 @@ public class Offer {
 
     private Price finalPrice(AcceptOfferDomainCommand command, DiscountService discountService, PersonalDataResponse response) {
         if (command.hasNoDiscountCode()) {
-            return price;
+            return trainingPrice;
         }
 
-        DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, price, command.discountCode());
+        DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, trainingPrice, command.discountCode());
         DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
 
         if (discount.isFailed()) {
@@ -120,8 +137,8 @@ public class Offer {
     }
 
     private boolean trainingPriceChanged(TrainingOfferCatalogue trainingOfferCatalogue) {
-        Price currentPrice = trainingOfferCatalogue.priceFor(trainingId);
-        return price.differentThan(currentPrice);
+        TrainingDto trainingDto = trainingOfferCatalogue.detailsOf(trainingId);
+        return trainingPrice.differentThan(trainingDto.price());
     }
 
     private boolean isOlderThan10Minutes(Clock clock) {

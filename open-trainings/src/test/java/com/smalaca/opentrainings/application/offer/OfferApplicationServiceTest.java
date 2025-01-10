@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.offer.DiscountException;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
+import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -22,6 +23,7 @@ import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRespo
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
@@ -59,6 +64,7 @@ class OfferApplicationServiceTest {
     private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String NO_DISCOUNT_CODE = null;
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
+    private static final int NO_AVAILABLE_PLACES = 0;
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -66,10 +72,10 @@ class OfferApplicationServiceTest {
     private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
     private final DiscountService discountService = mock(DiscountService.class);
     private final Clock clock = mock(Clock.class);
-    private final OfferApplicationService service = new OfferApplicationService(
+    private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
             offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, discountService, clock);
 
-    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
+    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository, trainingOfferCatalogue);
 
     @BeforeEach
     void givenNow() {
@@ -77,10 +83,46 @@ class OfferApplicationServiceTest {
     }
 
     @Test
+    void shouldInterruptTrainingChoiceIfThereNoAvailablePlaces() {
+        givenTraining(new TrainingDto(NO_AVAILABLE_PLACES, TRAINING_PRICE));
+
+        NoAvailablePlacesException actual = assertThrows(NoAvailablePlacesException.class, () -> service.chooseTraining(TRAINING_ID));
+
+        assertThat(actual.getTrainingId()).isEqualTo(TRAINING_ID);
+        then(offerRepository).should(never()).save(any());
+    }
+
+    @Test
+    void shouldChooseTraining() {
+        LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
+        given(clock.now()).willReturn(creationDateTime);
+        givenAvailableTraining();
+
+        service.chooseTraining(TRAINING_ID);
+
+        thenOfferSaved()
+                .isInitiated()
+                .hasOfferNumberStartingWith("OFR/2024/11/")
+                .hasCreationDateTime(creationDateTime)
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE);
+    }
+
+    @Test
+    void shouldReturnOfferIdWhenTrainingChosen() {
+        givenAvailableTraining();
+        given(offerRepository.save(any())).willReturn(OFFER_ID);
+
+        UUID actual = service.chooseTraining(TRAINING_ID);
+
+        assertThat(actual).isEqualTo(OFFER_ID);
+    }
+
+    @Test
     void shouldInterruptOfferAcceptanceIfCouldNotRetrieveParticipantId() {
         givenInitiatedOffer();
         givenParticipant(failed());
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
 
         assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommandWithoutDiscount()));
 
@@ -91,7 +133,7 @@ class OfferApplicationServiceTest {
     void shouldInterruptOfferAcceptanceIfCannotUseDiscountCode() {
         givenInitiatedOffer();
         givenParticipant();
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.failed("EXPIRED"));
         AcceptOfferCommand command = acceptOfferCommandWithDiscount(DISCOUNT_CODE);
 
@@ -106,18 +148,18 @@ class OfferApplicationServiceTest {
     void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
         givenOffer().createdMinutesAgo(minutes).initiated();
         givenParticipant();
-        givenAvailableTrainingWithPriceChanged();
+        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferUpdated().isRejected();
+        thenOfferSaved().isRejected();
     }
 
     @Test
     void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
         givenOffer().createdMinutesAgo(42).initiated();
         givenParticipant();
-        givenAvailableTrainingWithPriceChanged();
+        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
@@ -130,18 +172,18 @@ class OfferApplicationServiceTest {
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
         givenInitiatedOffer();
         givenParticipant();
-        givenNotAvailableTraining();
+        givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferUpdated().isRejected();
+        thenOfferSaved().isRejected();
     }
 
     @Test
     void shouldPublishOfferRejectedEventWhenTrainingNoLongerAvailable() {
         givenInitiatedOffer();
         givenParticipant();
-        givenNotAvailableTraining();
+        givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
@@ -155,18 +197,18 @@ class OfferApplicationServiceTest {
     void shouldAcceptOffer(int minutes) {
         givenOffer().createdMinutesAgo(minutes).initiated();
         givenParticipant();
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferUpdated().isAccepted();
+        thenOfferSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
         givenInitiatedOffer();
         givenParticipant();
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
@@ -183,18 +225,18 @@ class OfferApplicationServiceTest {
     void shouldAcceptExpiredOfferWhenTrainingPriceDidNotChanged() {
         givenOffer().createdMinutesAgo(16).initiated();
         givenParticipant();
-        givenAvailableTrainingWithSamePrice();
+        givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferUpdated().isAccepted();
+        thenOfferSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWhenExpiredOfferAndTrainingPriceDidNotChanged() {
         givenOffer().createdMinutesAgo(120).initiated();
         givenParticipant();
-        givenAvailableTrainingWithSamePrice();
+        givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
@@ -211,19 +253,19 @@ class OfferApplicationServiceTest {
     void shouldAcceptOfferWithPriceAfterDiscount() {
         givenInitiatedOffer();
         givenParticipant();
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.successful(randomPrice()));
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferUpdated().isAccepted();
+        thenOfferSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWithPriceAfterDiscount() {
         givenInitiatedOffer();
         givenParticipant();
-        givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
         Price newPrice = randomPrice();
         givenDiscount(DiscountResponse.successful(newPrice));
 
@@ -243,31 +285,47 @@ class OfferApplicationServiceTest {
         given(discountService.calculatePriceFor(dto)).willReturn(response);
     }
 
-    private void givenAvailableTrainingWithPriceChanged() {
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(randomPrice());
-        givenAvailableTraining();
+    private void givenAvailableTrainingThatCanBeBookedWithPriceChanged() {
+        givenAvailableTrainingWith(randomPrice());
+        givenTrainingThatCanBeBooked();
     }
 
-    private void givenAvailableTrainingWithSamePrice() {
-        given(trainingOfferCatalogue.priceFor(TRAINING_ID)).willReturn(TRAINING_PRICE);
+    private void givenAvailableTrainingThatCanBeBookedWithSamePrice() {
         givenAvailableTraining();
+        givenTrainingThatCanBeBooked();
     }
 
     private void givenAvailableTraining() {
-        givenTraining(TrainingBookingResponse.successful(TRAINING_ID, PARTICIPANT_ID));
+        givenAvailableTrainingWith(TRAINING_PRICE);
     }
 
-    private void givenNotAvailableTraining() {
-        givenTraining(TrainingBookingResponse.failed(TRAINING_ID, PARTICIPANT_ID));
+    private void givenAvailableTrainingWith(Price price) {
+        givenTraining(new TrainingDto(randomAvailability(), price));
     }
 
-    private void givenTraining(TrainingBookingResponse response) {
+    private void givenTraining(TrainingDto trainingDto) {
+        given(trainingOfferCatalogue.detailsOf(TRAINING_ID)).willReturn(trainingDto);
+    }
+
+    private int randomAvailability() {
+        return FAKER.number().numberBetween(1, 42);
+    }
+
+    private void givenTrainingThatCanBeBooked() {
+        givenTrainingToBookWith(TrainingBookingResponse.successful(TRAINING_ID, PARTICIPANT_ID));
+    }
+
+    private void givenTrainingThatCannotBeBooked() {
+        givenTrainingToBookWith(TrainingBookingResponse.failed(TRAINING_ID, PARTICIPANT_ID));
+    }
+
+    private void givenTrainingToBookWith(TrainingBookingResponse response) {
         TrainingBookingDto dto = new TrainingBookingDto(TRAINING_ID, PARTICIPANT_ID);
 
         given(trainingOfferCatalogue.book(dto)).willReturn(response);
     }
 
-    private OfferAssertion thenOfferUpdated() {
+    private OfferAssertion thenOfferSaved() {
         ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
         then(offerRepository).should().save(captor.capture());
         Offer actual = captor.getValue();

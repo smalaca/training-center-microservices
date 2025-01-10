@@ -4,5 +4,5 @@ import com.smalaca.domaindrivendesign.ValueObject;
 
 @ValueObject
 enum OfferStatus {
-    ACCEPTED, REJECTED
+    INITIATED, ACCEPTED, REJECTED
 }

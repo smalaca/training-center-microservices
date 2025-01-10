@@ -14,9 +14,9 @@ class OfferNumberFactory {
         this.clock = clock;
     }
 
-    OfferNumber createFor(UUID participantId) {
+    OfferNumber create() {
         LocalDateTime now = clock.now();
-        String orderNumber = "OFR/" + now.getYear() + "/" + monthFor(now) + "/" + participantId + "/" + UUID.randomUUID();
+        String orderNumber = "OFR/" + now.getYear() + "/" + monthFor(now) + "/" + UUID.randomUUID();
 
         return new OfferNumber(orderNumber);
     }

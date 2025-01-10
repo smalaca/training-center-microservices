@@ -1,18 +1,19 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 
 import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 
-public class GivenOfferWithMockRepository extends GivenOffer {
+class GivenOfferWithMockRepository extends GivenOffer {
     private final OfferRepository offerRepository;
     private final UUID offerId;
 
-    public GivenOfferWithMockRepository(OfferRepository offerRepository, Clock clock, OfferFactory offerFactory, UUID offerId) {
-        super(clock, offerFactory);
+    GivenOfferWithMockRepository(OfferFactory offerFactory, OfferRepository offerRepository, Clock clock, TrainingOfferCatalogue trainingOfferCatalogue, UUID offerId) {
+        super(offerFactory, clock, trainingOfferCatalogue);
         this.offerRepository = offerRepository;
         this.offerId = offerId;
     }
