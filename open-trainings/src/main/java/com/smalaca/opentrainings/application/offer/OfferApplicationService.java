@@ -59,4 +59,15 @@ public class OfferApplicationService {
         offerRepository.save(offer);
         eventRegistry.publish(event);
     }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void decline(UUID offerId) {
+        Offer offer = offerRepository.findById(offerId);
+
+        offer.decline();
+
+        offerRepository.save(offer);
+    }
 }

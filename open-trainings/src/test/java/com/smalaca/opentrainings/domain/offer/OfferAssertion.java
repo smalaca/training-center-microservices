@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,18 +33,24 @@ public class OfferAssertion {
     }
 
     public OfferAssertion isInitiated() {
-        assertThat(actual).extracting("status").isEqualTo(INITIATED);
-        return this;
+        return hasStatus(INITIATED);
     }
 
     public OfferAssertion isAccepted() {
-        assertThat(actual).extracting("status").isEqualTo(ACCEPTED);
+        return hasStatus(ACCEPTED);
+    }
+
+    public OfferAssertion isDeclined() {
+        return hasStatus(DECLINED);
+    }
+
+    private OfferAssertion hasStatus(OfferStatus expected) {
+        assertThat(actual).extracting("status").isEqualTo(expected);
         return this;
     }
 
     public OfferAssertion isRejected() {
-        assertThat(actual).extracting("status").isEqualTo(REJECTED);
-        return this;
+        return hasStatus(REJECTED);
     }
 
     public OfferAssertion hasOfferNumberStartingWith(String expected) {
