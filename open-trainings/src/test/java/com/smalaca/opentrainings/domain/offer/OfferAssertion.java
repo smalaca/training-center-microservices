@@ -9,6 +9,7 @@ import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OfferAssertion {
@@ -44,13 +45,17 @@ public class OfferAssertion {
         return hasStatus(DECLINED);
     }
 
+    public OfferAssertion isRejected() {
+        return hasStatus(REJECTED);
+    }
+
+    public OfferAssertion isTerminated() {
+        return hasStatus(TERMINATED);
+    }
+
     private OfferAssertion hasStatus(OfferStatus expected) {
         assertThat(actual).extracting("status").isEqualTo(expected);
         return this;
-    }
-
-    public OfferAssertion isRejected() {
-        return hasStatus(REJECTED);
     }
 
     public OfferAssertion hasOfferNumberStartingWith(String expected) {
