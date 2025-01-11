@@ -39,6 +39,20 @@ class GivenOfferWithMockRepository extends GivenOffer {
         return this;
     }
 
+    @Override
+    public GivenOffer terminated() {
+        super.terminated();
+        saveOffer();
+        return this;
+    }
+
+    @Override
+    public GivenOffer declined() {
+        super.declined();
+        saveOffer();
+        return this;
+    }
+
     private void saveOffer() {
         Offer offer = getOffer();
         assignOfferId(offer);

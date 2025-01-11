@@ -70,4 +70,15 @@ public class OfferApplicationService {
 
         offerRepository.save(offer);
     }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void terminate(UUID offerId) {
+        Offer offer = offerRepository.findById(offerId);
+
+        offer.terminate(clock);
+
+        offerRepository.save(offer);
+    }
 }

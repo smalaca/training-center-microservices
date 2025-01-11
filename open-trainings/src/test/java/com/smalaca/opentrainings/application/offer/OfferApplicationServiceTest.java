@@ -12,6 +12,7 @@ import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
+import com.smalaca.opentrainings.domain.offer.AvailableOfferException;
 import com.smalaca.opentrainings.domain.offer.OfferInFinalStateException;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -300,6 +301,15 @@ class OfferApplicationServiceTest {
     }
 
     @Test
+    void shouldInterruptDecliningIfOfferTerminated() {
+        givenOffer().createdMinutesAgo(42).terminated();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already TERMINATED");
+    }
+
+    @Test
     void shouldDeclineOffer() {
         givenInitiatedOffer();
 
@@ -311,6 +321,52 @@ class OfferApplicationServiceTest {
     private void givenDiscount(DiscountResponse response) {
         DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, TRAINING_PRICE, DISCOUNT_CODE);
         given(discountService.calculatePriceFor(dto)).willReturn(response);
+    }
+
+    @Test
+    void shouldInterruptTerminationIfOfferRejected() {
+        givenOffer().rejected();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already REJECTED");
+    }
+
+    @Test
+    void shouldInterruptTerminationIfOfferAccepted() {
+        givenOffer().accepted();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already ACCEPTED");
+    }
+
+    @Test
+    void shouldInterruptTerminationIfOfferDeclined() {
+        givenOffer().declined();
+
+        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already DECLINED");
+    }
+
+    @Test
+    void shouldInterruptTerminationIfOfferStillAvailable() {
+        givenOffer().initiated();
+
+        AvailableOfferException actual = assertThrows(AvailableOfferException.class, () -> service.terminate(OFFER_ID));
+
+        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " still available.");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {11, 13, 20})
+    void shouldTerminateOffer(int minutes) {
+        givenOffer().createdMinutesAgo(minutes).initiated();
+
+        service.terminate(OFFER_ID);
+
+        thenOfferSaved().isTerminated();
     }
 
     private void givenAvailableTrainingThatCanBeBookedWithPriceChanged() {
@@ -403,6 +459,6 @@ class OfferApplicationServiceTest {
     }
 
     private GivenOffer givenOffer() {
-        return given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE).initiated();
+        return given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE);
     }
 }

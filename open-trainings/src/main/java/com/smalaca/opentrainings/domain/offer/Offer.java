@@ -33,6 +33,7 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 
 @AggregateRoot
@@ -142,17 +143,33 @@ public class Offer {
         return trainingPrice.differentThan(trainingDto.price());
     }
 
-    private boolean isOlderThan10Minutes(Clock clock) {
-        LocalDateTime now = clock.now();
-        LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
-        return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
-    }
-
     public void decline() {
         if (status.isFinal()) {
             throw new OfferInFinalStateException(offerId, status);
         }
 
         status = DECLINED;
+    }
+
+    public void terminate(Clock clock) {
+        if (status.isFinal()) {
+            throw new OfferInFinalStateException(offerId, status);
+        }
+
+        if (isNewerThan10Minutes(clock)) {
+            throw new AvailableOfferException(offerId);
+        }
+
+        status = TERMINATED;
+    }
+
+    private boolean isNewerThan10Minutes(Clock clock) {
+        return !isOlderThan10Minutes(clock);
+    }
+
+    private boolean isOlderThan10Minutes(Clock clock) {
+        LocalDateTime now = clock.now();
+        LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
+        return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
     }
 }

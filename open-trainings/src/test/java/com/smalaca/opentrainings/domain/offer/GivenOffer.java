@@ -98,4 +98,19 @@ abstract public class GivenOffer {
         offer.accept(command, projectDataManagement, trainingOfferCatalogue, null, clock);
         return this;
     }
+
+    public GivenOffer terminated() {
+        initiated();
+        given(clock.now()).willReturn(LocalDateTime.now());
+        offer.terminate(clock);
+
+        return this;
+    }
+
+    public GivenOffer declined() {
+        initiated();
+        offer.decline();
+
+        return this;
+    }
 }
