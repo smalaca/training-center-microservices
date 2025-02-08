@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.price.Price;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.offer.OfferNumberAssertion.assertThatOfferNumber;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
@@ -21,6 +22,11 @@ public class OfferAssertion {
 
     public static OfferAssertion assertThatOffer(Offer actual) {
         return new OfferAssertion(actual);
+    }
+
+    public OfferAssertion hasOfferId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("offerId", expected);
+        return this;
     }
 
     public OfferAssertion hasTrainingId(UUID expected) {
@@ -61,6 +67,13 @@ public class OfferAssertion {
     public OfferAssertion hasOfferNumberStartingWith(String expected) {
         assertThat(actual).extracting("offerNumber").satisfies(field -> {
             assertThat(((OfferNumber) field).value()).startsWith(expected);
+        });
+        return this;
+    }
+
+    public OfferAssertion hasValidOfferNumber() {
+        assertThat(actual).extracting("offerNumber").satisfies(field -> {
+            assertThatOfferNumber(((OfferNumber) field)).isValid();
         });
         return this;
     }

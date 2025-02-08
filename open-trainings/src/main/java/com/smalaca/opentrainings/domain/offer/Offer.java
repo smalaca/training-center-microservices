@@ -172,4 +172,8 @@ public class Offer {
         LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
         return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
     }
+
+    public UUID offerId() {
+        return offerId;
+    }
 }

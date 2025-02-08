@@ -21,7 +21,7 @@ import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-abstract public class GivenOffer {
+public class GivenOffer {
     private static final Faker FAKER = new Faker();
 
     private final OfferFactory offerFactory;
@@ -33,7 +33,7 @@ abstract public class GivenOffer {
     private Price trainingPrice = randomPrice();
     private Offer offer;
 
-    protected GivenOffer(OfferFactory offerFactory, Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
+    GivenOffer(OfferFactory offerFactory, Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
         this.offerFactory = offerFactory;
         this.clock = clock;
         this.trainingOfferCatalogue = trainingOfferCatalogue;
@@ -64,10 +64,6 @@ abstract public class GivenOffer {
 
     private int randomAvailability() {
         return RandomUtils.secure().randomInt(1, 42);
-    }
-
-    protected Offer getOffer() {
-        return offer;
     }
 
     public GivenOffer rejected() {
@@ -112,5 +108,22 @@ abstract public class GivenOffer {
         offer.decline();
 
         return this;
+    }
+
+    public Offer getOffer() {
+        return offer;
+    }
+
+    public OfferTestDto getDto() {
+        return OfferTestDto.builder()
+                .offerId(getOfferId())
+                .trainingId(trainingId)
+                .trainingPrice(trainingPrice)
+                .creationDateTime(creationDateTime)
+                .build();
+    }
+
+    protected UUID getOfferId() {
+        return null;
     }
 }

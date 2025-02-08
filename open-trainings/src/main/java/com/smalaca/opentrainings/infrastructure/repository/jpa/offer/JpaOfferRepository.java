@@ -10,13 +10,19 @@ import java.util.UUID;
 @Repository
 @DrivenAdapter
 public class JpaOfferRepository implements OfferRepository {
+    private final SpringOfferCrudRepository repository;
+
+    JpaOfferRepository(SpringOfferCrudRepository repository) {
+        this.repository = repository;
+    }
+
     @Override
     public Offer findById(UUID offerId) {
-        return null;
+        return repository.findById(offerId).orElseThrow(() -> new OfferDoesNotExistException(offerId));
     }
 
     @Override
     public UUID save(Offer offer) {
-        return null;
+        return repository.save(offer).offerId();
     }
 }

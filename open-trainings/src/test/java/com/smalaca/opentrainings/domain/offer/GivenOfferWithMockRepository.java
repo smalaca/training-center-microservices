@@ -69,4 +69,9 @@ class GivenOfferWithMockRepository extends GivenOffer {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    protected UUID getOfferId() {
+        return this.offerId;
+    }
 }
