@@ -37,7 +37,15 @@ public class GivenOfferFactory {
     }
 
     public GivenOffer offer() {
-        return new GivenOffer(offerFactory, clock, trainingOfferCatalogue);
+        if (hasNoRepository()) {
+            return new GivenOffer(offerFactory, clock, trainingOfferCatalogue);
+        } else {
+            return new GivenOfferWithRepository(offerFactory, offerRepository, clock, trainingOfferCatalogue);
+        }
+    }
+
+    private boolean hasNoRepository() {
+        return NO_REPOSITORY == offerRepository;
     }
 
     public GivenOffer offer(UUID offerId) {
