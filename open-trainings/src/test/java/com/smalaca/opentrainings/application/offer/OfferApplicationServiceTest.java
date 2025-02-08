@@ -77,7 +77,7 @@ class OfferApplicationServiceTest {
     private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
             offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, discountService, clock);
 
-    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository, trainingOfferCatalogue);
+    private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
     @BeforeEach
     void givenNow() {

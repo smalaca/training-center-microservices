@@ -9,6 +9,8 @@ import static com.smalaca.opentrainings.domain.offer.OfferFactory.offerFactory;
 import static org.mockito.Mockito.mock;
 
 public class GivenOfferFactory {
+    private static final OfferRepository NO_REPOSITORY = null;
+
     private final OfferFactory offerFactory;
     private final OfferRepository offerRepository;
     private final Clock clock;
@@ -22,11 +24,20 @@ public class GivenOfferFactory {
         this.trainingOfferCatalogue = trainingOfferCatalogue;
     }
 
-    public static GivenOfferFactory create(OfferRepository offerRepository, TrainingOfferCatalogue trainingOfferCatalogue) {
+    public static GivenOfferFactory create(OfferRepository offerRepository) {
         Clock clock = mock(Clock.class);
+        TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
         OfferFactory offerFactory = offerFactory(trainingOfferCatalogue, clock);
 
         return new GivenOfferFactory(offerFactory, offerRepository, clock, trainingOfferCatalogue);
+    }
+
+    public static GivenOfferFactory withoutPersistence() {
+        return create(NO_REPOSITORY);
+    }
+
+    public GivenOffer offer() {
+        return new GivenOffer(offerFactory, clock, trainingOfferCatalogue);
     }
 
     public GivenOffer offer(UUID offerId) {
