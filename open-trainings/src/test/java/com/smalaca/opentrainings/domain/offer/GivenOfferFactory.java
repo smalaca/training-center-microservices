@@ -22,8 +22,9 @@ public class GivenOfferFactory {
         this.trainingOfferCatalogue = trainingOfferCatalogue;
     }
 
-    public static GivenOfferFactory create(OfferRepository offerRepository, TrainingOfferCatalogue trainingOfferCatalogue) {
+    public static GivenOfferFactory create(OfferRepository offerRepository) {
         Clock clock = mock(Clock.class);
+        TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
         OfferFactory offerFactory = offerFactory(trainingOfferCatalogue, clock);
 
         return new GivenOfferFactory(offerFactory, offerRepository, clock, trainingOfferCatalogue);
