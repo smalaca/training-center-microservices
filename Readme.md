@@ -1,12 +1,12 @@
 # Training Center
-## CICD
-1. Open Trainings: 
+## CI/CD
+1. **Open Trainings:** 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
  
-2. Payment Gateway
+2. **Payment Gateway:**
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
