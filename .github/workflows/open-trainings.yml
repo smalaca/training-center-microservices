@@ -26,6 +26,10 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Build Annotations
+        working-directory: ./annotations
+        run: mvn clean install
+
       - name: Tests
         working-directory: ./open-trainings
         run: mvn clean verify
