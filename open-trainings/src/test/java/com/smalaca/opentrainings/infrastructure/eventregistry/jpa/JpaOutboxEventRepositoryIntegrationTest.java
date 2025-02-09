@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @IntegrationTest
 @SpringBootTest
 @Import(JpaOutboxEventRepository.class)
-class JpaOutboxEventRepositoryTest {
+class JpaOutboxEventRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
 
     @Autowired
