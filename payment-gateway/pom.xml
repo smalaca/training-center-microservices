@@ -19,6 +19,12 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <sonar.organization>smalaca-github</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.links.homepage>https://github.com/smalaca/training-center-microservices</sonar.links.homepage>
+        <sonar.links.issue>https://github.com/smalaca/training-center-microservices/issues</sonar.links.issue>
+        <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
     </properties>
 
     <dependencies>
