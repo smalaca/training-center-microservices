@@ -8,4 +8,8 @@ public record AcceptOfferCommand(UUID offerId, String firstName, String lastName
     AcceptOfferDomainCommand asDomainCommand() {
         return new AcceptOfferDomainCommand(firstName, lastName, email, discountCode);
     }
+
+    public static AcceptOfferCommand from(UUID offerId, String firstName, String lastName, String email, String discountCode) {
+        return new AcceptOfferCommand(offerId, firstName, lastName, email, discountCode);
+    }
 }
