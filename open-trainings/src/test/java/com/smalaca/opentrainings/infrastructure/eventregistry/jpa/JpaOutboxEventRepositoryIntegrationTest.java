@@ -16,6 +16,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent.trainingNoLongerAvailable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
@@ -36,6 +37,11 @@ class JpaOutboxEventRepositoryIntegrationTest {
     @AfterEach
     void deleteAllEvents() {
         springRepository.deleteAll();
+    }
+
+    @Test
+    void shouldPublishOfferRejected() {
+        repository.publish(trainingNoLongerAvailable(randomId()));
     }
 
     @Test
