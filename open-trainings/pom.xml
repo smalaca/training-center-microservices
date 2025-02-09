@@ -30,6 +30,7 @@
 
         <sonar.organization>smalaca-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.projectName>Training Center: Open Trainings</sonar.projectName>
         <sonar.links.homepage>https://github.com/smalaca/training-center-microservices</sonar.links.homepage>
         <sonar.links.issue>https://github.com/smalaca/training-center-microservices/issues</sonar.links.issue>
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco/jacoco-ut/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
