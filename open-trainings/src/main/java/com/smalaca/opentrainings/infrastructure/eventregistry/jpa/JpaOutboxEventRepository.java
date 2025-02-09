@@ -41,7 +41,7 @@ public class JpaOutboxEventRepository implements EventRegistry {
         try {
             return objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new InvalidOutboxEventException(e);
         }
     }
 

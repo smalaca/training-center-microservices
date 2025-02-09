@@ -23,7 +23,7 @@ class JpaOutboxEventRepositoryTest {
         JsonProcessingException exception = new JsonProcessingException("dummy message") {};
         given(objectMapper.writeValueAsString(dummyEvent)).willThrow(exception);
 
-        RuntimeException actual = assertThrows(RuntimeException.class, () -> repository.publish(dummyEvent));
+        InvalidOutboxEventException actual = assertThrows(InvalidOutboxEventException.class, () -> repository.publish(dummyEvent));
 
         assertThat(actual).hasRootCause(exception);
     }
