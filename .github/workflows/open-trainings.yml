@@ -11,9 +11,11 @@ on:
     paths:
       - 'open-trainings/**'
 
-jobs:
-  build:
+permissions:
+  pull-requests: read
 
+jobs:
+  Tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,6 +28,20 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
       - name: Build Annotations
         working-directory: ./annotations
         run: mvn clean install
@@ -33,3 +49,11 @@ jobs:
       - name: Tests
         working-directory: ./open-trainings
         run: mvn clean verify
+
+      - name: SonarCloud Scan
+        working-directory: ./open-trainings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-open-trainings
