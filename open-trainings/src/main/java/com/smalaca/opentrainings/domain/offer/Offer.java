@@ -17,7 +17,6 @@ import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingRe
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -49,16 +48,12 @@ public class Offer {
     private UUID trainingId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "OFFER_NUMBER")),
-    })
+    @AttributeOverride(name = "value", column = @Column(name = "OFFER_NUMBER"))
     private OfferNumber offerNumber;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
-    })
+    @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT"))
+    @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
     private Price trainingPrice;
 
     @Column(name = "CREATION_DATE_TIME")

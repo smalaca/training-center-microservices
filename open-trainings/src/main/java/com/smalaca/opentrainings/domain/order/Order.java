@@ -13,7 +13,6 @@ import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
 import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -50,9 +49,7 @@ public class Order {
     private UUID participantId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "ORDER_NUMBER"))
-    })
+    @AttributeOverride(name = "value", column = @Column(name = "ORDER_NUMBER"))
     private OrderNumber orderNumber;
 
     @Column(name = "CREATION_DATE_TIME")
@@ -63,17 +60,13 @@ public class Order {
     private OrderStatus status;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
-    })
+    @AttributeOverride(name = "amount", column = @Column(name = "TRAINING_PRICE_AMOUNT"))
+    @AttributeOverride(name = "currency", column = @Column(name = "TRAINING_PRICE_CURRENCY"))
     private Price trainingPrice;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "amount", column = @Column(name = "FINAL_PRICE_AMOUNT")),
-            @AttributeOverride(name = "currency", column = @Column(name = "FINAL_PRICE_CURRENCY"))
-    })
+    @AttributeOverride(name = "amount", column = @Column(name = "FINAL_PRICE_AMOUNT"))
+    @AttributeOverride(name = "currency", column = @Column(name = "FINAL_PRICE_CURRENCY"))
     private Price finalPrice;
 
     @Column(name = "DISCOUNT_CODE")
