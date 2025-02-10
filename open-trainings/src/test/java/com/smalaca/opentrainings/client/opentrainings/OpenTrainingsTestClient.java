@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.client.opentrainings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smalaca.opentrainings.client.opentrainings.order.OrderEndpoints;
 import org.springframework.test.web.servlet.MockMvc;
 
 public class OpenTrainingsTestClient {
