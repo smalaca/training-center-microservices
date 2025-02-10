@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
-import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +14,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("offer")
 public class OfferRestController {
-    private final OfferApplicationService applicationService;
     private final OfferQueryService queryService;
 
-    OfferRestController(OfferApplicationService applicationService, OfferQueryService queryService) {
-        this.applicationService = applicationService;
+    OfferRestController(OfferQueryService queryService) {
         this.queryService = queryService;
     }
 
