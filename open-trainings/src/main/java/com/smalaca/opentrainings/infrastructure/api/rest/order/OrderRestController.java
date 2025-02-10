@@ -32,7 +32,7 @@ public class OrderRestController {
         this.queryService = queryService;
     }
 
-    @PutMapping("{orderId}/confirm")
+    @PutMapping("confirm")
     @DrivingAdapter
     public ResponseEntity<String> confirm(@RequestBody ConfirmOrderCommand command) {
         try {
@@ -47,7 +47,7 @@ public class OrderRestController {
         }
     }
 
-    @PutMapping("/{orderId}/cancel")
+    @PutMapping("/cancel/{orderId}")
     @DrivingAdapter
     public ResponseEntity<String> cancelOrder(@PathVariable UUID orderId) {
         try {

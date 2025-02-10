@@ -31,7 +31,7 @@ public class OrderEndpoints {
     }
 
     public RestOrderTestResponse confirm(RestConfirmOrderTestCommand command) {
-        MockHttpServletRequestBuilder request = put("/order/" + command.orderId() + "/confirm")
+        MockHttpServletRequestBuilder request = put("/order/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(command));
         return performSafe(request);
@@ -46,7 +46,7 @@ public class OrderEndpoints {
     }
 
     public RestOrderTestResponse cancel(UUID orderId) {
-        return performSafe(put("/order/" + orderId + "/cancel"));
+        return performSafe(put("/order/cancel/" + orderId));
     }
 
     private RestOrderTestResponse performSafe(RequestBuilder request) {
