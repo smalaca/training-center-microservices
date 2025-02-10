@@ -30,12 +30,16 @@ public class OfferEndpoints {
         return performSafe(get("/offer/" + offerId));
     }
 
-    public RestOfferTestResponse accept(RestAcceptOfferTestCommand command) {
+    public String getAcceptanceProgress(UUID commandId) {
+        return performSafe(get("/offer/accept/" + commandId)).asString();
+    }
+
+    public UUID accept(RestAcceptOfferTestCommand command) {
         MockHttpServletRequestBuilder request = put("/offer/accept")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(command));
 
-        return performSafe(request);
+        return performSafe(request).asUuid();
     }
 
     private String asJson(Object command) {

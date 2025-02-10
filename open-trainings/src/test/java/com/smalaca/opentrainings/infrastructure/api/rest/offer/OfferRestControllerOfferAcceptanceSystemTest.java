@@ -33,6 +33,8 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion.assertThatOfferResponse;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.BDDMockito.given;
 
 @SystemTest
@@ -87,8 +89,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        client.offers().accept(commandFor(dto));
+        UUID commandId = client.offers().accept(commandFor(dto));
 
+        assertThatAcceptanceCompletedFor(commandId);
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasAcceptedOffer(dto);
@@ -101,17 +104,24 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCannotBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        client.offers().accept(commandFor(dto));
+        UUID commandId = client.offers().accept(commandFor(dto));
 
+        assertThatAcceptanceCompletedFor(commandId);
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasRejectedOffer(dto);
     }
 
+    private void assertThatAcceptanceCompletedFor(UUID commandId) {
+        await().untilAsserted(() -> {
+            String status = client.offers().getAcceptanceProgress(commandId);
+            assertThat(status).isEqualTo("COMPLETED");
+        });
+    }
+
     private RestAcceptOfferTestCommand commandFor(OfferTestDto dto) {
         return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
     }
-
 
     private RestOfferTestResponseAssertion thenOfferResponse(UUID offerId) {
         RestOfferTestResponse offer = client.offers().findById(offerId);

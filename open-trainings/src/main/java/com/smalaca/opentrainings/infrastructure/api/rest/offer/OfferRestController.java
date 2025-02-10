@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class OfferRestController {
     private final OfferApplicationService applicationService;
     private final OfferQueryService queryService;
+    private final Map<UUID, String> commands = new HashMap<>();
 
     OfferRestController(OfferApplicationService applicationService, OfferQueryService queryService) {
         this.applicationService = applicationService;
@@ -27,10 +30,17 @@ public class OfferRestController {
     }
 
     @PutMapping("accept")
-    public ResponseEntity<String> accept(@RequestBody AcceptOfferCommand command) {
+    public ResponseEntity<UUID> accept(@RequestBody AcceptOfferCommand command) {
         applicationService.accept(command);
+        UUID commandId = UUID.randomUUID();
+        commands.put(commandId, "COMPLETED");
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(commandId);
+    }
+
+    @GetMapping("accept/{commandId}")
+    public String accept(@PathVariable UUID commandId) {
+        return commands.getOrDefault(commandId, "IN_PROGRESS");
     }
 
     @GetMapping("{offerId}")
