@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @DrivenPort
 public interface TrainingOfferCatalogue {
-    TrainingBookingResponse book(TrainingBookingDto trainingId);
+    TrainingBookingResponse book(TrainingBookingDto trainingBookingDto);
 
     TrainingDto detailsOf(UUID trainingId);
 }

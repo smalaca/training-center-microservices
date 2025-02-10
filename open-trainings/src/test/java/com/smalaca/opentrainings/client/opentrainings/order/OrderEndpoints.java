@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.client.opentrainings;
+package com.smalaca.opentrainings.client.opentrainings.order;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +17,7 @@ public class OrderEndpoints {
     private final MockMvc mockMvc;
     private final ObjectMapper objectMapper;
 
-    OrderEndpoints(MockMvc mockMvc, ObjectMapper objectMapper) {
+    public OrderEndpoints(MockMvc mockMvc, ObjectMapper objectMapper) {
         this.mockMvc = mockMvc;
         this.objectMapper = objectMapper;
     }

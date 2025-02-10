@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.client.opentrainings;
+package com.smalaca.opentrainings.client.opentrainings.order;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

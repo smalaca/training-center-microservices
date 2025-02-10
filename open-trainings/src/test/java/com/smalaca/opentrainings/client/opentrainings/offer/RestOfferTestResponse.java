@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.client.opentrainings;
+package com.smalaca.opentrainings.client.opentrainings.offer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,11 +8,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-public class RestOrderTestResponse {
+public class RestOfferTestResponse {
     private final MockHttpServletResponse response;
     private final ObjectMapper objectMapper;
 
-    RestOrderTestResponse(MockHttpServletResponse response, ObjectMapper objectMapper) {
+    RestOfferTestResponse(MockHttpServletResponse response, ObjectMapper objectMapper) {
         this.response = response;
         this.objectMapper = objectMapper;
     }
@@ -21,18 +21,18 @@ public class RestOrderTestResponse {
         return response.getStatus();
     }
 
-    List<RestOrderTestDto> asOrders() {
+    List<RestOfferTestDto> asOffers() {
         try {
-            RestOrderTestDto[] orders = objectMapper.readValue(asString(), RestOrderTestDto[].class);
-            return Lists.newArrayList(orders);
+            RestOfferTestDto[] offers = objectMapper.readValue(asString(), RestOfferTestDto[].class);
+            return Lists.newArrayList(offers);
         } catch (JsonProcessingException exception) {
             throw new RuntimeException(exception);
         }
     }
 
-    RestOrderTestDto asOrder() {
+    RestOfferTestDto asOffer() {
         try {
-            return objectMapper.readValue(asString(), RestOrderTestDto.class);
+            return objectMapper.readValue(asString(), RestOfferTestDto.class);
         } catch (JsonProcessingException exception) {
             throw new RuntimeException(exception);
         }

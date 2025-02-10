@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.client.opentrainings;
+package com.smalaca.opentrainings.client.opentrainings.order;
 
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import org.springframework.http.HttpStatus;

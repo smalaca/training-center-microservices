@@ -7,9 +7,13 @@ import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-class OfferApplicationServiceFactory {
-    OfferApplicationService offerApplicationService(
+@Configuration
+public class OfferApplicationServiceFactory {
+    @Bean
+    public OfferApplicationService offerApplicationService(
             OfferRepository offerRepository, EventRegistry eventRegistry, PersonalDataManagement personalDataManagement,
             TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         return new OfferApplicationService(

@@ -1,8 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
-import com.smalaca.opentrainings.client.opentrainings.RestConfirmOrderTestCommand;
-import com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponse;
+import com.smalaca.opentrainings.client.opentrainings.order.RestConfirmOrderTestCommand;
+import com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
@@ -21,7 +21,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.client.opentrainings.RestOrderTestResponseAssertion.assertThatOrderResponse;
+import static com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponseAssertion.assertThatOrderResponse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
