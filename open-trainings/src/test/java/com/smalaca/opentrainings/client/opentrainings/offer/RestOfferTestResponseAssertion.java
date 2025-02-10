@@ -74,6 +74,16 @@ public class RestOfferTestResponseAssertion {
         return offers;
     }
 
+    public RestOfferTestResponseAssertion hasRejectedOffer(OfferTestDto expected) {
+        isSameAsOffer(actual.asOffer(), expected, "REJECTED");
+        return this;
+    }
+
+    public RestOfferTestResponseAssertion hasAcceptedOffer(OfferTestDto expected) {
+        isSameAsOffer(actual.asOffer(), expected, "ACCEPTED");
+        return this;
+    }
+
     public RestOfferTestResponseAssertion hasInitiatedOffer(OfferTestDto expected) {
         isSameAsOffer(actual.asOffer(), expected, "INITIATED");
         return this;
