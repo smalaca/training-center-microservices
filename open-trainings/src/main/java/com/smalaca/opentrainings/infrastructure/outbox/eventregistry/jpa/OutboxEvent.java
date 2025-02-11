@@ -40,7 +40,7 @@ public class OutboxEvent {
 
     private OutboxEvent() {}
 
-    void published() {
+    public void published() {
         isPublished = true;
     }
 

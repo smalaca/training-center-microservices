@@ -15,7 +15,7 @@ class OutboxEventFactory {
         return new OutboxEvent(
                 eventId.eventId(),
                 eventId.creationDateTime(),
-                event.getClass().getSimpleName(),
+                event.getClass().getCanonicalName(),
                 asPayload(event));
     }
 
