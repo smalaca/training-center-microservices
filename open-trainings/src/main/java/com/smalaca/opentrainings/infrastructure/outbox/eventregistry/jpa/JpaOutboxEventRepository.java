@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.eventid.EventId;

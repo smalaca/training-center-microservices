@@ -17,6 +17,9 @@ services:
     url: http://localhost:9010
 
 scheduled:
+  outbox:
+    event:
+      rate: 100
   order:
     termination:
       rate: 60000
