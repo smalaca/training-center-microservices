@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

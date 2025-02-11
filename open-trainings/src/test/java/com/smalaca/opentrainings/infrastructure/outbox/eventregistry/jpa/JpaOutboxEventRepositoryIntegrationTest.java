@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
 
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
