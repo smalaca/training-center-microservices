@@ -1,7 +1,9 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
-import com.smalaca.opentrainings.application.offer.AcceptOfferCommand;
-import com.smalaca.opentrainings.application.offer.OfferApplicationService;
+import com.smalaca.architecture.portsandadapters.DrivingAdapter;
+import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaEventRegistry;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
 import org.springframework.http.ResponseEntity;
@@ -12,35 +14,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("offer")
 public class OfferRestController {
-    private final OfferApplicationService applicationService;
     private final OfferQueryService queryService;
-    private final Map<UUID, String> sagas = new HashMap<>();
+    private final OfferAcceptanceSagaEventRegistry eventRegistry;
+    private final OfferAcceptanceSagaEngine offerAcceptanceSagaEngine;
 
-    OfferRestController(OfferApplicationService applicationService, OfferQueryService queryService) {
-        this.applicationService = applicationService;
+    OfferRestController(OfferQueryService queryService, OfferAcceptanceSagaEventRegistry eventRegistry, OfferAcceptanceSagaEngine offerAcceptanceSagaEngine) {
         this.queryService = queryService;
+        this.eventRegistry = eventRegistry;
+        this.offerAcceptanceSagaEngine = offerAcceptanceSagaEngine;
     }
 
     @PutMapping("accept")
     public ResponseEntity<UUID> accept(@RequestBody AcceptOfferCommand command) {
-        applicationService.accept(command);
-        UUID sagaId = UUID.randomUUID();
-        sagas.put(sagaId, "COMPLETED");
+        OfferAcceptanceRequestedEvent event = command.asOfferAcceptanceRequestedEvent();
 
-        return ResponseEntity.ok(sagaId);
+        eventRegistry.publish(event);
+
+        return ResponseEntity.ok(event.offerId());
     }
 
     @GetMapping("accept/{sagaId}")
+    @DrivingAdapter
     public String accept(@PathVariable UUID sagaId) {
-        return sagas.getOrDefault(sagaId, "IN_PROGRESS");
+        return offerAcceptanceSagaEngine.isCompleted(sagaId) ? "COMPLETED" : "NOT COMPLETED";
     }
 
     @GetMapping("{offerId}")
