@@ -15,7 +15,7 @@ class JpaOutboxEventRepositoryTest {
     private static final SpringOutboxEventCrudRepository DUMMY_REPOSITORY = null;
 
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);
-    private final JpaOutboxEventRepository repository = new JpaOutboxEventRepository(DUMMY_REPOSITORY, objectMapper);
+    private final JpaOutboxEventRepository repository = new JpaOutboxEventRepositoryFactory().jpaOutboxEventRepository(DUMMY_REPOSITORY, objectMapper);
 
     @Test
     void shouldThrowRuntimeExceptionWhenCannotConvertEventToJson() throws JsonProcessingException {
