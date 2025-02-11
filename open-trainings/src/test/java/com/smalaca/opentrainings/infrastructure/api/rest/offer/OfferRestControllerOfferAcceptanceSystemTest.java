@@ -89,9 +89,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        UUID commandId = client.offers().accept(commandFor(dto));
+        UUID sagaId = client.offers().accept(commandFor(dto));
 
-        assertThatAcceptanceCompletedFor(commandId);
+        assertThatAcceptanceCompletedFor(sagaId);
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasAcceptedOffer(dto);
@@ -104,17 +104,17 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCannotBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        UUID commandId = client.offers().accept(commandFor(dto));
+        UUID sagaId = client.offers().accept(commandFor(dto));
 
-        assertThatAcceptanceCompletedFor(commandId);
+        assertThatAcceptanceCompletedFor(sagaId);
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasRejectedOffer(dto);
     }
 
-    private void assertThatAcceptanceCompletedFor(UUID commandId) {
+    private void assertThatAcceptanceCompletedFor(UUID sagaId) {
         await().untilAsserted(() -> {
-            String status = client.offers().getAcceptanceProgress(commandId);
+            String status = client.offers().getAcceptanceProgress(sagaId);
             assertThat(status).isEqualTo("COMPLETED");
         });
     }
