@@ -32,9 +32,11 @@ public class OfferAcceptanceSagaEngine {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
         AcceptOfferCommand command = offerAcceptanceSaga.accept(event);
+
         offerApplicationService.accept(command);
     }
 
+    @DrivenPort
     @QueryOperation
     public boolean isCompleted(UUID sagaId) {
         return true;
