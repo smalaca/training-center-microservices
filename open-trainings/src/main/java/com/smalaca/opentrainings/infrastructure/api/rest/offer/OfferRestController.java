@@ -22,7 +22,7 @@ import java.util.UUID;
 public class OfferRestController {
     private final OfferApplicationService applicationService;
     private final OfferQueryService queryService;
-    private final Map<UUID, String> commands = new HashMap<>();
+    private final Map<UUID, String> sagas = new HashMap<>();
 
     OfferRestController(OfferApplicationService applicationService, OfferQueryService queryService) {
         this.applicationService = applicationService;
@@ -32,15 +32,15 @@ public class OfferRestController {
     @PutMapping("accept")
     public ResponseEntity<UUID> accept(@RequestBody AcceptOfferCommand command) {
         applicationService.accept(command);
-        UUID commandId = UUID.randomUUID();
-        commands.put(commandId, "COMPLETED");
+        UUID sagaId = UUID.randomUUID();
+        sagas.put(sagaId, "COMPLETED");
 
-        return ResponseEntity.ok(commandId);
+        return ResponseEntity.ok(sagaId);
     }
 
-    @GetMapping("accept/{commandId}")
-    public String accept(@PathVariable UUID commandId) {
-        return commands.getOrDefault(commandId, "IN_PROGRESS");
+    @GetMapping("accept/{sagaId}")
+    public String accept(@PathVariable UUID sagaId) {
+        return sagas.getOrDefault(sagaId, "IN_PROGRESS");
     }
 
     @GetMapping("{offerId}")

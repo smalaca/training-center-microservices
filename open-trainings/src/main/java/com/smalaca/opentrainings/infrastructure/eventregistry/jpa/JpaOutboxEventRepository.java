@@ -1,22 +1,19 @@
 package com.smalaca.opentrainings.infrastructure.eventregistry.jpa;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @DrivenAdapter
 public class JpaOutboxEventRepository implements EventRegistry {
     private final SpringOutboxEventCrudRepository repository;
-    private final ObjectMapper objectMapper;
+    private final OutboxEventFactory outboxEventFactory;
 
-    JpaOutboxEventRepository(SpringOutboxEventCrudRepository repository, ObjectMapper objectMapper) {
+    JpaOutboxEventRepository(SpringOutboxEventCrudRepository repository, OutboxEventFactory outboxEventFactory) {
         this.repository = repository;
-        this.objectMapper = objectMapper;
+        this.outboxEventFactory = outboxEventFactory;
     }
 
     @Override
@@ -26,23 +23,11 @@ public class JpaOutboxEventRepository implements EventRegistry {
 
     @Override
     public void publish(OrderEvent event) {
-        repository.save(asOutboxEvent(event));
+        publish(event.eventId(), event);
     }
 
-    private OutboxEvent asOutboxEvent(OrderEvent event) {
-        return new OutboxEvent(
-                event.eventId().eventId(),
-                event.eventId().creationDateTime(),
-                event.getClass().getSimpleName(),
-                asPayload(event));
-    }
-
-    private String asPayload(OrderEvent event) {
-        try {
-            return objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException e) {
-            throw new InvalidOutboxEventException(e);
-        }
+    private void publish(EventId eventId, Object event) {
+        repository.save(outboxEventFactory.create(eventId, event));
     }
 
     Iterable<OutboxEvent> findAll() {
