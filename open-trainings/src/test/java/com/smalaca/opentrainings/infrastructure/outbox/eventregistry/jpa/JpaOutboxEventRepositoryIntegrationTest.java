@@ -137,7 +137,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
     private void assertOrderRejectedEventSaved(OutboxEvent actual, OrderRejectedEvent expected) {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("OrderRejectedEvent");
+        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"reason\" : \"" + expected.reason());
@@ -146,7 +146,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
     private void assertTrainingPurchasedEventSaved(OutboxEvent actual, TrainingPurchasedEvent expected) {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("TrainingPurchasedEvent");
+        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -157,7 +157,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
     private void assertOrderCancelledEventSaved(OutboxEvent actual, OrderCancelledEvent expected) {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("OrderCancelledEvent");
+        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -168,7 +168,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
     private void assertOrderTerminatedEventSaved(OutboxEvent actual, OrderTerminatedEvent expected) {
         assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("OrderTerminatedEvent");
+        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
