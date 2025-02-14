@@ -19,7 +19,7 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
 
     @Override
     public OfferAcceptanceSaga findById(UUID offerId) {
-        OfferAcceptanceSaga saga = OfferAcceptanceSaga.create(offerId);
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(offerId);
         repository.findAllByOfferIdOrderByConsumedAtAsc(offerId)
                 .forEach(event -> {
                     OfferAcceptanceSagaEvent offerAcceptanceSagaEvent = mapper.asEvent(event);

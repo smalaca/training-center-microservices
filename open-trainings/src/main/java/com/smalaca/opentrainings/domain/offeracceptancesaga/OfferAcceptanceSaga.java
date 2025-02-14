@@ -18,12 +18,8 @@ public class OfferAcceptanceSaga {
     private final List<AcceptedEvent> events = new ArrayList<>();
     private boolean isCompleted;
 
-    private OfferAcceptanceSaga(UUID offerId) {
+    public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
-    }
-
-    public static OfferAcceptanceSaga create(UUID offerId) {
-        return new OfferAcceptanceSaga(offerId);
     }
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {

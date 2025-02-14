@@ -32,7 +32,7 @@ public class OfferAcceptanceSagaEngine {
     @DrivenPort
     @CommandOperation
     public void accept(OfferAcceptanceRequestedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = OfferAcceptanceSaga.create(event.offerId());
+        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
 
         AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
