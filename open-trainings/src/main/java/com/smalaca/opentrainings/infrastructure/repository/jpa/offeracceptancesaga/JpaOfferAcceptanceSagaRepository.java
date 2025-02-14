@@ -22,7 +22,7 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(offerId);
         repository.findAllByOfferIdOrderByConsumedAtAsc(offerId)
                 .forEach(event -> {
-                    OfferAcceptanceSagaEvent offerAcceptanceSagaEvent = mapper.asEvent(event);
+                    OfferAcceptanceSagaEvent offerAcceptanceSagaEvent = mapper.offerAcceptanceSagaEventFrom(event);
                     saga.load(offerAcceptanceSagaEvent, event.getConsumedAt());
                 });
 
@@ -32,7 +32,7 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
     @Override
     public void save(OfferAcceptanceSaga offerAcceptanceSaga) {
         offerAcceptanceSaga.readEachEvent((event, consumedAt) -> {
-            repository.save(mapper.create(event, consumedAt));
+            repository.save(mapper.offerAcceptanceSagaJpaEventFrom(event, consumedAt));
         });
     }
 }
