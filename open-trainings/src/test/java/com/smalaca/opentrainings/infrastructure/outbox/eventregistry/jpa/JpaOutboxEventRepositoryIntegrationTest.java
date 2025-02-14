@@ -14,6 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent.trainingNoLongerAvailable;
@@ -34,9 +38,13 @@ class JpaOutboxEventRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private final List<UUID> eventIds = new ArrayList<>();
+
     @AfterEach
     void deleteAllEvents() {
-        springRepository.deleteAll();
+        if (!eventIds.isEmpty()) {
+            springRepository.deleteAllById(eventIds);
+        }
     }
 
     @Test
@@ -48,59 +56,50 @@ class JpaOutboxEventRepositoryIntegrationTest {
     void shouldPublishTrainingPurchased() {
         TrainingPurchasedEvent event = randomTrainingPurchasedEvent();
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.publish(event));
+        publish(event);
 
-        assertThat(repository.findAll())
-                .hasSize(1)
-                .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
+        assertThat(repository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
     }
 
     @Test
     void shouldPublishOrderRejected() {
         OrderRejectedEvent event = randomOrderRejectedEvent();
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.publish(event));
+        publish(event);
 
-        assertThat(repository.findAll())
-                .hasSize(1)
-                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
+        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
     }
 
     @Test
     void shouldPublishOrderCancelled() {
         OrderCancelledEvent event = randomOrderCancelledEvent();
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.publish(event));
+        publish(event);
 
-        assertThat(repository.findAll())
-                .hasSize(1)
-                .anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
+        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
     }
 
     @Test
     void shouldPublishOrderTerminatedEvent() {
         OrderTerminatedEvent event = randomOrderTerminatedEvent();
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.publish(event));
+        publish(event);
 
-        assertThat(repository.findAll())
-                .hasSize(1)
-                .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
+        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
     }
 
     @Test
     void shouldFindAllEvents() {
-        TrainingPurchasedEvent eventOne = saved(randomTrainingPurchasedEvent());
-        OrderRejectedEvent eventTwo = saved(randomOrderRejectedEvent());
-        TrainingPurchasedEvent eventThree = saved(randomTrainingPurchasedEvent());
-        TrainingPurchasedEvent eventFour = saved(randomTrainingPurchasedEvent());
-        OrderCancelledEvent eventFive = saved(randomOrderCancelledEvent());
-        OrderRejectedEvent eventSix = saved(randomOrderRejectedEvent());
-        OrderTerminatedEvent eventSeven = saved(randomOrderTerminatedEvent());
-        OrderTerminatedEvent eventEight = saved(randomOrderTerminatedEvent());
+        TrainingPurchasedEvent eventOne = publish(randomTrainingPurchasedEvent());
+        OrderRejectedEvent eventTwo = publish(randomOrderRejectedEvent());
+        TrainingPurchasedEvent eventThree = publish(randomTrainingPurchasedEvent());
+        TrainingPurchasedEvent eventFour = publish(randomTrainingPurchasedEvent());
+        OrderCancelledEvent eventFive = publish(randomOrderCancelledEvent());
+        OrderRejectedEvent eventSix = publish(randomOrderRejectedEvent());
+        OrderTerminatedEvent eventSeven = publish(randomOrderTerminatedEvent());
+        OrderTerminatedEvent eventEight = publish(randomOrderTerminatedEvent());
 
         assertThat(repository.findAll())
-                .hasSize(8)
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventOne))
                 .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventTwo))
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventThree))
@@ -111,9 +110,10 @@ class JpaOutboxEventRepositoryIntegrationTest {
                 .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, eventEight));
     }
 
-    private <T extends OrderEvent> T saved(T event) {
+    private <T extends OrderEvent> T publish(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
+            eventIds.add(event.eventId().eventId());
             return event;
         });
     }

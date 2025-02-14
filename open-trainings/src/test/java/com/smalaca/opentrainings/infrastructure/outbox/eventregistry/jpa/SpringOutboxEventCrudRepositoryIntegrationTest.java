@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,14 +29,18 @@ class SpringOutboxEventCrudRepositoryIntegrationTest {
 
     private OutboxEventFactory factory;
 
+    private final List<UUID> eventIds = new ArrayList<>();
+
     @BeforeEach
     void initOutboxEventFactory() {
         factory = new OutboxEventFactory(objectMapper);
     }
 
     @AfterEach
-    void deleteAll() {
-        repository.deleteAll();
+    void deleteAllEvents() {
+        if (!eventIds.isEmpty()) {
+            repository.deleteAllById(eventIds);
+        }
     }
 
     @Test
@@ -69,11 +75,13 @@ class SpringOutboxEventCrudRepositoryIntegrationTest {
     private void published(EventId eventId, Object event) {
         OutboxEvent outboxEvent = factory.create(eventId, event);
         outboxEvent.published();
+        eventIds.add(eventId.eventId());
         repository.save(outboxEvent);
     }
 
     private OutboxEvent notPublished(EventId eventId, Object event) {
         OutboxEvent outboxEvent = factory.create(eventId, event);
+        eventIds.add(eventId.eventId());
         repository.save(outboxEvent);
         return outboxEvent;
     }
