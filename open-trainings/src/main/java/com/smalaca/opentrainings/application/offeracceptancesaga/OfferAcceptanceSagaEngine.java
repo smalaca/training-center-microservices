@@ -6,6 +6,7 @@ import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.application.offer.AcceptOfferCommand;
 import com.smalaca.opentrainings.application.offer.OfferApplicationService;
+import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -17,10 +18,12 @@ import java.util.UUID;
 @Service
 @ApplicationLayer
 public class OfferAcceptanceSagaEngine {
+    private final Clock clock;
     private final OfferAcceptanceSagaRepository repository;
     private final OfferApplicationService offerApplicationService;
 
-    OfferAcceptanceSagaEngine(OfferAcceptanceSagaRepository repository, OfferApplicationService offerApplicationService) {
+    OfferAcceptanceSagaEngine(Clock clock, OfferAcceptanceSagaRepository repository, OfferApplicationService offerApplicationService) {
+        this.clock = clock;
         this.repository = repository;
         this.offerApplicationService = offerApplicationService;
     }
@@ -31,7 +34,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(OfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = OfferAcceptanceSaga.create(event.offerId());
 
-        AcceptOfferCommand command = offerAcceptanceSaga.accept(event);
+        AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
         offerApplicationService.accept(command);
         repository.save(offerAcceptanceSaga);
