@@ -31,7 +31,7 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
 
     @Override
     public void save(OfferAcceptanceSaga offerAcceptanceSaga) {
-        offerAcceptanceSaga.forEachEvent((event, consumedAt) -> {
+        offerAcceptanceSaga.readEachEvent((event, consumedAt) -> {
             repository.save(mapper.create(event, consumedAt));
         });
     }

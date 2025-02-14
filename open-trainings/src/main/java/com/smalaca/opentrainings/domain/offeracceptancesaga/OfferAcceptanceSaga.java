@@ -37,7 +37,7 @@ public class OfferAcceptanceSaga {
         return isCompleted;
     }
 
-    public void forEachEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {
+    public void readEachEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {
         events.forEach(event -> event.accept(consumer));
     }
 
