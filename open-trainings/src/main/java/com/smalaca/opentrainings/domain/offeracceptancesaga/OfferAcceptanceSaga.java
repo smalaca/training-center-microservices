@@ -10,11 +10,19 @@ import java.util.UUID;
 public class OfferAcceptanceSaga {
     private final UUID offerId;
 
-    public OfferAcceptanceSaga(UUID offerId) {
+    private OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
+    }
+
+    public static OfferAcceptanceSaga create(UUID offerId) {
+        return new OfferAcceptanceSaga(offerId);
     }
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event) {
         return new AcceptOfferCommand(event.offerId(), event.firstName(), event.lastName(), event.email(), event.discountCode());
+    }
+
+    public boolean isCompleted() {
+        return true;
     }
 }

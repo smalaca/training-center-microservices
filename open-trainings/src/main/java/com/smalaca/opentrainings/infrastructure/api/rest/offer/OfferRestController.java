@@ -3,7 +3,6 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaEventRegistry;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
 import org.springframework.http.ResponseEntity;
@@ -31,18 +30,14 @@ public class OfferRestController {
     }
 
     @PutMapping("accept")
-    public ResponseEntity<UUID> accept(@RequestBody AcceptOfferCommand command) {
-        OfferAcceptanceRequestedEvent event = command.asOfferAcceptanceRequestedEvent();
-
-        eventRegistry.publish(event);
-
-        return ResponseEntity.ok(event.offerId());
+    public void accept(@RequestBody AcceptOfferCommand command) {
+        eventRegistry.publish(command.asOfferAcceptanceRequestedEvent());
     }
 
-    @GetMapping("accept/{sagaId}")
+    @GetMapping("accept/{offerId}")
     @DrivingAdapter
-    public String accept(@PathVariable UUID sagaId) {
-        return offerAcceptanceSagaEngine.isCompleted(sagaId) ? "COMPLETED" : "NOT COMPLETED";
+    public String accept(@PathVariable UUID offerId) {
+        return offerAcceptanceSagaEngine.isCompleted(offerId) ? "COMPLETED" : "NOT COMPLETED";
     }
 
     @GetMapping("{offerId}")

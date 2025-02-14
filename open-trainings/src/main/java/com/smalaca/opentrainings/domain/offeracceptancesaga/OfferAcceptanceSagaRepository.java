@@ -6,5 +6,7 @@ import java.util.UUID;
 
 @DrivenPort
 public interface OfferAcceptanceSagaRepository {
-    OfferAcceptanceSaga findById(UUID sagaId);
+    OfferAcceptanceSaga findById(UUID offerId);
+
+    void save(OfferAcceptanceSaga offerAcceptanceSaga);
 }

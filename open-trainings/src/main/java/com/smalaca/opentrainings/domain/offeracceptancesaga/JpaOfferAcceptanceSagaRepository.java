@@ -9,7 +9,12 @@ import java.util.UUID;
 @DrivenAdapter
 public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepository {
     @Override
-    public OfferAcceptanceSaga findById(UUID sagaId) {
-        return new OfferAcceptanceSaga(sagaId);
+    public OfferAcceptanceSaga findById(UUID offerId) {
+        return OfferAcceptanceSaga.create(offerId);
+    }
+
+    @Override
+    public void save(OfferAcceptanceSaga offerAcceptanceSaga) {
+
     }
 }
