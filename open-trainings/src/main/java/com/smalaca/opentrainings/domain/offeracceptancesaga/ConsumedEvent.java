@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
-import com.smalaca.domaindrivendesign.DomainEntity;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 
@@ -9,7 +8,6 @@ import java.util.function.BiConsumer;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
-@DomainEntity
 class ConsumedEvent {
     private final EventId eventId;
     private final LocalDateTime consumedAt;
