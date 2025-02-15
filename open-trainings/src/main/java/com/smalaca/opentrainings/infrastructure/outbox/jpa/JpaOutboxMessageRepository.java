@@ -9,7 +9,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 
 @DrivenAdapter
-public class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry {
+class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry {
     private final SpringOutboxMessageCrudRepository repository;
     private final OutboxMessageMapper outboxMessageMapper;
 
@@ -35,9 +35,5 @@ public class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanc
 
     private void publish(EventId eventId, Object event) {
         repository.save(outboxMessageMapper.outboxMessage(eventId, event));
-    }
-
-    Iterable<OutboxMessage> findAll() {
-        return repository.findAll();
     }
 }

@@ -58,7 +58,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
     }
 
     @Test
@@ -67,7 +67,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
     }
 
     @Test
@@ -76,7 +76,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
     }
 
     @Test
@@ -85,7 +85,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
     }
 
     @Test
@@ -99,7 +99,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         OrderTerminatedEvent eventSeven = publish(randomOrderTerminatedEvent());
         OrderTerminatedEvent eventEight = publish(randomOrderTerminatedEvent());
 
-        assertThat(repository.findAll())
+        assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventOne))
                 .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventTwo))
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventThree))
