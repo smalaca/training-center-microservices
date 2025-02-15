@@ -11,7 +11,7 @@ class OutboxMessageMapper {
         this.objectMapper = objectMapper;
     }
 
-    OutboxMessage create(EventId eventId, Object event) {
+    OutboxMessage outboxMessage(EventId eventId, Object event) {
         return new OutboxMessage(
                 eventId.eventId(),
                 eventId.creationDateTime(),
@@ -22,8 +22,16 @@ class OutboxMessageMapper {
     private String asPayload(Object message) {
         try {
             return objectMapper.writeValueAsString(message);
-        } catch (JsonProcessingException e) {
-            throw new InvalidOutboxMessageException(e);
+        } catch (JsonProcessingException exception) {
+            throw new InvalidOutboxMessageException(exception);
+        }
+    }
+
+    Object message(OutboxMessage outboxMessage) {
+        try {
+            return objectMapper.readValue(outboxMessage.getPayload(), Class.forName(outboxMessage.getMessageType()));
+        } catch (JsonProcessingException | ClassNotFoundException exception) {
+            throw new InvalidOutboxMessageException(exception);
         }
     }
 }

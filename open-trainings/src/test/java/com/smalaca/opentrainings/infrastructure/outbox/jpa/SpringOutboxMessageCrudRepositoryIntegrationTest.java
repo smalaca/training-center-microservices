@@ -73,14 +73,14 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
     }
 
     private void published(EventId eventId, Object event) {
-        OutboxMessage outboxMessage = factory.create(eventId, event);
+        OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
         outboxMessage.published();
         messageIds.add(eventId.eventId());
         repository.save(outboxMessage);
     }
 
     private OutboxMessage notPublished(EventId eventId, Object event) {
-        OutboxMessage outboxMessage = factory.create(eventId, event);
+        OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
         messageIds.add(eventId.eventId());
         repository.save(outboxMessage);
         return outboxMessage;

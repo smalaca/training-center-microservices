@@ -34,7 +34,7 @@ public class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanc
     }
 
     private void publish(EventId eventId, Object event) {
-        repository.save(outboxMessageMapper.create(eventId, event));
+        repository.save(outboxMessageMapper.outboxMessage(eventId, event));
     }
 
     Iterable<OutboxMessage> findAll() {
