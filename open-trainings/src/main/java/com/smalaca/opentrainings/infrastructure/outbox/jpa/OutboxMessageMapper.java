@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 
 class OutboxMessageMapper {
@@ -9,6 +10,14 @@ class OutboxMessageMapper {
 
     OutboxMessageMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    OutboxMessage outboxMessage(CommandId commandId, Object command) {
+        return new OutboxMessage(
+                commandId.commandId(),
+                commandId.creationDateTime(),
+                command.getClass().getCanonicalName(),
+                asPayload(command));
     }
 
     OutboxMessage outboxMessage(EventId eventId, Object event) {

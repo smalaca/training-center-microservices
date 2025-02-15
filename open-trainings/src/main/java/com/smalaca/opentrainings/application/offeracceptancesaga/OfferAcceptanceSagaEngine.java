@@ -4,8 +4,8 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.cqrs.QueryOperation;
 import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
+import com.smalaca.opentrainings.domain.commandregistry.CommandRegistry;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
@@ -21,12 +21,12 @@ import java.util.UUID;
 public class OfferAcceptanceSagaEngine {
     private final Clock clock;
     private final OfferAcceptanceSagaRepository repository;
-    private final OfferApplicationService offerApplicationService;
+    private final CommandRegistry commandRegistry;
 
-    OfferAcceptanceSagaEngine(Clock clock, OfferAcceptanceSagaRepository repository, OfferApplicationService offerApplicationService) {
+    OfferAcceptanceSagaEngine(Clock clock, OfferAcceptanceSagaRepository repository, CommandRegistry commandRegistry) {
         this.clock = clock;
         this.repository = repository;
-        this.offerApplicationService = offerApplicationService;
+        this.commandRegistry = commandRegistry;
     }
 
     @Transactional
@@ -37,7 +37,7 @@ public class OfferAcceptanceSagaEngine {
 
         AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
-        offerApplicationService.accept(command);
+        commandRegistry.publish(command);
         repository.save(offerAcceptanceSaga);
     }
 
