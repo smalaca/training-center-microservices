@@ -34,12 +34,12 @@ public class OfferEndpoints {
         return performSafe(get("/offer/accept/" + commandId)).asString();
     }
 
-    public UUID accept(RestAcceptOfferTestCommand command) {
+    public void accept(RestAcceptOfferTestCommand command) {
         MockHttpServletRequestBuilder request = put("/offer/accept")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJson(command));
 
-        return performSafe(request).asUuid();
+        performSafe(request);
     }
 
     private String asJson(Object command) {

@@ -89,9 +89,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        UUID sagaId = client.offers().accept(commandFor(dto));
+        client.offers().accept(commandFor(dto));
 
-        assertThatAcceptanceCompletedFor(sagaId);
+        assertThatAcceptanceCompletedFor(dto.getOfferId());
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasAcceptedOffer(dto);
@@ -104,9 +104,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         givenTrainingThatCannotBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
-        UUID sagaId = client.offers().accept(commandFor(dto));
+        client.offers().accept(commandFor(dto));
 
-        assertThatAcceptanceCompletedFor(sagaId);
+        assertThatAcceptanceCompletedFor(dto.getOfferId());
         thenOfferResponse(dto.getOfferId())
                 .isOk()
                 .hasRejectedOffer(dto);

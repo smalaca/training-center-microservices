@@ -7,7 +7,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.UUID;
 
 public class RestOfferTestResponse {
     private final MockHttpServletResponse response;
@@ -37,10 +36,6 @@ public class RestOfferTestResponse {
         } catch (JsonProcessingException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    UUID asUuid() {
-        return UUID.fromString(asString().replace("\"",""));
     }
 
     String asString() {
