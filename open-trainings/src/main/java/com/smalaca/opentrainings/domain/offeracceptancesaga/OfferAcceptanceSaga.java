@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.domaindrivendesign.Saga;
-import com.smalaca.opentrainings.application.offer.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;

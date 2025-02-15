@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.application.offer;
+package com.smalaca.opentrainings.domain.offeracceptancesaga.commands;
 
 import java.util.UUID;
 

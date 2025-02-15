@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;

@@ -11,6 +11,7 @@ import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.transaction.annotation.Transactional;
