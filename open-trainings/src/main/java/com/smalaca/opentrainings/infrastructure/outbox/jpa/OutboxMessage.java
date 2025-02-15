@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,15 +15,15 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 
 @Entity
 @Getter
-@Table(name = "OUTBOX_EVENTS")
-public class OutboxEvent {
+@Table(name = "OUTBOX_MESSAGES")
+class OutboxMessage {
     @Id
-    @Column(name = "EVENT_ID")
-    private UUID eventId;
+    @Column(name = "MESSAGE_ID")
+    private UUID messageId;
     @Column(name = "OCCURRED_ON")
     private LocalDateTime occurredOn;
-    @Column(name = "EVENT_TYPE")
-    private String type;
+    @Column(name = "MESSAGE_TYPE")
+    private String messageType;
     @Column(name = "IS_PUBLISHED")
     private boolean isPublished;
 
@@ -31,16 +31,16 @@ public class OutboxEvent {
     @Column(name = "PAYLOAD")
     private String payload;
 
-    OutboxEvent(UUID eventId, LocalDateTime occurredOn, String type, String payload) {
-        this.eventId = eventId;
+    OutboxMessage(UUID messageId, LocalDateTime occurredOn, String messageType, String payload) {
+        this.messageId = messageId;
         this.occurredOn = occurredOn;
-        this.type = type;
+        this.messageType = messageType;
         this.payload = payload;
     }
 
-    private OutboxEvent() {}
+    private OutboxMessage() {}
 
-    public void published() {
+    void published() {
         isPublished = true;
     }
 
@@ -49,19 +49,19 @@ public class OutboxEvent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OutboxEvent that = (OutboxEvent) o;
+        OutboxMessage that = (OutboxMessage) o;
         return isPublished == that.isPublished &&
-                eventId.equals(that.eventId) &&
+                messageId.equals(that.messageId) &&
                 occurredOn.truncatedTo(SECONDS).equals(that.occurredOn.truncatedTo(SECONDS)) &&
-                type.equals(that.type) &&
+                messageType.equals(that.messageType) &&
                 payload.equals(that.payload);
     }
 
     @Override
     public int hashCode() {
-        int result = eventId.hashCode();
+        int result = messageId.hashCode();
         result = 31 * result + occurredOn.hashCode();
-        result = 31 * result + type.hashCode();
+        result = 31 * result + messageType.hashCode();
         result = 31 * result + Boolean.hashCode(isPublished);
         result = 31 * result + payload.hashCode();
         return result;

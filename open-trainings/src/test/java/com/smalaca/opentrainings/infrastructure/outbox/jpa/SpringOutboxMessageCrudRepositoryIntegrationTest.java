@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.domain.eventid.EventId;
@@ -20,38 +20,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @SpringBootTest
-class SpringOutboxEventCrudRepositoryIntegrationTest {
+class SpringOutboxMessageCrudRepositoryIntegrationTest {
     @Autowired
-    private SpringOutboxEventCrudRepository repository;
+    private SpringOutboxMessageCrudRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private OutboxEventFactory factory;
+    private OutboxMessageMapper factory;
 
-    private final List<UUID> eventIds = new ArrayList<>();
+    private final List<UUID> messageIds = new ArrayList<>();
 
     @BeforeEach
     void initOutboxEventFactory() {
-        factory = new OutboxEventFactory(objectMapper);
+        factory = new OutboxMessageMapper(objectMapper);
     }
 
     @AfterEach
     void deleteAllEvents() {
-        if (!eventIds.isEmpty()) {
-            repository.deleteAllById(eventIds);
+        if (!messageIds.isEmpty()) {
+            repository.deleteAllById(messageIds);
         }
     }
 
     @Test
     void shouldFindOnlyNotPublishOutboxEvents() {
-        OutboxEvent eventOne = notPublished(OfferRejectedEvent.expired(randomId()));
+        OutboxMessage eventOne = notPublished(OfferRejectedEvent.expired(randomId()));
         published(OfferRejectedEvent.expired(randomId()));
         published(OrderRejectedEvent.expired(randomId()));
-        OutboxEvent eventFour = notPublished(OrderRejectedEvent.expired(randomId()));
-        OutboxEvent eventFive = notPublished(OrderRejectedEvent.expired(randomId()));
+        OutboxMessage eventFour = notPublished(OrderRejectedEvent.expired(randomId()));
+        OutboxMessage eventFive = notPublished(OrderRejectedEvent.expired(randomId()));
 
-        List<OutboxEvent> actual = repository.findByIsPublishedFalse();
+        List<OutboxMessage> actual = repository.findByIsPublishedFalse();
 
         assertThat(actual).containsExactlyInAnyOrder(eventOne, eventFour, eventFive);
     }
@@ -60,7 +60,7 @@ class SpringOutboxEventCrudRepositoryIntegrationTest {
         published(event.eventId(), event);
     }
 
-    private OutboxEvent notPublished(OfferRejectedEvent event) {
+    private OutboxMessage notPublished(OfferRejectedEvent event) {
         return notPublished(event.eventId(), event);
     }
 
@@ -68,21 +68,21 @@ class SpringOutboxEventCrudRepositoryIntegrationTest {
         published(event.eventId(), event);
     }
 
-    private OutboxEvent notPublished(OrderRejectedEvent event) {
+    private OutboxMessage notPublished(OrderRejectedEvent event) {
         return notPublished(event.eventId(), event);
     }
 
     private void published(EventId eventId, Object event) {
-        OutboxEvent outboxEvent = factory.create(eventId, event);
-        outboxEvent.published();
-        eventIds.add(eventId.eventId());
-        repository.save(outboxEvent);
+        OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
+        outboxMessage.published();
+        messageIds.add(eventId.eventId());
+        repository.save(outboxMessage);
     }
 
-    private OutboxEvent notPublished(EventId eventId, Object event) {
-        OutboxEvent outboxEvent = factory.create(eventId, event);
-        eventIds.add(eventId.eventId());
-        repository.save(outboxEvent);
-        return outboxEvent;
+    private OutboxMessage notPublished(EventId eventId, Object event) {
+        OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
+        messageIds.add(eventId.eventId());
+        repository.save(outboxMessage);
+        return outboxMessage;
     }
 }

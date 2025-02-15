@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventpublisher;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-class OutboxEventTestListener {
+class OutboxMessageTestListener {
     List<OfferRejectedEvent> offerRejectedEvents = new ArrayList<>();
     List<OrderRejectedEvent> orderRejectedEvents = new ArrayList<>();
 

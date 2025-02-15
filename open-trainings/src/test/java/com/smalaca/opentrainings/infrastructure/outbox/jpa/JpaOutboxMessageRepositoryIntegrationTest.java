@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -25,25 +25,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @SpringBootTest
-@Import(JpaOutboxEventRepositoryFactory.class)
-class JpaOutboxEventRepositoryIntegrationTest {
+@Import(JpaOutboxMessageRepositoryFactory.class)
+class JpaOutboxMessageRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
 
     @Autowired
-    private JpaOutboxEventRepository repository;
+    private JpaOutboxMessageRepository repository;
 
     @Autowired
-    private SpringOutboxEventCrudRepository springRepository;
+    private SpringOutboxMessageCrudRepository springRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private final List<UUID> eventIds = new ArrayList<>();
+    private final List<UUID> messagesIds = new ArrayList<>();
 
     @AfterEach
     void deleteAllEvents() {
-        if (!eventIds.isEmpty()) {
-            springRepository.deleteAllById(eventIds);
+        if (!messagesIds.isEmpty()) {
+            springRepository.deleteAllById(messagesIds);
         }
     }
 
@@ -58,7 +58,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
     }
 
     @Test
@@ -67,7 +67,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
     }
 
     @Test
@@ -76,7 +76,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
     }
 
     @Test
@@ -85,7 +85,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
 
         publish(event);
 
-        assertThat(repository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
     }
 
     @Test
@@ -99,7 +99,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
         OrderTerminatedEvent eventSeven = publish(randomOrderTerminatedEvent());
         OrderTerminatedEvent eventEight = publish(randomOrderTerminatedEvent());
 
-        assertThat(repository.findAll())
+        assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventOne))
                 .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventTwo))
                 .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventThree))
@@ -113,7 +113,7 @@ class JpaOutboxEventRepositoryIntegrationTest {
     private <T extends OrderEvent> T publish(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
-            eventIds.add(event.eventId().eventId());
+            messagesIds.add(event.eventId().eventId());
             return event;
         });
     }
@@ -134,19 +134,19 @@ class JpaOutboxEventRepositoryIntegrationTest {
         return new OrderTerminatedEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
     }
 
-    private void assertOrderRejectedEventSaved(OutboxEvent actual, OrderRejectedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderRejectedEventSaved(OutboxMessage actual, OrderRejectedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"reason\" : \"" + expected.reason());
     }
 
-    private void assertTrainingPurchasedEventSaved(OutboxEvent actual, TrainingPurchasedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertTrainingPurchasedEventSaved(OutboxMessage actual, TrainingPurchasedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -154,10 +154,10 @@ class JpaOutboxEventRepositoryIntegrationTest {
                 .contains("\"participantId\" : \"" + expected.participantId());
     }
 
-    private void assertOrderCancelledEventSaved(OutboxEvent actual, OrderCancelledEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderCancelledEventSaved(OutboxMessage actual, OrderCancelledEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -165,10 +165,10 @@ class JpaOutboxEventRepositoryIntegrationTest {
                 .contains("\"participantId\" : \"" + expected.participantId());
     }
 
-    private void assertOrderTerminatedEventSaved(OutboxEvent actual, OrderTerminatedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderTerminatedEventSaved(OutboxMessage actual, OrderTerminatedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
