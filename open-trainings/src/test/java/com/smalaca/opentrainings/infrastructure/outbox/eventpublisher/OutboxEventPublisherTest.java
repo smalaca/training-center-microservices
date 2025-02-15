@@ -15,7 +15,7 @@ import static org.mockito.Mockito.mock;
 class OutboxEventPublisherTest {
     private final ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
     private final SpringOutboxEventCrudRepository repository = mock(SpringOutboxEventCrudRepository.class);
-    private final ObjectMapper objectMapper = mock(ObjectMapper.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final OutboxEventPublisher outboxEventPublisher = new OutboxEventPublisherFactory().outboxEventPublisher(publisher, repository, objectMapper);
 
     private final OutboxEventTestFactory outboxEventTestFactory = new OutboxEventTestFactory(objectMapper);
