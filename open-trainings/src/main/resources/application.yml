@@ -18,7 +18,7 @@ services:
 
 scheduled:
   outbox:
-    event:
+    message:
       rate: 100
   order:
     termination:

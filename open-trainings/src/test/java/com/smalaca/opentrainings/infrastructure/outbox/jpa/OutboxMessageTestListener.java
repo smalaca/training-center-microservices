@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-class OutboxEventTestListener {
+class OutboxMessageTestListener {
     List<OfferRejectedEvent> offerRejectedEvents = new ArrayList<>();
     List<OrderRejectedEvent> orderRejectedEvents = new ArrayList<>();
 

@@ -12,10 +12,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 class JpaOutboxMessageRepositoryTest {
-    private static final SpringOutboxEventCrudRepository DUMMY_REPOSITORY = null;
+    private static final SpringOutboxMessageCrudRepository DUMMY_REPOSITORY = null;
 
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);
-    private final JpaOutboxEventRepository repository = new JpaOutboxEventRepositoryFactory().jpaOutboxEventRepository(DUMMY_REPOSITORY, objectMapper);
+    private final JpaOutboxMessageRepository repository = new JpaOutboxMessageRepositoryFactory().jpaOutboxMessageRepository(DUMMY_REPOSITORY, objectMapper);
 
     @Test
     void shouldThrowRuntimeExceptionWhenCannotConvertEventToJson() throws JsonProcessingException {
@@ -23,7 +23,7 @@ class JpaOutboxMessageRepositoryTest {
         JsonProcessingException exception = new JsonProcessingException("dummy message") {};
         given(objectMapper.writeValueAsString(dummyEvent)).willThrow(exception);
 
-        InvalidOutboxEventException actual = assertThrows(InvalidOutboxEventException.class, () -> repository.publish(dummyEvent));
+        InvalidOutboxMessageException actual = assertThrows(InvalidOutboxMessageException.class, () -> repository.publish(dummyEvent));
 
         assertThat(actual).hasRootCause(exception);
     }

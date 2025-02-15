@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 
-class OutboxEventFactory {
+class OutboxMessageMapper {
     private final ObjectMapper objectMapper;
 
-    OutboxEventFactory(ObjectMapper objectMapper) {
+    OutboxMessageMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -19,11 +19,11 @@ class OutboxEventFactory {
                 asPayload(event));
     }
 
-    private String asPayload(Object event) {
+    private String asPayload(Object message) {
         try {
-            return objectMapper.writeValueAsString(event);
+            return objectMapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {
-            throw new InvalidOutboxEventException(e);
+            throw new InvalidOutboxMessageException(e);
         }
     }
 }

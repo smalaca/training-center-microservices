@@ -4,22 +4,22 @@ import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 
-public class OutboxEventPublisher {
+public class OutboxMessagePublisher {
     private final ApplicationEventPublisher publisher;
-    private final SpringOutboxEventCrudRepository repository;
-    private final EventFactory eventFactory;
+    private final SpringOutboxMessageCrudRepository repository;
+    private final MessageFactory messageFactory;
 
-    OutboxEventPublisher(ApplicationEventPublisher publisher, SpringOutboxEventCrudRepository repository, EventFactory eventFactory) {
+    OutboxMessagePublisher(ApplicationEventPublisher publisher, SpringOutboxMessageCrudRepository repository, MessageFactory messageFactory) {
         this.publisher = publisher;
         this.repository = repository;
-        this.eventFactory = eventFactory;
+        this.messageFactory = messageFactory;
     }
 
     @DrivingAdapter
-    @Scheduled(fixedRateString = "${scheduled.outbox.event.rate}")
+    @Scheduled(fixedRateString = "${scheduled.outbox.message.rate}")
     void publishOutboxEvents() {
         repository.findByIsPublishedFalse().forEach(outboxEvent -> {
-            publisher.publishEvent(eventFactory.from(outboxEvent));
+            publisher.publishEvent(messageFactory.from(outboxEvent));
 
             outboxEvent.published();
             repository.save(outboxEvent);

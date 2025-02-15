@@ -7,11 +7,11 @@ import java.time.LocalDateTime;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 
-public class OutboxEventTestFactory {
-    private final OutboxEventFactory factory;
+public class OutboxMessageTestFactory {
+    private final OutboxMessageMapper factory;
 
-    public OutboxEventTestFactory(ObjectMapper objectMapper) {
-        factory = new OutboxEventFactory(objectMapper);
+    public OutboxMessageTestFactory(ObjectMapper objectMapper) {
+        factory = new OutboxMessageMapper(objectMapper);
     }
 
     public OutboxMessage create(EventId eventId, Object event) {

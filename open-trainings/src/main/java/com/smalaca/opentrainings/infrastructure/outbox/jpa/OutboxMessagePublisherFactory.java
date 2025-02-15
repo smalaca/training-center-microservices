@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-class OutboxEventPublisherFactory {
+class OutboxMessagePublisherFactory {
     @Bean
-    OutboxEventPublisher outboxEventPublisher(ApplicationEventPublisher publisher, SpringOutboxEventCrudRepository repository, ObjectMapper objectMapper) {
-        return new OutboxEventPublisher(publisher, repository, new EventFactory(objectMapper));
+    OutboxMessagePublisher outboxMessagePublisher(ApplicationEventPublisher publisher, SpringOutboxMessageCrudRepository repository, ObjectMapper objectMapper) {
+        return new OutboxMessagePublisher(publisher, repository, new MessageFactory(objectMapper));
     }
 }

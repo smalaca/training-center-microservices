@@ -22,24 +22,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 class SpringOutboxMessageCrudRepositoryIntegrationTest {
     @Autowired
-    private SpringOutboxEventCrudRepository repository;
+    private SpringOutboxMessageCrudRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private OutboxEventFactory factory;
+    private OutboxMessageMapper factory;
 
-    private final List<UUID> eventIds = new ArrayList<>();
+    private final List<UUID> messageIds = new ArrayList<>();
 
     @BeforeEach
     void initOutboxEventFactory() {
-        factory = new OutboxEventFactory(objectMapper);
+        factory = new OutboxMessageMapper(objectMapper);
     }
 
     @AfterEach
     void deleteAllEvents() {
-        if (!eventIds.isEmpty()) {
-            repository.deleteAllById(eventIds);
+        if (!messageIds.isEmpty()) {
+            repository.deleteAllById(messageIds);
         }
     }
 
@@ -75,13 +75,13 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
     private void published(EventId eventId, Object event) {
         OutboxMessage outboxMessage = factory.create(eventId, event);
         outboxMessage.published();
-        eventIds.add(eventId.eventId());
+        messageIds.add(eventId.eventId());
         repository.save(outboxMessage);
     }
 
     private OutboxMessage notPublished(EventId eventId, Object event) {
         OutboxMessage outboxMessage = factory.create(eventId, event);
-        eventIds.add(eventId.eventId());
+        messageIds.add(eventId.eventId());
         repository.save(outboxMessage);
         return outboxMessage;
     }

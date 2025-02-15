@@ -25,25 +25,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 @SpringBootTest
-@Import(JpaOutboxEventRepositoryFactory.class)
+@Import(JpaOutboxMessageRepositoryFactory.class)
 class JpaOutboxMessageRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
 
     @Autowired
-    private JpaOutboxEventRepository repository;
+    private JpaOutboxMessageRepository repository;
 
     @Autowired
-    private SpringOutboxEventCrudRepository springRepository;
+    private SpringOutboxMessageCrudRepository springRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private final List<UUID> eventIds = new ArrayList<>();
+    private final List<UUID> messagesIds = new ArrayList<>();
 
     @AfterEach
     void deleteAllEvents() {
-        if (!eventIds.isEmpty()) {
-            springRepository.deleteAllById(eventIds);
+        if (!messagesIds.isEmpty()) {
+            springRepository.deleteAllById(messagesIds);
         }
     }
 
@@ -113,7 +113,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     private <T extends OrderEvent> T publish(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
-            eventIds.add(event.eventId().eventId());
+            messagesIds.add(event.eventId().eventId());
             return event;
         });
     }

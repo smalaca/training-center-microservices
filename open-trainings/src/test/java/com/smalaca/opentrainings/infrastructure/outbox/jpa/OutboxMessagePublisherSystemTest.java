@@ -17,25 +17,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @SystemTest
-@TestPropertySource(properties = "scheduled.outbox.event.rate=100")
+@TestPropertySource(properties = "scheduled.outbox.message.rate=100")
 class OutboxMessagePublisherSystemTest {
     @Autowired
-    private SpringOutboxEventCrudRepository repository;
+    private SpringOutboxMessageCrudRepository repository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private OutboxEventTestListener listener;
+    private OutboxMessageTestListener listener;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private OutboxEventTestFactory factory;
+    private OutboxMessageTestFactory factory;
 
     @BeforeEach
     void initFactory() {
-        factory = new OutboxEventTestFactory(objectMapper);
+        factory = new OutboxMessageTestFactory(objectMapper);
     }
 
     @AfterEach
