@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Table(name = "OFFER_ACCEPTANCE_SAGA_EVENTS")
-class OfferAcceptanceSagaJpaEvent {
+class OfferAcceptanceSagaPersistableEvent {
     @Id
     @Column(name = "EVENT_ID")
     private UUID eventId;
@@ -27,9 +27,9 @@ class OfferAcceptanceSagaJpaEvent {
     @Column(name = "PAYLOAD")
     private String payload;
 
-    private OfferAcceptanceSagaJpaEvent() {}
+    private OfferAcceptanceSagaPersistableEvent() {}
 
-    OfferAcceptanceSagaJpaEvent(UUID eventId, UUID offerId, LocalDateTime consumedAt, String type, String payload) {
+    OfferAcceptanceSagaPersistableEvent(UUID eventId, UUID offerId, LocalDateTime consumedAt, String type, String payload) {
         this.eventId = eventId;
         this.offerId = offerId;
         this.consumedAt = consumedAt;

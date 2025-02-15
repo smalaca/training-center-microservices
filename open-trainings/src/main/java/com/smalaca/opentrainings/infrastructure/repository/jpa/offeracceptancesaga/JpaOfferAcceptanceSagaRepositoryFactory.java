@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 class JpaOfferAcceptanceSagaRepositoryFactory {
     @Bean
-    JpaOfferAcceptanceSagaRepository jpaOfferAcceptanceSagaRepository(OfferAcceptanceSagaJpaEventCrudRepository repository, ObjectMapper objectMapper) {
+    JpaOfferAcceptanceSagaRepository jpaOfferAcceptanceSagaRepository(SpringOfferAcceptanceSagaEventCrudRepository repository, ObjectMapper objectMapper) {
         return new JpaOfferAcceptanceSagaRepository(repository, new OfferAcceptanceSagaJpaEventMapper(objectMapper));
     }
 }

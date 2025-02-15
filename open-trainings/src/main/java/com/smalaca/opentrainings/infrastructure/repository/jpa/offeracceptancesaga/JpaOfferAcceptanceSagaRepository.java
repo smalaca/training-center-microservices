@@ -9,10 +9,10 @@ import java.util.UUID;
 
 @DrivenAdapter
 public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepository {
-    private final OfferAcceptanceSagaJpaEventCrudRepository repository;
+    private final SpringOfferAcceptanceSagaEventCrudRepository repository;
     private final OfferAcceptanceSagaJpaEventMapper mapper;
 
-    JpaOfferAcceptanceSagaRepository(OfferAcceptanceSagaJpaEventCrudRepository repository, OfferAcceptanceSagaJpaEventMapper mapper) {
+    JpaOfferAcceptanceSagaRepository(SpringOfferAcceptanceSagaEventCrudRepository repository, OfferAcceptanceSagaJpaEventMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

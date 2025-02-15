@@ -13,8 +13,8 @@ class OfferAcceptanceSagaJpaEventMapper {
         this.objectMapper = objectMapper;
     }
 
-    OfferAcceptanceSagaJpaEvent offerAcceptanceSagaJpaEventFrom(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
-        return new OfferAcceptanceSagaJpaEvent(
+    OfferAcceptanceSagaPersistableEvent offerAcceptanceSagaJpaEventFrom(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
+        return new OfferAcceptanceSagaPersistableEvent(
                 event.eventId().eventId(),
                 event.offerId(),
                 consumedAt,
@@ -30,7 +30,7 @@ class OfferAcceptanceSagaJpaEventMapper {
         }
     }
 
-    OfferAcceptanceSagaEvent offerAcceptanceSagaEventFrom(OfferAcceptanceSagaJpaEvent from) {
+    OfferAcceptanceSagaEvent offerAcceptanceSagaEventFrom(OfferAcceptanceSagaPersistableEvent from) {
         try {
             return objectMapper.readValue(from.getPayload(), (Class<OfferAcceptanceSagaEvent>) Class.forName(from.getType()));
         } catch (JsonProcessingException | ClassNotFoundException exception) {
