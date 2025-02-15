@@ -16,7 +16,7 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 @Entity
 @Getter
 @Table(name = "OUTBOX_MESSAGES")
-public class OutboxMessage {
+class OutboxMessage {
     @Id
     @Column(name = "MESSAGE_ID")
     private UUID messageId;
@@ -40,7 +40,7 @@ public class OutboxMessage {
 
     private OutboxMessage() {}
 
-    public void published() {
+    void published() {
         isPublished = true;
     }
 

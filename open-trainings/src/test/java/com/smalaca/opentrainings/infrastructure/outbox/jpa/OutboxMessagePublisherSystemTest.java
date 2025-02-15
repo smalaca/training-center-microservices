@@ -31,11 +31,11 @@ class OutboxMessagePublisherSystemTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private OutboxMessageTestFactory factory;
+    private OutboxMessageMapper factory;
 
     @BeforeEach
     void initFactory() {
-        factory = new OutboxMessageTestFactory(objectMapper);
+        factory = new OutboxMessageMapper(objectMapper);
     }
 
     @AfterEach
@@ -95,7 +95,7 @@ class OutboxMessagePublisherSystemTest {
 
     private void published(EventId eventId, Object event) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            OutboxMessage outboxMessage = factory.create(eventId, event);
+            OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
             outboxMessage.published();
             repository.save(outboxMessage);
         });
@@ -103,7 +103,7 @@ class OutboxMessagePublisherSystemTest {
 
     private void notPublished(EventId eventId, Object event) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            OutboxMessage outboxMessage = factory.create(eventId, event);
+            OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
             repository.save(outboxMessage);
         });
     }

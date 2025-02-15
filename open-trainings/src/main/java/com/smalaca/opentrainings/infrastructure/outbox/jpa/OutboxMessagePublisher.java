@@ -4,7 +4,7 @@ import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 
-public class OutboxMessagePublisher {
+class OutboxMessagePublisher {
     private final ApplicationEventPublisher publisher;
     private final SpringOutboxMessageCrudRepository repository;
     private final OutboxMessageMapper mapper;
