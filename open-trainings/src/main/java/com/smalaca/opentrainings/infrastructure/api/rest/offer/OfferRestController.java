@@ -37,7 +37,7 @@ public class OfferRestController {
     @GetMapping("accept/{offerId}")
     @DrivingAdapter
     public String accept(@PathVariable UUID offerId) {
-        return offerAcceptanceSagaEngine.isCompleted(offerId) ? "COMPLETED" : "NOT COMPLETED";
+        return offerAcceptanceSagaEngine.statusOf(offerId).name();
     }
 
     @GetMapping("{offerId}")

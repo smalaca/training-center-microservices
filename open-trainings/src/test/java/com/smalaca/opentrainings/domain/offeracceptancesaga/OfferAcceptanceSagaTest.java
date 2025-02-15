@@ -10,7 +10,6 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -32,7 +31,7 @@ class OfferAcceptanceSagaTest {
     void shouldRecognizeCreatedOfferAcceptanceSagaAsNotCompleted() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
 
-        assertFalse(actual.isCompleted());
+        assertThatOfferAcceptanceSaga(actual).isInProgress();
     }
 
     @Test

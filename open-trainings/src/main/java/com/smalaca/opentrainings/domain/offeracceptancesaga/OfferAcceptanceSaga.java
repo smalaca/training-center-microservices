@@ -12,11 +12,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.COMPLETED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
+
 @Saga
 public class OfferAcceptanceSaga {
     private final UUID offerId;
     private final List<ConsumedEvent> events = new ArrayList<>();
-    private boolean isCompleted;
+    private OfferAcceptanceSagaStatus status = IN_PROGRESS;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -30,11 +33,7 @@ public class OfferAcceptanceSaga {
     private void process(OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {
         ConsumedEvent consumedEvent = new ConsumedEvent(event.eventId(), consumedAt, event);
         events.add(consumedEvent);
-        isCompleted = true;
-    }
-
-    public boolean isCompleted() {
-        return isCompleted;
+        status = COMPLETED;
     }
 
     public void readEachEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {
@@ -43,5 +42,9 @@ public class OfferAcceptanceSaga {
 
     public void load(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
         event.accept(this, consumedAt);
+    }
+
+    public OfferAcceptanceSagaStatus getStatus() {
+        return status;
     }
 }

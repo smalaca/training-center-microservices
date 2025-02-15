@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,9 @@ public class OfferAcceptanceSagaEngine {
 
     @DrivenPort
     @QueryOperation
-    public boolean isCompleted(UUID offerId) {
-        return repository.findById(offerId).isCompleted();
+    public OfferAcceptanceSagaStatus statusOf(UUID offerId) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
+
+        return offerAcceptanceSaga.getStatus();
     }
 }

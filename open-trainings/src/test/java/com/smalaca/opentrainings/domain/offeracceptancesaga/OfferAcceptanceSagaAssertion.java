@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.COMPLETED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OfferAcceptanceSagaAssertion {
@@ -19,8 +21,13 @@ public class OfferAcceptanceSagaAssertion {
         return new OfferAcceptanceSagaAssertion(actual);
     }
 
+    public OfferAcceptanceSagaAssertion isInProgress() {
+        assertThat(actual.getStatus()).isEqualTo(IN_PROGRESS);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion isCompleted() {
-        assertThat(actual.isCompleted()).isTrue();
+        assertThat(actual.getStatus()).isEqualTo(COMPLETED);
         return this;
     }
 
