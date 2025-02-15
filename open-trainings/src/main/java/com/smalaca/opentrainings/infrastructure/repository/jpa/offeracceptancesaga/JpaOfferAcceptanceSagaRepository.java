@@ -11,9 +11,9 @@ import java.util.UUID;
 @DrivenAdapter
 public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepository {
     private final SpringOfferAcceptanceSagaEventCrudRepository repository;
-    private final OfferAcceptanceSagaJpaEventMapper mapper;
+    private final OfferAcceptanceSagaPersistableEventMapper mapper;
 
-    JpaOfferAcceptanceSagaRepository(SpringOfferAcceptanceSagaEventCrudRepository repository, OfferAcceptanceSagaJpaEventMapper mapper) {
+    JpaOfferAcceptanceSagaRepository(SpringOfferAcceptanceSagaEventCrudRepository repository, OfferAcceptanceSagaPersistableEventMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -39,7 +39,7 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
     @Override
     public void save(OfferAcceptanceSaga offerAcceptanceSaga) {
         offerAcceptanceSaga.readEachEvent((event, consumedAt) -> {
-            repository.save(mapper.offerAcceptanceSagaJpaEventFrom(event, consumedAt));
+            repository.save(mapper.offerAcceptanceSagaPersistableEventFrom(event, consumedAt));
         });
     }
 }

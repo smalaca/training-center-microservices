@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 class JpaOfferAcceptanceSagaRepositoryFactory {
     @Bean
     OfferAcceptanceSagaRepository offerAcceptanceSagaRepository(SpringOfferAcceptanceSagaEventCrudRepository repository, ObjectMapper objectMapper) {
-        return new JpaOfferAcceptanceSagaRepository(repository, new OfferAcceptanceSagaJpaEventMapper(objectMapper));
+        return new JpaOfferAcceptanceSagaRepository(repository, new OfferAcceptanceSagaPersistableEventMapper(objectMapper));
     }
 }

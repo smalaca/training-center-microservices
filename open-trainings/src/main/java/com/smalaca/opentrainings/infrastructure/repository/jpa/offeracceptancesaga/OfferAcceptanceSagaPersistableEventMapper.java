@@ -6,14 +6,14 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 
 import java.time.LocalDateTime;
 
-class OfferAcceptanceSagaJpaEventMapper {
+class OfferAcceptanceSagaPersistableEventMapper {
     private final ObjectMapper objectMapper;
 
-    OfferAcceptanceSagaJpaEventMapper(ObjectMapper objectMapper) {
+    OfferAcceptanceSagaPersistableEventMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
-    OfferAcceptanceSagaPersistableEvent offerAcceptanceSagaJpaEventFrom(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
+    OfferAcceptanceSagaPersistableEvent offerAcceptanceSagaPersistableEventFrom(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
         return new OfferAcceptanceSagaPersistableEvent(
                 event.eventId().eventId(),
                 event.offerId(),
