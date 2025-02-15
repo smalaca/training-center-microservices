@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 
+import java.util.List;
 import java.util.UUID;
 
 @DrivenAdapter
@@ -19,8 +20,14 @@ public class JpaOfferAcceptanceSagaRepository implements OfferAcceptanceSagaRepo
 
     @Override
     public OfferAcceptanceSaga findById(UUID offerId) {
+        List<OfferAcceptanceSagaPersistableEvent> events = repository.findAllByOfferIdOrderByConsumedAtAsc(offerId);
+
+        if (events.isEmpty()) {
+            throw new OfferAcceptanceSagaDoesNotExistException(offerId);
+        }
+
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(offerId);
-        repository.findAllByOfferIdOrderByConsumedAtAsc(offerId)
+        events
                 .forEach(event -> {
                     OfferAcceptanceSagaEvent offerAcceptanceSagaEvent = mapper.offerAcceptanceSagaEventFrom(event);
                     saga.load(offerAcceptanceSagaEvent, event.getConsumedAt());

@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @DomainEvent
 public record OfferAcceptanceRequestedEvent(EventId eventId, UUID offerId, String firstName, String lastName, String email, String discountCode) implements OfferAcceptanceSagaEvent{
-    public static OfferAcceptanceRequestedEvent create(UUID sagaId, String firstName, String lastName, String email, String discountCode) {
-        return new OfferAcceptanceRequestedEvent(EventId.newEventId(), sagaId, firstName, lastName, email, discountCode);
+    public static OfferAcceptanceRequestedEvent create(UUID offerId, String firstName, String lastName, String email, String discountCode) {
+        return new OfferAcceptanceRequestedEvent(EventId.newEventId(), offerId, firstName, lastName, email, discountCode);
     }
 
     @Override

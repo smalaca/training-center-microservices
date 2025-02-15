@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 @Saga
 public class OfferAcceptanceSaga {
     private final UUID offerId;
-    private final List<AcceptedEvent> events = new ArrayList<>();
+    private final List<ConsumedEvent> events = new ArrayList<>();
     private boolean isCompleted;
 
     public OfferAcceptanceSaga(UUID offerId) {
@@ -28,8 +28,8 @@ public class OfferAcceptanceSaga {
     }
 
     private void process(OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {
-        AcceptedEvent acceptedEvent = new AcceptedEvent(event.eventId(), consumedAt, event);
-        events.add(acceptedEvent);
+        ConsumedEvent consumedEvent = new ConsumedEvent(event.eventId(), consumedAt, event);
+        events.add(consumedEvent);
         isCompleted = true;
     }
 
