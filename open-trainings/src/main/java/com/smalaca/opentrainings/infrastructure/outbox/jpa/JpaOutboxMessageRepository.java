@@ -1,15 +1,17 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
+import com.smalaca.opentrainings.domain.commandregistry.CommandRegistry;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaEventRegistry;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 
 @DrivenAdapter
-class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry {
+class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry, CommandRegistry {
     private final SpringOutboxMessageCrudRepository repository;
     private final OutboxMessageMapper outboxMessageMapper;
 
@@ -35,5 +37,10 @@ class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEv
 
     private void publish(EventId eventId, Object event) {
         repository.save(outboxMessageMapper.outboxMessage(eventId, event));
+    }
+
+    @Override
+    public void publish(AcceptOfferCommand command) {
+        repository.save(outboxMessageMapper.outboxMessage(command.commandId(), command));
     }
 }
