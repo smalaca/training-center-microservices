@@ -27,7 +27,7 @@ public class OfferAcceptanceSaga {
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
         process(event, clock.now());
-        return new AcceptOfferCommand(event.offerId(), event.firstName(), event.lastName(), event.email(), event.discountCode());
+        return event.asAcceptOfferCommand();
     }
 
     private void process(OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {
