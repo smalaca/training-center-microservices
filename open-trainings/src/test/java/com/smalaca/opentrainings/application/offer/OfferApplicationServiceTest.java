@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
@@ -439,7 +440,8 @@ class OfferApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
-        return new AcceptOfferCommand(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
+        return new AcceptOfferCommand(commandId, OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
     }
 
     private void givenParticipant() {
