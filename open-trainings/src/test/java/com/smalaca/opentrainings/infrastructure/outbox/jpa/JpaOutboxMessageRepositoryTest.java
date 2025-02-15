@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-class JpaOutboxEventRepositoryTest {
+class JpaOutboxMessageRepositoryTest {
     private static final SpringOutboxEventCrudRepository DUMMY_REPOSITORY = null;
 
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);

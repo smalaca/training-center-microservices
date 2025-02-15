@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 

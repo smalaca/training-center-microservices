@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.domain.eventid.EventId;
@@ -14,11 +14,11 @@ public class OutboxEventTestFactory {
         factory = new OutboxEventFactory(objectMapper);
     }
 
-    public OutboxEvent create(EventId eventId, Object event) {
+    public OutboxMessage create(EventId eventId, Object event) {
         return factory.create(eventId, event);
     }
 
-    public OutboxEvent createInvalid() {
-        return new OutboxEvent(randomId(), LocalDateTime.now(), "Invalid Type", "DUMMY PAYLOAD");
+    public OutboxMessage createInvalid() {
+        return new OutboxMessage(randomId(), LocalDateTime.now(), "Invalid Type", "DUMMY PAYLOAD");
     }
 }

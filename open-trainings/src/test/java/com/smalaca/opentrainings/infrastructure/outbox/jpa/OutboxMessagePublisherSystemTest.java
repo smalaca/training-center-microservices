@@ -1,12 +1,9 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventpublisher;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
-import com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa.OutboxEvent;
-import com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa.OutboxEventTestFactory;
-import com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa.SpringOutboxEventCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +18,7 @@ import static org.awaitility.Awaitility.await;
 
 @SystemTest
 @TestPropertySource(properties = "scheduled.outbox.event.rate=100")
-class OutboxEventPublisherSystemTest {
+class OutboxMessagePublisherSystemTest {
     @Autowired
     private SpringOutboxEventCrudRepository repository;
 
@@ -98,16 +95,16 @@ class OutboxEventPublisherSystemTest {
 
     private void published(EventId eventId, Object event) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            OutboxEvent outboxEvent = factory.create(eventId, event);
-            outboxEvent.published();
-            repository.save(outboxEvent);
+            OutboxMessage outboxMessage = factory.create(eventId, event);
+            outboxMessage.published();
+            repository.save(outboxMessage);
         });
     }
 
     private void notPublished(EventId eventId, Object event) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            OutboxEvent outboxEvent = factory.create(eventId, event);
-            repository.save(outboxEvent);
+            OutboxMessage outboxMessage = factory.create(eventId, event);
+            repository.save(outboxMessage);
         });
     }
 }

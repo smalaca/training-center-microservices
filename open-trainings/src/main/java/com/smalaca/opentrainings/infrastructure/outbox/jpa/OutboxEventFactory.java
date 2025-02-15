@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,8 +11,8 @@ class OutboxEventFactory {
         this.objectMapper = objectMapper;
     }
 
-    OutboxEvent create(EventId eventId, Object event) {
-        return new OutboxEvent(
+    OutboxMessage create(EventId eventId, Object event) {
+        return new OutboxMessage(
                 eventId.eventId(),
                 eventId.creationDateTime(),
                 event.getClass().getCanonicalName(),

@@ -1,7 +1,6 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventpublisher;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.architecture.portsandadapters.DrivingAdapter;
-import com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa.SpringOutboxEventCrudRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 

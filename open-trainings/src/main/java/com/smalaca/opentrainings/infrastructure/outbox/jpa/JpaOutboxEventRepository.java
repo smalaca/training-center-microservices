@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.eventid.EventId;
@@ -37,7 +37,7 @@ public class JpaOutboxEventRepository implements EventRegistry, OfferAcceptanceS
         repository.save(outboxEventFactory.create(eventId, event));
     }
 
-    Iterable<OutboxEvent> findAll() {
+    Iterable<OutboxMessage> findAll() {
         return repository.findAll();
     }
 }

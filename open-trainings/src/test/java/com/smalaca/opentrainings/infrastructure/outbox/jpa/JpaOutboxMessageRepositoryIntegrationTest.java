@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @IntegrationTest
 @SpringBootTest
 @Import(JpaOutboxEventRepositoryFactory.class)
-class JpaOutboxEventRepositoryIntegrationTest {
+class JpaOutboxMessageRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
 
     @Autowired
@@ -134,19 +134,19 @@ class JpaOutboxEventRepositoryIntegrationTest {
         return new OrderTerminatedEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
     }
 
-    private void assertOrderRejectedEventSaved(OutboxEvent actual, OrderRejectedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderRejectedEventSaved(OutboxMessage actual, OrderRejectedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"reason\" : \"" + expected.reason());
     }
 
-    private void assertTrainingPurchasedEventSaved(OutboxEvent actual, TrainingPurchasedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertTrainingPurchasedEventSaved(OutboxMessage actual, TrainingPurchasedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -154,10 +154,10 @@ class JpaOutboxEventRepositoryIntegrationTest {
                 .contains("\"participantId\" : \"" + expected.participantId());
     }
 
-    private void assertOrderCancelledEventSaved(OutboxEvent actual, OrderCancelledEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderCancelledEventSaved(OutboxMessage actual, OrderCancelledEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
@@ -165,10 +165,10 @@ class JpaOutboxEventRepositoryIntegrationTest {
                 .contains("\"participantId\" : \"" + expected.participantId());
     }
 
-    private void assertOrderTerminatedEventSaved(OutboxEvent actual, OrderTerminatedEvent expected) {
-        assertThat(actual.getEventId()).isEqualTo(expected.eventId().eventId());
+    private void assertOrderTerminatedEventSaved(OutboxMessage actual, OrderTerminatedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
         assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())

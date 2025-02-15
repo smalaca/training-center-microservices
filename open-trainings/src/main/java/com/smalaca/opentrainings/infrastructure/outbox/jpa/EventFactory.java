@@ -1,8 +1,7 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventpublisher;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smalaca.opentrainings.infrastructure.outbox.eventregistry.jpa.OutboxEvent;
 
 class EventFactory {
     private final ObjectMapper objectMapper;
@@ -11,9 +10,9 @@ class EventFactory {
         this.objectMapper = objectMapper;
     }
 
-    Object from(OutboxEvent outboxEvent) {
+    Object from(OutboxMessage outboxMessage) {
         try {
-            return objectMapper.readValue(outboxEvent.getPayload(), Class.forName(outboxEvent.getType()));
+            return objectMapper.readValue(outboxMessage.getPayload(), Class.forName(outboxMessage.getMessageType()));
         } catch (JsonProcessingException | ClassNotFoundException e) {
             throw new InvalidOutboxEventTypeException(e);
         }

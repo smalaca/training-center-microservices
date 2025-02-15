@@ -1,4 +1,4 @@
-package com.smalaca.opentrainings.infrastructure.outbox.eventpublisher;
+package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
