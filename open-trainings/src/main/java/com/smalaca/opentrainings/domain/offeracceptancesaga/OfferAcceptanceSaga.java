@@ -36,8 +36,8 @@ public class OfferAcceptanceSaga {
         status = COMPLETED;
     }
 
-    public void readEachEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {
-        events.forEach(event -> event.accept(consumer));
+    public void readLastEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {
+        events.getLast().accept(consumer);
     }
 
     public void load(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
