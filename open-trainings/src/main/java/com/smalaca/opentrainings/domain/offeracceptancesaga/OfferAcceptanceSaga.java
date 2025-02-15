@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.domaindrivendesign.Saga;
-import com.smalaca.opentrainings.application.offer.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
@@ -27,7 +27,7 @@ public class OfferAcceptanceSaga {
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
         process(event, clock.now());
-        return new AcceptOfferCommand(event.offerId(), event.firstName(), event.lastName(), event.email(), event.discountCode());
+        return event.asAcceptOfferCommand();
     }
 
     private void process(OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {

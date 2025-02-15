@@ -4,7 +4,7 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.cqrs.QueryOperation;
 import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
-import com.smalaca.opentrainings.application.offer.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
