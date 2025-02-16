@@ -20,6 +20,6 @@ public record OfferAcceptanceRequestedEvent(EventId eventId, UUID offerId, Strin
     }
 
     public AcceptOfferCommand asAcceptOfferCommand() {
-        return new AcceptOfferCommand(eventId.nextCommandId(), offerId(), firstName(), lastName(), email(), discountCode());
+        return AcceptOfferCommand.nextAfter(this);
     }
 }
