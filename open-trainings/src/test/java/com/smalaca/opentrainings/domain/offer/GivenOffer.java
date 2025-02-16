@@ -1,7 +1,9 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.eventid.EventId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
@@ -80,7 +82,7 @@ public class GivenOffer {
         String lastName = FAKER.name().lastName();
         String email = FAKER.address().mailBox();
         UUID participantId = UUID.randomUUID();
-        AcceptOfferDomainCommand command = new AcceptOfferDomainCommand(firstName, lastName, email, null);
+        AcceptOfferCommand command = new AcceptOfferCommand(CommandId.nextAfter(EventId.newEventId()), getOfferId(), firstName, lastName, email, null);
         PersonalDataManagement projectDataManagement = mock(PersonalDataManagement.class);
         PersonalDataRequest personalDataRequest = PersonalDataRequest.builder()
                 .firstName(firstName)

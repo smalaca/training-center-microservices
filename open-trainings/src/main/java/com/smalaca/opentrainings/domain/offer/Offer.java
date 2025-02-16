@@ -7,9 +7,9 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
-import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
@@ -82,7 +82,7 @@ public class Offer {
     }
 
     public OfferEvent accept(
-            AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
+            AcceptOfferCommand command, PersonalDataManagement personalDataManagement,
             TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             status = REJECTED;
@@ -116,7 +116,7 @@ public class Offer {
                 .build();
     }
 
-    private PersonalDataRequest asPersonalDataRequest(AcceptOfferDomainCommand command) {
+    private PersonalDataRequest asPersonalDataRequest(AcceptOfferCommand command) {
         return PersonalDataRequest.builder()
                 .firstName(command.firstName())
                 .lastName(command.lastName())
@@ -124,7 +124,7 @@ public class Offer {
                 .build();
     }
 
-    private Price finalPrice(AcceptOfferDomainCommand command, DiscountService discountService, PersonalDataResponse response) {
+    private Price finalPrice(AcceptOfferCommand command, DiscountService discountService, PersonalDataResponse response) {
         if (hasNoDiscountCode(command)) {
             return trainingPrice;
         }
@@ -139,7 +139,7 @@ public class Offer {
         return discount.newPrice();
     }
 
-    private boolean hasNoDiscountCode(AcceptOfferDomainCommand command) {
+    private boolean hasNoDiscountCode(AcceptOfferCommand command) {
         return Strings.isNullOrEmpty(command.discountCode());
     }
 

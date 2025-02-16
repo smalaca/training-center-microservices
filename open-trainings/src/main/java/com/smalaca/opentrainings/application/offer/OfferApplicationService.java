@@ -9,7 +9,6 @@ import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
-import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
@@ -56,14 +55,10 @@ public class OfferApplicationService {
     public void accept(AcceptOfferCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        OfferEvent event = offer.accept(asAcceptOfferDomainCommand(command), personalDataManagement, trainingOfferCatalogue, discountService, clock);
+        OfferEvent event = offer.accept(command, personalDataManagement, trainingOfferCatalogue, discountService, clock);
 
         offerRepository.save(offer);
         eventRegistry.publish(event);
-    }
-
-    private AcceptOfferDomainCommand asAcceptOfferDomainCommand(AcceptOfferCommand command) {
-        return new AcceptOfferDomainCommand(command.firstName(), command.lastName(), command.email(), command.discountCode());
     }
 
     @Transactional
