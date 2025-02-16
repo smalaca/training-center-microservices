@@ -90,7 +90,7 @@ class OfferAcceptanceSagaTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        AcceptOfferCommand command = new AcceptOfferCommand(randomCommandId(), OfferAcceptanceSagaTest.OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)

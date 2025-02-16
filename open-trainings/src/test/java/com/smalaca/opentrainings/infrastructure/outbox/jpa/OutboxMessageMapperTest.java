@@ -3,7 +3,6 @@ package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.function.Executable;
 import java.time.LocalDateTime;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
-import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -41,8 +39,11 @@ class OutboxMessageMapperTest {
     }
 
     private AcceptOfferCommand givenAcceptOfferCommand() {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
-        return new AcceptOfferCommand(commandId, randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().ean13());
+        return AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+    }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
+        return OfferAcceptanceRequestedEvent.create(randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -13,8 +14,6 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
-import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
-import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static org.mockito.BDDMockito.given;
 
@@ -110,7 +109,7 @@ public class GivenOrder {
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
         OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(new AcceptOfferCommand(nextAfter(newEventId()), offerId, null, null, null, discountCode))
+                .nextAfter(AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent(offerId)))
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(participantId)
@@ -122,6 +121,10 @@ public class GivenOrder {
         order = orderFactory.create(event);
 
         return this;
+    }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {
+        return OfferAcceptanceRequestedEvent.create(offerId, null, null, null, discountCode);
     }
 
     public OrderTestDto getDto() {

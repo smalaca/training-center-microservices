@@ -167,17 +167,17 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
         });
     }
 
-    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {
-        return OfferAcceptanceRequestedEvent.create(offerId, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
-    }
-
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
-        AcceptOfferCommand command = new AcceptOfferCommand(randomCommandId(), offerId, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent(offerId));
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)
                 .withOfferId(offerId)
                 .build();
+    }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {
+        return OfferAcceptanceRequestedEvent.create(offerId, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent(UUID offerId) {
