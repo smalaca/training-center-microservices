@@ -38,7 +38,15 @@ public class RestOfferTestResponse {
         }
     }
 
-    String asString() {
+    RestOfferAcceptanceTestDto asOfferAcceptance() {
+        try {
+            return objectMapper.readValue(asString(), RestOfferAcceptanceTestDto.class);
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private String asString() {
         try {
             return response.getContentAsString();
         } catch (UnsupportedEncodingException exception) {

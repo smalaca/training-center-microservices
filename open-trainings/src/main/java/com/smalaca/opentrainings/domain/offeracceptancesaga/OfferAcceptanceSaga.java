@@ -21,6 +21,8 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptan
 @Saga
 public class OfferAcceptanceSaga {
     private final UUID offerId;
+    private UUID orderId;
+    private String rejectionReason;
     private final List<ConsumedEvent> events = new ArrayList<>();
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
 
@@ -30,7 +32,7 @@ public class OfferAcceptanceSaga {
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
-        return event.asAcceptOfferCommand();
+        return AcceptOfferCommand.nextAfter(event);
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {
@@ -40,6 +42,7 @@ public class OfferAcceptanceSaga {
 
     public void accept(OfferRejectedEvent event, Clock clock) {
         consumed(event, clock.now());
+        rejectionReason = event.reason();
         status = REJECTED;
     }
 
@@ -56,7 +59,7 @@ public class OfferAcceptanceSaga {
         event.accept(this, consumedAt);
     }
 
-    public OfferAcceptanceSagaStatus getStatus() {
-        return status;
+    public OfferAcceptanceSagaDto asDto() {
+        return new OfferAcceptanceSagaDto(offerId, orderId, status.name(), rejectionReason);
     }
 }

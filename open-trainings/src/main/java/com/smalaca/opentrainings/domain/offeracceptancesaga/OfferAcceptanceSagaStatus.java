@@ -1,5 +1,5 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
-public enum OfferAcceptanceSagaStatus {
+enum OfferAcceptanceSagaStatus {
     IN_PROGRESS, ACCEPTED, REJECTED
 }
