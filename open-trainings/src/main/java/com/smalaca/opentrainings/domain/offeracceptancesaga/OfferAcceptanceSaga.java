@@ -30,7 +30,7 @@ public class OfferAcceptanceSaga {
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
-        return event.asAcceptOfferCommand();
+        return AcceptOfferCommand.nextAfter(event);
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {
