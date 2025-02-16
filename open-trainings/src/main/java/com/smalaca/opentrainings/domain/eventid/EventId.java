@@ -13,7 +13,7 @@ public record EventId(UUID eventId, UUID traceId, UUID correlationId, LocalDateT
     }
 
     public CommandId nextCommandId() {
-        return new CommandId(id(), traceId, correlationId, now());
+        return CommandId.nextAfter(this);
     }
 
     private static UUID id() {
