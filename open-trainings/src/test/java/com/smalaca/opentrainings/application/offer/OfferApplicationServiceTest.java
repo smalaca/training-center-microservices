@@ -1,11 +1,11 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
+import com.smalaca.opentrainings.domain.offer.AvailableOfferException;
 import com.smalaca.opentrainings.domain.offer.DiscountException;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
@@ -13,7 +13,6 @@ import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
-import com.smalaca.opentrainings.domain.offer.AvailableOfferException;
 import com.smalaca.opentrainings.domain.offer.OfferInFinalStateException;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -21,6 +20,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
@@ -440,8 +440,11 @@ class OfferApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
-        return new AcceptOfferCommand(commandId, OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
+        return AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent(discountCode));
+    }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(String discountCode) {
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
     }
 
     private void givenParticipant() {

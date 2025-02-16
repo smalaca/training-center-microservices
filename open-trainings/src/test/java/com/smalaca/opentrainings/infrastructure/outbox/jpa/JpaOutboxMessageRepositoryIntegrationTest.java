@@ -211,7 +211,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return new AcceptOfferCommand(randomCommandId(), randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().ean13());
+        return AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
     }
 
     private CommandId randomCommandId() {
