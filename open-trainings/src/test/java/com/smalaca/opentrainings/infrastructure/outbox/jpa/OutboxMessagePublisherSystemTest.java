@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
@@ -9,8 +10,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
@@ -32,7 +38,12 @@ class OutboxMessagePublisherSystemTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @MockBean
+    private OfferAcceptanceSagaEngine engine;
+
     private OutboxMessageMapper factory;
+
+    private final List<UUID> messageIds = new ArrayList<>();
 
     @BeforeEach
     void initFactory() {
@@ -40,8 +51,10 @@ class OutboxMessagePublisherSystemTest {
     }
 
     @AfterEach
-    void deleteAll() {
-        repository.deleteAll();
+    void deleteAllEvents() {
+        if (!messageIds.isEmpty()) {
+            repository.deleteAllById(messageIds);
+        }
     }
 
     @Test
@@ -98,6 +111,7 @@ class OutboxMessagePublisherSystemTest {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
             outboxMessage.published();
+            messageIds.add(eventId.eventId());
             repository.save(outboxMessage);
         });
     }
@@ -105,6 +119,7 @@ class OutboxMessagePublisherSystemTest {
     private void notPublished(EventId eventId, Object event) {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
             OutboxMessage outboxMessage = factory.outboxMessage(eventId, event);
+            messageIds.add(eventId.eventId());
             repository.save(outboxMessage);
         });
     }
