@@ -35,7 +35,7 @@ public class OfferAcceptanceSagaAssertion {
     }
 
     private OfferAcceptanceSagaAssertion hasStatus(OfferAcceptanceSagaStatus status) {
-        assertThat(actual.getStatus()).isEqualTo(status);
+        assertThat(actual).extracting("status").isEqualTo(status);
         return this;
     }
 

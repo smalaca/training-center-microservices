@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
 import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaEventRegistry;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
@@ -36,8 +37,8 @@ public class OfferRestController {
 
     @GetMapping("accept/{offerId}")
     @DrivingAdapter
-    public String accept(@PathVariable UUID offerId) {
-        return offerAcceptanceSagaEngine.statusOf(offerId).name();
+    public OfferAcceptanceSagaDto statusOf(@PathVariable UUID offerId) {
+        return offerAcceptanceSagaEngine.statusOf(offerId);
     }
 
     @GetMapping("{offerId}")

@@ -30,8 +30,8 @@ public class OfferEndpoints {
         return performSafe(get("/offer/" + offerId));
     }
 
-    public String getAcceptanceProgress(UUID commandId) {
-        return performSafe(get("/offer/accept/" + commandId)).asString();
+    public RestOfferAcceptanceTestDto getAcceptanceProgress(UUID commandId) {
+        return performSafe(get("/offer/accept/" + commandId)).asOfferAcceptance();
     }
 
     public void accept(RestAcceptOfferTestCommand command) {

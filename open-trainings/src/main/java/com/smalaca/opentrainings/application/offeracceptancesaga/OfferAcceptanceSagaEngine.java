@@ -7,11 +7,11 @@ import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.commandregistry.CommandRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,9 +67,9 @@ public class OfferAcceptanceSagaEngine {
 
     @DrivenPort
     @QueryOperation
-    public OfferAcceptanceSagaStatus statusOf(UUID offerId) {
+    public OfferAcceptanceSagaDto statusOf(UUID offerId) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
 
-        return offerAcceptanceSaga.getStatus();
+        return offerAcceptanceSaga.asDto();
     }
 }
