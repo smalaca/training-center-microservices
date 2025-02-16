@@ -1,15 +1,17 @@
 package com.smalaca.opentrainings.domain.offer;
 
+import com.google.common.base.Strings;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
-import com.smalaca.opentrainings.domain.offer.commands.AcceptOfferDomainCommand;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
+import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
@@ -80,14 +82,14 @@ public class Offer {
     }
 
     public OfferEvent accept(
-            AcceptOfferDomainCommand command, PersonalDataManagement personalDataManagement,
+            AcceptOfferCommand command, PersonalDataManagement personalDataManagement,
             TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             status = REJECTED;
             return OfferRejectedEvent.expired(offerId);
         }
 
-        PersonalDataResponse response = personalDataManagement.save(command.asPersonalDataRequest());
+        PersonalDataResponse response = personalDataManagement.save(asPersonalDataRequest(command));
 
         if (response.isFailed()) {
             throw new MissingParticipantException();
@@ -114,8 +116,16 @@ public class Offer {
                 .build();
     }
 
-    private Price finalPrice(AcceptOfferDomainCommand command, DiscountService discountService, PersonalDataResponse response) {
-        if (command.hasNoDiscountCode()) {
+    private PersonalDataRequest asPersonalDataRequest(AcceptOfferCommand command) {
+        return PersonalDataRequest.builder()
+                .firstName(command.firstName())
+                .lastName(command.lastName())
+                .email(command.email())
+                .build();
+    }
+
+    private Price finalPrice(AcceptOfferCommand command, DiscountService discountService, PersonalDataResponse response) {
+        if (hasNoDiscountCode(command)) {
             return trainingPrice;
         }
 
@@ -127,6 +137,10 @@ public class Offer {
         }
 
         return discount.newPrice();
+    }
+
+    private boolean hasNoDiscountCode(AcceptOfferCommand command) {
+        return Strings.isNullOrEmpty(command.discountCode());
     }
 
     private boolean isOfferNotAvailable(Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
