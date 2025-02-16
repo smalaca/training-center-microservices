@@ -4,7 +4,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 
 import java.util.UUID;
 
-public record AcceptOfferCommand(UUID offerId, String firstName, String lastName, String email, String discountCode) {
+public record AcceptOfferRestCommand(UUID offerId, String firstName, String lastName, String email, String discountCode) {
     OfferAcceptanceRequestedEvent asOfferAcceptanceRequestedEvent() {
         return OfferAcceptanceRequestedEvent.create(offerId, firstName, lastName, email, discountCode);
     }

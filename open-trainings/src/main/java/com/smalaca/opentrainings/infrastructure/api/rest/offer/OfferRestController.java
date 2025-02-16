@@ -30,7 +30,7 @@ public class OfferRestController {
     }
 
     @PutMapping("accept")
-    public void accept(@RequestBody AcceptOfferCommand command) {
+    public void accept(@RequestBody AcceptOfferRestCommand command) {
         eventRegistry.publish(command.asOfferAcceptanceRequestedEvent());
     }
 
