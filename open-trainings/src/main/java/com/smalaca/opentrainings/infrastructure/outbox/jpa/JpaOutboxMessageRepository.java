@@ -6,7 +6,7 @@ import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaEventRegistry;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 
@@ -40,7 +40,7 @@ class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEv
     }
 
     @Override
-    public void publish(AcceptOfferCommand command) {
+    public void publish(OfferAcceptanceSagaCommand command) {
         repository.save(outboxMessageMapper.outboxMessage(command.commandId(), command));
     }
 }

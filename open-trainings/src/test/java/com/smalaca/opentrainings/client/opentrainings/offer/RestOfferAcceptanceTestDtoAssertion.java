@@ -44,4 +44,9 @@ public class RestOfferAcceptanceTestDtoAssertion {
         assertThat(actual.orderId()).isNull();
         return this;
     }
+
+    public RestOfferAcceptanceTestDtoAssertion hasOrderId() {
+        assertThat(actual.orderId()).isNotNull();
+        return this;
+    }
 }

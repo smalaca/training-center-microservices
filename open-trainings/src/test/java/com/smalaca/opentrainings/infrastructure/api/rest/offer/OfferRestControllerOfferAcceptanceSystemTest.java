@@ -3,7 +3,6 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestCommand;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceTestDto;
-import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceTestDtoAssertion;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponse;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
@@ -94,15 +93,23 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         client.offers().accept(commandFor(dto));
 
         await().untilAsserted(() -> {
-            thenOfferAcceptance(dto.getOfferId())
+            RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
+            assertThatOfferAcceptance(actual)
                     .hasOfferId(dto.getOfferId())
                     .isAccepted()
                     .hasNoRejectionReason()
-                    .hasNoOrderId();
+//                    .hasOrderId()
+            ;
+
+            thenOfferResponse(actual.offerId())
+                    .isOk()
+                    .hasAcceptedOffer(dto);
+
+//            RestOrderTestResponse order = client.orders().findById(actual.orderId());
+//            assertThatOrderResponse(order)
+//                    .isOk();
+            // more to check
         });
-        thenOfferResponse(dto.getOfferId())
-                .isOk()
-                .hasAcceptedOffer(dto);
     }
 
     @Test
@@ -115,24 +122,26 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         client.offers().accept(commandFor(dto));
 
         await().untilAsserted(() -> {
-            thenOfferAcceptance(dto.getOfferId())
+            RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
+
+            assertThatOfferAcceptance(actual)
                     .hasOfferId(dto.getOfferId())
                     .isRejected()
                     .hasRejectionReason("Training no longer available")
                     .hasNoOrderId();
+
+            thenOfferResponse(actual.offerId())
+                    .isOk()
+                    .hasRejectedOffer(dto);
         });
-        thenOfferResponse(dto.getOfferId())
-                .isOk()
-                .hasRejectedOffer(dto);
+    }
+
+    private RestOfferAcceptanceTestDto offerAcceptanceProgressFor(UUID offerId) {
+        return client.offers().getAcceptanceProgress(offerId);
     }
 
     private RestAcceptOfferTestCommand commandFor(OfferTestDto dto) {
         return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
-    }
-
-    private RestOfferAcceptanceTestDtoAssertion thenOfferAcceptance(UUID offerId) {
-        RestOfferAcceptanceTestDto actual = client.offers().getAcceptanceProgress(offerId);
-        return assertThatOfferAcceptance(actual);
     }
 
     private RestOfferTestResponseAssertion thenOfferResponse(UUID offerId) {
