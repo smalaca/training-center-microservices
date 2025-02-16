@@ -60,6 +60,6 @@ public class OfferAcceptanceSaga {
     }
 
     public OfferAcceptanceSagaDto asDto() {
-        return new OfferAcceptanceSagaDto(offerId, orderId, status.name(), rejectionReason);
+        return new OfferAcceptanceSagaDto(offerId, status.name(), rejectionReason);
     }
 }

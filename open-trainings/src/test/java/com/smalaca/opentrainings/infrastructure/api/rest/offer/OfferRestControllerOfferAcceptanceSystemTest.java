@@ -97,18 +97,11 @@ class OfferRestControllerOfferAcceptanceSystemTest {
             assertThatOfferAcceptance(actual)
                     .hasOfferId(dto.getOfferId())
                     .isAccepted()
-                    .hasNoRejectionReason()
-//                    .hasOrderId()
-            ;
+                    .hasNoRejectionReason();
 
             thenOfferResponse(actual.offerId())
                     .isOk()
                     .hasAcceptedOffer(dto);
-
-//            RestOrderTestResponse order = client.orders().findById(actual.orderId());
-//            assertThatOrderResponse(order)
-//                    .isOk();
-            // more to check
         });
     }
 
@@ -127,8 +120,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
             assertThatOfferAcceptance(actual)
                     .hasOfferId(dto.getOfferId())
                     .isRejected()
-                    .hasRejectionReason("Training no longer available")
-                    .hasNoOrderId();
+                    .hasRejectionReason("Training no longer available");
 
             thenOfferResponse(actual.offerId())
                     .isOk()
