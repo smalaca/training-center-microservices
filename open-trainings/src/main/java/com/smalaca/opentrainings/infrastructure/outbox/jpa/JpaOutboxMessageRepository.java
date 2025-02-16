@@ -22,7 +22,7 @@ class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEv
 
     @Override
     public void publish(OfferEvent event) {
-
+        publish(event.eventId(), event);
     }
 
     @Override

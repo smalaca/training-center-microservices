@@ -1,9 +1,15 @@
 package com.smalaca.opentrainings.infrastructure.repository.jpa.offeracceptancesaga;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.test.type.IntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -16,9 +22,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Import(JpaOfferAcceptanceSagaRepositoryFactory.class)
 class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
+    private static final LocalDateTime NOW = LocalDateTime.now();
 
     @Autowired
     private OfferAcceptanceSagaRepository repository;
@@ -57,60 +67,126 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldSaveOfferAcceptanceSaga() {
+    void shouldCreateOfferAcceptanceSaga() {
         UUID offerId = randomId();
         OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent(offerId);
-        LocalDateTime consumedAt = LocalDateTime.now();
 
-        givenSavedOfferAcceptanceSaga(offerId, event, consumedAt);
+        givenSavedOfferAcceptanceSaga(offerId, of(event, NOW));
 
         thenOfferAcceptanceSaga(offerId)
-                .isCompleted()
+                .isInProgress()
                 .hasOfferId(offerId)
                 .consumedEvents(1)
-                .consumedEventAt(event, consumedAt);
+                .consumedEventAt(event, NOW);
+    }
+
+    @Test
+    void shouldAcceptOfferAcceptanceSaga() {
+        UUID offerId = randomId();
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent(offerId);
+        OfferAcceptedEvent eventTwo = randomOfferAcceptedEvent(offerId);
+        Map<OfferAcceptanceSagaEvent, LocalDateTime> events = of(eventOne, NOW.minusSeconds(10), eventTwo, NOW.minusSeconds(5));
+
+        givenSavedOfferAcceptanceSaga(offerId, events);
+
+        thenOfferAcceptanceSaga(offerId)
+                .isAccepted()
+                .hasOfferId(offerId)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(10))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(5));
+    }
+
+    @Test
+    void shouldRejectOfferAcceptanceSaga() {
+        UUID offerId = randomId();
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent(offerId);
+        OfferRejectedEvent eventTwo = randomOfferRejectedEvent(offerId);
+        Map<OfferAcceptanceSagaEvent, LocalDateTime> events = of(eventOne, NOW.minusSeconds(13), eventTwo, NOW.minusSeconds(3));
+
+        givenSavedOfferAcceptanceSaga(offerId, events);
+
+        thenOfferAcceptanceSaga(offerId)
+                .isRejected()
+                .hasOfferId(offerId)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(13))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(3));
     }
 
     @Test
     void shouldFindOfferAcceptanceSagaById() {
-        UUID offerIdOne = randomId();
-        LocalDateTime consumedAtOne = LocalDateTime.now();
-        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent(offerIdOne);
-        UUID offerIdTwo = randomId();
-        LocalDateTime consumedAtTwo = consumedAtOne.minusSeconds(10);
-        OfferAcceptanceRequestedEvent eventTwo = randomOfferAcceptanceRequestedEvent(offerIdTwo);
-        UUID offerIdThree = randomId();
-        LocalDateTime consumedAtThree = consumedAtOne.minusSeconds(2);
-        OfferAcceptanceRequestedEvent eventThree = randomOfferAcceptanceRequestedEvent(offerIdThree);
-
-        givenSavedOfferAcceptanceSaga(offerIdOne, eventOne, consumedAtOne);
-        givenSavedOfferAcceptanceSaga(offerIdTwo, eventTwo, consumedAtTwo);
-        givenSavedOfferAcceptanceSaga(offerIdThree, eventThree, consumedAtThree);
+        UUID offerIdOne = randomInProgressOfferAcceptanceSaga();
+        UUID offerIdTwo = randomAcceptedOfferAcceptanceSaga();
+        UUID offerIdThree = randomRejectedOfferAcceptanceSaga();
 
         thenOfferAcceptanceSaga(offerIdOne)
+                .isInProgress()
                 .hasOfferId(offerIdOne)
-                .consumedEvents(1)
-                .consumedEventAt(eventOne, consumedAtOne);
+                .consumedEvents(1);
         thenOfferAcceptanceSaga(offerIdTwo)
+                .isAccepted()
                 .hasOfferId(offerIdTwo)
-                .consumedEvents(1)
-                .consumedEventAt(eventTwo, consumedAtTwo);
+                .consumedEvents(2);
         thenOfferAcceptanceSaga(offerIdThree)
+                .isRejected()
                 .hasOfferId(offerIdThree)
-                .consumedEvents(1)
-                .consumedEventAt(eventThree, consumedAtThree);
+                .consumedEvents(2);
     }
 
-    private void givenSavedOfferAcceptanceSaga(UUID offerId, OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {
-        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(offerId);
-        offerAcceptanceSaga.accept(event, () -> consumedAt);
-        eventIds.add(event.eventId().eventId());
+    private UUID randomInProgressOfferAcceptanceSaga() {
+        UUID offerId = randomId();
+        givenSavedOfferAcceptanceSaga(offerId, of(randomOfferAcceptanceRequestedEvent(offerId), NOW));
 
-        transactionTemplate.executeWithoutResult(status -> repository.save(offerAcceptanceSaga));
+        return offerId;
+    }
+
+    private UUID randomAcceptedOfferAcceptanceSaga() {
+        UUID offerId = randomId();
+        givenSavedOfferAcceptanceSaga(offerId, of(
+                randomOfferAcceptanceRequestedEvent(offerId), NOW.minusSeconds(5),
+                randomOfferAcceptedEvent(offerId), NOW.minusSeconds(4)));
+        return offerId;
+    }
+
+    private UUID randomRejectedOfferAcceptanceSaga() {
+        UUID offerId = randomId();
+        givenSavedOfferAcceptanceSaga(offerId, of(
+                randomOfferAcceptanceRequestedEvent(offerId), NOW.minusSeconds(7),
+                randomOfferRejectedEvent(offerId), NOW.minusSeconds(3)));
+        return offerId;
+    }
+
+    private void givenSavedOfferAcceptanceSaga(UUID offerId, Map<OfferAcceptanceSagaEvent, LocalDateTime> events) {
+        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(offerId);
+
+        events.forEach((event, consumedAt) -> {
+            offerAcceptanceSaga.load(event, consumedAt);
+            eventIds.add(event.eventId().eventId());
+            transactionTemplate.executeWithoutResult(status -> repository.save(offerAcceptanceSaga));
+        });
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {
         return OfferAcceptanceRequestedEvent.create(offerId, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+    }
+
+    private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
+        AcceptOfferCommand command = new AcceptOfferCommand(randomCommandId(), offerId, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+
+        return offerAcceptedEventBuilder()
+                .nextAfter(command)
+                .withOfferId(offerId)
+                .build();
+    }
+
+    private OfferRejectedEvent randomOfferRejectedEvent(UUID offerId) {
+        RejectOfferCommand command = new RejectOfferCommand(randomCommandId(), offerId, FAKER.lorem().sentence());
+        return OfferRejectedEvent.nextAfter(command);
+    }
+
+    private CommandId randomCommandId() {
+        return new CommandId(randomId(), randomId(), randomId(), NOW);
     }
 
     private OfferAcceptanceSagaAssertion thenOfferAcceptanceSaga(UUID offerId) {

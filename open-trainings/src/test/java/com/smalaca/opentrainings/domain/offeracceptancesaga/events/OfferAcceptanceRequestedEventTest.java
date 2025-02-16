@@ -22,10 +22,7 @@ class OfferAcceptanceRequestedEventTest {
                 .hasLastName(event.lastName())
                 .hasEmail(event.email())
                 .hasDiscountCode(event.discountCode())
-                .hasTraceIdSameAs(event)
-                .hasCorrelationIdSameAs(event)
-                .hasDifferentCommandIdThan(event)
-                .hasCreationDateTimeAfterOrEqual(event);
+                .isNextAfter(event.eventId());
     }
 
     private OfferAcceptanceRequestedEvent givenOfferAcceptanceRequestedEvent() {

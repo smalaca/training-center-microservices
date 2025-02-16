@@ -1,9 +1,11 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -24,7 +26,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,15 +54,6 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         if (!messagesIds.isEmpty()) {
             springRepository.deleteAllById(messagesIds);
         }
-    }
-
-    @Test
-    void shouldPublishOfferRejected() {
-        repository.publish(randomOfferRejected());
-    }
-
-    private OfferEvent randomOfferRejected() {
-        return new OfferRejectedEvent(newEventId(), randomId(), "Dummy reason");
     }
 
     @Test
@@ -98,6 +93,24 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     @Test
+    void shouldPublishOfferAcceptedEvent() {
+        OfferAcceptedEvent event = randomOfferAcceptedEvent();
+
+        publish(event);
+
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOfferAcceptedEventSaved(actual, event));
+    }
+
+    @Test
+    void shouldPublishOfferRejectedEvent() {
+        OfferRejectedEvent event = randomOfferRejectedEvent();
+
+        publish(event);
+
+        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOfferRejectedEventSaved(actual, event));
+    }
+
+    @Test
     void shouldPublishOfferAcceptanceRequestedEvent() {
         OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
 
@@ -126,6 +139,8 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         OrderTerminatedEvent eventSeven = publish(randomOrderTerminatedEvent());
         OrderTerminatedEvent eventEight = publish(randomOrderTerminatedEvent());
         OfferAcceptanceRequestedEvent eventNine = publish(randomOfferAcceptanceRequestedEvent());
+        OfferAcceptedEvent eventTen = publish(randomOfferAcceptedEvent());
+        OfferRejectedEvent eventEleven = publish(randomOfferRejectedEvent());
         AcceptOfferCommand commandOne = publish(randomAcceptOfferCommand());
 
         assertThat(springRepository.findAll())
@@ -138,7 +153,17 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, eventSeven))
                 .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, eventEight))
                 .anySatisfy(actual -> assertOfferAcceptanceRequestedEventSaved(actual, eventNine))
+                .anySatisfy(actual -> assertOfferAcceptedEventSaved(actual, eventTen))
+                .anySatisfy(actual -> assertOfferRejectedEventSaved(actual, eventEleven))
                 .anySatisfy(actual -> assertAcceptOfferCommand(actual, commandOne));
+    }
+
+    private <T extends OfferEvent> T publish(T event) {
+        return transactionTemplate.execute(transactionStatus -> {
+            repository.publish(event);
+            messagesIds.add(event.eventId().eventId());
+            return event;
+        });
     }
 
     private <T extends OrderEvent> T publish(T event) {
@@ -165,9 +190,32 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         });
     }
 
+    private OfferAcceptedEvent randomOfferAcceptedEvent() {
+        return offerAcceptedEventBuilder()
+                .nextAfter(randomAcceptOfferCommand())
+                .withOfferId(randomId())
+                .withParticipantId(randomId())
+                .withTrainingId(randomId())
+                .withTrainingPrice(randomPrice())
+                .withFinalPrice(randomPrice())
+                .withDiscountCode(FAKER.code().ean13())
+                .build();
+    }
+
+    private OfferRejectedEvent randomOfferRejectedEvent() {
+        return OfferRejectedEvent.nextAfter(randomRejectOfferCommand());
+    }
+
+    private RejectOfferCommand randomRejectOfferCommand() {
+        return new RejectOfferCommand(randomCommandId(), randomId(), FAKER.lorem().paragraph());
+    }
+
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
-        return new AcceptOfferCommand(commandId, randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().ean13());
+        return new AcceptOfferCommand(randomCommandId(), randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().ean13());
+    }
+
+    private CommandId randomCommandId() {
+        return new CommandId(randomId(), randomId(), randomId(), now());
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
@@ -188,6 +236,31 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
     private OrderTerminatedEvent randomOrderTerminatedEvent() {
         return new OrderTerminatedEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
+    }
+
+    private void assertOfferAcceptedEventSaved(OutboxMessage actual, OfferAcceptedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
+        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent");
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingPriceAmount\" : " + expected.trainingPriceAmount())
+                .contains("\"trainingPriceCurrencyCode\" : \"" + expected.trainingPriceCurrencyCode())
+                .contains("\"finalPriceAmount\" : " + expected.finalPriceAmount())
+                .contains("\"finalPriceCurrencyCode\" : \"" + expected.finalPriceCurrencyCode())
+                .contains("\"discountCode\" : \"" + expected.discountCode());
+
+    }
+
+    private void assertOfferRejectedEventSaved(OutboxMessage actual, OfferRejectedEvent expected) {
+        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
+        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
+        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent");
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"reason\" : \"" + expected.reason());
     }
 
     private void assertAcceptOfferCommand(OutboxMessage actual, AcceptOfferCommand expected) {
