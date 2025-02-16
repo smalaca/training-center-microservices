@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
@@ -45,8 +46,8 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
 
     @Test
     void shouldFindOnlyNotPublishOutboxEvents() {
-        OutboxMessage eventOne = notPublished(OfferRejectedEvent.create(randomId(), "Dummy reason"));
-        published(OfferRejectedEvent.create(randomId(), "Dummy reason"));
+        OutboxMessage eventOne = notPublished(new OfferRejectedEvent(newEventId(), randomId(), "Dummy reason"));
+        published(new OfferRejectedEvent(newEventId(), randomId(), "Dummy reason"));
         published(OrderRejectedEvent.expired(randomId()));
         OutboxMessage eventFour = notPublished(OrderRejectedEvent.expired(randomId()));
         OutboxMessage eventFive = notPublished(OrderRejectedEvent.expired(randomId()));

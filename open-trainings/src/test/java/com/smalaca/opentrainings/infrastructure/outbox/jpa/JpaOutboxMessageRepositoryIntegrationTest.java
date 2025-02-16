@@ -58,7 +58,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private OfferEvent randomOfferRejected() {
-        return OfferRejectedEvent.create(randomId(), "Dummy reason");
+        return new OfferRejectedEvent(newEventId(), randomId(), "Dummy reason");
     }
 
     @Test
