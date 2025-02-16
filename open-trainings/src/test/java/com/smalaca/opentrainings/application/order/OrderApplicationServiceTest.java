@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.application.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.order.GivenOrder;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.Order;
@@ -37,6 +38,8 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
@@ -80,6 +83,7 @@ class OrderApplicationServiceTest {
         LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
         given(clock.now()).willReturn(creationDateTime);
         OfferAcceptedEvent event = offerAcceptedEventBuilder()
+                .nextAfter(givenAcceptOfferCommand())
                 .withOfferId(OFFER_ID)
                 .withParticipantId(PARTICIPANT_ID)
                 .withTrainingId(TRAINING_ID)
@@ -107,6 +111,7 @@ class OrderApplicationServiceTest {
         LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2011, 9, 1), LocalTime.now());
         given(clock.now()).willReturn(creationDateTime);
         OfferAcceptedEvent event = offerAcceptedEventBuilder()
+                .nextAfter(givenAcceptOfferCommand())
                 .withOfferId(OFFER_ID)
                 .withParticipantId(PARTICIPANT_ID)
                 .withTrainingId(TRAINING_ID)
@@ -126,6 +131,10 @@ class OrderApplicationServiceTest {
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasFinalPrice(FINAL_PRICE)
                 .hasNoDiscountCode();
+    }
+
+    private AcceptOfferCommand givenAcceptOfferCommand() {
+        return new AcceptOfferCommand(nextAfter(newEventId()), OFFER_ID, null, null, null, DISCOUNT_CODE);
     }
 
     @Test

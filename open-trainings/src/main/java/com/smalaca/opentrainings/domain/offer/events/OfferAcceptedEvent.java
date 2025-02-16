@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.domaindrivendesign.DomainEvent;
 import com.smalaca.opentrainings.domain.eventid.EventId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
 
 import java.util.UUID;
@@ -16,12 +17,18 @@ public record OfferAcceptedEvent(
     }
 
     public static class Builder {
+        private EventId eventId;
         private UUID offerId;
         private UUID trainingId;
         private UUID participantId;
         private Price trainingPrice;
         private Price finalPrice;
         private String discountCode;
+
+        public Builder nextAfter(AcceptOfferCommand command) {
+            this.eventId = command.commandId().nextEventId();
+            return this;
+        }
 
         public Builder withOfferId(UUID offerId) {
             this.offerId = offerId;
@@ -54,7 +61,7 @@ public record OfferAcceptedEvent(
         }
 
         public OfferAcceptedEvent build() {
-            return new OfferAcceptedEvent(EventId.newEventId(), offerId, trainingId, participantId, trainingPrice, finalPrice, discountCode);
+            return new OfferAcceptedEvent(eventId, offerId, trainingId, participantId, trainingPrice, finalPrice, discountCode);
         }
     }
 }

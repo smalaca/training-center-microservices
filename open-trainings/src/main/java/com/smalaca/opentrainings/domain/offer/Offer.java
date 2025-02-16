@@ -108,6 +108,7 @@ public class Offer {
         status = OfferStatus.ACCEPTED;
 
         return offerAcceptedEventBuilder()
+                .nextAfter(command)
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(response.participantId())
