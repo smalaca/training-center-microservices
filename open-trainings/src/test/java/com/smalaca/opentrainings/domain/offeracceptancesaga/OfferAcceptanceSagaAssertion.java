@@ -1,13 +1,14 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.COMPLETED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OfferAcceptanceSagaAssertion {
@@ -22,12 +23,19 @@ public class OfferAcceptanceSagaAssertion {
     }
 
     public OfferAcceptanceSagaAssertion isInProgress() {
-        assertThat(actual.getStatus()).isEqualTo(IN_PROGRESS);
-        return this;
+        return hasStatus(IN_PROGRESS);
     }
 
-    public OfferAcceptanceSagaAssertion isCompleted() {
-        assertThat(actual.getStatus()).isEqualTo(COMPLETED);
+    public OfferAcceptanceSagaAssertion isAccepted() {
+        return hasStatus(ACCEPTED);
+    }
+
+    public OfferAcceptanceSagaAssertion isRejected() {
+        return hasStatus(REJECTED);
+    }
+
+    private OfferAcceptanceSagaAssertion hasStatus(OfferAcceptanceSagaStatus status) {
+        assertThat(actual.getStatus()).isEqualTo(status);
         return this;
     }
 
@@ -44,7 +52,7 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
-    public OfferAcceptanceSagaAssertion consumedEventAt(OfferAcceptanceRequestedEvent expectedEvent, LocalDateTime expectedConsumedAt) {
+    public OfferAcceptanceSagaAssertion consumedEventAt(OfferAcceptanceSagaEvent expectedEvent, LocalDateTime expectedConsumedAt) {
         assertThat(actual).extracting("events").satisfies(events -> {
             assertThat((List<ConsumedEvent>) events).anySatisfy(acceptedEvent -> {
                 ConsumedEvent expected = new ConsumedEvent(expectedEvent.eventId(), expectedConsumedAt, expectedEvent);

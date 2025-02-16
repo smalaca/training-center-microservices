@@ -1,6 +1,11 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -9,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -18,15 +24,6 @@ class OfferAcceptanceSagaTest {
     private static final UUID OFFER_ID = randomId();
     private static final LocalDateTime NOW = LocalDateTime.now();
 
-    private final Clock clock = givenClock();
-
-    private Clock givenClock() {
-        Clock clock = mock(Clock.class);
-        given(clock.now()).willReturn(NOW);
-
-        return clock;
-    }
-
     @Test
     void shouldRecognizeCreatedOfferAcceptanceSagaAsNotCompleted() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
@@ -35,20 +32,78 @@ class OfferAcceptanceSagaTest {
     }
 
     @Test
-    void shouldRecognizeOfferAcceptanceRequestedAsCompleted() {
+    void shouldRecognizeSagaAsInProgressWhenOfferAcceptanceRequested() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
 
-        actual.accept(event, clock);
+        actual.accept(event, givenClock(5));
 
         assertThatOfferAcceptanceSaga(actual)
-                .isCompleted()
+                .isInProgress()
                 .hasOfferId(OFFER_ID)
                 .consumedEvents(1)
-                .consumedEventAt(event, NOW);
+                .consumedEventAt(event, NOW.minusSeconds(5));
+    }
+
+    @Test
+    void shouldRecognizeSagaAsAcceptedWhenOfferAccepted() {
+        OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
+        actual.accept(eventOne, givenClock(13));
+        OfferAcceptedEvent eventTwo = randomOfferAcceptedEvent();
+
+        actual.accept(eventTwo, givenClock(7));
+
+        assertThatOfferAcceptanceSaga(actual)
+                .isAccepted()
+                .hasOfferId(OFFER_ID)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(13))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(7));
+    }
+
+    @Test
+    void shouldRecognizeSagaAsRejectedWhenOfferRejected() {
+        OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
+        actual.accept(eventOne, givenClock(13));
+        OfferRejectedEvent eventTwo = randomOfferRejectedEvent();
+
+        actual.accept(eventTwo, givenClock(7));
+
+        assertThatOfferAcceptanceSaga(actual)
+                .isRejected()
+                .hasOfferId(OFFER_ID)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(13))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(7));
+    }
+
+    private Clock givenClock(int seconds) {
+        Clock clock = mock(Clock.class);
+        given(clock.now()).willReturn(NOW.minusSeconds(seconds));
+        return clock;
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
         return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+    }
+
+    private OfferAcceptedEvent randomOfferAcceptedEvent() {
+        AcceptOfferCommand command = new AcceptOfferCommand(randomCommandId(), OfferAcceptanceSagaTest.OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+
+        return offerAcceptedEventBuilder()
+                .nextAfter(command)
+                .withOfferId(OFFER_ID)
+                .build();
+    }
+
+    private OfferRejectedEvent randomOfferRejectedEvent() {
+        RejectOfferCommand command = new RejectOfferCommand(randomCommandId(), OFFER_ID, FAKER.lorem().sentence());
+        return OfferRejectedEvent.nextAfter(command);
+    }
+
+    private CommandId randomCommandId() {
+        return new CommandId(randomId(), randomId(), randomId(), NOW);
     }
 }

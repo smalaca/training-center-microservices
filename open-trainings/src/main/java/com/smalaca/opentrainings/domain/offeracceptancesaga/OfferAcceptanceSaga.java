@@ -1,8 +1,10 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.domaindrivendesign.Saga;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 
@@ -12,8 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.COMPLETED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.REJECTED;
 
 @Saga
 public class OfferAcceptanceSaga {
@@ -26,14 +29,23 @@ public class OfferAcceptanceSaga {
     }
 
     public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
-        process(event, clock.now());
+        consumed(event, clock.now());
         return event.asAcceptOfferCommand();
     }
 
-    private void process(OfferAcceptanceRequestedEvent event, LocalDateTime consumedAt) {
+    public void accept(OfferAcceptedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        status = ACCEPTED;
+    }
+
+    public void accept(OfferRejectedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        status = REJECTED;
+    }
+
+    private void consumed(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
         ConsumedEvent consumedEvent = new ConsumedEvent(event.eventId(), consumedAt, event);
         events.add(consumedEvent);
-        status = COMPLETED;
     }
 
     public void readLastEvent(BiConsumer<OfferAcceptanceSagaEvent, LocalDateTime> consumer) {

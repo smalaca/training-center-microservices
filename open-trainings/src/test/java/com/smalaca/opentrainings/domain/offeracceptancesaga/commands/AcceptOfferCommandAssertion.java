@@ -1,9 +1,10 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga.commands;
 
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.commandid.CommandIdAssertion.assertThatCommandId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AcceptOfferCommandAssertion {
@@ -42,23 +43,8 @@ public class AcceptOfferCommandAssertion {
         return this;
     }
 
-    public AcceptOfferCommandAssertion hasTraceIdSameAs(OfferAcceptanceRequestedEvent event) {
-        assertThat(actual.commandId().traceId()).isEqualTo(event.eventId().traceId());
-        return this;
-    }
-
-    public AcceptOfferCommandAssertion hasCorrelationIdSameAs(OfferAcceptanceRequestedEvent event) {
-        assertThat(actual.commandId().correlationId()).isEqualTo(event.eventId().correlationId());
-        return this;
-    }
-
-    public AcceptOfferCommandAssertion hasDifferentCommandIdThan(OfferAcceptanceRequestedEvent event) {
-        assertThat(actual.commandId().commandId()).isNotEqualTo(event.eventId().eventId());
-        return this;
-    }
-
-    public AcceptOfferCommandAssertion hasCreationDateTimeAfterOrEqual(OfferAcceptanceRequestedEvent event) {
-        assertThat(actual.commandId().creationDateTime()).isAfterOrEqualTo(event.eventId().creationDateTime());
+    public AcceptOfferCommandAssertion isNextAfter(EventId eventId) {
+        assertThatCommandId(actual.commandId()).isNextAfter(eventId);
         return this;
     }
 }

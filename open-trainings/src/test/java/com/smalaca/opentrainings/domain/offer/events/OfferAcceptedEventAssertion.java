@@ -1,9 +1,11 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.price.Price;
 
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.eventid.EventIdAssertion.assertThatEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OfferAcceptedEventAssertion {
@@ -51,6 +53,11 @@ public class OfferAcceptedEventAssertion {
 
     public OfferAcceptedEventAssertion hasDiscountCode(String expected) {
         assertThat(actual.discountCode()).isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptedEventAssertion isNextAfter(CommandId commandId) {
+        assertThatEventId(actual.eventId()).isNextAfter(commandId);
         return this;
     }
 }

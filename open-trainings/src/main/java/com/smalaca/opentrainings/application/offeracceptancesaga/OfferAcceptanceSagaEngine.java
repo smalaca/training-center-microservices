@@ -5,6 +5,8 @@ import com.smalaca.architecture.cqrs.QueryOperation;
 import com.smalaca.architecture.portsandadapters.DrivenPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.commandregistry.CommandRegistry;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
@@ -38,6 +40,28 @@ public class OfferAcceptanceSagaEngine {
         AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
         commandRegistry.publish(command);
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(OfferAcceptedEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+
+        offerAcceptanceSaga.accept(event, clock);
+
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(OfferRejectedEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+
+        offerAcceptanceSaga.accept(event, clock);
+
         repository.save(offerAcceptanceSaga);
     }
 

@@ -2,10 +2,13 @@ package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.domaindrivendesign.DomainEvent;
 import com.smalaca.opentrainings.domain.eventid.EventId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @DomainEvent
@@ -13,10 +16,15 @@ public record OfferAcceptedEvent(
         EventId eventId, UUID offerId, UUID trainingId, UUID participantId,
         BigDecimal trainingPriceAmount, String trainingPriceCurrencyCode,
         BigDecimal finalPriceAmount, String finalPriceCurrencyCode,
-        String discountCode) implements OfferEvent {
+        String discountCode) implements OfferEvent, OfferAcceptanceSagaEvent {
 
     public static OfferAcceptedEvent.Builder offerAcceptedEventBuilder() {
         return new OfferAcceptedEvent.Builder();
+    }
+
+    @Override
+    public void accept(OfferAcceptanceSaga offerAcceptanceSaga, LocalDateTime consumedAt) {
+        offerAcceptanceSaga.accept(this, () -> consumedAt);
     }
 
     public static class Builder {

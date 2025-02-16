@@ -91,12 +91,10 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(commandFor(dto));
 
-        await().untilAsserted(() -> {
-            assertThatAcceptanceCompletedFor(dto.getOfferId());
-            thenOfferResponse(dto.getOfferId())
-                    .isOk()
-                    .hasAcceptedOffer(dto);
-        });
+        thenOfferAcceptanceIs(dto, "ACCEPTED");
+        thenOfferResponse(dto.getOfferId())
+                .isOk()
+                .hasAcceptedOffer(dto);
     }
 
     @Test
@@ -108,17 +106,21 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(commandFor(dto));
 
+        thenOfferAcceptanceIs(dto, "REJECTED");
+        thenOfferResponse(dto.getOfferId())
+                .isOk()
+                .hasRejectedOffer(dto);
+    }
+
+    private void thenOfferAcceptanceIs(OfferTestDto dto, String expected) {
         await().untilAsserted(() -> {
-            assertThatAcceptanceCompletedFor(dto.getOfferId());
-            thenOfferResponse(dto.getOfferId())
-                    .isOk()
-                    .hasRejectedOffer(dto);
+            assertThatAcceptanceForIs(dto.getOfferId(), expected);
         });
     }
 
-    private void assertThatAcceptanceCompletedFor(UUID sagaId) {
+    private void assertThatAcceptanceForIs(UUID sagaId, String expected) {
         String status = client.offers().getAcceptanceProgress(sagaId);
-        assertThat(status).isEqualTo("COMPLETED");
+        assertThat(status).isEqualTo(expected);
     }
 
     private RestAcceptOfferTestCommand commandFor(OfferTestDto dto) {
