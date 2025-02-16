@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
@@ -23,7 +25,6 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent.trainingNoLongerAvailable;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,7 +54,11 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
     @Test
     void shouldPublishOfferRejected() {
-        repository.publish(trainingNoLongerAvailable(randomId()));
+        repository.publish(randomOfferRejected());
+    }
+
+    private OfferEvent randomOfferRejected() {
+        return new OfferRejectedEvent(newEventId(), randomId(), "Dummy reason");
     }
 
     @Test
