@@ -21,7 +21,6 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptan
 @Saga
 public class OfferAcceptanceSaga {
     private final UUID offerId;
-    private UUID orderId;
     private String rejectionReason;
     private final List<ConsumedEvent> events = new ArrayList<>();
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
