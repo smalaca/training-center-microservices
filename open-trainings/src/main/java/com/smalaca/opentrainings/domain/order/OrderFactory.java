@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 
 @Factory
 public class OrderFactory {
@@ -23,8 +24,8 @@ public class OrderFactory {
                 .withOfferId(event.offerId())
                 .withTrainingId(event.trainingId())
                 .withParticipantId(event.participantId())
-                .withTrainingPrice(event.trainingPrice())
-                .withFinalPrice(event.finalPrice())
+                .withTrainingPrice(Price.of(event.trainingPriceAmount(), event.trainingPriceCurrencyCode()))
+                .withFinalPrice(Price.of(event.finalPriceAmount(), event.finalPriceCurrencyCode()))
                 .withDiscountCode(event.discountCode())
                 .withOrderNumber(orderNumberFactory.createFor(event.participantId()))
                 .withCreationDateTime(clock.now())

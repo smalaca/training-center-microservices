@@ -33,12 +33,14 @@ public class OfferAcceptedEventAssertion {
     }
 
     public OfferAcceptedEventAssertion hasTrainingPrice(Price expected) {
-        assertThat(actual.trainingPrice()).isEqualTo(expected);
+        assertThat(actual.trainingPriceAmount()).isEqualTo(expected.amount());
+        assertThat(actual.trainingPriceCurrencyCode()).isEqualTo(expected.currencyCode());
         return this;
     }
 
     public OfferAcceptedEventAssertion hasFinalPrice(Price expected) {
-        assertThat(actual.finalPrice()).isEqualTo(expected);
+        assertThat(actual.finalPriceAmount()).isEqualTo(expected.amount());
+        assertThat(actual.finalPriceCurrencyCode()).isEqualTo(expected.currencyCode());
         return this;
     }
 

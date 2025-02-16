@@ -5,12 +5,15 @@ import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @DomainEvent
 public record OfferAcceptedEvent(
         EventId eventId, UUID offerId, UUID trainingId, UUID participantId,
-        Price trainingPrice, Price finalPrice, String discountCode) implements OfferEvent {
+        BigDecimal trainingPriceAmount, String trainingPriceCurrencyCode,
+        BigDecimal finalPriceAmount, String finalPriceCurrencyCode,
+        String discountCode) implements OfferEvent {
 
     public static OfferAcceptedEvent.Builder offerAcceptedEventBuilder() {
         return new OfferAcceptedEvent.Builder();
@@ -21,8 +24,10 @@ public record OfferAcceptedEvent(
         private UUID offerId;
         private UUID trainingId;
         private UUID participantId;
-        private Price trainingPrice;
-        private Price finalPrice;
+        private BigDecimal trainingPriceAmount;
+        private String trainingPriceCurrencyCode;
+        private BigDecimal finalPriceAmount;
+        private String finalPriceCurrencyCode;
         private String discountCode;
 
         public Builder nextAfter(AcceptOfferCommand command) {
@@ -46,12 +51,14 @@ public record OfferAcceptedEvent(
         }
 
         public Builder withTrainingPrice(Price trainingPrice) {
-            this.trainingPrice = trainingPrice;
+            this.trainingPriceAmount = trainingPrice.amount();
+            this.trainingPriceCurrencyCode = trainingPrice.currencyCode();
             return this;
         }
 
         public Builder withFinalPrice(Price finalPrice) {
-            this.finalPrice = finalPrice;
+            this.finalPriceAmount = finalPrice.amount();
+            this.finalPriceCurrencyCode = finalPrice.currencyCode();
             return this;
         }
 
@@ -61,7 +68,9 @@ public record OfferAcceptedEvent(
         }
 
         public OfferAcceptedEvent build() {
-            return new OfferAcceptedEvent(eventId, offerId, trainingId, participantId, trainingPrice, finalPrice, discountCode);
+            return new OfferAcceptedEvent(
+                    eventId, offerId, trainingId, participantId, trainingPriceAmount, trainingPriceCurrencyCode,
+                    finalPriceAmount, finalPriceCurrencyCode, discountCode);
         }
     }
 }
