@@ -15,4 +15,8 @@ public record CommandId(UUID commandId, UUID traceId, UUID correlationId, LocalD
     private static UUID id() {
         return UUID.randomUUID();
     }
+
+    public EventId nextEventId() {
+        return EventId.nextAfter(this);
+    }
 }

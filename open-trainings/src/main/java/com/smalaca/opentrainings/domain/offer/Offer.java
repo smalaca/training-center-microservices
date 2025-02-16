@@ -123,7 +123,7 @@ public class Offer {
 
     private OfferRejectedEvent reject(RejectOfferCommand command) {
         status = REJECTED;
-        return OfferRejectedEvent.create(command.offerId(), command.reason());
+        return OfferRejectedEvent.nextAfter(command);
     }
 
     private PersonalDataRequest asPersonalDataRequest(AcceptOfferCommand command) {

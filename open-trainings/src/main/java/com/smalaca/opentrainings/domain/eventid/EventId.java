@@ -12,6 +12,10 @@ public record EventId(UUID eventId, UUID traceId, UUID correlationId, LocalDateT
         return new EventId(id(), id(), id(), now());
     }
 
+    public static EventId nextAfter(CommandId commandId) {
+        return new EventId(id(), commandId.traceId(), commandId.correlationId(), now());
+    }
+
     public CommandId nextCommandId() {
         return CommandId.nextAfter(this);
     }
