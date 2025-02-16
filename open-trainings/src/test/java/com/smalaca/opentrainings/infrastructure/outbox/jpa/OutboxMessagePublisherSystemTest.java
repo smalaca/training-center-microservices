@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.UUID;
+
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -45,11 +47,13 @@ class OutboxMessagePublisherSystemTest {
 
     @Test
     void shouldPublishOnlyNotPublishedOutboxEvents() {
-        OfferRejectedEvent eventOne = OfferRejectedEvent.expired(randomId());
+        UUID offerId1 = randomId();
+        OfferRejectedEvent eventOne = OfferRejectedEvent.create(offerId1, "Dummy reason");
         OrderRejectedEvent eventTwo = OrderRejectedEvent.expired(randomId());
         OrderRejectedEvent eventThree = OrderRejectedEvent.expired(randomId());
         notPublished(eventOne);
-        published(OfferRejectedEvent.expired(randomId()));
+        UUID offerId = randomId();
+        published(OfferRejectedEvent.create(offerId, "Dummy message"));
         published(OrderRejectedEvent.expired(randomId()));
         notPublished(eventTwo);
         notPublished(eventThree);
@@ -63,8 +67,8 @@ class OutboxMessagePublisherSystemTest {
 
     @Test
     void shouldMarkOutboxEventsAsPublished() {
-        notPublished(OfferRejectedEvent.expired(randomId()));
-        published(OfferRejectedEvent.expired(randomId()));
+        notPublished(OfferRejectedEvent.create(randomId(), "Dummy reason"));
+        published(OfferRejectedEvent.create(randomId(), "Dummy reason"));
         published(OrderRejectedEvent.expired(randomId()));
         notPublished(OrderRejectedEvent.expired(randomId()));
         notPublished(OrderRejectedEvent.expired(randomId()));

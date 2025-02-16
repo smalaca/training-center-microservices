@@ -45,8 +45,8 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
 
     @Test
     void shouldFindOnlyNotPublishOutboxEvents() {
-        OutboxMessage eventOne = notPublished(OfferRejectedEvent.expired(randomId()));
-        published(OfferRejectedEvent.expired(randomId()));
+        OutboxMessage eventOne = notPublished(OfferRejectedEvent.create(randomId(), "Dummy reason"));
+        published(OfferRejectedEvent.create(randomId(), "Dummy reason"));
         published(OrderRejectedEvent.expired(randomId()));
         OutboxMessage eventFour = notPublished(OrderRejectedEvent.expired(randomId()));
         OutboxMessage eventFive = notPublished(OrderRejectedEvent.expired(randomId()));

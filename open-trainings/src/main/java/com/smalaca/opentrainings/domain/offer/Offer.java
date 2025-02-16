@@ -10,6 +10,7 @@ import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
@@ -31,6 +32,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
@@ -85,8 +88,7 @@ public class Offer {
             AcceptOfferCommand command, PersonalDataManagement personalDataManagement,
             TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
-            status = REJECTED;
-            return OfferRejectedEvent.expired(offerId);
+            return reject(asRejectOfferCommand("Offer expired"));
         }
 
         PersonalDataResponse response = personalDataManagement.save(asPersonalDataRequest(command));
@@ -100,8 +102,7 @@ public class Offer {
         TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, response.participantId()));
 
         if (booking.isFailed()) {
-            status = REJECTED;
-            return OfferRejectedEvent.trainingNoLongerAvailable(offerId);
+            return reject(asRejectOfferCommand("Training no longer available"));
         }
 
         status = OfferStatus.ACCEPTED;
@@ -114,6 +115,15 @@ public class Offer {
                 .withFinalPrice(finalPrice)
                 .withDiscountCode(command.discountCode())
                 .build();
+    }
+
+    private RejectOfferCommand asRejectOfferCommand(String reason) {
+        return new RejectOfferCommand(nextAfter(newEventId()), offerId, reason);
+    }
+
+    private OfferRejectedEvent reject(RejectOfferCommand command) {
+        status = REJECTED;
+        return OfferRejectedEvent.create(command.offerId(), command.reason());
     }
 
     private PersonalDataRequest asPersonalDataRequest(AcceptOfferCommand command) {
