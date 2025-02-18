@@ -8,6 +8,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +34,11 @@ public class OfferAcceptanceSaga {
     RegisterPersonCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
         return RegisterPersonCommand.nextAfter(event);
+    }
+
+    public AcceptOfferCommand accept(PersonRegisteredEvent event, Clock clock) {
+        consumed(event, clock.now());
+        return AcceptOfferCommand.nextAfter(event);
     }
 
     public AcceptOfferCommand acceptToRemove(OfferAcceptanceRequestedEvent event, Clock clock) {

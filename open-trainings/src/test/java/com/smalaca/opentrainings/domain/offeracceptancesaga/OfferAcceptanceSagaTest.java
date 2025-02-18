@@ -2,12 +2,14 @@ package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -60,6 +63,42 @@ class OfferAcceptanceSagaTest {
                 .hasOfferId(OFFER_ID)
                 .consumedEvents(1)
                 .consumedEventAt(event, NOW.minusSeconds(5));
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenPersonRegisteredEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenClock(13));
+        PersonRegisteredEvent event = randomPersonRegisteredEvent();
+
+        AcceptOfferCommand actual = saga.accept(event, givenClock(5));
+
+        assertThatAcceptOfferCommand(actual)
+                .hasOfferId(OFFER_ID)
+                .hasParticipantId(event.participantId())
+                .hasDiscountCode(event.discountCode())
+                .isNextAfter(event.eventId());
+    }
+
+    @Test
+    void shouldRecognizeSagaAsInProgressWhenPersonRegisteredEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
+        saga.accept(eventOne, givenClock(13));
+        PersonRegisteredEvent eventTwo = randomPersonRegisteredEvent();
+
+        saga.accept(eventTwo, givenClock(5));
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(13))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(5));
+    }
+
+    private PersonRegisteredEvent randomPersonRegisteredEvent() {
+        return new PersonRegisteredEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
     }
 
     @Test
@@ -132,6 +171,10 @@ class OfferAcceptanceSagaTest {
     private OfferRejectedEvent randomOfferRejectedEvent() {
         RejectOfferCommand command = new RejectOfferCommand(randomCommandId(), OFFER_ID, FAKER.lorem().sentence());
         return OfferRejectedEvent.nextAfter(command);
+    }
+
+    private EventId randomEventId() {
+        return new EventId(randomId(), randomId(), randomId(), NOW);
     }
 
     private CommandId randomCommandId() {

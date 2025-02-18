@@ -23,6 +23,11 @@ public class AcceptOfferCommandAssertion {
         return this;
     }
 
+    public AcceptOfferCommandAssertion hasParticipantId(UUID expected) {
+        assertThat(actual.participantId()).isEqualTo(expected);
+        return this;
+    }
+
     public AcceptOfferCommandAssertion hasFirstName(String expected) {
         assertThat(actual.firstName()).isEqualTo(expected);
         return this;
