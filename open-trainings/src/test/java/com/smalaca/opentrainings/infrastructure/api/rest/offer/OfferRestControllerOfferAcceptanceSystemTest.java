@@ -8,12 +8,12 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestRespons
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -63,13 +63,13 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private OpenTrainingsTestClient client;
 
     @MockBean
-    private PersonalDataManagement personalDataManagement;
-
-    @MockBean
     private TrainingOfferCatalogue trainingOfferCatalogue;
 
     @MockBean
     private DiscountService discountService;
+
+    @Autowired
+    private OfferAcceptanceSagaEventTestListener testListener;
 
     private GivenOfferFactory given;
 
@@ -84,9 +84,31 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldAcceptOffer() {
+    void shouldAcceptOfferWhenPersonRegistered() {
         OfferTestDto dto = given.offer().initiated().getDto();
-        givenParticipant();
+        givenPersonRegistered(dto.getOfferId());
+        givenTrainingThatCanBeBooked(dto.getTrainingId());
+        givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
+
+        client.offers().accept(commandFor(dto));
+
+        await().untilAsserted(() -> {
+            RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
+            assertThatOfferAcceptance(actual)
+                    .hasOfferId(dto.getOfferId())
+                    .isAccepted()
+                    .hasNoRejectionReason();
+
+            thenOfferResponse(actual.offerId())
+                    .isOk()
+                    .hasAcceptedOffer(dto);
+        });
+    }
+
+    @Test
+    void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
+        OfferTestDto dto = given.offer().initiated().getDto();
+        givenAlreadyRegisteredPersonFound(dto.getOfferId());
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
@@ -108,7 +130,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Test
     void shouldRejectOffer() {
         OfferTestDto dto = given.offer().initiated().getDto();
-        givenParticipant();
+        givenPersonRegistered(dto.getOfferId());
         givenTrainingThatCannotBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
 
@@ -142,14 +164,12 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         return assertThatOfferResponse(offer);
     }
 
-    private void givenParticipant() {
-        PersonalDataResponse response = PersonalDataResponse.successful(PARTICIPANT_ID);
-        PersonalDataRequest request = PersonalDataRequest.builder()
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .email(EMAIL)
-                .build();
-        given(personalDataManagement.save(request)).willReturn(response);
+    private void givenAlreadyRegisteredPersonFound(UUID offerId) {
+        testListener.willReturn(offerId, new AlreadyRegisteredPersonFoundEvent(EventId.newEventId(), offerId, PARTICIPANT_ID));
+    }
+
+    private void givenPersonRegistered(UUID offerId) {
+        testListener.willReturn(offerId, new PersonRegisteredEvent(EventId.newEventId(), offerId, PARTICIPANT_ID));
     }
 
     private void givenTrainingThatCanBeBooked(UUID trainingId) {

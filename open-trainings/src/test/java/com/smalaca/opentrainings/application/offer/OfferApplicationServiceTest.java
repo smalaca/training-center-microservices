@@ -9,7 +9,6 @@ import com.smalaca.opentrainings.domain.offer.AvailableOfferException;
 import com.smalaca.opentrainings.domain.offer.DiscountException;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
-import com.smalaca.opentrainings.domain.offer.MissingParticipantException;
 import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
@@ -20,10 +19,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -43,10 +39,10 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
-import static com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse.failed;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,21 +59,17 @@ class OfferApplicationServiceTest {
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
     private static final Price TRAINING_PRICE = randomPrice();
-    private static final String FIRST_NAME = FAKER.name().firstName();
-    private static final String LAST_NAME = FAKER.name().lastName();
-    private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String NO_DISCOUNT_CODE = null;
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
     private static final int NO_AVAILABLE_PLACES = 0;
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
     private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
     private final DiscountService discountService = mock(DiscountService.class);
     private final Clock clock = mock(Clock.class);
     private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
-            offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, discountService, clock);
+            offerRepository, eventRegistry, trainingOfferCatalogue, discountService, clock);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 
@@ -123,20 +115,8 @@ class OfferApplicationServiceTest {
     }
 
     @Test
-    void shouldInterruptOfferAcceptanceIfCouldNotRetrieveParticipantId() {
-        givenInitiatedOffer();
-        givenParticipant(failed());
-        givenTrainingThatCanBeBooked();
-
-        assertThrows(MissingParticipantException.class, () -> service.accept(acceptOfferCommandWithoutDiscount()));
-
-        then(offerRepository).should(never()).save(any());
-    }
-
-    @Test
     void shouldInterruptOfferAcceptanceIfCannotUseDiscountCode() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.failed("EXPIRED"));
         AcceptOfferCommand command = acceptOfferCommandWithDiscount(DISCOUNT_CODE);
@@ -151,7 +131,6 @@ class OfferApplicationServiceTest {
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
         givenOffer().createdMinutesAgo(minutes).initiated();
-        givenParticipant();
         givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -162,7 +141,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
         givenOffer().createdMinutesAgo(42).initiated();
-        givenParticipant();
         givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -175,7 +153,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -186,7 +163,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferRejectedEventWhenTrainingNoLongerAvailable() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -200,7 +176,6 @@ class OfferApplicationServiceTest {
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldAcceptOffer(int minutes) {
         givenOffer().createdMinutesAgo(minutes).initiated();
-        givenParticipant();
         givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -211,7 +186,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -228,7 +202,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldAcceptExpiredOfferWhenTrainingPriceDidNotChanged() {
         givenOffer().createdMinutesAgo(16).initiated();
-        givenParticipant();
         givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -239,7 +212,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferAcceptedEventWhenExpiredOfferAndTrainingPriceDidNotChanged() {
         givenOffer().createdMinutesAgo(120).initiated();
-        givenParticipant();
         givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
@@ -256,7 +228,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldAcceptOfferWithPriceAfterDiscount() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.successful(randomPrice()));
 
@@ -268,7 +239,6 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferAcceptedEventWithPriceAfterDiscount() {
         givenInitiatedOffer();
-        givenParticipant();
         givenTrainingThatCanBeBooked();
         Price newPrice = randomPrice();
         givenDiscount(DiscountResponse.successful(newPrice));
@@ -440,24 +410,11 @@ class OfferApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
-        return AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent(discountCode));
+        return AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), discountCode);
     }
 
-    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(String discountCode) {
-        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FIRST_NAME, LAST_NAME, EMAIL, discountCode);
-    }
-
-    private void givenParticipant() {
-        givenParticipant(PersonalDataResponse.successful(PARTICIPANT_ID));
-    }
-
-    private void givenParticipant(PersonalDataResponse response) {
-        PersonalDataRequest request = PersonalDataRequest.builder()
-                .firstName(FIRST_NAME)
-                .lastName(LAST_NAME)
-                .email(EMAIL)
-                .build();
-        given(personalDataManagement.save(request)).willReturn(response);
+    private PersonRegisteredEvent randomPersonRegisteredEvent() {
+        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
     }
 
     private void givenInitiatedOffer() {

@@ -44,6 +44,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasDiscountCode(String expected) {
+        assertThat(actual).extracting("discountCode").isEqualTo(expected);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion consumedEvents(int expected) {
         assertThat(actual).extracting("events").satisfies(events -> {
             assertThat((List<ConsumedEvent>) events).hasSize(expected);

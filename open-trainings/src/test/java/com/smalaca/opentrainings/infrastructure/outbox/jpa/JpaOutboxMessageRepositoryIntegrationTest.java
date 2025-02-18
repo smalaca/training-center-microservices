@@ -7,6 +7,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
@@ -211,7 +212,8 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+        PersonRegisteredEvent event = new PersonRegisteredEvent(newEventId(), randomId(), randomId());
+        return AcceptOfferCommand.nextAfter(event, FAKER.code().ean13());
     }
 
     private CommandId randomCommandId() {
@@ -269,10 +271,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand");
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"discountCode\" : \"" + expected.discountCode())
-                .contains("\"firstName\" : \"" + expected.firstName())
-                .contains("\"lastName\" : \"" + expected.lastName())
-                .contains("\"email\" : \"" + expected.email());
+                .contains("\"discountCode\" : \"" + expected.discountCode());
     }
 
     private void assertOfferAcceptanceRequestedEventSaved(OutboxMessage actual, OfferAcceptanceRequestedEvent expected) {

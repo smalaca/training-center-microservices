@@ -4,7 +4,9 @@ import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,18 @@ public class OfferAcceptanceEventListener {
     @EventListener
     @DrivenAdapter
     public void listen(OfferAcceptanceRequestedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(PersonRegisteredEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(AlreadyRegisteredPersonFoundEvent event) {
         engine.accept(event);
     }
 

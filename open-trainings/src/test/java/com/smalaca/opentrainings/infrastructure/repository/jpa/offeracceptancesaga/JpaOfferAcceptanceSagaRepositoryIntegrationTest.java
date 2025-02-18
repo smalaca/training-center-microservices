@@ -10,6 +10,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.test.type.IntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,7 +170,7 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent(offerId));
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(newEventId(), offerId, randomId()), FAKER.code().imei());
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)
