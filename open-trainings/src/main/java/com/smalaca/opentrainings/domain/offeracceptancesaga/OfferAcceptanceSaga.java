@@ -29,7 +29,7 @@ public class OfferAcceptanceSaga {
         this.offerId = offerId;
     }
 
-    public AcceptOfferCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
+    public AcceptOfferCommand acceptToRemove(OfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
         return AcceptOfferCommand.nextAfter(event);
     }

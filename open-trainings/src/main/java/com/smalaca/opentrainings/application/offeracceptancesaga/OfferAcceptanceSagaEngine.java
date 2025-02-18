@@ -37,7 +37,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(OfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
 
-        AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
+        AcceptOfferCommand command = offerAcceptanceSaga.acceptToRemove(event, clock);
 
         commandRegistry.publish(command);
         repository.save(offerAcceptanceSaga);

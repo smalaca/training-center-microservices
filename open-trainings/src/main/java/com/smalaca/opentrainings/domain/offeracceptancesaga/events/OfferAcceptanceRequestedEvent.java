@@ -15,6 +15,6 @@ public record OfferAcceptanceRequestedEvent(EventId eventId, UUID offerId, Strin
 
     @Override
     public void accept(OfferAcceptanceSaga offerAcceptanceSaga, LocalDateTime consumedAt) {
-        offerAcceptanceSaga.accept(this, () -> consumedAt);
+        offerAcceptanceSaga.acceptToRemove(this, () -> consumedAt);
     }
 }

@@ -36,7 +36,7 @@ class OfferAcceptanceSagaTest {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
 
-        actual.accept(event, givenClock(5));
+        actual.acceptToRemove(event, givenClock(5));
 
         assertThatOfferAcceptanceSaga(actual)
                 .isInProgress()
@@ -49,7 +49,7 @@ class OfferAcceptanceSagaTest {
     void shouldRecognizeSagaAsAcceptedWhenOfferAccepted() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
-        actual.accept(eventOne, givenClock(13));
+        actual.acceptToRemove(eventOne, givenClock(13));
         OfferAcceptedEvent eventTwo = randomOfferAcceptedEvent();
 
         actual.accept(eventTwo, givenClock(7));
@@ -66,7 +66,7 @@ class OfferAcceptanceSagaTest {
     void shouldRecognizeSagaAsRejectedWhenOfferRejected() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
-        actual.accept(eventOne, givenClock(13));
+        actual.acceptToRemove(eventOne, givenClock(13));
         OfferRejectedEvent eventTwo = randomOfferRejectedEvent();
 
         actual.accept(eventTwo, givenClock(7));
