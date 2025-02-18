@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 
@@ -27,6 +28,11 @@ public class OfferAcceptanceSaga {
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
+    }
+
+    RegisterPersonCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        return RegisterPersonCommand.nextAfter(event);
     }
 
     public AcceptOfferCommand acceptToRemove(OfferAcceptanceRequestedEvent event, Clock clock) {

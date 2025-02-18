@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import net.datafaker.Faker;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -29,6 +31,35 @@ class OfferAcceptanceSagaTest {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
 
         assertThatOfferAcceptanceSaga(actual).isInProgress();
+    }
+
+    @Test
+    void shouldPublishRegisterPersonCommandWhenOfferAcceptanceRequestedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
+
+        RegisterPersonCommand actual = saga.accept(event, givenClock(5));
+
+        assertThatRegisterPersonCommand(actual)
+                .hasOfferId(OFFER_ID)
+                .hasFirstName(event.firstName())
+                .hasLastName(event.lastName())
+                .hasEmail(event.email())
+                .isNextAfter(event.eventId());
+    }
+
+    @Test
+    void shouldRecognizeSagaAsInProgressWhenOfferAcceptanceRequestedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
+
+        saga.accept(event, givenClock(5));
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .consumedEvents(1)
+                .consumedEventAt(event, NOW.minusSeconds(5));
     }
 
     @Test
