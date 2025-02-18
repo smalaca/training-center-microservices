@@ -3,7 +3,6 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
@@ -123,10 +122,6 @@ public class GivenOrder {
         order = orderFactory.create(event);
 
         return this;
-    }
-
-    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {
-        return OfferAcceptanceRequestedEvent.create(offerId, null, null, null, discountCode);
     }
 
     public OrderTestDto getDto() {
