@@ -9,7 +9,6 @@ import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDt
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
-import net.datafaker.Faker;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.LocalDateTime;
@@ -20,8 +19,6 @@ import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOffer {
-    private static final Faker FAKER = new Faker();
-
     private final OfferFactory offerFactory;
     private final Clock clock;
     private final TrainingOfferCatalogue trainingOfferCatalogue;
