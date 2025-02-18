@@ -20,7 +20,6 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -66,12 +65,11 @@ class OfferApplicationServiceTest {
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final PersonalDataManagement personalDataManagement = mock(PersonalDataManagement.class);
     private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
     private final DiscountService discountService = mock(DiscountService.class);
     private final Clock clock = mock(Clock.class);
     private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
-            offerRepository, eventRegistry, personalDataManagement, trainingOfferCatalogue, discountService, clock);
+            offerRepository, eventRegistry, trainingOfferCatalogue, discountService, clock);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
 

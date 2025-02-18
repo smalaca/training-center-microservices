@@ -4,7 +4,6 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -19,7 +18,6 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
 public class GivenOffer {
     private static final Faker FAKER = new Faker();
@@ -70,7 +68,7 @@ public class GivenOffer {
         initiated();
         given(clock.now()).willReturn(creationDateTime.plusMinutes(20));
         given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(new TrainingDto(randomAvailability(), randomPrice()));
-        offer.accept(null, null, trainingOfferCatalogue, null, clock);
+        offer.accept(null, trainingOfferCatalogue, null, clock);
         return this;
     }
 
@@ -78,11 +76,10 @@ public class GivenOffer {
         initiated();
         UUID participantId = UUID.randomUUID();
         AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(EventId.newEventId(), getOfferId(), participantId), null);
-        PersonalDataManagement projectDataManagement = mock(PersonalDataManagement.class);
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
         given(trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, participantId))).willReturn(TrainingBookingResponse.successful(trainingId, participantId));
 
-        offer.accept(command, projectDataManagement, trainingOfferCatalogue, null, clock);
+        offer.accept(command, trainingOfferCatalogue, null, clock);
         return this;
     }
 

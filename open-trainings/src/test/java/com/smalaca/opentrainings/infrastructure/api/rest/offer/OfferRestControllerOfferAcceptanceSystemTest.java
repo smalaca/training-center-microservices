@@ -14,7 +14,6 @@ import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -62,9 +61,6 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Autowired
     private OpenTrainingsTestClient client;
-
-    @MockBean
-    private PersonalDataManagement personalDataManagement;
 
     @MockBean
     private TrainingOfferCatalogue trainingOfferCatalogue;
