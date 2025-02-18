@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga.commands;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 
@@ -12,6 +13,10 @@ public record AcceptOfferCommand(CommandId commandId, UUID offerId, UUID partici
     }
 
     public static AcceptOfferCommand nextAfter(PersonRegisteredEvent event) {
+        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, event.discountCode());
+    }
+
+    public static AcceptOfferCommand nextAfter(AlreadyRegisteredPersonFoundEvent event) {
         return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, event.discountCode());
     }
 }

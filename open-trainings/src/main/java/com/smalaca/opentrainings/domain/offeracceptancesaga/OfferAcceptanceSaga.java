@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
@@ -37,6 +38,11 @@ public class OfferAcceptanceSaga {
     }
 
     public AcceptOfferCommand accept(PersonRegisteredEvent event, Clock clock) {
+        consumed(event, clock.now());
+        return AcceptOfferCommand.nextAfter(event);
+    }
+
+    public AcceptOfferCommand accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
         consumed(event, clock.now());
         return AcceptOfferCommand.nextAfter(event);
     }

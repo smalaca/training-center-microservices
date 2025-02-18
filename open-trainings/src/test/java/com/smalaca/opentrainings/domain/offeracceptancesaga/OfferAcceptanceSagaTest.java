@@ -8,6 +8,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import net.datafaker.Faker;
@@ -97,8 +98,36 @@ class OfferAcceptanceSagaTest {
                 .consumedEventAt(eventTwo, NOW.minusSeconds(5));
     }
 
-    private PersonRegisteredEvent randomPersonRegisteredEvent() {
-        return new PersonRegisteredEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
+    @Test
+    void shouldPublishAcceptOfferCommandWhenAlreadyRegisteredPersonFoundEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenClock(13));
+        AlreadyRegisteredPersonFoundEvent event = randomAlreadyRegisteredPersonFoundEvent();
+
+        AcceptOfferCommand actual = saga.accept(event, givenClock(5));
+
+        assertThatAcceptOfferCommand(actual)
+                .hasOfferId(OFFER_ID)
+                .hasParticipantId(event.participantId())
+                .hasDiscountCode(event.discountCode())
+                .isNextAfter(event.eventId());
+    }
+
+    @Test
+    void shouldRecognizeSagaAsInProgressWhenAlreadyRegisteredPersonFoundEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
+        saga.accept(eventOne, givenClock(13));
+        AlreadyRegisteredPersonFoundEvent eventTwo = randomAlreadyRegisteredPersonFoundEvent();
+
+        saga.accept(eventTwo, givenClock(5));
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .consumedEvents(2)
+                .consumedEventAt(eventOne, NOW.minusSeconds(13))
+                .consumedEventAt(eventTwo, NOW.minusSeconds(5));
     }
 
     @Test
@@ -157,6 +186,14 @@ class OfferAcceptanceSagaTest {
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
         return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+    }
+
+    private PersonRegisteredEvent randomPersonRegisteredEvent() {
+        return new PersonRegisteredEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
+    }
+
+    private AlreadyRegisteredPersonFoundEvent randomAlreadyRegisteredPersonFoundEvent() {
+        return new AlreadyRegisteredPersonFoundEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
