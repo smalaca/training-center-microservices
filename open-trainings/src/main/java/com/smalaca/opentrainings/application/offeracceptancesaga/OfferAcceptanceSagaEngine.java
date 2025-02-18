@@ -12,7 +12,10 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +40,31 @@ public class OfferAcceptanceSagaEngine {
     public void accept(OfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
 
-        AcceptOfferCommand command = offerAcceptanceSaga.acceptToRemove(event, clock);
+        RegisterPersonCommand command = offerAcceptanceSaga.accept(event, clock);
+
+        commandRegistry.publish(command);
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(PersonRegisteredEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
+
+        AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
+
+        commandRegistry.publish(command);
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(AlreadyRegisteredPersonFoundEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
+
+        AcceptOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
         commandRegistry.publish(command);
         repository.save(offerAcceptanceSaga);

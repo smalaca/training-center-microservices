@@ -27,29 +27,26 @@ public class OfferAcceptanceSaga {
     private String rejectionReason;
     private final List<ConsumedEvent> events = new ArrayList<>();
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
+    private String discountCode;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
     }
 
-    RegisterPersonCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
+    public RegisterPersonCommand accept(OfferAcceptanceRequestedEvent event, Clock clock) {
+        discountCode = event.discountCode();
         consumed(event, clock.now());
         return RegisterPersonCommand.nextAfter(event);
     }
 
     public AcceptOfferCommand accept(PersonRegisteredEvent event, Clock clock) {
         consumed(event, clock.now());
-        return AcceptOfferCommand.nextAfter(event);
+        return AcceptOfferCommand.nextAfter(event, discountCode);
     }
 
     public AcceptOfferCommand accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
         consumed(event, clock.now());
-        return AcceptOfferCommand.nextAfter(event);
-    }
-
-    public AcceptOfferCommand acceptToRemove(OfferAcceptanceRequestedEvent event, Clock clock) {
-        consumed(event, clock.now());
-        return AcceptOfferCommand.nextAfter(event);
+        return AcceptOfferCommand.nextAfter(event, discountCode);
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {

@@ -12,11 +12,11 @@ public record AcceptOfferCommand(CommandId commandId, UUID offerId, UUID partici
         return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), null, event.firstName(), event.lastName(), event.email(), event.discountCode());
     }
 
-    public static AcceptOfferCommand nextAfter(PersonRegisteredEvent event) {
-        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, event.discountCode());
+    public static AcceptOfferCommand nextAfter(PersonRegisteredEvent event, String discountCode) {
+        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, discountCode);
     }
 
-    public static AcceptOfferCommand nextAfter(AlreadyRegisteredPersonFoundEvent event) {
-        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, event.discountCode());
+    public static AcceptOfferCommand nextAfter(AlreadyRegisteredPersonFoundEvent event, String discountCode) {
+        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), event.participantId(), null, null, null, discountCode);
     }
 }

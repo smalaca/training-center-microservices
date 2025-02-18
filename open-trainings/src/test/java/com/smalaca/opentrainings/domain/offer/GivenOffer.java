@@ -1,11 +1,10 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -77,18 +76,9 @@ public class GivenOffer {
 
     public GivenOffer accepted() {
         initiated();
-        String firstName = FAKER.name().firstName();
-        String lastName = FAKER.name().lastName();
-        String email = FAKER.address().mailBox();
         UUID participantId = UUID.randomUUID();
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(OfferAcceptanceRequestedEvent.create(getOfferId(), firstName, lastName, email, null));
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(EventId.newEventId(), getOfferId(), participantId), null);
         PersonalDataManagement projectDataManagement = mock(PersonalDataManagement.class);
-        PersonalDataRequest personalDataRequest = PersonalDataRequest.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .build();
-        given(projectDataManagement.save(personalDataRequest)).willReturn(PersonalDataResponse.successful(participantId));
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
         given(trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, participantId))).willReturn(TrainingBookingResponse.successful(trainingId, participantId));
 

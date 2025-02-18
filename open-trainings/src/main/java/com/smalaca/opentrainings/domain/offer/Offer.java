@@ -13,7 +13,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataResponse;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -91,15 +90,9 @@ public class Offer {
             return reject(asRejectOfferCommand("Offer expired"));
         }
 
-        PersonalDataResponse response = personalDataManagement.save(asPersonalDataRequest(command));
+        Price finalPrice = finalPrice(command, discountService);
 
-        if (response.isFailed()) {
-            throw new MissingParticipantException();
-        }
-
-        Price finalPrice = finalPrice(command, discountService, response);
-
-        TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, response.participantId()));
+        TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, command.participantId()));
 
         if (booking.isFailed()) {
             return reject(asRejectOfferCommand("Training no longer available"));
@@ -111,7 +104,7 @@ public class Offer {
                 .nextAfter(command)
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
-                .withParticipantId(response.participantId())
+                .withParticipantId(command.participantId())
                 .withTrainingPrice(trainingPrice)
                 .withFinalPrice(finalPrice)
                 .withDiscountCode(command.discountCode())
@@ -135,12 +128,12 @@ public class Offer {
                 .build();
     }
 
-    private Price finalPrice(AcceptOfferCommand command, DiscountService discountService, PersonalDataResponse response) {
+    private Price finalPrice(AcceptOfferCommand command, DiscountService discountService) {
         if (hasNoDiscountCode(command)) {
             return trainingPrice;
         }
 
-        DiscountCodeDto discountCodeDto = new DiscountCodeDto(response.participantId(), trainingId, trainingPrice, command.discountCode());
+        DiscountCodeDto discountCodeDto = new DiscountCodeDto(command.participantId(), trainingId, trainingPrice, command.discountCode());
         DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
 
         if (discount.isFailed()) {

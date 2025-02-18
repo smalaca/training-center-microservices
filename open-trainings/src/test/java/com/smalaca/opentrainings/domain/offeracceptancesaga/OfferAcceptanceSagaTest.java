@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 
 class OfferAcceptanceSagaTest {
     private static final Faker FAKER = new Faker();
+    private static final String DISCOUNT_CODE = FAKER.code().imei();
     private static final UUID OFFER_ID = randomId();
     private static final LocalDateTime NOW = LocalDateTime.now();
 
@@ -62,6 +63,7 @@ class OfferAcceptanceSagaTest {
         assertThatOfferAcceptanceSaga(saga)
                 .isInProgress()
                 .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
                 .consumedEvents(1)
                 .consumedEventAt(event, NOW.minusSeconds(5));
     }
@@ -77,7 +79,6 @@ class OfferAcceptanceSagaTest {
         assertThatAcceptOfferCommand(actual)
                 .hasOfferId(OFFER_ID)
                 .hasParticipantId(event.participantId())
-                .hasDiscountCode(event.discountCode())
                 .isNextAfter(event.eventId());
     }
 
@@ -93,6 +94,7 @@ class OfferAcceptanceSagaTest {
         assertThatOfferAcceptanceSaga(saga)
                 .isInProgress()
                 .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
                 .consumedEvents(2)
                 .consumedEventAt(eventOne, NOW.minusSeconds(13))
                 .consumedEventAt(eventTwo, NOW.minusSeconds(5));
@@ -109,7 +111,6 @@ class OfferAcceptanceSagaTest {
         assertThatAcceptOfferCommand(actual)
                 .hasOfferId(OFFER_ID)
                 .hasParticipantId(event.participantId())
-                .hasDiscountCode(event.discountCode())
                 .isNextAfter(event.eventId());
     }
 
@@ -125,57 +126,52 @@ class OfferAcceptanceSagaTest {
         assertThatOfferAcceptanceSaga(saga)
                 .isInProgress()
                 .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
                 .consumedEvents(2)
                 .consumedEventAt(eventOne, NOW.minusSeconds(13))
                 .consumedEventAt(eventTwo, NOW.minusSeconds(5));
     }
 
     @Test
-    void shouldRecognizeSagaAsInProgressWhenOfferAcceptanceRequested() {
-        OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
-        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
-
-        actual.acceptToRemove(event, givenClock(5));
-
-        assertThatOfferAcceptanceSaga(actual)
-                .isInProgress()
-                .hasOfferId(OFFER_ID)
-                .consumedEvents(1)
-                .consumedEventAt(event, NOW.minusSeconds(5));
-    }
-
-    @Test
     void shouldRecognizeSagaAsAcceptedWhenOfferAccepted() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
-        actual.acceptToRemove(eventOne, givenClock(13));
-        OfferAcceptedEvent eventTwo = randomOfferAcceptedEvent();
-
+        actual.accept(eventOne, givenClock(13));
+        PersonRegisteredEvent eventTwo = randomPersonRegisteredEvent();
         actual.accept(eventTwo, givenClock(7));
+        OfferAcceptedEvent eventThree = randomOfferAcceptedEvent();
+
+        actual.accept(eventThree, givenClock(7));
 
         assertThatOfferAcceptanceSaga(actual)
                 .isAccepted()
                 .hasOfferId(OFFER_ID)
-                .consumedEvents(2)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .consumedEvents(3)
                 .consumedEventAt(eventOne, NOW.minusSeconds(13))
-                .consumedEventAt(eventTwo, NOW.minusSeconds(7));
+                .consumedEventAt(eventTwo, NOW.minusSeconds(7))
+                .consumedEventAt(eventThree, NOW.minusSeconds(7));
     }
 
     @Test
     void shouldRecognizeSagaAsRejectedWhenOfferRejected() {
         OfferAcceptanceSaga actual = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent eventOne = randomOfferAcceptanceRequestedEvent();
-        actual.acceptToRemove(eventOne, givenClock(13));
-        OfferRejectedEvent eventTwo = randomOfferRejectedEvent();
-
+        actual.accept(eventOne, givenClock(13));
+        PersonRegisteredEvent eventTwo = randomPersonRegisteredEvent();
         actual.accept(eventTwo, givenClock(7));
+        OfferRejectedEvent eventThree = randomOfferRejectedEvent();
+
+        actual.accept(eventThree, givenClock(5));
 
         assertThatOfferAcceptanceSaga(actual)
                 .isRejected()
                 .hasOfferId(OFFER_ID)
-                .consumedEvents(2)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .consumedEvents(3)
                 .consumedEventAt(eventOne, NOW.minusSeconds(13))
-                .consumedEventAt(eventTwo, NOW.minusSeconds(7));
+                .consumedEventAt(eventTwo, NOW.minusSeconds(7))
+                .consumedEventAt(eventThree, NOW.minusSeconds(5));
     }
 
     private Clock givenClock(int seconds) {
@@ -185,15 +181,15 @@ class OfferAcceptanceSagaTest {
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().imei());
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {
-        return new PersonRegisteredEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
+        return new PersonRegisteredEvent(randomEventId(), OFFER_ID, randomId());
     }
 
     private AlreadyRegisteredPersonFoundEvent randomAlreadyRegisteredPersonFoundEvent() {
-        return new AlreadyRegisteredPersonFoundEvent(randomEventId(), OFFER_ID, randomId(), FAKER.code().imei());
+        return new AlreadyRegisteredPersonFoundEvent(randomEventId(), OFFER_ID, randomId());
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {

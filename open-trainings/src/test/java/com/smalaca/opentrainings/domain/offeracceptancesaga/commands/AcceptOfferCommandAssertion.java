@@ -28,21 +28,6 @@ public class AcceptOfferCommandAssertion {
         return this;
     }
 
-    public AcceptOfferCommandAssertion hasFirstName(String expected) {
-        assertThat(actual.firstName()).isEqualTo(expected);
-        return this;
-    }
-
-    public AcceptOfferCommandAssertion hasLastName(String expected) {
-        assertThat(actual.lastName()).isEqualTo(expected);
-        return this;
-    }
-
-    public AcceptOfferCommandAssertion hasEmail(String expected) {
-        assertThat(actual.email()).isEqualTo(expected);
-        return this;
-    }
-
     public AcceptOfferCommandAssertion hasDiscountCode(String expected) {
         assertThat(actual.discountCode()).isEqualTo(expected);
         return this;
