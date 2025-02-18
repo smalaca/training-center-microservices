@@ -78,6 +78,7 @@ class OfferAcceptanceSagaTest {
 
         assertThatAcceptOfferCommand(actual)
                 .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(event.participantId())
                 .isNextAfter(event.eventId());
     }
@@ -110,6 +111,7 @@ class OfferAcceptanceSagaTest {
 
         assertThatAcceptOfferCommand(actual)
                 .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(event.participantId())
                 .isNextAfter(event.eventId());
     }
