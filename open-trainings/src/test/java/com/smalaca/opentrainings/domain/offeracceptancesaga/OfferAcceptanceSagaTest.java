@@ -193,7 +193,7 @@ class OfferAcceptanceSagaTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), DISCOUNT_CODE);
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)

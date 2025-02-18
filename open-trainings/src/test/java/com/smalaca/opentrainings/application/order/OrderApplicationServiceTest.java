@@ -4,7 +4,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.order.GivenOrder;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.Order;
@@ -39,6 +39,7 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
@@ -133,8 +134,7 @@ class OrderApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(
-                OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE));
+        return AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID), DISCOUNT_CODE);
     }
 
     @Test

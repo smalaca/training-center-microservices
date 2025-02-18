@@ -12,7 +12,6 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataManagement;
-import com.smalaca.opentrainings.domain.personaldatamanagement.PersonalDataRequest;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -118,14 +117,6 @@ public class Offer {
     private OfferRejectedEvent reject(RejectOfferCommand command) {
         status = REJECTED;
         return OfferRejectedEvent.nextAfter(command);
-    }
-
-    private PersonalDataRequest asPersonalDataRequest(AcceptOfferCommand command) {
-        return PersonalDataRequest.builder()
-                .firstName(command.firstName())
-                .lastName(command.lastName())
-                .email(command.email())
-                .build();
     }
 
     private Price finalPrice(AcceptOfferCommand command, DiscountService discountService) {

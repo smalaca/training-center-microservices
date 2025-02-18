@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
 
 class OfferAcceptedEventTest {
@@ -23,7 +24,7 @@ class OfferAcceptedEventTest {
 
     @Test
     void shouldCreateOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(offerAcceptanceRequestedEvent());
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(personRegisteredEvent(), DISCOUNT_CODE);
 
         OfferAcceptedEvent actual = OfferAcceptedEvent.offerAcceptedEventBuilder()
                 .nextAfter(command)
@@ -45,7 +46,7 @@ class OfferAcceptedEventTest {
                 .isNextAfter(command.commandId());
     }
 
-    private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
+    private PersonRegisteredEvent personRegisteredEvent() {
+        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
     }
 }
