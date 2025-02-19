@@ -18,7 +18,11 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
@@ -43,6 +47,7 @@ import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
+import static com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion.assertThatUnexpiredOfferAcceptanceRequestedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -112,6 +117,43 @@ class OfferApplicationServiceTest {
         UUID actual = service.chooseTraining(TRAINING_ID);
 
         assertThat(actual).isEqualTo(OFFER_ID);
+    }
+
+    @Test
+    void shouldBeginOfferAcceptance() {
+        givenInitiatedOffer();
+
+        service.beginAcceptance(beginOfferAcceptanceCommand());
+
+        thenOfferSaved().isAcceptanceInProgress();
+    }
+
+    @Test
+    void shouldPublishUnexpiredOfferAcceptanceRequestedEvent() {
+        givenInitiatedOffer();
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        service.beginAcceptance(command);
+
+        thenUnexpiredOfferAcceptanceRequestedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .isNextAfter(command.commandId());
+    }
+
+    private UnexpiredOfferAcceptanceRequestedEventAssertion thenUnexpiredOfferAcceptanceRequestedEventPublished() {
+        ArgumentCaptor<UnexpiredOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(UnexpiredOfferAcceptanceRequestedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        UnexpiredOfferAcceptanceRequestedEvent actual = captor.getValue();
+
+        return assertThatUnexpiredOfferAcceptanceRequestedEvent(actual);
+    }
+
+    private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {
+        return BeginOfferAcceptanceCommand.nextAfter(offerAcceptanceRequestedEvent());
+    }
+
+    private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
     }
 
     @Test

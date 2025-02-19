@@ -9,7 +9,9 @@ import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
@@ -31,6 +33,7 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTANCE_IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
@@ -79,6 +82,11 @@ public class Offer {
         Offer offer = new Offer(trainingId, offerNumber, trainingPrice, creationDateTime);
         offer.status = INITIATED;
         return offer;
+    }
+
+    public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command) {
+        status = ACCEPTANCE_IN_PROGRESS;
+        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
     }
 
     public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {

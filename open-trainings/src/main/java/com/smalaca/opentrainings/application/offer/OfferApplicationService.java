@@ -11,6 +11,7 @@ import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,18 @@ public class OfferApplicationService {
         Offer offer = offerFactory.create(trainingId);
 
         return offerRepository.save(offer);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    void beginAcceptance(BeginOfferAcceptanceCommand command) {
+        Offer offer = offerRepository.findById(command.offerId());
+
+        OfferEvent event = offer.beginAcceptance(command);
+
+        eventRegistry.publish(event);
+        offerRepository.save(offer);
     }
 
     @Transactional

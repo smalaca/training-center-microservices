@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.offer.OfferNumberAssertion.assertThatOfferNumber;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTANCE_IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
@@ -45,6 +46,10 @@ public class OfferAssertion {
 
     public OfferAssertion isAccepted() {
         return hasStatus(ACCEPTED);
+    }
+
+    public OfferAssertion isAcceptanceInProgress() {
+        return hasStatus(ACCEPTANCE_IN_PROGRESS);
     }
 
     public OfferAssertion isDeclined() {
