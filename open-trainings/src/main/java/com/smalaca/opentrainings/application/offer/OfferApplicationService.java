@@ -52,7 +52,7 @@ public class OfferApplicationService {
     void beginAcceptance(BeginOfferAcceptanceCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        OfferEvent event = offer.beginAcceptance(command);
+        OfferEvent event = offer.beginAcceptance(command, clock);
 
         eventRegistry.publish(event);
         offerRepository.save(offer);

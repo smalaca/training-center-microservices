@@ -2,6 +2,8 @@ package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.domaindrivendesign.Saga;
 import com.smalaca.opentrainings.domain.clock.Clock;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
@@ -51,6 +53,14 @@ public class OfferAcceptanceSaga {
     }
 
     public void accept(UnexpiredOfferAcceptanceRequestedEvent event, Clock clock) {
+
+    }
+
+    public void accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
+
+    }
+
+    public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
 
     }
 

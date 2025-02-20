@@ -14,4 +14,5 @@ public class OfferTestDto {
     private final UUID trainingId;
     private final Price trainingPrice;
     private final LocalDateTime creationDateTime;
+    private final OfferStatus status;
 }

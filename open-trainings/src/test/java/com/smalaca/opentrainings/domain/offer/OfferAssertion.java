@@ -64,7 +64,7 @@ public class OfferAssertion {
         return hasStatus(TERMINATED);
     }
 
-    private OfferAssertion hasStatus(OfferStatus expected) {
+    public OfferAssertion hasStatus(OfferStatus expected) {
         assertThat(actual).extracting("status").isEqualTo(expected);
         return this;
     }

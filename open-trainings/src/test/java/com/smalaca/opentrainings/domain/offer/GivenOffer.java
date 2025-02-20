@@ -16,6 +16,11 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOffer {
@@ -27,6 +32,7 @@ public class GivenOffer {
     private LocalDateTime creationDateTime = LocalDateTime.now();
     private Price trainingPrice = randomPrice();
     private Offer offer;
+    private OfferStatus status;
 
     GivenOffer(OfferFactory offerFactory, Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
         this.offerFactory = offerFactory;
@@ -45,11 +51,16 @@ public class GivenOffer {
     }
 
     public GivenOffer createdMinutesAgo(int minutes) {
-        this.creationDateTime = LocalDateTime.now().minusMinutes(minutes);
+        return createdAt(LocalDateTime.now().minusMinutes(minutes));
+    }
+
+    public GivenOffer createdAt(LocalDateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
         return this;
     }
 
     public GivenOffer initiated() {
+        status = INITIATED;
         given(clock.now()).willReturn(creationDateTime);
         given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(new TrainingDto(randomAvailability(), trainingPrice));
         offer = offerFactory.create(trainingId);
@@ -63,6 +74,7 @@ public class GivenOffer {
 
     public GivenOffer rejected() {
         initiated();
+        status = REJECTED;
         given(clock.now()).willReturn(creationDateTime.plusMinutes(20));
         given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(new TrainingDto(randomAvailability(), randomPrice()));
         offer.accept(null, trainingOfferCatalogue, null, clock);
@@ -71,6 +83,7 @@ public class GivenOffer {
 
     public GivenOffer accepted() {
         initiated();
+        status = ACCEPTED;
         UUID participantId = UUID.randomUUID();
         AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(EventId.newEventId(), getOfferId(), participantId), null);
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
@@ -82,6 +95,7 @@ public class GivenOffer {
 
     public GivenOffer terminated() {
         initiated();
+        status = TERMINATED;
         given(clock.now()).willReturn(LocalDateTime.now());
         offer.terminate(clock);
 
@@ -90,6 +104,7 @@ public class GivenOffer {
 
     public GivenOffer declined() {
         initiated();
+        status = DECLINED;
         offer.decline();
 
         return this;
@@ -105,6 +120,7 @@ public class GivenOffer {
                 .trainingId(trainingId)
                 .trainingPrice(trainingPrice)
                 .creationDateTime(creationDateTime)
+                .status(status)
                 .build();
     }
 

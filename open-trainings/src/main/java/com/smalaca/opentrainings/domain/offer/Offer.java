@@ -7,6 +7,8 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
@@ -84,9 +86,18 @@ public class Offer {
         return offer;
     }
 
-    public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command) {
+    public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command, Clock clock) {
+        if (status.isFinal()) {
+            return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(command);
+        }
+
         status = ACCEPTANCE_IN_PROGRESS;
-        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+
+        if (isNewerThan10Minutes(clock)) {
+            return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+        } else {
+            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+        }
     }
 
     public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
