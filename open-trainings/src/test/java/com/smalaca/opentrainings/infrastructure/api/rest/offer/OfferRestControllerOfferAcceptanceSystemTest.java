@@ -17,6 +17,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegiste
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
+import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
@@ -72,6 +73,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private OfferAcceptanceSagaEventTestListener testListener;
 
     private GivenOfferFactory given;
+    private OfferTestDto dto;
 
     @BeforeEach
     void givenOfferFactory() {
@@ -80,12 +82,12 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @AfterEach
     void deleteOffers() {
-        transactionTemplate.executeWithoutResult(transactionStatus -> springOfferCrudRepository.deleteAll());
+        transactionTemplate.executeWithoutResult(transactionStatus -> springOfferCrudRepository.deleteById(dto.getOfferId()));
     }
 
     @Test
     void shouldAcceptOfferWhenPersonRegistered() {
-        OfferTestDto dto = given.offer().initiated().getDto();
+        dto = given.offer().initiated().getDto();
         givenPersonRegistered(dto.getOfferId());
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
@@ -107,7 +109,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
-        OfferTestDto dto = given.offer().initiated().getDto();
+        dto = given.offer().initiated().getDto();
         givenAlreadyRegisteredPersonFound(dto.getOfferId());
         givenTrainingThatCanBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
@@ -128,8 +130,30 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldRejectOffer() {
-        OfferTestDto dto = given.offer().initiated().getDto();
+    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
+        dto = given.offer().createdMinutesAgo(13).initiated().getDto();
+        givenPersonRegistered(dto.getOfferId());
+        givenTrainingPriceChanged(dto);
+
+        client.offers().accept(commandFor(dto));
+
+        await().untilAsserted(() -> {
+            RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
+
+            assertThatOfferAcceptance(actual)
+                    .hasOfferId(dto.getOfferId())
+                    .isRejected()
+                    .hasRejectionReason("Offer expired");
+
+            thenOfferResponse(actual.offerId())
+                    .isOk()
+                    .hasRejectedOffer(dto);
+        });
+    }
+
+    @Test
+    void shouldRejectOfferWhenTrainingNoLongerAvailable() {
+        dto = given.offer().initiated().getDto();
         givenPersonRegistered(dto.getOfferId());
         givenTrainingThatCannotBeBooked(dto.getTrainingId());
         givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
@@ -147,6 +171,29 @@ class OfferRestControllerOfferAcceptanceSystemTest {
             thenOfferResponse(actual.offerId())
                     .isOk()
                     .hasRejectedOffer(dto);
+        });
+    }
+
+    @Test
+    void shouldRejectOfferAcceptanceWhenOfferNotAvailableAnymore() {
+        dto = given.offer().declined().getDto();
+        givenPersonRegistered(dto.getOfferId());
+        givenTrainingThatCanBeBooked(dto.getTrainingId());
+        givenDiscount(dto.getTrainingId(), dto.getTrainingPrice());
+
+        client.offers().accept(commandFor(dto));
+
+        await().untilAsserted(() -> {
+            RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
+
+            assertThatOfferAcceptance(actual)
+                    .hasOfferId(dto.getOfferId())
+                    .isRejected()
+                    .hasRejectionReason("Offer already DECLINED");
+
+            thenOfferResponse(actual.offerId())
+                    .isOk()
+                    .hasDeclinedOffer(dto);
         });
     }
 
@@ -177,6 +224,11 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         TrainingBookingDto dto = new TrainingBookingDto(trainingId, PARTICIPANT_ID);
 
         given(trainingOfferCatalogue.book(dto)).willReturn(response);
+    }
+
+    private void givenTrainingPriceChanged(OfferTestDto dto) {
+        TrainingDto trainingDto = new TrainingDto(13, randomPrice());
+        given(trainingOfferCatalogue.detailsOf(dto.getTrainingId())).willReturn(trainingDto);
     }
 
     private void givenTrainingThatCannotBeBooked(UUID trainingId) {

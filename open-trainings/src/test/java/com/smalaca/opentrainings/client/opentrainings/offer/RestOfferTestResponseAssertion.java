@@ -89,6 +89,11 @@ public class RestOfferTestResponseAssertion {
         return this;
     }
 
+    public RestOfferTestResponseAssertion hasDeclinedOffer(OfferTestDto expected) {
+        isSameAsOffer(actual.asOffer(), expected, "DECLINED");
+        return this;
+    }
+
     private void isSameAsOffer(RestOfferTestDto actual, OfferTestDto expected, String expectedStatus) {
         assertThat(actual.offerId()).isEqualTo(expected.getOfferId());
         assertThat(actual.status()).isEqualTo(expectedStatus);

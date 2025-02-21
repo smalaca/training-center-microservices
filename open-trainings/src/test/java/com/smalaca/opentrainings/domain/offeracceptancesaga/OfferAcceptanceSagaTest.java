@@ -5,7 +5,10 @@ import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
@@ -15,6 +18,8 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
@@ -43,9 +48,9 @@ class OfferAcceptanceSagaTest {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
 
-        RegisterPersonCommand actual = saga.accept(event, givenClock(5));
+        List<OfferAcceptanceSagaCommand> actual = saga.accept(event, givenClock(5));
 
-        assertThatRegisterPersonCommand(actual)
+        assertThatRegisterPersonCommand((RegisterPersonCommand) actual.get(0))
                 .hasOfferId(OFFER_ID)
                 .hasFirstName(event.firstName())
                 .hasLastName(event.lastName())
@@ -72,11 +77,12 @@ class OfferAcceptanceSagaTest {
     void shouldPublishAcceptOfferCommandWhenPersonRegisteredEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenClock(13));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenClock(8));
         PersonRegisteredEvent event = randomPersonRegisteredEvent();
 
-        AcceptOfferCommand actual = saga.accept(event, givenClock(5));
+        Optional<AcceptOfferCommand> actual = saga.accept(event, givenClock(5));
 
-        assertThatAcceptOfferCommand(actual)
+        assertThatAcceptOfferCommand(actual.get())
                 .hasOfferId(OFFER_ID)
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(event.participantId())
@@ -105,11 +111,12 @@ class OfferAcceptanceSagaTest {
     void shouldPublishAcceptOfferCommandWhenAlreadyRegisteredPersonFoundEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenClock(13));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenClock(8));
         AlreadyRegisteredPersonFoundEvent event = randomAlreadyRegisteredPersonFoundEvent();
 
-        AcceptOfferCommand actual = saga.accept(event, givenClock(5));
+        Optional<AcceptOfferCommand> actual = saga.accept(event, givenClock(5));
 
-        assertThatAcceptOfferCommand(actual)
+        assertThatAcceptOfferCommand(actual.get())
                 .hasOfferId(OFFER_ID)
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(event.participantId())
@@ -201,6 +208,11 @@ class OfferAcceptanceSagaTest {
                 .nextAfter(command)
                 .withOfferId(OFFER_ID)
                 .build();
+    }
+
+    private UnexpiredOfferAcceptanceRequestedEvent randomUnexpiredOfferAcceptanceRequestedEvent() {
+        BeginOfferAcceptanceCommand command = BeginOfferAcceptanceCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent() {

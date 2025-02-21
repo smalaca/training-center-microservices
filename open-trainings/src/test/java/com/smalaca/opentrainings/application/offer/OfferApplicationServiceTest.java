@@ -14,11 +14,19 @@ import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
 import com.smalaca.opentrainings.domain.offer.OfferInFinalStateException;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEventAssertion;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEventAssertion;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
@@ -29,6 +37,8 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
@@ -36,13 +46,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
+import static com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEventAssertion.assertThatExpiredOfferAcceptanceRequestedEvent;
+import static com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEventAssertion.assertThatNotAvailableOfferAcceptanceRequestedEvent;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
+import static com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion.assertThatUnexpiredOfferAcceptanceRequestedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,10 +83,13 @@ class OfferApplicationServiceTest {
     private final TrainingOfferCatalogue trainingOfferCatalogue = mock(TrainingOfferCatalogue.class);
     private final DiscountService discountService = mock(DiscountService.class);
     private final Clock clock = mock(Clock.class);
-    private final OfferApplicationService service = new OfferApplicationServiceFactory().offerApplicationService(
-            offerRepository, eventRegistry, trainingOfferCatalogue, discountService, clock);
+    private final OfferApplicationService service = offerApplicationService(offerRepository);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
+
+    private OfferApplicationService offerApplicationService(OfferRepository repository) {
+        return new OfferApplicationServiceFactory().offerApplicationService(repository, eventRegistry, trainingOfferCatalogue, discountService, clock);
+    }
 
     @BeforeEach
     void givenNow() {
@@ -112,6 +130,128 @@ class OfferApplicationServiceTest {
         UUID actual = service.chooseTraining(TRAINING_ID);
 
         assertThat(actual).isEqualTo(OFFER_ID);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 7, 10, 13, 20, 100})
+    void shouldBeginOfferAcceptance(int minutes) {
+        givenOffer().createdMinutesAgo(minutes).initiated();
+
+        service.beginAcceptance(beginOfferAcceptanceCommand());
+
+        thenOfferSaved().isAcceptanceInProgress();
+    }
+
+    @ParameterizedTest
+    @MethodSource("offersInFinalState")
+    void shouldNotChangeStateOfOfferWhenBeginOfferAcceptanceCommandReceivedAndOfferInFinalState(GivenOffer offer, OfferRepository repository) {
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        offerApplicationService(repository).beginAcceptance(command);
+
+        thenOfferSaved(repository)
+                .hasStatus(offer.getDto().getStatus());
+    }
+
+    @Test
+    void shouldPublishUnexpiredOfferAcceptanceRequestedEventWhenOfferNotExpired() {
+        givenInitiatedOffer();
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        service.beginAcceptance(command);
+
+        thenUnexpiredOfferAcceptanceRequestedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .isNextAfter(command.commandId());
+    }
+
+    @Test
+    void shouldPublishUnexpiredOfferAcceptanceRequestedEventWhenOfferAtBoundaryOfExpiration() {
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+        LocalDateTime createdAt = command.commandId().creationDateTime().minusMinutes(10);
+        givenOffer().createdAt(createdAt).initiated();
+
+        service.beginAcceptance(command);
+
+        thenUnexpiredOfferAcceptanceRequestedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .isNextAfter(command.commandId());
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {13, 20, 100})
+    void shouldPublishExpiredOfferAcceptanceRequestedEventWhenOfferExpired(int minutes) {
+        givenOffer().createdMinutesAgo(minutes).initiated();
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        service.beginAcceptance(command);
+
+        thenExpiredOfferAcceptanceRequestedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .isNextAfter(command.commandId());
+    }
+
+    @ParameterizedTest
+    @MethodSource("offersInFinalState")
+    void shouldPublishNotAvailableOfferAcceptanceRequestedEventWhenOfferInFinalState(GivenOffer offer, OfferRepository repository) {
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        offerApplicationService(repository).beginAcceptance(command);
+
+        thenNotAvailableOfferAcceptanceRequestedEvent()
+                .hasOfferId(OFFER_ID)
+                .isNextAfter(command.commandId());
+    }
+
+    private static Stream<Arguments> offersInFinalState() {
+        return Stream.of(
+                offerInFinalState(GivenOffer::accepted),
+                offerInFinalState(GivenOffer::declined),
+                offerInFinalState(offer -> offer.createdMinutesAgo(11).terminated()),
+                offerInFinalState(GivenOffer::rejected)
+        );
+    }
+    
+    private static Arguments offerInFinalState(Consumer<GivenOffer> finalizingAction) {
+        OfferRepository repository = mock(OfferRepository.class);
+        GivenOfferFactory given = GivenOfferFactory.create(repository);
+        GivenOffer givenOffer = given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE);
+        finalizingAction.accept(givenOffer);
+        
+        return Arguments.of(givenOffer, repository);
+    }
+
+    private NotAvailableOfferAcceptanceRequestedEventAssertion thenNotAvailableOfferAcceptanceRequestedEvent() {
+        ArgumentCaptor<NotAvailableOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(NotAvailableOfferAcceptanceRequestedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        NotAvailableOfferAcceptanceRequestedEvent actual = captor.getValue();
+
+        return assertThatNotAvailableOfferAcceptanceRequestedEvent(actual);
+
+    }
+
+    private ExpiredOfferAcceptanceRequestedEventAssertion thenExpiredOfferAcceptanceRequestedEventPublished() {
+        ArgumentCaptor<ExpiredOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(ExpiredOfferAcceptanceRequestedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        ExpiredOfferAcceptanceRequestedEvent actual = captor.getValue();
+
+        return assertThatExpiredOfferAcceptanceRequestedEvent(actual);
+    }
+
+    private UnexpiredOfferAcceptanceRequestedEventAssertion thenUnexpiredOfferAcceptanceRequestedEventPublished() {
+        ArgumentCaptor<UnexpiredOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(UnexpiredOfferAcceptanceRequestedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        UnexpiredOfferAcceptanceRequestedEvent actual = captor.getValue();
+
+        return assertThatUnexpiredOfferAcceptanceRequestedEvent(actual);
+    }
+
+    private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {
+        return BeginOfferAcceptanceCommand.nextAfter(offerAcceptanceRequestedEvent());
+    }
+
+    private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
     }
 
     @Test
@@ -382,6 +522,10 @@ class OfferApplicationServiceTest {
     }
 
     private OfferAssertion thenOfferSaved() {
+        return thenOfferSaved(offerRepository);
+    }
+
+    private OfferAssertion thenOfferSaved(OfferRepository offerRepository) {
         ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
         then(offerRepository).should().save(captor.capture());
         Offer actual = captor.getValue();

@@ -7,9 +7,13 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
 import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
@@ -31,6 +35,7 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTANCE_IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
@@ -81,6 +86,20 @@ public class Offer {
         return offer;
     }
 
+    public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command, Clock clock) {
+        if (status.isFinal()) {
+            return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(command, status.name());
+        }
+
+        status = ACCEPTANCE_IN_PROGRESS;
+
+        if (isNewerThan10Minutes(clock)) {
+            return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+        } else {
+            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+        }
+    }
+
     public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             return reject(asRejectOfferCommand("Offer expired"));
@@ -111,7 +130,7 @@ public class Offer {
         return new RejectOfferCommand(nextAfter(newEventId()), offerId, reason);
     }
 
-    private OfferRejectedEvent reject(RejectOfferCommand command) {
+    public OfferRejectedEvent reject(RejectOfferCommand command) {
         status = REJECTED;
         return OfferRejectedEvent.nextAfter(command);
     }
