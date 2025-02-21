@@ -8,9 +8,9 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record NotAvailableOfferAcceptanceRequestedEvent(EventId eventId, UUID offerId) implements OfferEvent, OfferAcceptanceSagaEvent {
-    public static OfferEvent nextAfter(BeginOfferAcceptanceCommand command) {
-        return new NotAvailableOfferAcceptanceRequestedEvent(command.commandId().nextEventId(), command.offerId());
+public record NotAvailableOfferAcceptanceRequestedEvent(EventId eventId, UUID offerId, String status) implements OfferEvent, OfferAcceptanceSagaEvent {
+    public static NotAvailableOfferAcceptanceRequestedEvent nextAfter(BeginOfferAcceptanceCommand command, String status) {
+        return new NotAvailableOfferAcceptanceRequestedEvent(command.commandId().nextEventId(), command.offerId(), status);
     }
 
     @Override

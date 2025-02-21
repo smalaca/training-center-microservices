@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record UnexpiredOfferAcceptanceRequestedEvent(EventId eventId, UUID offerId) implements OfferEvent, OfferAcceptanceSagaEvent {
-    public static OfferEvent nextAfter(BeginOfferAcceptanceCommand command) {
+    public static UnexpiredOfferAcceptanceRequestedEvent nextAfter(BeginOfferAcceptanceCommand command) {
         return new UnexpiredOfferAcceptanceRequestedEvent(command.commandId().nextEventId(), command.offerId());
     }
 

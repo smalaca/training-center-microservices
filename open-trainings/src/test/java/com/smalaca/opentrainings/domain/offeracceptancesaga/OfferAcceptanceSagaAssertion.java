@@ -49,6 +49,10 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion consumedNoEvents() {
+        return consumedEvents(0);
+    }
+
     public OfferAcceptanceSagaAssertion consumedEvents(int expected) {
         assertThat(actual).extracting("events").satisfies(events -> {
             assertThat((List<ConsumedEvent>) events).hasSize(expected);

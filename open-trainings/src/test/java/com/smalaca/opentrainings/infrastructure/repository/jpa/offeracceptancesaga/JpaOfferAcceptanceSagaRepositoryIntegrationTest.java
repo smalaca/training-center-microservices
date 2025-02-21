@@ -31,8 +31,6 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @IntegrationTest
 @SpringBootTest
@@ -60,12 +58,15 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldFindNoOfferAcceptanceSagaWhenDoesNotExist() {
+    void shouldFindEmptyOfferAcceptanceSagaWhenNoEventsStoredYet() {
         UUID offerId = randomId();
 
-        RuntimeException actual = assertThrows(OfferAcceptanceSagaDoesNotExistException.class, () -> repository.findById(offerId));
+        OfferAcceptanceSaga actual = repository.findById(offerId);
 
-        assertThat(actual).hasMessage("OfferAcceptanceSaga with id " + offerId + " does not exist.");
+        assertThatOfferAcceptanceSaga(actual)
+                .isInProgress()
+                .hasOfferId(offerId)
+                .consumedNoEvents();
     }
 
     @Test

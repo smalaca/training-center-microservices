@@ -10,8 +10,10 @@ import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,7 @@ public class OfferApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    void beginAcceptance(BeginOfferAcceptanceCommand command) {
+    public void beginAcceptance(BeginOfferAcceptanceCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
         OfferEvent event = offer.beginAcceptance(command, clock);
@@ -65,6 +67,18 @@ public class OfferApplicationService {
         Offer offer = offerRepository.findById(command.offerId());
 
         OfferEvent event = offer.accept(command, trainingOfferCatalogue, discountService, clock);
+
+        offerRepository.save(offer);
+        eventRegistry.publish(event);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void reject(RejectOfferCommand command) {
+        Offer offer = offerRepository.findById(command.offerId());
+
+        OfferRejectedEvent event = offer.reject(command);
 
         offerRepository.save(offer);
         eventRegistry.publish(event);

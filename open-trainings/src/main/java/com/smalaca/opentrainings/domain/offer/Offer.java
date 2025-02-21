@@ -88,7 +88,7 @@ public class Offer {
 
     public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command, Clock clock) {
         if (status.isFinal()) {
-            return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(command);
+            return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(command, status.name());
         }
 
         status = ACCEPTANCE_IN_PROGRESS;
@@ -130,7 +130,7 @@ public class Offer {
         return new RejectOfferCommand(nextAfter(newEventId()), offerId, reason);
     }
 
-    private OfferRejectedEvent reject(RejectOfferCommand command) {
+    public OfferRejectedEvent reject(RejectOfferCommand command) {
         status = REJECTED;
         return OfferRejectedEvent.nextAfter(command);
     }
