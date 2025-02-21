@@ -87,7 +87,7 @@ public class Offer {
     }
 
     public OfferEvent beginAcceptance(BeginOfferAcceptanceCommand command, Clock clock) {
-        if (status.isFinal()) {
+        if (status.isNotInitiated()) {
             return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(command, status.name());
         }
 
@@ -101,6 +101,10 @@ public class Offer {
     }
 
     public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
+        if (status.isAcceptanceNotInProgress()) {
+            throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
+        }
+
         if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
             return reject(asRejectOfferCommand("Offer expired"));
         }
@@ -131,6 +135,10 @@ public class Offer {
     }
 
     public OfferRejectedEvent reject(RejectOfferCommand command) {
+        if (status.isAcceptanceNotInProgress()) {
+            throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
+        }
+
         status = REJECTED;
         return OfferRejectedEvent.nextAfter(command);
     }
@@ -164,16 +172,16 @@ public class Offer {
     }
 
     public void decline() {
-        if (status.isFinal()) {
-            throw new OfferInFinalStateException(offerId, status);
+        if (status.isNotInitiated()) {
+            throw InvalidOfferStatusException.notInitiated(offerId);
         }
 
         status = DECLINED;
     }
 
     public void terminate(Clock clock) {
-        if (status.isFinal()) {
-            throw new OfferInFinalStateException(offerId, status);
+        if (status.isNotInitiated()) {
+            throw InvalidOfferStatusException.notInitiated(offerId);
         }
 
         if (isNewerThan10Minutes(clock)) {
