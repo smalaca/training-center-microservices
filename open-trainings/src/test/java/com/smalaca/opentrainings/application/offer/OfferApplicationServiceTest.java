@@ -9,23 +9,15 @@ import com.smalaca.opentrainings.domain.offer.AvailableOfferException;
 import com.smalaca.opentrainings.domain.offer.DiscountException;
 import com.smalaca.opentrainings.domain.offer.GivenOffer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
+import com.smalaca.opentrainings.domain.offer.InvalidOfferStatusException;
 import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
-import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
-import com.smalaca.opentrainings.domain.offer.OfferInFinalStateException;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
+import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEventAssertion;
-import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEventAssertion;
-import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
-import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion;
-import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
-import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion;
-import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -36,11 +28,11 @@ import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCata
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,12 +44,6 @@ import java.util.stream.Stream;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.OfferAssertion.assertThatOffer;
-import static com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEventAssertion.assertThatExpiredOfferAcceptanceRequestedEvent;
-import static com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEventAssertion.assertThatNotAvailableOfferAcceptanceRequestedEvent;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
-import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
-import static com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEventAssertion.assertThatUnexpiredOfferAcceptanceRequestedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,6 +63,7 @@ class OfferApplicationServiceTest {
     private static final String NO_DISCOUNT_CODE = null;
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
     private static final int NO_AVAILABLE_PLACES = 0;
+    private static final String REJECTION_REASON = FAKER.lorem().sentence();
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -86,6 +73,7 @@ class OfferApplicationServiceTest {
     private final OfferApplicationService service = offerApplicationService(offerRepository);
 
     private final GivenOfferFactory given = GivenOfferFactory.create(offerRepository);
+    private final OfferTestThen then = new OfferTestThen(eventRegistry, offerRepository);
 
     private OfferApplicationService offerApplicationService(OfferRepository repository) {
         return new OfferApplicationServiceFactory().offerApplicationService(repository, eventRegistry, trainingOfferCatalogue, discountService, clock);
@@ -114,7 +102,7 @@ class OfferApplicationServiceTest {
 
         service.chooseTraining(TRAINING_ID);
 
-        thenOfferSaved()
+        then.offerSaved()
                 .isInitiated()
                 .hasOfferNumberStartingWith("OFR/2024/11/")
                 .hasCreationDateTime(creationDateTime)
@@ -139,18 +127,7 @@ class OfferApplicationServiceTest {
 
         service.beginAcceptance(beginOfferAcceptanceCommand());
 
-        thenOfferSaved().isAcceptanceInProgress();
-    }
-
-    @ParameterizedTest
-    @MethodSource("offersInFinalState")
-    void shouldNotChangeStateOfOfferWhenBeginOfferAcceptanceCommandReceivedAndOfferInFinalState(GivenOffer offer, OfferRepository repository) {
-        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
-
-        offerApplicationService(repository).beginAcceptance(command);
-
-        thenOfferSaved(repository)
-                .hasStatus(offer.getDto().getStatus());
+        then.offerSaved().isAcceptanceInProgress();
     }
 
     @Test
@@ -160,7 +137,7 @@ class OfferApplicationServiceTest {
 
         service.beginAcceptance(command);
 
-        thenUnexpiredOfferAcceptanceRequestedEventPublished()
+        then.unexpiredOfferAcceptanceRequestedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .isNextAfter(command.commandId());
     }
@@ -173,7 +150,7 @@ class OfferApplicationServiceTest {
 
         service.beginAcceptance(command);
 
-        thenUnexpiredOfferAcceptanceRequestedEventPublished()
+        then.unexpiredOfferAcceptanceRequestedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .isNextAfter(command.commandId());
     }
@@ -186,77 +163,37 @@ class OfferApplicationServiceTest {
 
         service.beginAcceptance(command);
 
-        thenExpiredOfferAcceptanceRequestedEventPublished()
+        then.expiredOfferAcceptanceRequestedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .isNextAfter(command.commandId());
     }
 
     @ParameterizedTest
-    @MethodSource("offersInFinalState")
+    @MethodSource("offersNotInInitiatedStatus")
+    void shouldNotChangeStateOfOfferWhenBeginOfferAcceptanceCommandReceivedAndOfferInFinalState(GivenOffer offer, OfferRepository repository) {
+        BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
+
+        offerApplicationService(repository).beginAcceptance(command);
+
+        thenOfferSaved(repository)
+                .hasStatus(offer.getDto().getStatus());
+    }
+
+    @ParameterizedTest
+    @MethodSource("offersNotInInitiatedStatus")
     void shouldPublishNotAvailableOfferAcceptanceRequestedEventWhenOfferInFinalState(GivenOffer offer, OfferRepository repository) {
         BeginOfferAcceptanceCommand command = beginOfferAcceptanceCommand();
 
         offerApplicationService(repository).beginAcceptance(command);
 
-        thenNotAvailableOfferAcceptanceRequestedEvent()
-                .hasOfferId(OFFER_ID)
+        then.notAvailableOfferAcceptanceRequestedEvent()
+                .hasOfferId(offer.getDto().getOfferId())
                 .isNextAfter(command.commandId());
-    }
-
-    private static Stream<Arguments> offersInFinalState() {
-        return Stream.of(
-                offerInFinalState(GivenOffer::accepted),
-                offerInFinalState(GivenOffer::declined),
-                offerInFinalState(offer -> offer.createdMinutesAgo(11).terminated()),
-                offerInFinalState(GivenOffer::rejected)
-        );
-    }
-    
-    private static Arguments offerInFinalState(Consumer<GivenOffer> finalizingAction) {
-        OfferRepository repository = mock(OfferRepository.class);
-        GivenOfferFactory given = GivenOfferFactory.create(repository);
-        GivenOffer givenOffer = given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE);
-        finalizingAction.accept(givenOffer);
-        
-        return Arguments.of(givenOffer, repository);
-    }
-
-    private NotAvailableOfferAcceptanceRequestedEventAssertion thenNotAvailableOfferAcceptanceRequestedEvent() {
-        ArgumentCaptor<NotAvailableOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(NotAvailableOfferAcceptanceRequestedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        NotAvailableOfferAcceptanceRequestedEvent actual = captor.getValue();
-
-        return assertThatNotAvailableOfferAcceptanceRequestedEvent(actual);
-
-    }
-
-    private ExpiredOfferAcceptanceRequestedEventAssertion thenExpiredOfferAcceptanceRequestedEventPublished() {
-        ArgumentCaptor<ExpiredOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(ExpiredOfferAcceptanceRequestedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        ExpiredOfferAcceptanceRequestedEvent actual = captor.getValue();
-
-        return assertThatExpiredOfferAcceptanceRequestedEvent(actual);
-    }
-
-    private UnexpiredOfferAcceptanceRequestedEventAssertion thenUnexpiredOfferAcceptanceRequestedEventPublished() {
-        ArgumentCaptor<UnexpiredOfferAcceptanceRequestedEvent> captor = ArgumentCaptor.forClass(UnexpiredOfferAcceptanceRequestedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        UnexpiredOfferAcceptanceRequestedEvent actual = captor.getValue();
-
-        return assertThatUnexpiredOfferAcceptanceRequestedEvent(actual);
-    }
-
-    private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {
-        return BeginOfferAcceptanceCommand.nextAfter(offerAcceptanceRequestedEvent());
-    }
-
-    private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
     }
 
     @Test
     void shouldInterruptOfferAcceptanceIfCannotUseDiscountCode() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.failed("EXPIRED"));
         AcceptOfferCommand command = acceptOfferCommandWithDiscount(DISCOUNT_CODE);
@@ -270,44 +207,44 @@ class OfferApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {13, 20, 100})
     void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
-        givenOffer().createdMinutesAgo(minutes).initiated();
+        givenOffer().createdMinutesAgo(minutes).acceptanceInProgress();
         givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferSaved().isRejected();
+        then.offerSaved().isRejected();
     }
 
     @Test
     void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
-        givenOffer().createdMinutesAgo(42).initiated();
+        givenOffer().createdMinutesAgo(42).acceptanceInProgress();
         givenAvailableTrainingThatCanBeBookedWithPriceChanged();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferRejectedEventPublished()
+        then.offerRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .hasReason("Offer expired");
     }
 
     @Test
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferSaved().isRejected();
+        then.offerSaved().isRejected();
     }
 
     @Test
     void shouldPublishOfferRejectedEventWhenTrainingNoLongerAvailable() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCannotBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferRejectedEventPublished()
+        then.offerRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .hasReason("Training no longer available");
     }
@@ -315,22 +252,22 @@ class OfferApplicationServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {1, 3, 9, 10})
     void shouldAcceptOffer(int minutes) {
-        givenOffer().createdMinutesAgo(minutes).initiated();
+        givenOffer().createdMinutesAgo(minutes).acceptanceInProgress();
         givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferSaved().isAccepted();
+        then.offerSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCanBeBooked();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferAcceptedEventPublished()
+        then.offerAcceptedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
@@ -339,24 +276,36 @@ class OfferApplicationServiceTest {
                 .hasNoDiscountCode();
     }
 
+    @ParameterizedTest
+    @MethodSource("offersNotInAcceptanceInProgressStatus")
+    void shouldInterruptAcceptingOfferIfAcceptanceNotInProgress(GivenOffer offer, OfferRepository repository) {
+        OfferTestDto dto = offer.getDto();
+        givenTrainingThatCanBeBooked();
+        Executable executable = () -> offerApplicationService(repository).accept(acceptOfferCommandWithoutDiscount());
+
+        InvalidOfferStatusException actual = assertThrows(InvalidOfferStatusException.class, executable);
+
+        assertThat(actual).hasMessage("Offer: " + dto.getOfferId() + " acceptance not in progress.");
+    }
+
     @Test
     void shouldAcceptExpiredOfferWhenTrainingPriceDidNotChanged() {
-        givenOffer().createdMinutesAgo(16).initiated();
+        givenOffer().createdMinutesAgo(16).acceptanceInProgress();
         givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferSaved().isAccepted();
+        then.offerSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWhenExpiredOfferAndTrainingPriceDidNotChanged() {
-        givenOffer().createdMinutesAgo(120).initiated();
+        givenOffer().createdMinutesAgo(120).acceptanceInProgress();
         givenAvailableTrainingThatCanBeBookedWithSamePrice();
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferAcceptedEventPublished()
+        then.offerAcceptedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
@@ -367,25 +316,25 @@ class OfferApplicationServiceTest {
 
     @Test
     void shouldAcceptOfferWithPriceAfterDiscount() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCanBeBooked();
         givenDiscount(DiscountResponse.successful(randomPrice()));
 
         service.accept(acceptOfferCommandWithoutDiscount());
 
-        thenOfferSaved().isAccepted();
+        then.offerSaved().isAccepted();
     }
 
     @Test
     void shouldPublishOfferAcceptedEventWithPriceAfterDiscount() {
-        givenInitiatedOffer();
+        givenOfferWithAcceptanceInProgress();
         givenTrainingThatCanBeBooked();
         Price newPrice = randomPrice();
         givenDiscount(DiscountResponse.successful(newPrice));
 
         service.accept(acceptOfferCommandWithDiscount(DISCOUNT_CODE));
 
-        thenOfferAcceptedEventPublished()
+        then.offerAcceptedEventPublished()
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
@@ -394,31 +343,15 @@ class OfferApplicationServiceTest {
                 .hasDiscountCode(DISCOUNT_CODE);
     }
 
-    @Test
-    void shouldInterruptDecliningIfOfferRejected() {
-        givenOffer().rejected();
+    @ParameterizedTest
+    @MethodSource("offersNotInInitiatedStatus")
+    void shouldInterruptDecliningOfferIfNotInInitiatedStatus(GivenOffer offer, OfferRepository repository) {
+        OfferTestDto dto = offer.getDto();
+        Executable executable = () -> offerApplicationService(repository).decline(dto.getOfferId());
 
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
+        InvalidOfferStatusException actual = assertThrows(InvalidOfferStatusException.class, executable);
 
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already REJECTED");
-    }
-
-    @Test
-    void shouldInterruptDecliningIfOfferAccepted() {
-        givenOffer().accepted();
-
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
-
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already ACCEPTED");
-    }
-
-    @Test
-    void shouldInterruptDecliningIfOfferTerminated() {
-        givenOffer().createdMinutesAgo(42).terminated();
-
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.decline(OFFER_ID));
-
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already TERMINATED");
+        assertThat(actual).hasMessage("Offer: " + dto.getOfferId() + " not in INITIATED status.");
     }
 
     @Test
@@ -427,39 +360,18 @@ class OfferApplicationServiceTest {
 
         service.decline(OFFER_ID);
 
-        thenOfferSaved().isDeclined();
+        then.offerSaved().isDeclined();
     }
 
-    private void givenDiscount(DiscountResponse response) {
-        DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, TRAINING_PRICE, DISCOUNT_CODE);
-        given(discountService.calculatePriceFor(dto)).willReturn(response);
-    }
+    @ParameterizedTest
+    @MethodSource("offersNotInInitiatedStatus")
+    void shouldInterruptTerminationIfOfferNotInInitiatedStatus(GivenOffer offer, OfferRepository repository) {
+        OfferTestDto dto = offer.getDto();
+        Executable executable = () -> offerApplicationService(repository).terminate(dto.getOfferId());
 
-    @Test
-    void shouldInterruptTerminationIfOfferRejected() {
-        givenOffer().rejected();
+        InvalidOfferStatusException actual = assertThrows(InvalidOfferStatusException.class, executable);
 
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
-
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already REJECTED");
-    }
-
-    @Test
-    void shouldInterruptTerminationIfOfferAccepted() {
-        givenOffer().accepted();
-
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
-
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already ACCEPTED");
-    }
-
-    @Test
-    void shouldInterruptTerminationIfOfferDeclined() {
-        givenOffer().declined();
-
-        OfferInFinalStateException actual = assertThrows(OfferInFinalStateException.class, () -> service.terminate(OFFER_ID));
-
-        assertThat(actual).hasMessage("Offer: " + OFFER_ID + " already DECLINED");
+        assertThat(actual).hasMessage("Offer: " + dto.getOfferId() + " not in INITIATED status.");
     }
 
     @Test
@@ -478,7 +390,57 @@ class OfferApplicationServiceTest {
 
         service.terminate(OFFER_ID);
 
-        thenOfferSaved().isTerminated();
+        then.offerSaved().isTerminated();
+    }
+
+    @ParameterizedTest
+    @MethodSource("offersNotInInitiatedStatus")
+    void shouldInterruptRejectionIfAcceptanceNotInProgress(GivenOffer offer, OfferRepository repository) {
+        OfferTestDto dto = offer.getDto();
+        Executable executable = () -> offerApplicationService(repository).terminate(dto.getOfferId());
+
+        InvalidOfferStatusException actual = assertThrows(InvalidOfferStatusException.class, executable);
+
+        assertThat(actual).hasMessage("Offer: " + dto.getOfferId() + " not in INITIATED status.");
+    }
+
+    @ParameterizedTest
+    @MethodSource("offersNotInAcceptanceInProgressStatus")
+    void shouldInterruptRejectingOfferIfAcceptanceNotInProgress(GivenOffer offer, OfferRepository repository) {
+        OfferTestDto dto = offer.getDto();
+        givenTrainingThatCanBeBooked();
+        Executable executable = () -> offerApplicationService(repository).reject(rejectOfferCommand());
+
+        InvalidOfferStatusException actual = assertThrows(InvalidOfferStatusException.class, executable);
+
+        assertThat(actual).hasMessage("Offer: " + dto.getOfferId() + " acceptance not in progress.");
+    }
+
+    @Test
+    void shouldRejectOffer() {
+        givenOfferWithAcceptanceInProgress();
+
+        service.reject(rejectOfferCommand());
+
+        then.offerSaved().isRejected();
+    }
+
+    @Test
+    void shouldPublishEventWhenOfferRejected() {
+        givenOfferWithAcceptanceInProgress();
+        RejectOfferCommand command = rejectOfferCommand();
+
+        service.reject(command);
+
+        then.offerRejectedEventPublished()
+                .hasOfferId(OFFER_ID)
+                .hasReason(REJECTION_REASON)
+                .isNextAfter(command.commandId());
+    }
+
+    private void givenDiscount(DiscountResponse response) {
+        DiscountCodeDto dto = new DiscountCodeDto(PARTICIPANT_ID, TRAINING_ID, TRAINING_PRICE, DISCOUNT_CODE);
+        given(discountService.calculatePriceFor(dto)).willReturn(response);
     }
 
     private void givenAvailableTrainingThatCanBeBookedWithPriceChanged() {
@@ -496,15 +458,13 @@ class OfferApplicationServiceTest {
     }
 
     private void givenAvailableTrainingWith(Price price) {
-        givenTraining(new TrainingDto(randomAvailability(), price));
+        int availablePlaces = FAKER.number().numberBetween(1, 42);
+
+        givenTraining(new TrainingDto(availablePlaces, price));
     }
 
     private void givenTraining(TrainingDto trainingDto) {
         given(trainingOfferCatalogue.detailsOf(TRAINING_ID)).willReturn(trainingDto);
-    }
-
-    private int randomAvailability() {
-        return FAKER.number().numberBetween(1, 42);
     }
 
     private void givenTrainingThatCanBeBooked() {
@@ -521,44 +481,8 @@ class OfferApplicationServiceTest {
         given(trainingOfferCatalogue.book(dto)).willReturn(response);
     }
 
-    private OfferAssertion thenOfferSaved() {
-        return thenOfferSaved(offerRepository);
-    }
-
-    private OfferAssertion thenOfferSaved(OfferRepository offerRepository) {
-        ArgumentCaptor<Offer> captor = ArgumentCaptor.forClass(Offer.class);
-        then(offerRepository).should().save(captor.capture());
-        Offer actual = captor.getValue();
-
-        return assertThatOffer(actual);
-    }
-
-    private OfferRejectedEventAssertion thenOfferRejectedEventPublished() {
-        ArgumentCaptor<OfferRejectedEvent> captor = ArgumentCaptor.forClass(OfferRejectedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        OfferRejectedEvent actual = captor.getValue();
-
-        return assertThatOfferRejectedEvent(actual);
-    }
-
-    private OfferAcceptedEventAssertion thenOfferAcceptedEventPublished() {
-        ArgumentCaptor<OfferAcceptedEvent> captor = ArgumentCaptor.forClass(OfferAcceptedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        OfferAcceptedEvent actual = captor.getValue();
-
-        return assertThatOfferAcceptedEvent(actual);
-    }
-
-    private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
-        return acceptOfferCommandWithDiscount(NO_DISCOUNT_CODE);
-    }
-
-    private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
-        return AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), discountCode);
-    }
-
-    private PersonRegisteredEvent randomPersonRegisteredEvent() {
-        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
+    private void givenOfferWithAcceptanceInProgress() {
+        givenOffer().acceptanceInProgress();
     }
 
     private void givenInitiatedOffer() {
@@ -567,5 +491,63 @@ class OfferApplicationServiceTest {
 
     private GivenOffer givenOffer() {
         return given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE);
+    }
+
+    private RejectOfferCommand rejectOfferCommand() {
+        ExpiredOfferAcceptanceRequestedEvent event = ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand());
+        return RejectOfferCommand.nextAfter(event, REJECTION_REASON);
+    }
+
+    private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
+        return acceptOfferCommandWithDiscount(NO_DISCOUNT_CODE);
+    }
+
+    private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
+        return AcceptOfferCommand.nextAfter(personRegisteredEvent(), discountCode);
+    }
+
+    private PersonRegisteredEvent personRegisteredEvent() {
+        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
+    }
+
+    private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {
+        return BeginOfferAcceptanceCommand.nextAfter(offerAcceptanceRequestedEvent());
+    }
+
+    private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
+    }
+
+    private OfferAssertion thenOfferSaved(OfferRepository offerRepository) {
+        return new OfferTestThen(eventRegistry, offerRepository).offerSaved();
+    }
+
+    private static Stream<Arguments> offersNotInAcceptanceInProgressStatus() {
+        return Stream.of(
+                offerInFinalState(GivenOffer::initiated),
+                offerInFinalState(GivenOffer::accepted),
+                offerInFinalState(GivenOffer::declined),
+                offerInFinalState(offer -> offer.createdMinutesAgo(11).terminated()),
+                offerInFinalState(GivenOffer::rejected)
+        );
+    }
+
+    private static Stream<Arguments> offersNotInInitiatedStatus() {
+        return Stream.of(
+                offerInFinalState(GivenOffer::acceptanceInProgress),
+                offerInFinalState(GivenOffer::accepted),
+                offerInFinalState(GivenOffer::declined),
+                offerInFinalState(offer -> offer.createdMinutesAgo(11).terminated()),
+                offerInFinalState(GivenOffer::rejected)
+        );
+    }
+
+    private static Arguments offerInFinalState(Consumer<GivenOffer> finalizingAction) {
+        OfferRepository repository = mock(OfferRepository.class);
+        GivenOfferFactory given = GivenOfferFactory.create(repository);
+        GivenOffer givenOffer = given.offer(OFFER_ID).trainingId(TRAINING_ID).trainingPrice(TRAINING_PRICE);
+        finalizingAction.accept(givenOffer);
+
+        return Arguments.of(givenOffer, repository);
     }
 }
