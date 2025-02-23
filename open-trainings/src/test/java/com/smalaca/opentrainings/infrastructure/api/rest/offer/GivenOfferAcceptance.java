@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.mockito.BDDMockito.given;
 
@@ -25,6 +27,9 @@ class GivenOfferAcceptance {
     private final DiscountService discountService;
     private final TrainingOfferCatalogue trainingOfferCatalogue;
     private final OfferAcceptanceSagaEventTestListener testListener;
+    private final UUID participantId = randomId();
+    private final Price newPrice = randomPrice();
+
     private OfferTestDto offer;
 
     private GivenOfferAcceptance(
@@ -57,33 +62,33 @@ class GivenOfferAcceptance {
         return offer;
     }
 
-    GivenOfferAcceptance discount(DiscountTestDto discountTestDto) {
-        DiscountResponse response = discountTestDto.asDiscountResponse();
-        DiscountCodeDto dto = discountTestDto.asDiscountCodeDto();
+    GivenOfferAcceptance discount(String discountCode) {
+        DiscountResponse response = DiscountResponse.successful(newPrice);
+        DiscountCodeDto dto = new DiscountCodeDto(participantId, offer.getTrainingId(), offer.getTrainingPrice(), discountCode);
         given(discountService.calculatePriceFor(dto)).willReturn(response);
 
         return this;
     }
 
-    GivenOfferAcceptance bookableTraining(UUID trainingId, UUID participantId) {
-        TrainingBookingResponse response = TrainingBookingResponse.successful(trainingId, participantId);
-        TrainingBookingDto dto = new TrainingBookingDto(trainingId, participantId);
+    GivenOfferAcceptance bookableTraining() {
+        TrainingBookingResponse response = TrainingBookingResponse.successful(offer.getTrainingId(), participantId);
+        TrainingBookingDto dto = new TrainingBookingDto(offer.getTrainingId(), participantId);
         given(trainingOfferCatalogue.book(dto)).willReturn(response);
 
         return this;
     }
 
-    GivenOfferAcceptance nonBookableTraining(UUID trainingId, UUID participantId) {
-        TrainingBookingResponse response = TrainingBookingResponse.failed(trainingId, participantId);
-        TrainingBookingDto dto = new TrainingBookingDto(trainingId, participantId);
+    GivenOfferAcceptance nonBookableTraining() {
+        TrainingBookingResponse response = TrainingBookingResponse.failed(offer.getTrainingId(), participantId);
+        TrainingBookingDto dto = new TrainingBookingDto(offer.getTrainingId(), participantId);
         given(trainingOfferCatalogue.book(dto)).willReturn(response);
 
         return this;
     }
 
-    GivenOfferAcceptance trainingPriceChanged(UUID trainingId) {
+    GivenOfferAcceptance trainingPriceChanged() {
         TrainingDto trainingDto = new TrainingDto(randomAvailablePlaces(), randomPrice());
-        given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(trainingDto);
+        given(trainingOfferCatalogue.detailsOf(offer.getTrainingId())).willReturn(trainingDto);
 
         return this;
     }
@@ -92,13 +97,17 @@ class GivenOfferAcceptance {
         return RandomUtils.secure().randomInt(1, 42);
     }
 
-    GivenOfferAcceptance alreadyRegisteredPersonFound(UUID offerId, UUID participantId) {
-        testListener.willReturn(offerId, new AlreadyRegisteredPersonFoundEvent(EventId.newEventId(), offerId, participantId));
+    GivenOfferAcceptance alreadyRegisteredPersonFound() {
+        AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(EventId.newEventId(), offer.getOfferId(), participantId);
+        testListener.willReturn(offer.getOfferId(), event);
+
         return this;
     }
 
-    GivenOfferAcceptance personRegistered(UUID offerId, UUID participantId) {
-        testListener.willReturn(offerId, new PersonRegisteredEvent(EventId.newEventId(), offerId, participantId));
+    GivenOfferAcceptance personRegistered() {
+        PersonRegisteredEvent event = new PersonRegisteredEvent(EventId.newEventId(), offer.getOfferId(), participantId);
+        testListener.willReturn(offer.getOfferId(), event);
+
         return this;
     }
 }

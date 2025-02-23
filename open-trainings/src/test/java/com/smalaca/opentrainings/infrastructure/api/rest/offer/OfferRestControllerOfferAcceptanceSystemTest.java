@@ -8,7 +8,6 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestRespons
 import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
@@ -25,8 +24,6 @@ import java.util.UUID;
 
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceTestDtoAssertion.assertThatOfferAcceptance;
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion.assertThatOfferResponse;
-import static com.smalaca.opentrainings.data.Random.randomId;
-import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static org.awaitility.Awaitility.await;
 
 @SystemTest
@@ -38,8 +35,6 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
-    private static final UUID PARTICIPANT_ID = randomId();
-    private static final Price NEW_PRICE = randomPrice();
 
     @Autowired
     private OfferRepository repository;
@@ -79,9 +74,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     void shouldAcceptOfferWhenPersonRegistered() {
         dto = given.initiatedOffer();
         given
-                .personRegistered(dto.getOfferId(), PARTICIPANT_ID)
-                .bookableTraining(dto.getTrainingId(), PARTICIPANT_ID)
-                .discount(discountDto(dto.getTrainingId(), dto.getTrainingPrice()));
+                .personRegistered()
+                .bookableTraining()
+                .discount(DISCOUNT_CODE);
 
         client.offers().accept(commandFor(dto));
 
@@ -101,9 +96,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Test
     void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
         dto = given.initiatedOffer();
-        given.alreadyRegisteredPersonFound(dto.getOfferId(), PARTICIPANT_ID);
-        given.bookableTraining(dto.getTrainingId(), PARTICIPANT_ID);
-        given.discount(discountDto(dto.getTrainingId(), dto.getTrainingPrice()));
+        given.alreadyRegisteredPersonFound();
+        given.bookableTraining();
+        given.discount(DISCOUNT_CODE);
 
         client.offers().accept(commandFor(dto));
 
@@ -123,8 +118,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Test
     void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
         dto = given.expiredOffer();
-        given.personRegistered(dto.getOfferId(), PARTICIPANT_ID);
-        given.trainingPriceChanged(dto.getTrainingId());
+        given.personRegistered();
+        given.trainingPriceChanged();
 
         client.offers().accept(commandFor(dto));
 
@@ -145,9 +140,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Test
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
         dto = given.initiatedOffer();
-        given.personRegistered(dto.getOfferId(), PARTICIPANT_ID);
-        given.nonBookableTraining(dto.getTrainingId(), PARTICIPANT_ID);
-        given.discount(discountDto(dto.getTrainingId(), dto.getTrainingPrice()));
+        given.personRegistered();
+        given.nonBookableTraining();
+        given.discount(DISCOUNT_CODE);
 
         client.offers().accept(commandFor(dto));
 
@@ -168,9 +163,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Test
     void shouldRejectOfferAcceptanceWhenOfferNotAvailableAnymore() {
         dto = given.declinedOffer();
-        given.personRegistered(dto.getOfferId(), PARTICIPANT_ID);
-        given.bookableTraining(dto.getTrainingId(), PARTICIPANT_ID);
-        given.discount(discountDto(dto.getTrainingId(), dto.getTrainingPrice()));
+        given.personRegistered();
+        given.bookableTraining();
+        given.discount(DISCOUNT_CODE);
 
         client.offers().accept(commandFor(dto));
 
@@ -200,9 +195,5 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         RestOfferTestResponse offer = client.offers().findById(offerId);
 
         return assertThatOfferResponse(offer);
-    }
-
-    private DiscountTestDto discountDto(UUID trainingId, Price trainingPrice) {
-        return new DiscountTestDto(trainingId, PARTICIPANT_ID, DISCOUNT_CODE, trainingPrice, NEW_PRICE);
     }
 }
