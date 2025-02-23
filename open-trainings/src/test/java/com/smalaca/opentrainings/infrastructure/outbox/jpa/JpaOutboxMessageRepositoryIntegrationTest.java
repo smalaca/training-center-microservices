@@ -1,12 +1,18 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
-import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
-import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
+import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
@@ -30,7 +36,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
-import static java.time.LocalDateTime.now;
+import static com.smalaca.opentrainings.infrastructure.outbox.jpa.OutboxMessageAssertion.assertThatOutboxMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
@@ -58,113 +64,41 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldPublishTrainingPurchased() {
-        TrainingPurchasedEvent event = randomTrainingPurchasedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOrderRejected() {
-        OrderRejectedEvent event = randomOrderRejectedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderRejectedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOrderCancelled() {
-        OrderCancelledEvent event = randomOrderCancelledEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderCancelledEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOrderTerminatedEvent() {
-        OrderTerminatedEvent event = randomOrderTerminatedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOfferAcceptedEvent() {
-        OfferAcceptedEvent event = randomOfferAcceptedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOfferAcceptedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOfferRejectedEvent() {
-        OfferRejectedEvent event = randomOfferRejectedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOfferRejectedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishOfferAcceptanceRequestedEvent() {
-        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
-
-        publish(event);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertOfferAcceptanceRequestedEventSaved(actual, event));
-    }
-
-    @Test
-    void shouldPublishAcceptOfferCommand() {
-        AcceptOfferCommand command = randomAcceptOfferCommand();
-
-        publish(command);
-
-        assertThat(springRepository.findAll()).anySatisfy(actual -> assertAcceptOfferCommand(actual, command));
-    }
-
-    @Test
     void shouldFindAllOutboxMessages() {
-        TrainingPurchasedEvent eventOne = publish(randomTrainingPurchasedEvent());
-        OrderRejectedEvent eventTwo = publish(randomOrderRejectedEvent());
-        TrainingPurchasedEvent eventThree = publish(randomTrainingPurchasedEvent());
-        TrainingPurchasedEvent eventFour = publish(randomTrainingPurchasedEvent());
-        OrderCancelledEvent eventFive = publish(randomOrderCancelledEvent());
-        OrderRejectedEvent eventSix = publish(randomOrderRejectedEvent());
-        OrderTerminatedEvent eventSeven = publish(randomOrderTerminatedEvent());
-        OrderTerminatedEvent eventEight = publish(randomOrderTerminatedEvent());
-        OfferAcceptanceRequestedEvent eventNine = publish(randomOfferAcceptanceRequestedEvent());
-        OfferAcceptedEvent eventTen = publish(randomOfferAcceptedEvent());
-        OfferRejectedEvent eventEleven = publish(randomOfferRejectedEvent());
-        AcceptOfferCommand commandOne = publish(randomAcceptOfferCommand());
+        ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent = publish(randomExpiredOfferAcceptanceRequestedEvent());
+        NotAvailableOfferAcceptanceRequestedEvent notAvailableOfferAcceptanceRequestedEvent = publish(randomNotAvailableOfferAcceptanceRequestedEvent());
+        OfferAcceptedEvent offerAcceptedEvent = publish(randomOfferAcceptedEvent());
+        OfferRejectedEvent offerRejectedEvent = publish(randomOfferRejectedEvent());
+        UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = publish(randomUnexpiredOfferAcceptanceRequestedEvent());
+        OrderCancelledEvent orderCancelledEvent = publish(randomOrderCancelledEvent());
+        OrderRejectedEvent orderRejectedEvent = publish(randomOrderRejectedEvent());
+        OrderTerminatedEvent orderTerminatedEvent = publish(randomOrderTerminatedEvent());
+        TrainingPurchasedEvent trainingPurchasedEvent = publish(randomTrainingPurchasedEvent());
+        AlreadyRegisteredPersonFoundEvent alreadyRegisteredPersonFoundEvent = publish(randomAlreadyRegisteredPersonFoundEvent());
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = publish(randomOfferAcceptanceRequestedEvent());
+        PersonRegisteredEvent personRegisteredEvent = publish(randomPersonRegisteredEvent());
+        AcceptOfferCommand acceptOfferCommand = publish(randomAcceptOfferCommand());
+        BeginOfferAcceptanceCommand beginOfferAcceptanceCommand = publish(randomBeginOfferAcceptanceCommand());
+        RegisterPersonCommand registerPersonCommand = publish(randomRegisterPersonCommand());
+        RejectOfferCommand rejectOfferCommand = publish(randomRejectOfferCommand());
 
         assertThat(springRepository.findAll())
-                .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventOne))
-                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventTwo))
-                .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventThree))
-                .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, eventFour))
-                .anySatisfy(actual -> assertOrderCancelledEventSaved(actual, eventFive))
-                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, eventSix))
-                .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, eventSeven))
-                .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, eventEight))
-                .anySatisfy(actual -> assertOfferAcceptanceRequestedEventSaved(actual, eventNine))
-                .anySatisfy(actual -> assertOfferAcceptedEventSaved(actual, eventTen))
-                .anySatisfy(actual -> assertOfferRejectedEventSaved(actual, eventEleven))
-                .anySatisfy(actual -> assertAcceptOfferCommand(actual, commandOne));
-    }
-
-    private <T extends OfferEvent> T publish(T event) {
-        return transactionTemplate.execute(transactionStatus -> {
-            repository.publish(event);
-            messagesIds.add(event.eventId().eventId());
-            return event;
-        });
+                .anySatisfy(actual -> assertExpiredOfferAcceptanceRequestedEventSaved(actual, expiredOfferAcceptanceRequestedEvent))
+                .anySatisfy(actual -> assertNotAvailableOfferAcceptanceRequestedEvent(actual, notAvailableOfferAcceptanceRequestedEvent))
+                .anySatisfy(actual -> assertUnexpiredOfferAcceptanceRequestedEvent(actual, unexpiredOfferAcceptanceRequestedEvent))
+                .anySatisfy(actual -> assertAlreadyRegisteredPersonFoundEvent(actual, alreadyRegisteredPersonFoundEvent))
+                .anySatisfy(actual -> assertPersonRegisteredEvent(actual, personRegisteredEvent))
+                .anySatisfy(actual -> assertBeginOfferAcceptanceCommand(actual, beginOfferAcceptanceCommand))
+                .anySatisfy(actual -> assertRegisterPersonCommand(actual, registerPersonCommand))
+                .anySatisfy(actual -> assertRejectOfferCommand(actual, rejectOfferCommand))
+                .anySatisfy(actual -> assertTrainingPurchasedEventSaved(actual, trainingPurchasedEvent))
+                .anySatisfy(actual -> assertOrderRejectedEventSaved(actual, orderRejectedEvent))
+                .anySatisfy(actual -> assertOrderCancelledEventSaved(actual, orderCancelledEvent))
+                .anySatisfy(actual -> assertOrderTerminatedEventSaved(actual, orderTerminatedEvent))
+                .anySatisfy(actual -> assertOfferAcceptanceRequestedEventSaved(actual, offerAcceptanceRequestedEvent))
+                .anySatisfy(actual -> assertOfferAcceptedEventSaved(actual, offerAcceptedEvent))
+                .anySatisfy(actual -> assertOfferRejectedEventSaved(actual, offerRejectedEvent))
+                .anySatisfy(actual -> assertAcceptOfferCommand(actual, acceptOfferCommand));
     }
 
     private <T extends OrderEvent> T publish(T event) {
@@ -175,7 +109,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         });
     }
 
-    private OfferAcceptanceRequestedEvent publish(OfferAcceptanceRequestedEvent event) {
+    private <T extends OfferAcceptanceSagaEvent> T publish(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
             messagesIds.add(event.eventId().eventId());
@@ -183,7 +117,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         });
     }
 
-    private AcceptOfferCommand publish(AcceptOfferCommand command) {
+    private <T extends OfferAcceptanceSagaCommand> T publish(T command) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(command);
             messagesIds.add(command.commandId().commandId());
@@ -203,21 +137,44 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .build();
     }
 
+    private NotAvailableOfferAcceptanceRequestedEvent randomNotAvailableOfferAcceptanceRequestedEvent() {
+        return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), FAKER.lorem().paragraph());
+    }
+
+    private UnexpiredOfferAcceptanceRequestedEvent randomUnexpiredOfferAcceptanceRequestedEvent() {
+        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+    }
+
+    private AlreadyRegisteredPersonFoundEvent randomAlreadyRegisteredPersonFoundEvent() {
+        return new AlreadyRegisteredPersonFoundEvent(newEventId(), randomId(), randomId());
+    }
+
+    private RegisterPersonCommand randomRegisterPersonCommand() {
+        return RegisterPersonCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+    }
+
     private OfferRejectedEvent randomOfferRejectedEvent() {
         return OfferRejectedEvent.nextAfter(randomRejectOfferCommand());
     }
 
     private RejectOfferCommand randomRejectOfferCommand() {
-        return new RejectOfferCommand(randomCommandId(), randomId(), FAKER.lorem().paragraph());
+        return RejectOfferCommand.nextAfter(randomExpiredOfferAcceptanceRequestedEvent(), FAKER.lorem().paragraph());
+    }
+
+    private ExpiredOfferAcceptanceRequestedEvent randomExpiredOfferAcceptanceRequestedEvent() {
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+    }
+
+    private BeginOfferAcceptanceCommand randomBeginOfferAcceptanceCommand() {
+        return BeginOfferAcceptanceCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        PersonRegisteredEvent event = new PersonRegisteredEvent(newEventId(), randomId(), randomId());
-        return AcceptOfferCommand.nextAfter(event, FAKER.code().ean13());
+        return AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), FAKER.code().ean13());
     }
 
-    private CommandId randomCommandId() {
-        return new CommandId(randomId(), randomId(), randomId(), now());
+    private PersonRegisteredEvent randomPersonRegisteredEvent() {
+        return new PersonRegisteredEvent(newEventId(), randomId(), randomId());
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
@@ -225,106 +182,147 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private OrderRejectedEvent randomOrderRejectedEvent() {
-        return new OrderRejectedEvent(newEventId(), randomId(), FAKER.lorem().paragraph());
+        return OrderRejectedEvent.expired(randomId());
     }
 
     private TrainingPurchasedEvent randomTrainingPurchasedEvent() {
-        return new TrainingPurchasedEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
+        return TrainingPurchasedEvent.create(randomId(), randomId(), randomId(), randomId());
     }
 
     private OrderCancelledEvent randomOrderCancelledEvent() {
-        return new OrderCancelledEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
+        return OrderCancelledEvent.create(randomId(), randomId(), randomId(), randomId());
     }
 
     private OrderTerminatedEvent randomOrderTerminatedEvent() {
-        return new OrderTerminatedEvent(newEventId(), randomId(), randomId(), randomId(), randomId());
+        return OrderTerminatedEvent.create(randomId(), randomId(), randomId(), randomId());
     }
 
     private void assertOfferAcceptedEventSaved(OutboxMessage actual, OfferAcceptedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingId\" : \"" + expected.trainingId())
-                .contains("\"participantId\" : \"" + expected.participantId())
-                .contains("\"trainingPriceAmount\" : " + expected.trainingPriceAmount())
-                .contains("\"trainingPriceCurrencyCode\" : \"" + expected.trainingPriceCurrencyCode())
-                .contains("\"finalPriceAmount\" : " + expected.finalPriceAmount())
-                .contains("\"finalPriceCurrencyCode\" : \"" + expected.finalPriceCurrencyCode())
-                .contains("\"discountCode\" : \"" + expected.discountCode());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
 
     }
 
     private void assertOfferRejectedEventSaved(OutboxMessage actual, OfferRejectedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"reason\" : \"" + expected.reason());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertAcceptOfferCommand(OutboxMessage actual, AcceptOfferCommand expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.commandId().commandId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.commandId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand");
-        assertThat(actual.getPayload())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"discountCode\" : \"" + expected.discountCode());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertOfferAcceptanceRequestedEventSaved(OutboxMessage actual, OfferAcceptanceRequestedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"discountCode\" : \"" + expected.discountCode())
-                .contains("\"firstName\" : \"" + expected.firstName())
-                .contains("\"lastName\" : \"" + expected.lastName())
-                .contains("\"email\" : \"" + expected.email());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertOrderRejectedEventSaved(OutboxMessage actual, OrderRejectedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"orderId\" : \"" + expected.orderId())
-                .contains("\"reason\" : \"" + expected.reason());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertTrainingPurchasedEventSaved(OutboxMessage actual, TrainingPurchasedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"orderId\" : \"" + expected.orderId())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingId\" : \"" + expected.trainingId())
-                .contains("\"participantId\" : \"" + expected.participantId());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertOrderCancelledEventSaved(OutboxMessage actual, OrderCancelledEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent");
-        assertThat(actual.getPayload())
-                .contains("\"orderId\" : \"" + expected.orderId())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingId\" : \"" + expected.trainingId())
-                .contains("\"participantId\" : \"" + expected.participantId());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 
     private void assertOrderTerminatedEventSaved(OutboxMessage actual, OrderTerminatedEvent expected) {
-        assertThat(actual.getMessageId()).isEqualTo(expected.eventId().eventId());
-        assertThat(actual.getOccurredOn()).isEqualToIgnoringNanos(expected.eventId().creationDateTime());
-        assertThat(actual.getMessageType()).isEqualTo("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent");
-        assertThat(actual.getPayload())
-                .contains("\"orderId\" : \"" + expected.orderId())
-                .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingId\" : \"" + expected.trainingId())
-                .contains("\"participantId\" : \"" + expected.participantId());
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertExpiredOfferAcceptanceRequestedEventSaved(OutboxMessage actual, ExpiredOfferAcceptanceRequestedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertNotAvailableOfferAcceptanceRequestedEvent(OutboxMessage actual, NotAvailableOfferAcceptanceRequestedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertUnexpiredOfferAcceptanceRequestedEvent(OutboxMessage actual, UnexpiredOfferAcceptanceRequestedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertAlreadyRegisteredPersonFoundEvent(OutboxMessage actual, AlreadyRegisteredPersonFoundEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertPersonRegisteredEvent(OutboxMessage actual, PersonRegisteredEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertBeginOfferAcceptanceCommand(OutboxMessage actual, BeginOfferAcceptanceCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertRegisterPersonCommand(OutboxMessage actual, RegisterPersonCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertRejectOfferCommand(OutboxMessage actual, RejectOfferCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
     }
 }
