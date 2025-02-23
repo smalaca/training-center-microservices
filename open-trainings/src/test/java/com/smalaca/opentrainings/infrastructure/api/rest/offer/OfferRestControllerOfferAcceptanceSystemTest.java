@@ -72,13 +72,14 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldAcceptOfferWhenPersonRegistered() {
-        dto = given.initiatedOffer();
         given
+                .initiatedOffer()
                 .personRegistered()
                 .bookableTraining()
                 .discount(DISCOUNT_CODE);
+        dto = given.getOffer();
 
-        client.offers().accept(commandFor(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> {
             RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
@@ -95,12 +96,14 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
-        dto = given.initiatedOffer();
-        given.alreadyRegisteredPersonFound();
-        given.bookableTraining();
-        given.discount(DISCOUNT_CODE);
+        given
+                .initiatedOffer()
+                .alreadyRegisteredPersonFound()
+                .bookableTraining()
+                .discount(DISCOUNT_CODE);
+        dto = given.getOffer();
 
-        client.offers().accept(commandFor(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> {
             RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
@@ -117,11 +120,13 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
-        dto = given.expiredOffer();
-        given.personRegistered();
-        given.trainingPriceChanged();
+        given
+                .expiredOffer()
+                .personRegistered()
+                .trainingPriceChanged();
+        dto = given.getOffer();
 
-        client.offers().accept(commandFor(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> {
             RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
@@ -139,12 +144,14 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
-        dto = given.initiatedOffer();
-        given.personRegistered();
-        given.nonBookableTraining();
-        given.discount(DISCOUNT_CODE);
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .nonBookableTraining()
+                .discount(DISCOUNT_CODE);
+        dto = given.getOffer();
 
-        client.offers().accept(commandFor(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> {
             RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
@@ -162,12 +169,14 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Test
     void shouldRejectOfferAcceptanceWhenOfferNotAvailableAnymore() {
-        dto = given.declinedOffer();
-        given.personRegistered();
-        given.bookableTraining();
-        given.discount(DISCOUNT_CODE);
+        given
+                .declinedOffer()
+                .personRegistered()
+                .bookableTraining()
+                .discount(DISCOUNT_CODE);
+        dto = given.getOffer();
 
-        client.offers().accept(commandFor(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> {
             RestOfferAcceptanceTestDto actual = offerAcceptanceProgressFor(dto.getOfferId());
@@ -183,12 +192,12 @@ class OfferRestControllerOfferAcceptanceSystemTest {
         });
     }
 
-    private RestOfferAcceptanceTestDto offerAcceptanceProgressFor(UUID offerId) {
-        return client.offers().getAcceptanceProgress(offerId);
+    private RestAcceptOfferTestCommand command(OfferTestDto dto) {
+        return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
     }
 
-    private RestAcceptOfferTestCommand commandFor(OfferTestDto dto) {
-        return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
+    private RestOfferAcceptanceTestDto offerAcceptanceProgressFor(UUID offerId) {
+        return client.offers().getAcceptanceProgress(offerId);
     }
 
     private RestOfferTestResponseAssertion thenOfferResponse(UUID offerId) {

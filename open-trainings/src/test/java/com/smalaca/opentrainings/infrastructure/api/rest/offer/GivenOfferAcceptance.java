@@ -47,19 +47,19 @@ class GivenOfferAcceptance {
         return new GivenOfferAcceptance(GivenOfferFactory.create(repository), discountService, trainingOfferCatalogue, testListener);
     }
 
-    OfferTestDto expiredOffer() {
+    GivenOfferAcceptance expiredOffer() {
         offer = givenOfferFactory.offer().createdMinutesAgo(13).initiated().getDto();
-        return offer;
+        return this;
     }
 
-    OfferTestDto initiatedOffer() {
+    GivenOfferAcceptance initiatedOffer() {
         offer = givenOfferFactory.offer().initiated().getDto();
-        return offer;
+        return this;
     }
 
-    OfferTestDto declinedOffer() {
+    GivenOfferAcceptance declinedOffer() {
         offer = givenOfferFactory.offer().declined().getDto();
-        return offer;
+        return this;
     }
 
     GivenOfferAcceptance discount(String discountCode) {
@@ -109,5 +109,9 @@ class GivenOfferAcceptance {
         testListener.willReturn(offer.getOfferId(), event);
 
         return this;
+    }
+
+    OfferTestDto getOffer() {
+        return offer;
     }
 }
