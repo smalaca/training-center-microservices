@@ -49,6 +49,39 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoParticipantId() {
+        assertThat(actual).extracting("participantId").isNull();
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasParticipantId(UUID expected) {
+        assertThat(actual).extracting("participantId").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion isOfferAcceptanceNotInProgress() {
+        return isOfferAcceptanceInProgressEqualsTo(false);
+    }
+
+    public OfferAcceptanceSagaAssertion isOfferAcceptanceInProgress() {
+        return isOfferAcceptanceInProgressEqualsTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion isOfferAcceptanceInProgressEqualsTo(boolean expected) {
+        assertThat(actual).extracting("isOfferAcceptanceInProgress").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasNoRejectionReason() {
+        assertThat(actual).extracting("rejectionReason").isNull();
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasRejectionReason(String expected) {
+        assertThat(actual).extracting("rejectionReason").isEqualTo(expected);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion consumedNoEvents() {
         return consumedEvents(0);
     }
