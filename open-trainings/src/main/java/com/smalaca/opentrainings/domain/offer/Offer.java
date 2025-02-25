@@ -96,7 +96,7 @@ public class Offer {
         if (isNewerThan10Minutes(clock)) {
             return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
         } else {
-            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command, trainingId, trainingPrice);
         }
     }
 

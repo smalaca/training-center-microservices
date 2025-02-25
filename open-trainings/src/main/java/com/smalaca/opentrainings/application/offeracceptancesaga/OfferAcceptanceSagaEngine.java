@@ -16,7 +16,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaD
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
@@ -94,7 +94,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(ExpiredOfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        RejectOfferCommand command = offerAcceptanceSaga.accept(event, clock);
+        ConfirmTrainingPriceCommand command = offerAcceptanceSaga.accept(event, clock);
 
         commandRegistry.publish(command);
         repository.save(offerAcceptanceSaga);

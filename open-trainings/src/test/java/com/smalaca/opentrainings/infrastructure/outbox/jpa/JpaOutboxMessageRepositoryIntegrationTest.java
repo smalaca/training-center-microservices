@@ -162,7 +162,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private ExpiredOfferAcceptanceRequestedEvent randomExpiredOfferAcceptanceRequestedEvent() {
-        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), randomId(), randomPrice());
     }
 
     private BeginOfferAcceptanceCommand randomBeginOfferAcceptanceCommand() {

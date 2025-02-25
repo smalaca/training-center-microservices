@@ -494,8 +494,11 @@ class OfferApplicationServiceTest {
     }
 
     private RejectOfferCommand rejectOfferCommand() {
-        ExpiredOfferAcceptanceRequestedEvent event = ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand());
-        return RejectOfferCommand.nextAfter(event, REJECTION_REASON);
+        return RejectOfferCommand.nextAfter(expiredOfferAcceptanceRequestedEvent(), REJECTION_REASON);
+    }
+
+    private ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent() {
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand(), TRAINING_ID, TRAINING_PRICE);
     }
 
     private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {

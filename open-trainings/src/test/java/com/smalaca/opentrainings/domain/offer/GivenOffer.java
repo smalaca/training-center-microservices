@@ -147,7 +147,11 @@ public class GivenOffer {
     }
 
     private RejectOfferCommand rejectOfferCommand() {
-        return RejectOfferCommand.nextAfter(ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand()), FAKER.lorem().word());
+        return RejectOfferCommand.nextAfter(expiredOfferAcceptanceRequestedEvent(), FAKER.lorem().word());
+    }
+
+    private ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent() {
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand(), trainingId, trainingPrice);
     }
 
     private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {

@@ -16,24 +16,29 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferA
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
-import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommandAssertion.assertThatRejectOfferCommand;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommandAssertion.assertThatConfirmTrainingPriceCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -46,6 +51,9 @@ class OfferAcceptanceSagaEngineTest {
     private static final UUID OFFER_ID = randomId();
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final UUID PARTICIPANT_ID = randomId();
+    private static final UUID TRAINING_ID = randomId();
+    private static final BigDecimal TRAINING_PRICE_AMOUNT = randomAmount();
+    private static final String TRAINING_PRICE_CURRENCY_CODE = randomCurrency();
 
     private final Clock clock = mock(Clock.class);
     private final OfferAcceptanceSagaRepository repository = mock(OfferAcceptanceSagaRepository.class);
@@ -305,7 +313,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldPublishRejectOfferCommandWhenExpiredOfferAcceptanceRequestedEventAccepted() {
+    void shouldPublishConfirmTrainingPriceCommandWhenExpiredOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
         given(repository.findById(OFFER_ID)).willReturn(saga);
@@ -316,10 +324,11 @@ class OfferAcceptanceSagaEngineTest {
 
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
-                    assertThat(actual).isInstanceOf(RejectOfferCommand.class);
-                    assertThatRejectOfferCommand((RejectOfferCommand) actual)
+                    assertThat(actual).isInstanceOf(ConfirmTrainingPriceCommand.class);
+                    assertThatConfirmTrainingPriceCommand((ConfirmTrainingPriceCommand) actual)
                             .hasOfferId(OFFER_ID)
-                            .hasReason("Offer expired")
+                            .hasTrainingId(TRAINING_ID)
+                            .hasPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -374,7 +383,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldMarkAsAcceptedWhenOfferAcceptedEventComsumed() {
+    void shouldMarkAsAcceptedWhenOfferAcceptedEventConsumed() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -460,6 +469,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private ExpiredOfferAcceptanceRequestedEvent randomExpiredOfferAcceptanceRequestedEvent() {
-        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+        Price trainingPrice = Price.of(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), TRAINING_ID, trainingPrice);
     }
 }

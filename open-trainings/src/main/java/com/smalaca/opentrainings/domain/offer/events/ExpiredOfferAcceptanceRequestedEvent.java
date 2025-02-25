@@ -4,13 +4,15 @@ import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ExpiredOfferAcceptanceRequestedEvent(EventId eventId, UUID offerId) implements OfferEvent, OfferAcceptanceSagaEvent {
-    public static ExpiredOfferAcceptanceRequestedEvent nextAfter(BeginOfferAcceptanceCommand command) {
-        return new ExpiredOfferAcceptanceRequestedEvent(command.commandId().nextEventId(), command.offerId());
+public record ExpiredOfferAcceptanceRequestedEvent(EventId eventId, UUID offerId, UUID trainingId, BigDecimal trainingPriceAmount, String trainingPriceCurrencyCode) implements OfferEvent, OfferAcceptanceSagaEvent {
+    public static ExpiredOfferAcceptanceRequestedEvent nextAfter(BeginOfferAcceptanceCommand command, UUID trainingId, Price trainingPrice) {
+        return new ExpiredOfferAcceptanceRequestedEvent(command.commandId().nextEventId(), command.offerId(), trainingId, trainingPrice.amount(), trainingPrice.currencyCode());
     }
 
     @Override
