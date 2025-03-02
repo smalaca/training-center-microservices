@@ -16,6 +16,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegist
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -93,6 +94,17 @@ public class OfferAcceptanceSaga {
     public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
         return ConfirmTrainingPriceCommand.nextAfter(event);
+    }
+
+    public Optional<AcceptOfferCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        isOfferAcceptanceInProgress = true;
+
+        if (hasParticipantId()) {
+            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
