@@ -17,9 +17,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaR
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,6 +112,19 @@ public class OfferAcceptanceSagaEngine {
         Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
 
         command.ifPresent(commandRegistry::publish);
+        repository.save(offerAcceptanceSaga);
+    }
+
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(TrainingPriceChangedEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+
+        RejectOfferCommand command = offerAcceptanceSaga.accept(event, clock);
+
+        commandRegistry.publish(command);
         repository.save(offerAcceptanceSaga);
     }
 

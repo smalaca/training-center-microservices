@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
@@ -40,6 +41,7 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.Acce
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommandAssertion.assertThatConfirmTrainingPriceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommandAssertion.assertThatRejectOfferCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -55,6 +57,8 @@ class OfferAcceptanceSagaEngineTest {
     private static final UUID TRAINING_ID = randomId();
     private static final BigDecimal TRAINING_PRICE_AMOUNT = randomAmount();
     private static final String TRAINING_PRICE_CURRENCY_CODE = randomCurrency();
+    private static final BigDecimal NEW_TRAINING_PRICE_AMOUNT = BigDecimal.valueOf(123.45);
+    private static final String NEW_TRAINING_PRICE_CURRENCY_CODE = "USD";
 
     private final Clock clock = mock(Clock.class);
     private final OfferAcceptanceSagaRepository repository = mock(OfferAcceptanceSagaRepository.class);
@@ -412,6 +416,48 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
+@Test
+void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted() {
+    OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+    OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+    saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+    given(repository.findById(OFFER_ID)).willReturn(saga);
+    givenNowSecondsAgo(5);
+    TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+
+    engine.accept(event);
+
+    assertThatOfferAcceptanceSaga(saga)
+            .isInProgress()
+            .hasOfferId(OFFER_ID)
+            .hasDiscountCode(DISCOUNT_CODE)
+            .hasNoParticipantId()
+            .isOfferAcceptanceNotInProgress()
+            .consumedEvents(2)
+            .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+            .consumedEventAt(event, NOW.minusSeconds(5));
+}
+
+    @Test
+    void shouldPublishRejectOfferCommandWhenTrainingPriceChangedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(RejectOfferCommand.class);
+                    assertThatRejectOfferCommand((RejectOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasReason("Training price changed to: 123.45 USD")
+                            .isNextAfter(event.eventId());
+                });
+    }
+
     @Test
     void shouldMarkAsRejectedWhenNotAvailableOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
@@ -554,5 +600,9 @@ class OfferAcceptanceSagaEngineTest {
 
     private TrainingPriceNotChangedEvent randomTrainingPriceNotChangedEvent() {
         return new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
+    }
+
+    private TrainingPriceChangedEvent randomTrainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), OFFER_ID, TRAINING_ID, NEW_TRAINING_PRICE_AMOUNT, NEW_TRAINING_PRICE_CURRENCY_CODE);
     }
 }

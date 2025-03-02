@@ -12,10 +12,12 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferA
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
 import java.time.LocalDateTime;
@@ -105,6 +107,11 @@ public class OfferAcceptanceSaga {
         } else {
             return Optional.empty();
         }
+    }
+
+    public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        return RejectOfferCommand.nextAfter(event);
     }
 
     public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
