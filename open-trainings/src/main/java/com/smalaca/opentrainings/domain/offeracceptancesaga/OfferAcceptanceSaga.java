@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
@@ -16,6 +17,8 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegist
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -90,9 +93,25 @@ public class OfferAcceptanceSaga {
         return participantId != null;
     }
 
-    public RejectOfferCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
+    public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
-        return RejectOfferCommand.nextAfter(event, "Offer expired");
+        return ConfirmTrainingPriceCommand.nextAfter(event);
+    }
+
+    public Optional<AcceptOfferCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        isOfferAcceptanceInProgress = true;
+
+        if (hasParticipantId()) {
+            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        return RejectOfferCommand.nextAfter(event);
     }
 
     public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {

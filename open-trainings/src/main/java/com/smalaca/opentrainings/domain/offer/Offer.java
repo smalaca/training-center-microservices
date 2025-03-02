@@ -18,7 +18,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOffer
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -96,17 +95,13 @@ public class Offer {
         if (isNewerThan10Minutes(clock)) {
             return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
         } else {
-            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+            return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command, trainingId, trainingPrice);
         }
     }
 
-    public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
+    public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService) {
         if (status.isAcceptanceNotInProgress()) {
             throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
-        }
-
-        if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
-            return reject(asRejectOfferCommand("Offer expired"));
         }
 
         Price finalPrice = finalPrice(command, discountService);
@@ -114,7 +109,7 @@ public class Offer {
         TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, command.participantId()));
 
         if (booking.isFailed()) {
-            return reject(asRejectOfferCommand("Training no longer available"));
+            return reject(asRejectOfferCommand());
         }
 
         status = OfferStatus.ACCEPTED;
@@ -130,8 +125,8 @@ public class Offer {
                 .build();
     }
 
-    private RejectOfferCommand asRejectOfferCommand(String reason) {
-        return new RejectOfferCommand(nextAfter(newEventId()), offerId, reason);
+    private RejectOfferCommand asRejectOfferCommand() {
+        return new RejectOfferCommand(nextAfter(newEventId()), offerId, "Training no longer available");
     }
 
     public OfferRejectedEvent reject(RejectOfferCommand command) {
@@ -162,15 +157,6 @@ public class Offer {
         return Strings.isNullOrEmpty(command.discountCode());
     }
 
-    private boolean isOfferNotAvailable(Clock clock, TrainingOfferCatalogue trainingOfferCatalogue) {
-        return isOlderThan10Minutes(clock) && trainingPriceChanged(trainingOfferCatalogue);
-    }
-
-    private boolean trainingPriceChanged(TrainingOfferCatalogue trainingOfferCatalogue) {
-        TrainingDto trainingDto = trainingOfferCatalogue.detailsOf(trainingId);
-        return trainingPrice.differentThan(trainingDto.price());
-    }
-
     public void decline() {
         if (status.isNotInitiated()) {
             throw InvalidOfferStatusException.notInitiated(offerId);
@@ -192,13 +178,9 @@ public class Offer {
     }
 
     private boolean isNewerThan10Minutes(Clock clock) {
-        return !isOlderThan10Minutes(clock);
-    }
-
-    private boolean isOlderThan10Minutes(Clock clock) {
         LocalDateTime now = clock.now();
         LocalDateTime lastAcceptableDateTime = creationDateTime.plusMinutes(10);
-        return now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime);
+        return !(now.isAfter(lastAcceptableDateTime) && !now.isEqual(lastAcceptableDateTime));
     }
 
     public UUID offerId() {

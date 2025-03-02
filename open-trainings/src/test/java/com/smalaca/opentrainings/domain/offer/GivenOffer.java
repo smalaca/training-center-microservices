@@ -2,12 +2,12 @@ package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventid.EventId;
-import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -19,8 +19,11 @@ import org.apache.commons.lang3.RandomUtils;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTANCE_IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
@@ -103,7 +106,7 @@ public class GivenOffer {
         UUID participantId = UUID.randomUUID();
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
         given(trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, participantId))).willReturn(TrainingBookingResponse.successful(trainingId, participantId));
-        offer.accept(acceptOfferCommand(participantId), trainingOfferCatalogue, null, clock);
+        offer.accept(acceptOfferCommand(participantId), trainingOfferCatalogue, null);
 
         return this;
     }
@@ -147,7 +150,11 @@ public class GivenOffer {
     }
 
     private RejectOfferCommand rejectOfferCommand() {
-        return RejectOfferCommand.nextAfter(ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand()), FAKER.lorem().word());
+        return RejectOfferCommand.nextAfter(trainingPriceChangedEvent());
+    }
+
+    private TrainingPriceChangedEvent trainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), getOfferId(), trainingId, randomAmount(), randomCurrency());
     }
 
     private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {

@@ -66,7 +66,7 @@ public class OfferApplicationService {
     public void accept(AcceptOfferCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        OfferEvent event = offer.accept(command, trainingOfferCatalogue, discountService, clock);
+        OfferEvent event = offer.accept(command, trainingOfferCatalogue, discountService);
 
         offerRepository.save(offer);
         eventRegistry.publish(event);

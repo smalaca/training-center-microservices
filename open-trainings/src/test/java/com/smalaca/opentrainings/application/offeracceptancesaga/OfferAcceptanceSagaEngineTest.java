@@ -11,27 +11,35 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommandAssertion.assertThatConfirmTrainingPriceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommandAssertion.assertThatRejectOfferCommand;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +54,11 @@ class OfferAcceptanceSagaEngineTest {
     private static final UUID OFFER_ID = randomId();
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final UUID PARTICIPANT_ID = randomId();
+    private static final UUID TRAINING_ID = randomId();
+    private static final BigDecimal TRAINING_PRICE_AMOUNT = randomAmount();
+    private static final String TRAINING_PRICE_CURRENCY_CODE = randomCurrency();
+    private static final BigDecimal NEW_TRAINING_PRICE_AMOUNT = BigDecimal.valueOf(123.45);
+    private static final String NEW_TRAINING_PRICE_CURRENCY_CODE = "USD";
 
     private final Clock clock = mock(Clock.class);
     private final OfferAcceptanceSagaRepository repository = mock(OfferAcceptanceSagaRepository.class);
@@ -140,7 +153,7 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
-                    AcceptOfferCommandAssertion.assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
                             .hasParticipantId(PARTICIPANT_ID)
@@ -196,7 +209,7 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
-                    AcceptOfferCommandAssertion.assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
                             .hasParticipantId(PARTICIPANT_ID)
@@ -252,7 +265,7 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
-                    AcceptOfferCommandAssertion.assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
                             .hasParticipantId(PARTICIPANT_ID)
@@ -274,7 +287,7 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
-                    AcceptOfferCommandAssertion.assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
                             .hasParticipantId(PARTICIPANT_ID)
@@ -305,7 +318,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldPublishRejectOfferCommandWhenExpiredOfferAcceptanceRequestedEventAccepted() {
+    void shouldPublishConfirmTrainingPriceCommandWhenExpiredOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
         given(repository.findById(OFFER_ID)).willReturn(saga);
@@ -316,10 +329,131 @@ class OfferAcceptanceSagaEngineTest {
 
         thenPublishedCommands(1)
                 .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(ConfirmTrainingPriceCommand.class);
+                    assertThatConfirmTrainingPriceCommand((ConfirmTrainingPriceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasTrainingId(TRAINING_ID)
+                            .hasPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
+    void shouldMakeOfferAcceptanceAsInProgressWhenTrainingPriceNotChangedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = randomTrainingPriceNotChangedEvent();
+
+        engine.accept(trainingPriceNotChangedEvent);
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasNoParticipantId()
+                .isOfferAcceptanceInProgress()
+                .consumedEvents(2)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(trainingPriceNotChangedEvent, NOW.minusSeconds(5));
+    }
+
+    @Test
+    void shouldPublishNoCommandWhenTrainingPriceNotChangedEventAcceptedAndHasNoParticipantId() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+
+        engine.accept(randomTrainingPriceNotChangedEvent());
+
+        thenPublishedCommands(0);
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenTrainingPriceNotChangedEventAcceptedAndPersonRegistered() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceNotChangedEvent event = randomTrainingPriceNotChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenTrainingPriceNotChangedEventAcceptedAndPersonAlreadyRegistered() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceNotChangedEvent event = randomTrainingPriceNotChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+@Test
+void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted() {
+    OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+    OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+    saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+    given(repository.findById(OFFER_ID)).willReturn(saga);
+    givenNowSecondsAgo(5);
+    TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+
+    engine.accept(event);
+
+    assertThatOfferAcceptanceSaga(saga)
+            .isInProgress()
+            .hasOfferId(OFFER_ID)
+            .hasDiscountCode(DISCOUNT_CODE)
+            .hasNoParticipantId()
+            .isOfferAcceptanceNotInProgress()
+            .consumedEvents(2)
+            .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+            .consumedEventAt(event, NOW.minusSeconds(5));
+}
+
+    @Test
+    void shouldPublishRejectOfferCommandWhenTrainingPriceChangedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(RejectOfferCommand.class);
                     assertThatRejectOfferCommand((RejectOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
-                            .hasReason("Offer expired")
+                            .hasReason("Training price changed to: 123.45 USD")
                             .isNextAfter(event.eventId());
                 });
     }
@@ -374,7 +508,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldMarkAsAcceptedWhenOfferAcceptedEventComsumed() {
+    void shouldMarkAsAcceptedWhenOfferAcceptedEventConsumed() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -455,11 +589,20 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent() {
-        RejectOfferCommand command = RejectOfferCommand.nextAfter(randomExpiredOfferAcceptanceRequestedEvent(), FAKER.lorem().sentence());
+        RejectOfferCommand command = RejectOfferCommand.nextAfter(randomTrainingPriceChangedEvent());
         return OfferRejectedEvent.nextAfter(command);
     }
 
     private ExpiredOfferAcceptanceRequestedEvent randomExpiredOfferAcceptanceRequestedEvent() {
-        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+        Price trainingPrice = Price.of(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
+        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), TRAINING_ID, trainingPrice);
+    }
+
+    private TrainingPriceNotChangedEvent randomTrainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
+    }
+
+    private TrainingPriceChangedEvent randomTrainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), OFFER_ID, TRAINING_ID, NEW_TRAINING_PRICE_AMOUNT, NEW_TRAINING_PRICE_CURRENCY_CODE);
     }
 }

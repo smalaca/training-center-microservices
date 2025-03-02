@@ -14,12 +14,12 @@ import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,7 +64,6 @@ class OfferApplicationServiceTest {
     private static final String NO_DISCOUNT_CODE = null;
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
     private static final int NO_AVAILABLE_PLACES = 0;
-    private static final String REJECTION_REASON = FAKER.lorem().sentence();
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -202,29 +202,6 @@ class OfferApplicationServiceTest {
 
         assertThat(actual).hasMessage("Discount Code could not be used because: EXPIRED");
         then(offerRepository).should(never()).save(any());
-    }
-
-    @ParameterizedTest
-    @ValueSource(ints = {13, 20, 100})
-    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
-        givenOffer().createdMinutesAgo(minutes).acceptanceInProgress();
-        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
-
-        service.accept(acceptOfferCommandWithoutDiscount());
-
-        then.offerSaved().isRejected();
-    }
-
-    @Test
-    void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
-        givenOffer().createdMinutesAgo(42).acceptanceInProgress();
-        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
-
-        service.accept(acceptOfferCommandWithoutDiscount());
-
-        then.offerRejectedEventPublished()
-                .hasOfferId(OFFER_ID)
-                .hasReason("Offer expired");
     }
 
     @Test
@@ -434,7 +411,7 @@ class OfferApplicationServiceTest {
 
         then.offerRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
-                .hasReason(REJECTION_REASON)
+                .hasReason("Training price changed to: 455.34 PLN")
                 .isNextAfter(command.commandId());
     }
 
@@ -443,24 +420,15 @@ class OfferApplicationServiceTest {
         given(discountService.calculatePriceFor(dto)).willReturn(response);
     }
 
-    private void givenAvailableTrainingThatCanBeBookedWithPriceChanged() {
-        givenAvailableTrainingWith(randomPrice());
-        givenTrainingThatCanBeBooked();
-    }
-
     private void givenAvailableTrainingThatCanBeBookedWithSamePrice() {
         givenAvailableTraining();
         givenTrainingThatCanBeBooked();
     }
 
     private void givenAvailableTraining() {
-        givenAvailableTrainingWith(TRAINING_PRICE);
-    }
-
-    private void givenAvailableTrainingWith(Price price) {
         int availablePlaces = FAKER.number().numberBetween(1, 42);
 
-        givenTraining(new TrainingDto(availablePlaces, price));
+        givenTraining(new TrainingDto(availablePlaces, OfferApplicationServiceTest.TRAINING_PRICE));
     }
 
     private void givenTraining(TrainingDto trainingDto) {
@@ -494,8 +462,11 @@ class OfferApplicationServiceTest {
     }
 
     private RejectOfferCommand rejectOfferCommand() {
-        ExpiredOfferAcceptanceRequestedEvent event = ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand());
-        return RejectOfferCommand.nextAfter(event, REJECTION_REASON);
+        return RejectOfferCommand.nextAfter(trainingPriceChangedEvent());
+    }
+
+    private TrainingPriceChangedEvent trainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), OFFER_ID, TRAINING_ID, valueOf(455.34), "PLN");
     }
 
     private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
