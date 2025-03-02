@@ -589,7 +589,7 @@ void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted()
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent() {
-        RejectOfferCommand command = RejectOfferCommand.nextAfter(randomExpiredOfferAcceptanceRequestedEvent(), FAKER.lorem().sentence());
+        RejectOfferCommand command = RejectOfferCommand.nextAfter(randomTrainingPriceChangedEvent());
         return OfferRejectedEvent.nextAfter(command);
     }
 

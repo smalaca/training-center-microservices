@@ -14,12 +14,12 @@ import com.smalaca.opentrainings.domain.offer.NoAvailablePlacesException;
 import com.smalaca.opentrainings.domain.offer.OfferAssertion;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,7 +64,6 @@ class OfferApplicationServiceTest {
     private static final String NO_DISCOUNT_CODE = null;
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
     private static final int NO_AVAILABLE_PLACES = 0;
-    private static final String REJECTION_REASON = FAKER.lorem().sentence();
 
     private final OfferRepository offerRepository = mock(OfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -411,7 +411,7 @@ class OfferApplicationServiceTest {
 
         then.offerRejectedEventPublished()
                 .hasOfferId(OFFER_ID)
-                .hasReason(REJECTION_REASON)
+                .hasReason("Training price changed to: 455.34 PLN")
                 .isNextAfter(command.commandId());
     }
 
@@ -462,11 +462,11 @@ class OfferApplicationServiceTest {
     }
 
     private RejectOfferCommand rejectOfferCommand() {
-        return RejectOfferCommand.nextAfter(expiredOfferAcceptanceRequestedEvent(), REJECTION_REASON);
+        return RejectOfferCommand.nextAfter(trainingPriceChangedEvent());
     }
 
-    private ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent() {
-        return ExpiredOfferAcceptanceRequestedEvent.nextAfter(beginOfferAcceptanceCommand(), TRAINING_ID, TRAINING_PRICE);
+    private TrainingPriceChangedEvent trainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), OFFER_ID, TRAINING_ID, valueOf(455.34), "PLN");
     }
 
     private AcceptOfferCommand acceptOfferCommandWithoutDiscount() {
