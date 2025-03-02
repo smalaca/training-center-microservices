@@ -103,7 +103,7 @@ public class GivenOffer {
         UUID participantId = UUID.randomUUID();
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
         given(trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, participantId))).willReturn(TrainingBookingResponse.successful(trainingId, participantId));
-        offer.accept(acceptOfferCommand(participantId), trainingOfferCatalogue, null, clock);
+        offer.accept(acceptOfferCommand(participantId), trainingOfferCatalogue, null);
 
         return this;
     }

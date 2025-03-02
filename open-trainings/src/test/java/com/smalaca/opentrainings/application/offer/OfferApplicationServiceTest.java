@@ -204,29 +204,6 @@ class OfferApplicationServiceTest {
         then(offerRepository).should(never()).save(any());
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = {13, 20, 100})
-    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged(int minutes) {
-        givenOffer().createdMinutesAgo(minutes).acceptanceInProgress();
-        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
-
-        service.accept(acceptOfferCommandWithoutDiscount());
-
-        then.offerSaved().isRejected();
-    }
-
-    @Test
-    void shouldPublishOfferRejectedEventWhenOfferExpiredAndTrainingPriceChanged() {
-        givenOffer().createdMinutesAgo(42).acceptanceInProgress();
-        givenAvailableTrainingThatCanBeBookedWithPriceChanged();
-
-        service.accept(acceptOfferCommandWithoutDiscount());
-
-        then.offerRejectedEventPublished()
-                .hasOfferId(OFFER_ID)
-                .hasReason("Offer expired");
-    }
-
     @Test
     void shouldRejectOfferWhenTrainingNoLongerAvailable() {
         givenOfferWithAcceptanceInProgress();
@@ -443,24 +420,15 @@ class OfferApplicationServiceTest {
         given(discountService.calculatePriceFor(dto)).willReturn(response);
     }
 
-    private void givenAvailableTrainingThatCanBeBookedWithPriceChanged() {
-        givenAvailableTrainingWith(randomPrice());
-        givenTrainingThatCanBeBooked();
-    }
-
     private void givenAvailableTrainingThatCanBeBookedWithSamePrice() {
         givenAvailableTraining();
         givenTrainingThatCanBeBooked();
     }
 
     private void givenAvailableTraining() {
-        givenAvailableTrainingWith(TRAINING_PRICE);
-    }
-
-    private void givenAvailableTrainingWith(Price price) {
         int availablePlaces = FAKER.number().numberBetween(1, 42);
 
-        givenTraining(new TrainingDto(availablePlaces, price));
+        givenTraining(new TrainingDto(availablePlaces, OfferApplicationServiceTest.TRAINING_PRICE));
     }
 
     private void givenTraining(TrainingDto trainingDto) {

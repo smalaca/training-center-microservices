@@ -48,8 +48,4 @@ public class Price {
         result = 31 * result + currency.hashCode();
         return result;
     }
-
-    public boolean differentThan(Price price) {
-        return !this.equals(price);
-    }
 }
