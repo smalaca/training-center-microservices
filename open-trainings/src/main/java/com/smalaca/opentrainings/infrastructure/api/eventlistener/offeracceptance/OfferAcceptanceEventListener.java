@@ -10,6 +10,8 @@ import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceReq
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +56,18 @@ public class OfferAcceptanceEventListener {
     @EventListener
     @DrivenAdapter
     public void listen(ExpiredOfferAcceptanceRequestedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(TrainingPriceChangedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(TrainingPriceNotChangedEvent event) {
         engine.accept(event);
     }
 

@@ -105,9 +105,9 @@ public class Offer {
             throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
         }
 
-        if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
-            return reject(asRejectOfferCommand("Offer expired"));
-        }
+//        if (isOfferNotAvailable(clock, trainingOfferCatalogue)) {
+//            return reject(asRejectOfferCommand("Offer expired"));
+//        }
 
         Price finalPrice = finalPrice(command, discountService);
 

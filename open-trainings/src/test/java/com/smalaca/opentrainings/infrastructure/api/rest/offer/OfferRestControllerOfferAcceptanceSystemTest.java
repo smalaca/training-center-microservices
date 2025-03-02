@@ -11,13 +11,13 @@ import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.awaitility.Awaitility.await;
@@ -101,18 +101,34 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    @Disabled
-    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
+    void shouldAcceptOfferWhenOfferExpiredAndTrainingPriceNotChanged() {
         given
                 .expiredOffer()
                 .personRegistered()
-                .trainingPriceChanged();
+                .trainingPriceNotChanged()
+                .bookableTraining()
+                .discount(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Offer expired")
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
+        given
+                .expiredOffer()
+                .personRegistered()
+                .trainingPriceChanged(BigDecimal.valueOf(439.21), "EUR");
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
                 .offerRejected(dto));
     }
 
