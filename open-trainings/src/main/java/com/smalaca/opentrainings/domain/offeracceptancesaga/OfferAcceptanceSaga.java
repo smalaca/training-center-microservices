@@ -81,16 +81,12 @@ public class OfferAcceptanceSaga {
         consumed(event, clock.now());
         isOfferAcceptanceInProgress = true;
 
-        if (hasParticipantId()) {
+        if (canStartOfferAcceptance()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
         } else {
             return Optional.empty();
         }
 
-    }
-
-    private boolean hasParticipantId() {
-        return participantId != null;
     }
 
     public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
@@ -102,11 +98,15 @@ public class OfferAcceptanceSaga {
         consumed(event, clock.now());
         isOfferAcceptanceInProgress = true;
 
-        if (hasParticipantId()) {
+        if (canStartOfferAcceptance()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
         } else {
             return Optional.empty();
         }
+    }
+
+    private boolean canStartOfferAcceptance() {
+        return participantId != null && isOfferAcceptanceInProgress;
     }
 
     public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
