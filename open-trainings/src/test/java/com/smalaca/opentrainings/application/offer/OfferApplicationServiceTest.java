@@ -18,8 +18,8 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -474,11 +474,11 @@ class OfferApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommandWithDiscount(String discountCode) {
-        return AcceptOfferCommand.nextAfter(personRegisteredEvent(), discountCode);
+        return AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), PARTICIPANT_ID, discountCode);
     }
 
-    private PersonRegisteredEvent personRegisteredEvent() {
-        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
+    private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
     }
 
     private BeginOfferAcceptanceCommand beginOfferAcceptanceCommand() {

@@ -193,7 +193,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), FAKER.code().ean13());
+        return AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), FAKER.code().ean13());
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {

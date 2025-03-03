@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -41,8 +41,8 @@ class OutboxMessageMapperTest {
     }
 
     private AcceptOfferCommand givenAcceptOfferCommand() {
-        PersonRegisteredEvent event = new PersonRegisteredEvent(newEventId(), randomId(), randomId());
-        return AcceptOfferCommand.nextAfter(event, FAKER.code().ean8());
+        TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(newEventId(), randomId(), randomId());
+        return AcceptOfferCommand.nextAfter(event, randomId(), FAKER.code().ean8());
     }
 
     @Test
