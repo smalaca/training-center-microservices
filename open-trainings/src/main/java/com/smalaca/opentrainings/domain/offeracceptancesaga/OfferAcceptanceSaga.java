@@ -114,20 +114,22 @@ public class OfferAcceptanceSaga {
         return RejectOfferCommand.nextAfter(event);
     }
 
-    public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
-        consumed(event, clock.now());
-        rejectionReason = "Offer already " + event.status();
-        status = REJECTED;
-    }
-
     public void accept(OfferAcceptedEvent event, Clock clock) {
         consumed(event, clock.now());
         status = ACCEPTED;
     }
 
     public void accept(OfferRejectedEvent event, Clock clock) {
+        reject(event, clock, event.reason());
+    }
+
+    public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
+        reject(event, clock, "Offer already " + event.status());
+    }
+
+    private void reject(OfferAcceptanceSagaEvent event, Clock clock, String rejectionReason) {
         consumed(event, clock.now());
-        rejectionReason = event.reason();
+        this.rejectionReason = rejectionReason;
         status = REJECTED;
     }
 
