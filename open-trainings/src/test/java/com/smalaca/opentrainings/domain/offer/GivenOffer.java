@@ -1,13 +1,12 @@
 package com.smalaca.opentrainings.domain.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
@@ -146,7 +145,11 @@ public class GivenOffer {
     }
 
     private AcceptOfferCommand acceptOfferCommand(UUID participantId) {
-        return AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(EventId.newEventId(), getOfferId(), participantId), null);
+        return AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), participantId, null);
+    }
+
+    private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(newEventId(), getOfferId(), trainingId);
     }
 
     private RejectOfferCommand rejectOfferCommand() {

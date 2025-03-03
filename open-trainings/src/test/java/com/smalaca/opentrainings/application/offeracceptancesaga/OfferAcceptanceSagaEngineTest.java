@@ -572,7 +572,7 @@ void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted()
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomPersonRegisteredEvent(), DISCOUNT_CODE);
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)

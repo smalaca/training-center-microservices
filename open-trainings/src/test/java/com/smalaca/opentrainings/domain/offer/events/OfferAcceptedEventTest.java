@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class OfferAcceptedEventTest {
 
     @Test
     void shouldCreateOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(personRegisteredEvent(), DISCOUNT_CODE);
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
 
         OfferAcceptedEvent actual = OfferAcceptedEvent.offerAcceptedEventBuilder()
                 .nextAfter(command)
@@ -46,7 +46,7 @@ class OfferAcceptedEventTest {
                 .isNextAfter(command.commandId());
     }
 
-    private PersonRegisteredEvent personRegisteredEvent() {
-        return new PersonRegisteredEvent(newEventId(), OFFER_ID, PARTICIPANT_ID);
+    private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
     }
 }

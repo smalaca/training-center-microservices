@@ -3,7 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -110,7 +110,7 @@ public class GivenOrder {
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
         OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(newEventId(), offerId, participantId), discountCode))
+                .nextAfter(AcceptOfferCommand.nextAfter(new TrainingPriceNotChangedEvent(newEventId(), offerId, trainingId), participantId, discountCode))
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(participantId)

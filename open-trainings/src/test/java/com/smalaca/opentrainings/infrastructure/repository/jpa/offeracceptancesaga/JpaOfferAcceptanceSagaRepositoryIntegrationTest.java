@@ -10,7 +10,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.IntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -171,7 +171,7 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new PersonRegisteredEvent(newEventId(), offerId, randomId()), FAKER.code().imei());
+        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new TrainingPriceNotChangedEvent(newEventId(), offerId, randomId()), randomId(), FAKER.code().imei());
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)
