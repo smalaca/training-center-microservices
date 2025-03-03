@@ -58,35 +58,19 @@ public class OfferAcceptanceSaga {
     public Optional<AcceptOfferCommand> accept(PersonRegisteredEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
-
-        if (isOfferAcceptanceInProgress) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, discountCode));
-        } else {
-            return Optional.empty();
-        }
+        return startAcceptanceIfPossible(event);
     }
 
     public Optional<AcceptOfferCommand> accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
-
-        if (isOfferAcceptanceInProgress) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, discountCode));
-        } else {
-            return Optional.empty();
-        }
+        return startAcceptanceIfPossible(event);
     }
 
     public Optional<AcceptOfferCommand> accept(UnexpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
         isOfferAcceptanceInProgress = true;
-
-        if (canStartOfferAcceptance()) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
-        } else {
-            return Optional.empty();
-        }
-
+        return startAcceptanceIfPossible(event);
     }
 
     public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
@@ -97,7 +81,10 @@ public class OfferAcceptanceSaga {
     public Optional<AcceptOfferCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
         consumed(event, clock.now());
         isOfferAcceptanceInProgress = true;
+        return startAcceptanceIfPossible(event);
+    }
 
+    private Optional<AcceptOfferCommand> startAcceptanceIfPossible(OfferAcceptanceSagaEvent event) {
         if (canStartOfferAcceptance()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
         } else {
