@@ -10,6 +10,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferA
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
@@ -200,6 +201,17 @@ class OutboxMessageAssertion {
                 .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"priceAmount\" : " + expected.priceAmount())
                 .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(UseDiscountCodeCommand expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
+                .contains("\"priceAmount\" : " + expected.priceAmount())
+                .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode())
+                .contains("\"discountCode\" : \"" + expected.discountCode());
         return this;
     }
 }

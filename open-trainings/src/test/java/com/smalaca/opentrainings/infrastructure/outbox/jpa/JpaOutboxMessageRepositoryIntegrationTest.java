@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -11,6 +12,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrai
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
@@ -89,6 +91,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         TrainingPriceChangedEvent trainingPriceChangedEvent = publish(randomTrainingPriceChangedEvent());
         TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = publish(randomTrainingPriceNotChangedEvent());
         ConfirmTrainingPriceCommand confirmTrainingPriceCommand = publish(randomConfirmTrainingPriceCommand());
+        UseDiscountCodeCommand useDiscountCodeCommand = publish(randomUseDiscountCodeCommand());
 
         assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertExpiredOfferAcceptanceRequestedEventSaved(actual, expiredOfferAcceptanceRequestedEvent))
@@ -109,7 +112,8 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .anySatisfy(actual -> assertAcceptOfferCommand(actual, acceptOfferCommand))
                 .anySatisfy(actual -> assertTrainingPriceChangedEvent(actual, trainingPriceChangedEvent))
                 .anySatisfy(actual -> assertTrainingPriceNotChangedEvent(actual, trainingPriceNotChangedEvent))
-                .anySatisfy(actual -> assertConfirmTrainingPriceCommand(actual, confirmTrainingPriceCommand));
+                .anySatisfy(actual -> assertConfirmTrainingPriceCommand(actual, confirmTrainingPriceCommand))
+                .anySatisfy(actual -> assertUseDiscountCodeCommand(actual, useDiscountCodeCommand));
     }
 
     private <T extends OrderEvent> T publish(T event) {
@@ -136,6 +140,10 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         });
     }
 
+    private UseDiscountCodeCommand randomUseDiscountCodeCommand() {
+        return new UseDiscountCodeCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomId(), randomAmount(), randomCurrency(), randomDiscountCode());
+    }
+
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
         return offerAcceptedEventBuilder()
                 .nextAfter(randomAcceptOfferCommand())
@@ -144,8 +152,12 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .withTrainingId(randomId())
                 .withTrainingPrice(randomPrice())
                 .withFinalPrice(randomPrice())
-                .withDiscountCode(FAKER.code().ean13())
+                .withDiscountCode(randomDiscountCode())
                 .build();
+    }
+
+    private String randomDiscountCode() {
+        return FAKER.code().ean13();
     }
 
     private ConfirmTrainingPriceCommand randomConfirmTrainingPriceCommand() {
@@ -193,7 +205,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), FAKER.code().ean13());
+        return AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomDiscountCode());
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {
@@ -201,7 +213,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.code().ean13());
+        return OfferAcceptanceRequestedEvent.create(randomId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), randomDiscountCode());
     }
 
     private OrderRejectedEvent randomOrderRejectedEvent() {
@@ -370,6 +382,14 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.commandId().commandId())
                 .hasOccurredOn(expected.commandId().creationDateTime())
                 .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertUseDiscountCodeCommand(OutboxMessage actual, UseDiscountCodeCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }
