@@ -17,6 +17,8 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAccept
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
@@ -416,27 +418,51 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
-@Test
-void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted() {
-    OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
-    OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
-    saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
-    given(repository.findById(OFFER_ID)).willReturn(saga);
-    givenNowSecondsAgo(5);
-    TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+    @Test
+    void shouldPublishNoCommandWhenDiscountCodeAlreadyUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
 
-    engine.accept(event);
+        engine.accept(randomDiscountCodeAlreadyUsedEvent());
 
-    assertThatOfferAcceptanceSaga(saga)
-            .isInProgress()
-            .hasOfferId(OFFER_ID)
-            .hasDiscountCode(DISCOUNT_CODE)
-            .hasNoParticipantId()
-            .isOfferAcceptanceNotInProgress()
-            .consumedEvents(2)
-            .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
-            .consumedEventAt(event, NOW.minusSeconds(5));
-}
+        thenPublishedCommands(0);
+    }
+
+    @Test
+    void shouldPublishNoCommandWhenDiscountCodeUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+
+        engine.accept(randomDiscountCodeUsedEvent());
+
+        thenPublishedCommands(0);
+    }
+
+    @Test
+    void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceChangedEvent event = randomTrainingPriceChangedEvent();
+
+        engine.accept(event);
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasNoParticipantId()
+                .isOfferAcceptanceNotInProgress()
+                .consumedEvents(2)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(event, NOW.minusSeconds(5));
+    }
 
     @Test
     void shouldPublishRejectOfferCommandWhenTrainingPriceChangedEventAccepted() {
@@ -604,5 +630,13 @@ void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted()
 
     private TrainingPriceChangedEvent randomTrainingPriceChangedEvent() {
         return new TrainingPriceChangedEvent(newEventId(), OFFER_ID, TRAINING_ID, NEW_TRAINING_PRICE_AMOUNT, NEW_TRAINING_PRICE_CURRENCY_CODE);
+    }
+
+    private DiscountCodeAlreadyUsedEvent randomDiscountCodeAlreadyUsedEvent() {
+        return new DiscountCodeAlreadyUsedEvent(newEventId(), OFFER_ID, PARTICIPANT_ID, TRAINING_ID, DISCOUNT_CODE);
+    }
+
+    private DiscountCodeUsedEvent randomDiscountCodeUsedEvent() {
+        return new DiscountCodeUsedEvent(newEventId(), OFFER_ID, PARTICIPANT_ID, TRAINING_ID, DISCOUNT_CODE, TRAINING_PRICE_AMOUNT, NEW_TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
     }
 }
