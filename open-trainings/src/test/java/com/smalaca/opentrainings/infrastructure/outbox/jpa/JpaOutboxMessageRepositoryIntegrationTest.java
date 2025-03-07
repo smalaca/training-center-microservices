@@ -16,6 +16,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscount
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
@@ -98,6 +99,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         DiscountCodeUsedEvent discountCodeUsedEvent = publish(randomDiscountCodeUsedEvent());
         DiscountCodeAlreadyUsedEvent discountCodeAlreadyUsedEvent = publish(randomDiscountCodeAlreadyUsedEvent());
         TrainingPlaceBookedEvent trainingPlaceBookedEvent = publish(randomTrainingPlaceBookedEvent());
+        NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = publish(randomNoAvailableTrainingPlacesLeftEvent());
 
         assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertExpiredOfferAcceptanceRequestedEventSaved(actual, expiredOfferAcceptanceRequestedEvent))
@@ -122,7 +124,8 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .anySatisfy(actual -> assertUseDiscountCodeCommand(actual, useDiscountCodeCommand))
                 .anySatisfy(actual -> assertDiscountCodeUsedEvent(actual, discountCodeUsedEvent))
                 .anySatisfy(actual -> assertDiscountCodeAlreadyUsedEvent(actual, discountCodeAlreadyUsedEvent))
-                .anySatisfy(actual -> assertTrainingPlaceBookedEvent(actual, trainingPlaceBookedEvent));
+                .anySatisfy(actual -> assertTrainingPlaceBookedEvent(actual, trainingPlaceBookedEvent))
+                .anySatisfy(actual -> assertNoAvailableTrainingPlacesLeftEvent(actual, noAvailableTrainingPlacesLeftEvent));
     }
 
     private <T extends OrderEvent> T publish(T event) {
@@ -147,6 +150,10 @@ class JpaOutboxMessageRepositoryIntegrationTest {
             messagesIds.add(command.commandId().commandId());
             return command;
         });
+    }
+
+    private NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {
+        return new NoAvailableTrainingPlacesLeftEvent(newEventId(), randomId(), randomId(), randomId());
     }
 
     private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
@@ -435,6 +442,14 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.eventId().eventId())
                 .hasOccurredOn(expected.eventId().creationDateTime())
                 .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertNoAvailableTrainingPlacesLeftEvent(OutboxMessage actual, NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }

@@ -14,6 +14,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscount
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
@@ -240,6 +241,14 @@ class OutboxMessageAssertion {
     }
 
     OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPlaceBookedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(NoAvailableTrainingPlacesLeftEvent expected) {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"participantId\" : \"" + expected.participantId())
