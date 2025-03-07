@@ -7,13 +7,19 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
@@ -211,6 +217,59 @@ class OutboxMessageAssertion {
                 .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"priceAmount\" : " + expected.priceAmount())
                 .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode())
+                .contains("\"discountCode\" : \"" + expected.discountCode());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(DiscountCodeUsedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"discountCode\" : \"" + expected.discountCode())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
+                .contains("\"originalPrice\" : " + expected.originalPrice())
+                .contains("\"newPrice\" : " + expected.newPrice())
+                .contains("\"priceCurrency\" : \"" + expected.priceCurrency());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(DiscountCodeAlreadyUsedEvent expected) {
+        assertThat(actual.getPayload())
+            .contains("\"offerId\" : \"" + expected.offerId())
+            .contains("\"participantId\" : \"" + expected.participantId())
+            .contains("\"trainingId\" : \"" + expected.trainingId())
+            .contains("\"discountCode\" : \"" + expected.discountCode());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPlaceBookedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(BookTrainingPlaceCommand expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(ReturnDiscountCodeCommand expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
                 .contains("\"discountCode\" : \"" + expected.discountCode());
         return this;
     }

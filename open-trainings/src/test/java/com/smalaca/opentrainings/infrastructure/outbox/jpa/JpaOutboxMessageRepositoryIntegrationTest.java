@@ -8,15 +8,21 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
@@ -92,6 +98,12 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = publish(randomTrainingPriceNotChangedEvent());
         ConfirmTrainingPriceCommand confirmTrainingPriceCommand = publish(randomConfirmTrainingPriceCommand());
         UseDiscountCodeCommand useDiscountCodeCommand = publish(randomUseDiscountCodeCommand());
+        DiscountCodeUsedEvent discountCodeUsedEvent = publish(randomDiscountCodeUsedEvent());
+        DiscountCodeAlreadyUsedEvent discountCodeAlreadyUsedEvent = publish(randomDiscountCodeAlreadyUsedEvent());
+        TrainingPlaceBookedEvent trainingPlaceBookedEvent = publish(randomTrainingPlaceBookedEvent());
+        NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = publish(randomNoAvailableTrainingPlacesLeftEvent());
+        BookTrainingPlaceCommand bookTrainingPlaceCommand = publish(randomBookTrainingPlaceCommand());
+        ReturnDiscountCodeCommand returnDiscountCodeCommand = publish(randomReturnDiscountCodeCommand());
 
         assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertExpiredOfferAcceptanceRequestedEventSaved(actual, expiredOfferAcceptanceRequestedEvent))
@@ -113,7 +125,13 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .anySatisfy(actual -> assertTrainingPriceChangedEvent(actual, trainingPriceChangedEvent))
                 .anySatisfy(actual -> assertTrainingPriceNotChangedEvent(actual, trainingPriceNotChangedEvent))
                 .anySatisfy(actual -> assertConfirmTrainingPriceCommand(actual, confirmTrainingPriceCommand))
-                .anySatisfy(actual -> assertUseDiscountCodeCommand(actual, useDiscountCodeCommand));
+                .anySatisfy(actual -> assertUseDiscountCodeCommand(actual, useDiscountCodeCommand))
+                .anySatisfy(actual -> assertDiscountCodeUsedEvent(actual, discountCodeUsedEvent))
+                .anySatisfy(actual -> assertDiscountCodeAlreadyUsedEvent(actual, discountCodeAlreadyUsedEvent))
+                .anySatisfy(actual -> assertTrainingPlaceBookedEvent(actual, trainingPlaceBookedEvent))
+                .anySatisfy(actual -> assertNoAvailableTrainingPlacesLeftEvent(actual, noAvailableTrainingPlacesLeftEvent))
+                .anySatisfy(actual -> assertBookTrainingPlaceCommand(actual, bookTrainingPlaceCommand))
+                .anySatisfy(actual -> assertReturnDiscountCodeCommand(actual, returnDiscountCodeCommand));
     }
 
     private <T extends OrderEvent> T publish(T event) {
@@ -140,6 +158,26 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         });
     }
 
+    private ReturnDiscountCodeCommand randomReturnDiscountCodeCommand() {
+        return new ReturnDiscountCodeCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomDiscountCode());
+    }
+
+    private NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {
+        return new NoAvailableTrainingPlacesLeftEvent(newEventId(), randomId(), randomId(), randomId());
+    }
+
+    private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
+        return new TrainingPlaceBookedEvent(newEventId(), randomId(), randomId(), randomId());
+    }
+
+    private DiscountCodeAlreadyUsedEvent randomDiscountCodeAlreadyUsedEvent() {
+        return new DiscountCodeAlreadyUsedEvent(newEventId(), randomId(), randomId(), randomId(), randomDiscountCode());
+    }
+
+    private DiscountCodeUsedEvent randomDiscountCodeUsedEvent() {
+        return new DiscountCodeUsedEvent(newEventId(), randomId(), randomId(), randomId(), randomDiscountCode(), randomAmount(), randomAmount(), randomCurrency());
+    }
+
     private UseDiscountCodeCommand randomUseDiscountCodeCommand() {
         return new UseDiscountCodeCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomId(), randomAmount(), randomCurrency(), randomDiscountCode());
     }
@@ -158,6 +196,10 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
     private String randomDiscountCode() {
         return FAKER.code().ean13();
+    }
+
+    private BookTrainingPlaceCommand randomBookTrainingPlaceCommand() {
+        return new BookTrainingPlaceCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomId());
     }
 
     private ConfirmTrainingPriceCommand randomConfirmTrainingPriceCommand() {
@@ -390,6 +432,54 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.commandId().commandId())
                 .hasOccurredOn(expected.commandId().creationDateTime())
                 .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertDiscountCodeUsedEvent(OutboxMessage actual, DiscountCodeUsedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertDiscountCodeAlreadyUsedEvent(OutboxMessage actual, DiscountCodeAlreadyUsedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertTrainingPlaceBookedEvent(OutboxMessage actual, TrainingPlaceBookedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertNoAvailableTrainingPlacesLeftEvent(OutboxMessage actual, NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertBookTrainingPlaceCommand(OutboxMessage actual, BookTrainingPlaceCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertReturnDiscountCodeCommand(OutboxMessage actual, ReturnDiscountCodeCommand expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.commandId().commandId())
+                .hasOccurredOn(expected.commandId().creationDateTime())
+                .hasMessageType("com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }

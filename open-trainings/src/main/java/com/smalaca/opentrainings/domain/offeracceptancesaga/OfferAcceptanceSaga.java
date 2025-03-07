@@ -14,9 +14,13 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAccept
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
@@ -99,6 +103,22 @@ public class OfferAcceptanceSaga {
     public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
         consumed(event, clock.now());
         return RejectOfferCommand.nextAfter(event);
+    }
+
+    public void accept(DiscountCodeUsedEvent event, Clock clock) {
+        consumed(event, clock.now());
+    }
+
+    public void accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
+        consumed(event, clock.now());
+    }
+
+    public void accept(TrainingPlaceBookedEvent event, Clock clock) {
+        consumed(event, clock.now());
+    }
+
+    public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
+        consumed(event, clock.now());
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {
