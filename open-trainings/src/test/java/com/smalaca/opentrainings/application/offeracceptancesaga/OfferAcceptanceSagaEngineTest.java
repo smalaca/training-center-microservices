@@ -21,6 +21,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeA
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -443,6 +444,18 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
+    void shouldPublishNoCommandWhenTrainingPlaceBookedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+
+        engine.accept(randomTrainingPlaceBookedEvent());
+
+        thenPublishedCommands(0);
+    }
+
+    @Test
     void shouldLeaveOfferAcceptanceInProgressWhenTrainingPriceChangedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
@@ -638,5 +651,9 @@ class OfferAcceptanceSagaEngineTest {
 
     private DiscountCodeUsedEvent randomDiscountCodeUsedEvent() {
         return new DiscountCodeUsedEvent(newEventId(), OFFER_ID, PARTICIPANT_ID, TRAINING_ID, DISCOUNT_CODE, TRAINING_PRICE_AMOUNT, NEW_TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
+    }
+
+    private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
+        return new TrainingPlaceBookedEvent(newEventId(), OFFER_ID, PARTICIPANT_ID, TRAINING_ID);
     }
 }

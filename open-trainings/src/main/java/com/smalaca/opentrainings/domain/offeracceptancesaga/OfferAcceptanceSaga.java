@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeU
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
@@ -108,6 +109,10 @@ public class OfferAcceptanceSaga {
     }
 
     public void accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
+        consumed(event, clock.now());
+    }
+
+    public void accept(TrainingPlaceBookedEvent event, Clock clock) {
         consumed(event, clock.now());
     }
 

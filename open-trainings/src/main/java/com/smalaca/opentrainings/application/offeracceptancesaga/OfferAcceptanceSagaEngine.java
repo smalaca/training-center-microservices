@@ -23,6 +23,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeA
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.stereotype.Service;
@@ -147,6 +148,17 @@ public class OfferAcceptanceSagaEngine {
     @DrivenPort
     @CommandOperation
     public void accept(DiscountCodeAlreadyUsedEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+
+        offerAcceptanceSaga.accept(event, clock);
+
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(TrainingPlaceBookedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
         offerAcceptanceSaga.accept(event, clock);
