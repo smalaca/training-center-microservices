@@ -179,7 +179,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private UseDiscountCodeCommand randomUseDiscountCodeCommand() {
-        return new UseDiscountCodeCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomId(), randomAmount(), randomCurrency(), randomDiscountCode());
+        return UseDiscountCodeCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomId(), randomAmount(), randomCurrency(), randomDiscountCode());
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
@@ -199,7 +199,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private BookTrainingPlaceCommand randomBookTrainingPlaceCommand() {
-        return new BookTrainingPlaceCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomId());
+        return BookTrainingPlaceCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomId());
     }
 
     private ConfirmTrainingPriceCommand randomConfirmTrainingPriceCommand() {
@@ -211,7 +211,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private UnexpiredOfferAcceptanceRequestedEvent randomUnexpiredOfferAcceptanceRequestedEvent() {
-        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand());
+        return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), randomId(), randomPrice());
     }
 
     private AlreadyRegisteredPersonFoundEvent randomAlreadyRegisteredPersonFoundEvent() {

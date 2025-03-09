@@ -93,7 +93,7 @@ public class Offer {
         status = ACCEPTANCE_IN_PROGRESS;
 
         if (isNewerThan10Minutes(clock)) {
-            return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command);
+            return UnexpiredOfferAcceptanceRequestedEvent.nextAfter(command, trainingId, trainingPrice);
         } else {
             return ExpiredOfferAcceptanceRequestedEvent.nextAfter(command, trainingId, trainingPrice);
         }

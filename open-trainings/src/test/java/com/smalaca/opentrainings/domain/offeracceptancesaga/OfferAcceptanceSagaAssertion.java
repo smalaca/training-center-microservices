@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,6 +50,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoDiscountCode() {
+        assertThat(actual).extracting("discountCode").isNull();
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasNoParticipantId() {
         assertThat(actual).extracting("participantId").isNull();
         return this;
@@ -59,16 +65,16 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
-    public OfferAcceptanceSagaAssertion isOfferAcceptanceNotInProgress() {
-        return isOfferAcceptanceInProgressEqualsTo(false);
+    public OfferAcceptanceSagaAssertion isOfferPriceNotConfirmed() {
+        return isOfferPriceConfirmedEqualsTo(false);
     }
 
-    public OfferAcceptanceSagaAssertion isOfferAcceptanceInProgress() {
-        return isOfferAcceptanceInProgressEqualsTo(true);
+    public OfferAcceptanceSagaAssertion isOfferPriceConfirmed() {
+        return isOfferPriceConfirmedEqualsTo(true);
     }
 
-    private OfferAcceptanceSagaAssertion isOfferAcceptanceInProgressEqualsTo(boolean expected) {
-        assertThat(actual).extracting("isOfferAcceptanceInProgress").isEqualTo(expected);
+    private OfferAcceptanceSagaAssertion isOfferPriceConfirmedEqualsTo(boolean expected) {
+        assertThat(actual).extracting("isOfferPriceConfirmed").isEqualTo(expected);
         return this;
     }
 
@@ -79,6 +85,16 @@ public class OfferAcceptanceSagaAssertion {
 
     public OfferAcceptanceSagaAssertion hasRejectionReason(String expected) {
         assertThat(actual).extracting("rejectionReason").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasTrainingId(UUID expected) {
+        assertThat(actual).extracting("trainingId").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasTrainingPrice(Price expected) {
+        assertThat(actual).extracting("trainingPrice").isEqualTo(expected);
         return this;
     }
 

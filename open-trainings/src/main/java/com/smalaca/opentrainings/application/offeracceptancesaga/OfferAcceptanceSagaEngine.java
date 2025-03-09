@@ -14,7 +14,6 @@ import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceReq
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -53,9 +51,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(OfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        command.forEach(commandRegistry::publish);
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -65,9 +63,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(PersonRegisteredEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -77,9 +75,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(AlreadyRegisteredPersonFoundEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -89,9 +87,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(UnexpiredOfferAcceptanceRequestedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -113,9 +111,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(TrainingPriceNotChangedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
