@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record UseDiscountCodeCommand(
         CommandId commandId, UUID offerId, UUID participantId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode, String discountCode) implements OfferAcceptanceSagaCommand {
-    public static OfferAcceptanceSagaCommand nextAfter(OfferAcceptanceSagaEvent event, UUID participantId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode, String discountCode) {
+    public static UseDiscountCodeCommand nextAfter(OfferAcceptanceSagaEvent event, UUID participantId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode, String discountCode) {
         return new UseDiscountCodeCommand(
                 CommandId.nextAfter(event.eventId()), event.offerId(), participantId, trainingId, priceAmount, priceCurrencyCode, discountCode);
     }

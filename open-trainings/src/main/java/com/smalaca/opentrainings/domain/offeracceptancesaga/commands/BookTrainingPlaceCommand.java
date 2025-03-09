@@ -6,7 +6,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import java.util.UUID;
 
 public record BookTrainingPlaceCommand(CommandId commandId, UUID offerId, UUID participantId, UUID trainingId) implements OfferAcceptanceSagaCommand {
-    public static OfferAcceptanceSagaCommand nextAfter(OfferAcceptanceSagaEvent event, UUID participantId, UUID trainingId) {
+    public static BookTrainingPlaceCommand nextAfter(OfferAcceptanceSagaEvent event, UUID participantId, UUID trainingId) {
         return new BookTrainingPlaceCommand(CommandId.nextAfter(event.eventId()), event.offerId(), participantId, trainingId);
     }
 }
