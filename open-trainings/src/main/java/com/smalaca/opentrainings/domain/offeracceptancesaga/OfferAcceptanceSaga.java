@@ -8,6 +8,7 @@ import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptance
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
@@ -107,10 +108,13 @@ public class OfferAcceptanceSaga {
         if (canStartBooking()) {
             if (hasDiscountCode()) {
                 return asList(
+                        AcceptOfferCommand.nextAfter(event, participantId, discountCode),
                         BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId),
                         UseDiscountCodeCommand.nextAfter(event, participantId, trainingId, trainingPrice.amount(), trainingPrice.currencyCode(), discountCode));
             } else {
-                return asList(BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId));
+                return asList(
+                        AcceptOfferCommand.nextAfter(event, participantId, discountCode),
+                        BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId));
             }
         } else {
             return emptyList();

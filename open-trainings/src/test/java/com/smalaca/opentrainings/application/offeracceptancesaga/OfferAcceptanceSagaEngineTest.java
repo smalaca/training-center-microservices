@@ -175,7 +175,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -208,7 +208,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -264,7 +264,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -297,7 +297,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -355,7 +355,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -388,7 +388,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -410,7 +410,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -443,7 +443,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -549,7 +549,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -583,7 +583,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -606,7 +606,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(2)
+        thenPublishedCommands(3)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
@@ -640,7 +640,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        thenPublishedCommands(1)
+        thenPublishedCommands(2)
                 .anySatisfy(actual -> {
                     assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)

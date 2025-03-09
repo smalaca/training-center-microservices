@@ -20,6 +20,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static org.awaitility.Awaitility.await;
+
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
 class OfferRestControllerOfferAcceptanceSystemTest {
@@ -77,9 +79,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceAccepted(dto.getOfferId())
-//                .offerAccepted(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
     }
 
     @Test
@@ -93,9 +95,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceAccepted(dto.getOfferId())
-//                .offerAccepted(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
     }
 
     @Test
@@ -110,9 +112,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceAccepted(dto.getOfferId())
-//                .offerAccepted(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
     }
 
     @Test
@@ -125,9 +127,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
-//                .offerRejected(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
+                .offerRejected(dto));
     }
 
     @Test
@@ -141,9 +143,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceRejected(dto.getOfferId(), "Training no longer available")
-//                .offerRejected(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Training no longer available")
+                .offerRejected(dto));
     }
 
     @Test
@@ -157,9 +159,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         client.offers().accept(command(dto));
 
-//        await().untilAsserted(() -> then
-//                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
-//                .offerDeclined(dto));
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
+                .offerDeclined(dto));
     }
 
     private RestAcceptOfferTestCommand command(OfferTestDto dto) {
