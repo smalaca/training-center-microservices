@@ -7,12 +7,13 @@ import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptance
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
@@ -23,11 +24,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegiste
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.opentrainings.domain.price.Price;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -35,6 +36,7 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptan
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.REJECTED;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 @Saga
 public class OfferAcceptanceSaga {
@@ -44,6 +46,8 @@ public class OfferAcceptanceSaga {
     private OfferAcceptanceSagaStatus status;
     private String discountCode;
     private UUID participantId;
+    private UUID trainingId;
+    private Price trainingPrice;
     private boolean isOfferPriceConfirmed;
 
     public OfferAcceptanceSaga(UUID offerId) {
@@ -60,40 +64,47 @@ public class OfferAcceptanceSaga {
                 BeginOfferAcceptanceCommand.nextAfter(event));
     }
 
-    public Optional<AcceptOfferCommand> accept(PersonRegisteredEvent event, Clock clock) {
+    public List<OfferAcceptanceSagaCommand> accept(PersonRegisteredEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
         return startBookingIfPossible(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
+    public List<OfferAcceptanceSagaCommand> accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
         return startBookingIfPossible(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(UnexpiredOfferAcceptanceRequestedEvent event, Clock clock) {
+    public List<OfferAcceptanceSagaCommand> accept(UnexpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
         isOfferPriceConfirmed = true;
+        trainingId = event.trainingId();
+        trainingPrice = Price.of(event.trainingPriceAmount(), event.trainingPriceCurrencyCode());
         return startBookingIfPossible(event);
     }
 
     public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
+        trainingId = event.trainingId();
+        trainingPrice = Price.of(event.trainingPriceAmount(), event.trainingPriceCurrencyCode());
         return ConfirmTrainingPriceCommand.nextAfter(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
+    public List<OfferAcceptanceSagaCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
         consumed(event, clock.now());
         isOfferPriceConfirmed = true;
         return startBookingIfPossible(event);
     }
 
-    private Optional<AcceptOfferCommand> startBookingIfPossible(OfferAcceptanceSagaEvent event) {
+    private List<OfferAcceptanceSagaCommand> startBookingIfPossible(OfferAcceptanceSagaEvent event) {
         if (canStartBooking()) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+            return asList(
+                    BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId),
+                    UseDiscountCodeCommand.nextAfter(event, participantId, trainingId, trainingPrice.amount(), trainingPrice.currencyCode(), discountCode)
+            );
         } else {
-            return Optional.empty();
+            return emptyList();
         }
     }
 
