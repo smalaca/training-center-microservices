@@ -39,18 +39,19 @@ import static java.util.Arrays.asList;
 @Saga
 public class OfferAcceptanceSaga {
     private final UUID offerId;
-    private String rejectionReason;
     private final List<ConsumedEvent> events = new ArrayList<>();
-    private OfferAcceptanceSagaStatus status = IN_PROGRESS;
+    private String rejectionReason;
+    private OfferAcceptanceSagaStatus status;
     private String discountCode;
     private UUID participantId;
-    private boolean isOfferAcceptanceInProgress;
+    private boolean isOfferPriceConfirmed;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
     }
 
     public List<OfferAcceptanceSagaCommand> accept(OfferAcceptanceRequestedEvent event, Clock clock) {
+        status = IN_PROGRESS;
         discountCode = event.discountCode();
         consumed(event, clock.now());
 
@@ -62,19 +63,19 @@ public class OfferAcceptanceSaga {
     public Optional<AcceptOfferCommand> accept(PersonRegisteredEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
-        return startAcceptanceIfPossible(event);
+        return startBookingIfPossible(event);
     }
 
     public Optional<AcceptOfferCommand> accept(AlreadyRegisteredPersonFoundEvent event, Clock clock) {
         consumed(event, clock.now());
         participantId = event.participantId();
-        return startAcceptanceIfPossible(event);
+        return startBookingIfPossible(event);
     }
 
     public Optional<AcceptOfferCommand> accept(UnexpiredOfferAcceptanceRequestedEvent event, Clock clock) {
         consumed(event, clock.now());
-        isOfferAcceptanceInProgress = true;
-        return startAcceptanceIfPossible(event);
+        isOfferPriceConfirmed = true;
+        return startBookingIfPossible(event);
     }
 
     public ConfirmTrainingPriceCommand accept(ExpiredOfferAcceptanceRequestedEvent event, Clock clock) {
@@ -84,20 +85,20 @@ public class OfferAcceptanceSaga {
 
     public Optional<AcceptOfferCommand> accept(TrainingPriceNotChangedEvent event, Clock clock) {
         consumed(event, clock.now());
-        isOfferAcceptanceInProgress = true;
-        return startAcceptanceIfPossible(event);
+        isOfferPriceConfirmed = true;
+        return startBookingIfPossible(event);
     }
 
-    private Optional<AcceptOfferCommand> startAcceptanceIfPossible(OfferAcceptanceSagaEvent event) {
-        if (canStartOfferAcceptance()) {
+    private Optional<AcceptOfferCommand> startBookingIfPossible(OfferAcceptanceSagaEvent event) {
+        if (canStartBooking()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
         } else {
             return Optional.empty();
         }
     }
 
-    private boolean canStartOfferAcceptance() {
-        return participantId != null && isOfferAcceptanceInProgress;
+    private boolean canStartBooking() {
+        return participantId != null && isOfferPriceConfirmed;
     }
 
     public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
