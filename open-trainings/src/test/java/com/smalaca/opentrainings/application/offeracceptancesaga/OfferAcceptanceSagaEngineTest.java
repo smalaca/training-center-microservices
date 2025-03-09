@@ -31,6 +31,8 @@ import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
 import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
@@ -83,6 +85,22 @@ class OfferAcceptanceSagaEngineTest {
                 .isInProgress()
                 .hasOfferId(event.offerId())
                 .hasDiscountCode(DISCOUNT_CODE)
+                .consumedEvents(1)
+                .consumedEventAt(event, NOW.minusSeconds(1));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldCreateOfferAcceptanceSagaWhenOfferAcceptanceRequestedEventAcceptedWithNoDiscountCode(String noDiscountCode) {
+        givenNowSecondsAgo(1);
+        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEventWith(noDiscountCode);
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .isInProgress()
+                .hasOfferId(event.offerId())
+                .hasNoDiscountCode()
                 .consumedEvents(1)
                 .consumedEventAt(event, NOW.minusSeconds(1));
     }
@@ -178,6 +196,29 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenPersonRegisteredEventAcceptedAndOfferPriceConfirmedAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        PersonRegisteredEvent event = randomPersonRegisteredEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
     @Test
     void shouldHasParticipantIdWhenAlreadyRegisteredPersonFoundEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
@@ -240,6 +281,29 @@ class OfferAcceptanceSagaEngineTest {
                             .hasTrainingId(TRAINING_ID)
                             .hasTrainingPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenAlreadyRegisteredPersonFoundEventAcceptedAndOfferPriceConfirmedAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        AlreadyRegisteredPersonFoundEvent event = randomAlreadyRegisteredPersonFoundEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -312,6 +376,29 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndPersonRegisteredAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        UnexpiredOfferAcceptanceRequestedEvent event = randomUnexpiredOfferAcceptanceRequestedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndPersonAlreadyRegistered() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
@@ -340,6 +427,29 @@ class OfferAcceptanceSagaEngineTest {
                             .hasTrainingId(TRAINING_ID)
                             .hasTrainingPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndPersonAlreadyRegisteredAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        UnexpiredOfferAcceptanceRequestedEvent event = randomUnexpiredOfferAcceptanceRequestedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -460,6 +570,30 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenTrainingPriceNotChangedEventAcceptedAndPersonRegisteredAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceNotChangedEvent event = randomTrainingPriceNotChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenTrainingPriceNotChangedEventAcceptedAndPersonAlreadyRegistered() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
@@ -489,6 +623,30 @@ class OfferAcceptanceSagaEngineTest {
                             .hasTrainingId(TRAINING_ID)
                             .hasTrainingPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishBookTrainingPlaceCommandWhenTrainingPriceNotChangedEventAcceptedAndPersonAlreadyRegisteredAndNoDiscountCode(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPriceNotChangedEvent event = randomTrainingPriceNotChangedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(BookTrainingPlaceCommand.class);
+                    assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasTrainingId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -695,7 +853,11 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), DISCOUNT_CODE);
+        return randomOfferAcceptanceRequestedEventWith(DISCOUNT_CODE);
+    }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEventWith(String discountCode) {
+        return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), discountCode);
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {

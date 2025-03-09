@@ -50,6 +50,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoDiscountCode() {
+        assertThat(actual).extracting("discountCode").isNull();
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasNoParticipantId() {
         assertThat(actual).extracting("participantId").isNull();
         return this;

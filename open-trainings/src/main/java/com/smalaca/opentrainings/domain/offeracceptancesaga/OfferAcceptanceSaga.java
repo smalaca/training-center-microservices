@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.domain.offeracceptancesaga;
 
+import com.google.common.base.Strings;
 import com.smalaca.domaindrivendesign.Saga;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
@@ -55,12 +56,18 @@ public class OfferAcceptanceSaga {
     }
 
     public List<OfferAcceptanceSagaCommand> accept(OfferAcceptanceRequestedEvent event, Clock clock) {
-        discountCode = event.discountCode();
         consumed(event, clock.now());
+        if(hasDiscountCode(event)) {
+            discountCode = event.discountCode();
+        }
 
         return asList(
                 RegisterPersonCommand.nextAfter(event),
                 BeginOfferAcceptanceCommand.nextAfter(event));
+    }
+
+    private boolean hasDiscountCode(OfferAcceptanceRequestedEvent event) {
+        return !Strings.isNullOrEmpty(event.discountCode());
     }
 
     public List<OfferAcceptanceSagaCommand> accept(PersonRegisteredEvent event, Clock clock) {
@@ -98,13 +105,20 @@ public class OfferAcceptanceSaga {
 
     private List<OfferAcceptanceSagaCommand> startBookingIfPossible(OfferAcceptanceSagaEvent event) {
         if (canStartBooking()) {
-            return asList(
-                    BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId),
-                    UseDiscountCodeCommand.nextAfter(event, participantId, trainingId, trainingPrice.amount(), trainingPrice.currencyCode(), discountCode)
-            );
+            if (hasDiscountCode()) {
+                return asList(
+                        BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId),
+                        UseDiscountCodeCommand.nextAfter(event, participantId, trainingId, trainingPrice.amount(), trainingPrice.currencyCode(), discountCode));
+            } else {
+                return asList(BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId));
+            }
         } else {
             return emptyList();
         }
+    }
+
+    private boolean hasDiscountCode() {
+        return discountCode != null;
     }
 
     private boolean canStartBooking() {
