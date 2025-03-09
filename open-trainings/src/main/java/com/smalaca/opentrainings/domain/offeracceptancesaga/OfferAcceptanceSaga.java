@@ -43,7 +43,7 @@ public class OfferAcceptanceSaga {
     private final UUID offerId;
     private final List<ConsumedEvent> events = new ArrayList<>();
     private String rejectionReason;
-    private OfferAcceptanceSagaStatus status;
+    private OfferAcceptanceSagaStatus status = IN_PROGRESS;
     private String discountCode;
     private UUID participantId;
     private UUID trainingId;
@@ -55,7 +55,6 @@ public class OfferAcceptanceSaga {
     }
 
     public List<OfferAcceptanceSagaCommand> accept(OfferAcceptanceRequestedEvent event, Clock clock) {
-        status = IN_PROGRESS;
         discountCode = event.discountCode();
         consumed(event, clock.now());
 
