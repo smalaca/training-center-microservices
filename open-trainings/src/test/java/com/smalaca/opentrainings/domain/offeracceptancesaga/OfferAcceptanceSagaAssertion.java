@@ -55,6 +55,16 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasDiscountCodeUsed() {
+        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(true);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsed() {
+        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(true);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasNoParticipantId() {
         assertThat(actual).extracting("participantId").isNull();
         return this;
@@ -95,6 +105,16 @@ public class OfferAcceptanceSagaAssertion {
 
     public OfferAcceptanceSagaAssertion hasTrainingPrice(Price expected) {
         assertThat(actual).extracting("trainingPrice").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasTrainingPlaceBooked() {
+        assertThat(actual).extracting("isTrainingPlaceBooked").isEqualTo(true);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasNoAvailableTrainingPlacesLeft() {
+        assertThat(actual).extracting("hasNoAvailableTrainingPlacesLeft").isEqualTo(true);
         return this;
     }
 

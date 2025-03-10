@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -135,8 +136,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(DiscountCodeUsedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
+        command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -146,8 +148,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(DiscountCodeAlreadyUsedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
+        command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -157,8 +160,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(TrainingPlaceBookedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
+        command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
@@ -168,8 +172,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(NoAvailableTrainingPlacesLeftEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 

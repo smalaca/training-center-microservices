@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
-import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -159,7 +158,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private ReturnDiscountCodeCommand randomReturnDiscountCodeCommand() {
-        return new ReturnDiscountCodeCommand(CommandId.nextAfter(newEventId()), randomId(), randomId(), randomDiscountCode());
+        return ReturnDiscountCodeCommand.nextAfter(randomDiscountCodeUsedEvent(), randomId(), randomDiscountCode());
     }
 
     private NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {

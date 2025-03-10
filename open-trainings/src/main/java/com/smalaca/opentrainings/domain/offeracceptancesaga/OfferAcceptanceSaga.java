@@ -15,6 +15,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrai
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
@@ -31,6 +32,7 @@ import com.smalaca.opentrainings.domain.price.Price;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -47,10 +49,14 @@ public class OfferAcceptanceSaga {
     private String rejectionReason;
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
     private String discountCode;
+    private boolean isDiscountCodeUsed;
+    private boolean isDiscountAlreadyCodeUsed;
     private UUID participantId;
     private UUID trainingId;
     private Price trainingPrice;
     private boolean isOfferPriceConfirmed;
+    private boolean isTrainingPlaceBooked;
+    private boolean hasNoAvailableTrainingPlacesLeft;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -121,10 +127,6 @@ public class OfferAcceptanceSaga {
         }
     }
 
-    private boolean hasDiscountCode() {
-        return discountCode != null;
-    }
-
     private boolean canStartBooking() {
         return participantId != null && isOfferPriceConfirmed;
     }
@@ -134,20 +136,60 @@ public class OfferAcceptanceSaga {
         return RejectOfferCommand.nextAfter(event);
     }
 
-    public void accept(DiscountCodeUsedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isDiscountCodeUsed = true;
+
+        if (hasNoAvailableTrainingPlacesLeft) {
+            return Optional.of(ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
+        }
+
+        return acceptOfferIfPossible(event);
     }
 
-    public void accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isDiscountAlreadyCodeUsed = true;
+        return acceptOfferIfPossible(event);
     }
 
-    public void accept(TrainingPlaceBookedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(TrainingPlaceBookedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isTrainingPlaceBooked = true;
+        return acceptOfferIfPossible(event);
     }
 
-    public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
+    private Optional<OfferAcceptanceSagaCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
+        if (canAcceptOffer()) {
+            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private boolean canAcceptOffer() {
+        return (hasNoDiscountCode() || isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
+    }
+
+    private boolean hasNoDiscountCode() {
+        return !hasDiscountCode();
+    }
+
+    private boolean hasDiscountCode() {
+        return discountCode != null;
+    }
+
+    public List<OfferAcceptanceSagaCommand> accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
         consumed(event, clock.now());
+        hasNoAvailableTrainingPlacesLeft = true;
+
+        if (isDiscountCodeUsed) {
+            return asList(
+                    RejectOfferCommand.nextAfter(event),
+                    ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return List.of(RejectOfferCommand.nextAfter(event));
+        }
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {
