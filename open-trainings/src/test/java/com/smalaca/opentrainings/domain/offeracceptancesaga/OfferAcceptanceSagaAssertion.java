@@ -113,6 +113,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoAvailableTrainingPlacesLeft() {
+        assertThat(actual).extracting("hasNoAvailableTrainingPlacesLeft").isEqualTo(true);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion consumedNoEvents() {
         return consumedEvents(0);
     }

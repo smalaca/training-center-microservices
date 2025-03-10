@@ -54,6 +54,7 @@ public class OfferAcceptanceSaga {
     private Price trainingPrice;
     private boolean isOfferPriceConfirmed;
     private boolean isTrainingPlaceBooked;
+    private boolean hasNoAvailableTrainingPlacesLeft;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -154,6 +155,7 @@ public class OfferAcceptanceSaga {
 
     public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
         consumed(event, clock.now());
+        hasNoAvailableTrainingPlacesLeft = true;
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {
