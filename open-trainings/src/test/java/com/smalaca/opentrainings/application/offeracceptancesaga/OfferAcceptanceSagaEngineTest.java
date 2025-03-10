@@ -787,7 +787,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldPublishReturnDiscountCodeCommandWhennoAvailableTrainingPlacesLeftEventAndDiscountCodeUsedEventAccepted() {
+    void shouldPublishReturnDiscountCodeCommandWhenNoAvailableTrainingPlacesLeftEventAndDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
