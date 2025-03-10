@@ -651,6 +651,33 @@ class OfferAcceptanceSagaEngineTest {
                 });
     }
 
+    @Test
+    void shouldSetDiscountCodeAlreadyUsedWhenDiscountCodeAlreadyUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
+        UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        saga.accept(personRegisteredEvent, givenNowSecondsAgo(10));
+        saga.accept(unexpiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        DiscountCodeAlreadyUsedEvent discountCodeAlreadyUsedEvent = randomDiscountCodeAlreadyUsedEvent();
+
+        engine.accept(discountCodeAlreadyUsedEvent);
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeAlreadyUsed()
+                .consumedEvents(4)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
+                .consumedEventAt(unexpiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(8))
+                .consumedEventAt(discountCodeAlreadyUsedEvent, NOW.minusSeconds(5));
+    }
+
     // to change, missing logic
     @Test
     void shouldPublishNoCommandWhenDiscountCodeAlreadyUsedEventAccepted() {

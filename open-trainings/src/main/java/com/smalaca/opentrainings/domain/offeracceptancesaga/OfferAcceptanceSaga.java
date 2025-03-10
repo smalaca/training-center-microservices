@@ -48,6 +48,7 @@ public class OfferAcceptanceSaga {
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
     private String discountCode;
     private boolean isDiscountCodeUsed;
+    private boolean isDiscountAlreadyCodeUsed;
     private UUID participantId;
     private UUID trainingId;
     private Price trainingPrice;
@@ -142,6 +143,7 @@ public class OfferAcceptanceSaga {
 
     public void accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isDiscountAlreadyCodeUsed = true;
     }
 
     public void accept(TrainingPlaceBookedEvent event, Clock clock) {
