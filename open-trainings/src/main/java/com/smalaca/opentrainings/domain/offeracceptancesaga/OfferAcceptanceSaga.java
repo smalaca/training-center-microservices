@@ -15,6 +15,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrai
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
@@ -135,25 +136,30 @@ public class OfferAcceptanceSaga {
         return RejectOfferCommand.nextAfter(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountCodeUsed = true;
+
+        if (hasNoAvailableTrainingPlacesLeft) {
+            return Optional.of(ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
+        }
+
         return acceptOfferIfPossible(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountAlreadyCodeUsed = true;
         return acceptOfferIfPossible(event);
     }
 
-    public Optional<AcceptOfferCommand> accept(TrainingPlaceBookedEvent event, Clock clock) {
+    public Optional<OfferAcceptanceSagaCommand> accept(TrainingPlaceBookedEvent event, Clock clock) {
         consumed(event, clock.now());
         isTrainingPlaceBooked = true;
         return acceptOfferIfPossible(event);
     }
 
-    private Optional<AcceptOfferCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
+    private Optional<OfferAcceptanceSagaCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
         if (canAcceptOffer()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
         } else {
@@ -173,9 +179,17 @@ public class OfferAcceptanceSaga {
         return discountCode != null;
     }
 
-    public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
+    public List<OfferAcceptanceSagaCommand> accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
         consumed(event, clock.now());
         hasNoAvailableTrainingPlacesLeft = true;
+
+        if (isDiscountCodeUsed) {
+            return asList(
+                    RejectOfferCommand.nextAfter(event),
+                    ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return List.of(RejectOfferCommand.nextAfter(event));
+        }
     }
 
     public void accept(OfferAcceptedEvent event, Clock clock) {

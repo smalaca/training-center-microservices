@@ -17,6 +17,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrai
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
@@ -51,6 +52,7 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.Book
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommandAssertion.assertThatConfirmTrainingPriceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommandAssertion.assertThatRegisterPersonCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommandAssertion.assertThatRejectOfferCommand;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommandAssertion.assertThatReturnDiscountCodeCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommandAssertion.assertThatUseDiscountCodeCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -785,6 +787,30 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
+    void shouldPublishReturnDiscountCodeCommandWhennoAvailableTrainingPlacesLeftEventAndDiscountCodeUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(7));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        DiscountCodeUsedEvent event = randomDiscountCodeUsedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(ReturnDiscountCodeCommand.class);
+                    assertThatReturnDiscountCodeCommand((ReturnDiscountCodeCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
     void shouldSetTrainingPlaceBookedWhenTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
@@ -927,17 +953,57 @@ class OfferAcceptanceSagaEngineTest {
                 .consumedEventAt(noAvailableTrainingPlacesLeftEvent, NOW.minusSeconds(5));
     }
 
-    // to change, missing logic
     @Test
-    void shouldPublishNoCommandWhenNoAvailableTrainingPlacesLeftEventAccepted() {
+    void shouldPublishRejectOfferCommandWhenNoAvailableTrainingPlacesLeftEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         given(repository.findById(OFFER_ID)).willReturn(saga);
         givenNowSecondsAgo(5);
+        NoAvailableTrainingPlacesLeftEvent event = randomNoAvailableTrainingPlacesLeftEvent();
 
-        engine.accept(randomNoAvailableTrainingPlacesLeftEvent());
+        engine.accept(event);
 
-        thenPublishedCommands(0);
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(RejectOfferCommand.class);
+                    assertThatRejectOfferCommand((RejectOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasReason("No available training places left")
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
+    void shouldPublishReturnDiscountCodeAndRejectOfferCommandsWhenDiscountCodeUsedAndNoAvailableTrainingPlacesLeftEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(7));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        NoAvailableTrainingPlacesLeftEvent event = randomNoAvailableTrainingPlacesLeftEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(2)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(RejectOfferCommand.class);
+                    assertThatRejectOfferCommand((RejectOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasReason("No available training places left")
+                            .isNextAfter(event.eventId());
+                })
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(ReturnDiscountCodeCommand.class);
+                    assertThatReturnDiscountCodeCommand((ReturnDiscountCodeCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .isNextAfter(event.eventId());
+                });
     }
 
     @Test

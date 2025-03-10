@@ -14,7 +14,6 @@ import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceReq
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
@@ -137,7 +136,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(DiscountCodeUsedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
         command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
@@ -149,7 +148,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(DiscountCodeAlreadyUsedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
         command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
@@ -161,7 +160,7 @@ public class OfferAcceptanceSagaEngine {
     public void accept(TrainingPlaceBookedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
+        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
         command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
@@ -173,8 +172,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(NoAvailableTrainingPlacesLeftEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
+        commands.forEach(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 
