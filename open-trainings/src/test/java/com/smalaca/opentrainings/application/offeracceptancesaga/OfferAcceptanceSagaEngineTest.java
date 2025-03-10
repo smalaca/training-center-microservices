@@ -733,6 +733,33 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(0);
     }
 
+    @Test
+    void shouldSetTrainingPlaceBookedWhenTrainingPlaceBookedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
+        UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        saga.accept(personRegisteredEvent, givenNowSecondsAgo(10));
+        saga.accept(unexpiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPlaceBookedEvent trainingPlaceBookedEvent = randomTrainingPlaceBookedEvent();
+
+        engine.accept(trainingPlaceBookedEvent);
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasTrainingPlaceBooked()
+                .consumedEvents(4)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
+                .consumedEventAt(unexpiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(8))
+                .consumedEventAt(trainingPlaceBookedEvent, NOW.minusSeconds(5));
+    }
+
     // to change, missing logic
     @Test
     void shouldPublishNoCommandWhenTrainingPlaceBookedEventAccepted() {

@@ -53,6 +53,7 @@ public class OfferAcceptanceSaga {
     private UUID trainingId;
     private Price trainingPrice;
     private boolean isOfferPriceConfirmed;
+    private boolean isTrainingPlaceBooked;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -148,6 +149,7 @@ public class OfferAcceptanceSaga {
 
     public void accept(TrainingPlaceBookedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isTrainingPlaceBooked = true;
     }
 
     public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {
