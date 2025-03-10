@@ -664,11 +664,40 @@ class OfferAcceptanceSagaEngineTest {
         thenPublishedCommands(0);
     }
 
+    @Test
+    void shouldSetDiscountCodeUsedWhenDiscountCodeUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
+        UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        saga.accept(personRegisteredEvent, givenNowSecondsAgo(10));
+        saga.accept(unexpiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        DiscountCodeUsedEvent discountCodeUsedEvent = randomDiscountCodeUsedEvent();
+
+        engine.accept(discountCodeUsedEvent);
+
+        assertThatOfferAcceptanceSaga(saga)
+                .isInProgress()
+                .hasOfferId(OFFER_ID)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeUsed()
+                .consumedEvents(4)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
+                .consumedEventAt(unexpiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(8))
+                .consumedEventAt(discountCodeUsedEvent, NOW.minusSeconds(5));
+    }
+
     // to change, missing logic
     @Test
     void shouldPublishNoCommandWhenDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         given(repository.findById(OFFER_ID)).willReturn(saga);
         givenNowSecondsAgo(5);
 

@@ -55,6 +55,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasDiscountCodeUsed() {
+        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(true);
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasNoParticipantId() {
         assertThat(actual).extracting("participantId").isNull();
         return this;
