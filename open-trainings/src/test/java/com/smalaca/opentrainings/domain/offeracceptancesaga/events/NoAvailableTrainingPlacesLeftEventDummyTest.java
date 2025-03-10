@@ -4,12 +4,13 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import org.junit.jupiter.api.Test;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class NoAvailableTrainingPlacesLeftEventDummyTest {
     @Test
     void shouldEventBeAccepted() {
-        NoAvailableTrainingPlacesLeftEvent event = new NoAvailableTrainingPlacesLeftEvent(null, null, null, null);
+        NoAvailableTrainingPlacesLeftEvent event = new NoAvailableTrainingPlacesLeftEvent(newEventId(), randomId(), randomId(), randomId());
 
         assertDoesNotThrow(() -> event.accept(new OfferAcceptanceSaga(randomId()), null));
     }
