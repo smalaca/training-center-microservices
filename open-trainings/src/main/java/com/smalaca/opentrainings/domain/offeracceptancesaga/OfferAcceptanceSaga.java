@@ -126,10 +126,6 @@ public class OfferAcceptanceSaga {
         }
     }
 
-    private boolean hasDiscountCode() {
-        return discountCode != null;
-    }
-
     private boolean canStartBooking() {
         return participantId != null && isOfferPriceConfirmed;
     }
@@ -151,6 +147,12 @@ public class OfferAcceptanceSaga {
         return acceptOfferIfPossible(event);
     }
 
+    public Optional<AcceptOfferCommand> accept(TrainingPlaceBookedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        isTrainingPlaceBooked = true;
+        return acceptOfferIfPossible(event);
+    }
+
     private Optional<AcceptOfferCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
         if (canAcceptOffer()) {
             return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
@@ -160,12 +162,15 @@ public class OfferAcceptanceSaga {
     }
 
     private boolean canAcceptOffer() {
-        return (isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
+        return (hasNoDiscountCode() || isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
     }
 
-    public void accept(TrainingPlaceBookedEvent event, Clock clock) {
-        consumed(event, clock.now());
-        isTrainingPlaceBooked = true;
+    private boolean hasNoDiscountCode() {
+        return !hasDiscountCode();
+    }
+
+    private boolean hasDiscountCode() {
+        return discountCode != null;
     }
 
     public void accept(NoAvailableTrainingPlacesLeftEvent event, Clock clock) {

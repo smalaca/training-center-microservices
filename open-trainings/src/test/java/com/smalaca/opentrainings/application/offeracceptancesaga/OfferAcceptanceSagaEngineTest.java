@@ -811,17 +811,93 @@ class OfferAcceptanceSagaEngineTest {
                 .consumedEventAt(trainingPlaceBookedEvent, NOW.minusSeconds(5));
     }
 
-    // to change, missing logic
     @Test
     void shouldPublishNoCommandWhenTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         given(repository.findById(OFFER_ID)).willReturn(saga);
         givenNowSecondsAgo(5);
 
         engine.accept(randomTrainingPlaceBookedEvent());
 
         thenPublishedCommands(0);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldPublishAcceptOfferCommandWhenDiscountCodeNotReceivedAndTrainingPlaceBookedEventAccepted(String noDiscountCode) {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEventWith(noDiscountCode), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPlaceBookedEvent event = randomTrainingPlaceBookedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasNoDiscountCode()
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenDiscountCodeUsedAndTrainingPlaceBookedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPlaceBookedEvent event = randomTrainingPlaceBookedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenDiscountCodeAlreadyUsedAndTrainingPlaceBookedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        saga.accept(randomDiscountCodeAlreadyUsedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        TrainingPlaceBookedEvent event = randomTrainingPlaceBookedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
     }
 
     @Test

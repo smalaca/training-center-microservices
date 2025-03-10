@@ -161,8 +161,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(TrainingPlaceBookedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
 
+        command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 

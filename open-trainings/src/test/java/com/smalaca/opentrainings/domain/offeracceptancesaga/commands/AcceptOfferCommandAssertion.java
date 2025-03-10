@@ -33,6 +33,11 @@ public class AcceptOfferCommandAssertion {
         return this;
     }
 
+    public AcceptOfferCommandAssertion hasNoDiscountCode() {
+        assertThat(actual.discountCode()).isNull();
+        return this;
+    }
+
     public AcceptOfferCommandAssertion isNextAfter(EventId eventId) {
         assertThatCommandId(actual.commandId()).isNextAfter(eventId);
         return this;
