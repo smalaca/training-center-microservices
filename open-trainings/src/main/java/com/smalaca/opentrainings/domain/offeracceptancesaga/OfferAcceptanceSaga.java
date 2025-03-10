@@ -139,9 +139,10 @@ public class OfferAcceptanceSaga {
         return RejectOfferCommand.nextAfter(event);
     }
 
-    public void accept(DiscountCodeUsedEvent event, Clock clock) {
+    public Optional<AcceptOfferCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountCodeUsed = true;
+        return acceptOfferIfPossible(event);
     }
 
     public Optional<AcceptOfferCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
@@ -159,7 +160,7 @@ public class OfferAcceptanceSaga {
     }
 
     private boolean canAcceptOffer() {
-        return isDiscountAlreadyCodeUsed && isTrainingPlaceBooked;
+        return (isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
     }
 
     public void accept(TrainingPlaceBookedEvent event, Clock clock) {
