@@ -31,6 +31,7 @@ import com.smalaca.opentrainings.domain.price.Price;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
@@ -143,9 +144,22 @@ public class OfferAcceptanceSaga {
         isDiscountCodeUsed = true;
     }
 
-    public void accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
+    public Optional<AcceptOfferCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountAlreadyCodeUsed = true;
+        return acceptOfferIfPossible(event);
+    }
+
+    private Optional<AcceptOfferCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
+        if (canAcceptOffer()) {
+            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private boolean canAcceptOffer() {
+        return isDiscountAlreadyCodeUsed && isTrainingPlaceBooked;
     }
 
     public void accept(TrainingPlaceBookedEvent event, Clock clock) {

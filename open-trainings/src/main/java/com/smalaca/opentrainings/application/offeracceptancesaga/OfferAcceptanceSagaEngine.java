@@ -14,6 +14,7 @@ import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceReq
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAcceptanceSagaCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -146,8 +148,9 @@ public class OfferAcceptanceSagaEngine {
     public void accept(DiscountCodeAlreadyUsedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+        Optional<AcceptOfferCommand> command = offerAcceptanceSaga.accept(event, clock);
 
+        command.ifPresent(commandRegistry::publish);
         repository.save(offerAcceptanceSaga);
     }
 

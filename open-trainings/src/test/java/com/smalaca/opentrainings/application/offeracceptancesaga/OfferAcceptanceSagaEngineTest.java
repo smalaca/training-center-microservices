@@ -45,6 +45,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommandAssertion.assertThatBookTrainingPlaceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommandAssertion.assertThatConfirmTrainingPriceCommand;
@@ -678,17 +679,43 @@ class OfferAcceptanceSagaEngineTest {
                 .consumedEventAt(discountCodeAlreadyUsedEvent, NOW.minusSeconds(5));
     }
 
-    // to change, missing logic
     @Test
-    void shouldPublishNoCommandWhenDiscountCodeAlreadyUsedEventAccepted() {
+    void shouldPublishNoCommandWhenTrainingPlacesNotBookedAndDiscountCodeAlreadyUsedEventAccepted() {
         OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
         saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         given(repository.findById(OFFER_ID)).willReturn(saga);
         givenNowSecondsAgo(5);
 
         engine.accept(randomDiscountCodeAlreadyUsedEvent());
 
         thenPublishedCommands(0);
+    }
+
+    @Test
+    void shouldPublishAcceptOfferCommandWhenTrainingPlaceBookedAndDiscountCodeAlreadyUsedEventAccepted() {
+        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
+        saga.accept(randomTrainingPlaceBookedEvent(), givenNowSecondsAgo(8));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+        DiscountCodeAlreadyUsedEvent event = randomDiscountCodeAlreadyUsedEvent();
+
+        engine.accept(event);
+
+        thenPublishedCommands(1)
+                .anySatisfy(actual -> {
+                    assertThat(actual).isInstanceOf(AcceptOfferCommand.class);
+                    assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
+                            .hasOfferId(OFFER_ID)
+                            .hasDiscountCode(DISCOUNT_CODE)
+                            .hasOfferId(OFFER_ID)
+                            .hasParticipantId(PARTICIPANT_ID)
+                            .isNextAfter(event.eventId());
+                });
     }
 
     @Test
