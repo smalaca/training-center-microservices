@@ -114,13 +114,10 @@ public class OfferAcceptanceSaga {
         if (canStartBooking()) {
             if (hasDiscountCode()) {
                 return asList(
-                        AcceptOfferCommand.nextAfter(event, participantId, discountCode),
                         BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId),
                         UseDiscountCodeCommand.nextAfter(event, participantId, trainingId, trainingPrice.amount(), trainingPrice.currencyCode(), discountCode));
             } else {
-                return asList(
-                        AcceptOfferCommand.nextAfter(event, participantId, discountCode),
-                        BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId));
+                return List.of(BookTrainingPlaceCommand.nextAfter(event, participantId, trainingId));
             }
         } else {
             return emptyList();
