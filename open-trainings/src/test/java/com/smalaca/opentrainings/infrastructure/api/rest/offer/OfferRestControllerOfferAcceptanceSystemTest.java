@@ -2,10 +2,8 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestCommand;
-import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -44,12 +41,6 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Autowired
     private OpenTrainingsTestClient client;
 
-    @MockBean
-    private TrainingOfferCatalogue trainingOfferCatalogue;
-
-    @MockBean
-    private DiscountService discountService;
-
     @Autowired
     private OfferAcceptanceSagaEventTestListener testListener;
 
@@ -59,7 +50,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @BeforeEach
     void givenOfferFactory() {
-        given = GivenOfferAcceptance.create(repository, discountService, trainingOfferCatalogue, testListener);
+        given = GivenOfferAcceptance.create(repository, testListener);
         then = new ThenOfferAcceptance(client);
     }
 
@@ -74,7 +65,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .initiatedOffer()
                 .personRegistered()
                 .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
@@ -90,7 +81,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .initiatedOffer()
                 .alreadyRegisteredPersonFound()
                 .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
@@ -107,7 +98,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .personRegistered()
                 .trainingPriceNotChanged()
                 .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
@@ -138,13 +129,13 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .initiatedOffer()
                 .personRegistered()
                 .nonBookableTraining()
-                .discount(DISCOUNT_CODE);
+                .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Training no longer available")
+                .offerAcceptanceRejected(dto.getOfferId(), "No available training places left")
                 .offerRejected(dto));
     }
 
@@ -154,7 +145,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .declinedOffer()
                 .personRegistered()
                 .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));

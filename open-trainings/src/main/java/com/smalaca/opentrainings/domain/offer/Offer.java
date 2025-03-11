@@ -16,8 +16,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -104,14 +102,6 @@ public class Offer {
             throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
         }
 
-        Price finalPrice = finalPrice(command, discountService);
-
-        TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, command.participantId()));
-
-        if (booking.isFailed()) {
-            return reject(asRejectOfferCommand());
-        }
-
         status = OfferStatus.ACCEPTED;
 
         return offerAcceptedEventBuilder()
@@ -120,7 +110,7 @@ public class Offer {
                 .withTrainingId(trainingId)
                 .withParticipantId(command.participantId())
                 .withTrainingPrice(trainingPrice)
-                .withFinalPrice(finalPrice)
+//                .withFinalPrice(null)
                 .withDiscountCode(command.discountCode())
                 .build();
     }
