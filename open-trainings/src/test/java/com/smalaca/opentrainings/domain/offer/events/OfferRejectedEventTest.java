@@ -1,27 +1,29 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
-import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
-import net.datafaker.Faker;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import org.junit.jupiter.api.Test;
 
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferRejectedEventAssertion.assertThatOfferRejectedEvent;
-import static java.time.LocalDateTime.now;
 
 class OfferRejectedEventTest {
-    private static final Faker FAKER = new Faker();
-
     @Test
     void shouldCreateOfferRejectedEvent() {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
-        RejectOfferCommand command = new RejectOfferCommand(commandId, randomId(), FAKER.lorem().sentence());
+        RejectOfferCommand command = RejectOfferCommand.nextAfter(trainingPriceChangedEvent());
 
         OfferRejectedEvent actual = OfferRejectedEvent.nextAfter(command);
 
         assertThatOfferRejectedEvent(actual)
                 .hasOfferId(command.offerId())
                 .hasReason(command.reason())
-                .isNextAfter(commandId);
+                .isNextAfter(command.commandId());
+    }
+
+    private TrainingPriceChangedEvent trainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(newEventId(), randomId(), randomId(), randomAmount(), randomCurrency());
     }
 }

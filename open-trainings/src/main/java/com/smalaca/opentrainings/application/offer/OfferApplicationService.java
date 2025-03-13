@@ -4,7 +4,6 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.Offer;
 import com.smalaca.opentrainings.domain.offer.OfferFactory;
@@ -14,7 +13,6 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -24,18 +22,12 @@ public class OfferApplicationService {
     private final OfferFactory offerFactory;
     private final OfferRepository offerRepository;
     private final EventRegistry eventRegistry;
-    private final TrainingOfferCatalogue trainingOfferCatalogue;
-    private final DiscountService discountService;
     private final Clock clock;
 
-    OfferApplicationService(
-            OfferFactory offerFactory, OfferRepository offerRepository, EventRegistry eventRegistry,
-            TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService, Clock clock) {
+    OfferApplicationService(OfferFactory offerFactory, OfferRepository offerRepository, EventRegistry eventRegistry, Clock clock) {
         this.offerFactory = offerFactory;
         this.offerRepository = offerRepository;
         this.eventRegistry = eventRegistry;
-        this.trainingOfferCatalogue = trainingOfferCatalogue;
-        this.discountService = discountService;
         this.clock = clock;
     }
 
@@ -66,7 +58,7 @@ public class OfferApplicationService {
     public void accept(AcceptOfferCommand command) {
         Offer offer = offerRepository.findById(command.offerId());
 
-        OfferEvent event = offer.accept(command, trainingOfferCatalogue, discountService);
+        OfferEvent event = offer.accept(command);
 
         offerRepository.save(offer);
         eventRegistry.publish(event);

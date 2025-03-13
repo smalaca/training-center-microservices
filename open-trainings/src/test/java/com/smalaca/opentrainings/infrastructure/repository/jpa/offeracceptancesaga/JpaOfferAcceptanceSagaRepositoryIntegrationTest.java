@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.repository.jpa.offeracceptancesaga;
 
-import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
@@ -10,6 +9,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.IntegrationTest;
 import net.datafaker.Faker;
@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.smalaca.opentrainings.data.Random.randomAmount;
+import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
@@ -184,12 +186,12 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent(UUID offerId) {
-        RejectOfferCommand command = new RejectOfferCommand(randomCommandId(), offerId, FAKER.lorem().sentence());
+        RejectOfferCommand command = RejectOfferCommand.nextAfter(trainingPriceChangedEvent(offerId));
         return OfferRejectedEvent.nextAfter(command);
     }
 
-    private CommandId randomCommandId() {
-        return new CommandId(randomId(), randomId(), randomId(), NOW);
+    private TrainingPriceChangedEvent trainingPriceChangedEvent(UUID offerId) {
+        return new TrainingPriceChangedEvent(newEventId(), offerId, randomId(), randomAmount(), randomCurrency());
     }
 
     private OfferAcceptanceSagaAssertion thenOfferAcceptanceSaga(UUID offerId) {

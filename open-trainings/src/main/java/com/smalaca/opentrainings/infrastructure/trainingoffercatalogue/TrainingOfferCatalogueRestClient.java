@@ -2,8 +2,6 @@ package com.smalaca.opentrainings.infrastructure.trainingoffercatalogue;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import org.springframework.stereotype.Service;
@@ -14,10 +12,6 @@ import java.util.UUID;
 @Service
 @DrivenAdapter
 public class TrainingOfferCatalogueRestClient implements TrainingOfferCatalogue {
-    @Override
-    public TrainingBookingResponse book(TrainingBookingDto trainingBookingDto) {
-        return TrainingBookingResponse.failed(UUID.randomUUID(), UUID.randomUUID());
-    }
 
     @Override
     public TrainingDto detailsOf(UUID trainingId) {
