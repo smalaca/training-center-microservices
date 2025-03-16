@@ -28,6 +28,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
+    private static final String NO_DISCOUNT_CODE = null;
 
     @Autowired
     private OfferRepository repository;
@@ -60,10 +61,90 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldAcceptOfferWhenPersonRegistered() {
+    void shouldRejectWhenOfferNotAvailableAnymore() {
+        given
+                .declinedOffer()
+                .personRegistered();
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
+                .offerDeclined(dto));
+    }
+
+    @Test
+    void shouldRejectWhenOfferExpiredAndTrainingPriceChanged() {
+        given
+                .expiredOffer()
+                .personRegistered()
+                .trainingPriceChanged(BigDecimal.valueOf(439.21), "EUR");
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
+                .offerRejected(dto));
+    }
+
+    @Test
+    void shouldRejectWhenTrainingNoLongerAvailable() {
         given
                 .initiatedOffer()
                 .personRegistered()
+                .trainingPriceNotChanged()
+                .discountUsed(DISCOUNT_CODE)
+                .nonBookableTraining();
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceRejected(dto.getOfferId(), "No available training places left")
+                .offerRejected(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenDiscountNotGiven() {
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
+                .bookableTraining();
+        dto = given.getOffer();
+
+        client.offers().accept(commandWithoutDiscount(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenDiscountCodeAlreadyUsed() {
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
+                .discountAlreadyUsed(DISCOUNT_CODE)
+                .bookableTraining();
+        dto = given.getOffer();
+
+        client.offers().accept(commandWithoutDiscount(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenPersonRegistered() {
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
                 .bookableTraining()
                 .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
@@ -76,10 +157,11 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
+    void shouldAcceptWhenRegisteredPersonAlreadyFound() {
         given
                 .initiatedOffer()
                 .alreadyRegisteredPersonFound()
+                .trainingPriceNotChanged()
                 .bookableTraining()
                 .discountUsed(DISCOUNT_CODE);
         dto = given.getOffer();
@@ -92,7 +174,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldAcceptOfferWhenOfferExpiredAndTrainingPriceNotChanged() {
+    void shouldAcceptWhenOfferExpiredAndTrainingPriceNotChanged() {
         given
                 .expiredOffer()
                 .personRegistered()
@@ -108,54 +190,11 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .offerAccepted(dto));
     }
 
-    @Test
-    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
-        given
-                .expiredOffer()
-                .personRegistered()
-                .trainingPriceChanged(BigDecimal.valueOf(439.21), "EUR");
-        dto = given.getOffer();
-
-        client.offers().accept(command(dto));
-
-        await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
-                .offerRejected(dto));
-    }
-
-    @Test
-    void shouldRejectOfferWhenTrainingNoLongerAvailable() {
-        given
-                .initiatedOffer()
-                .personRegistered()
-                .nonBookableTraining()
-                .discountUsed(DISCOUNT_CODE);
-        dto = given.getOffer();
-
-        client.offers().accept(command(dto));
-
-        await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "No available training places left")
-                .offerRejected(dto));
-    }
-
-    @Test
-    void shouldRejectOfferAcceptanceWhenOfferNotAvailableAnymore() {
-        given
-                .declinedOffer()
-                .personRegistered()
-                .bookableTraining()
-                .discountUsed(DISCOUNT_CODE);
-        dto = given.getOffer();
-
-        client.offers().accept(command(dto));
-
-        await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
-                .offerDeclined(dto));
-    }
-
     private RestAcceptOfferTestCommand command(OfferTestDto dto) {
         return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
+    }
+
+    private RestAcceptOfferTestCommand commandWithoutDiscount(OfferTestDto dto) {
+        return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, NO_DISCOUNT_CODE);
     }
 }

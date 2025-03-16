@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
@@ -47,6 +48,13 @@ class GivenOfferAcceptance {
 
     GivenOfferAcceptance declinedOffer() {
         offer = givenOfferFactory.offer().declined().getDto();
+        return this;
+    }
+
+    GivenOfferAcceptance discountAlreadyUsed(String discountCode) {
+        OfferAcceptanceSagaEvent event = new DiscountCodeAlreadyUsedEvent(newEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode);
+        testListener.willReturnAfterUseDiscountCodeCommand(offer.getOfferId(), event);
+
         return this;
     }
 
