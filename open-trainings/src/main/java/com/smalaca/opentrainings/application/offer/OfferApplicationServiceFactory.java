@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.application.offer;
 
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.OfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -14,9 +13,7 @@ public class OfferApplicationServiceFactory {
     @Bean
     public OfferApplicationService offerApplicationService(
             OfferRepository offerRepository, EventRegistry eventRegistry, TrainingOfferCatalogue trainingOfferCatalogue,
-            DiscountService discountService, Clock clock) {
-        return new OfferApplicationService(
-                OfferFactory.offerFactory(trainingOfferCatalogue, clock), offerRepository, eventRegistry,
-                trainingOfferCatalogue, discountService, clock);
+            Clock clock) {
+        return new OfferApplicationService(OfferFactory.offerFactory(trainingOfferCatalogue, clock), offerRepository, eventRegistry, clock);
     }
 }

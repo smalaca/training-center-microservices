@@ -8,8 +8,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import net.datafaker.Faker;
@@ -104,8 +102,7 @@ public class GivenOffer {
         status = ACCEPTED;
         UUID participantId = UUID.randomUUID();
         given(clock.now()).willReturn(creationDateTime.plusMinutes(1));
-        given(trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, participantId))).willReturn(TrainingBookingResponse.successful(trainingId, participantId));
-        offer.accept(acceptOfferCommand(participantId), trainingOfferCatalogue, null);
+        offer.accept(acceptOfferCommand(participantId));
 
         return this;
     }

@@ -2,10 +2,8 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestCommand;
-import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
@@ -13,7 +11,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -31,6 +28,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private static final String LAST_NAME = FAKER.name().lastName();
     private static final String EMAIL = FAKER.internet().emailAddress();
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
+    private static final String NO_DISCOUNT_CODE = null;
 
     @Autowired
     private OfferRepository repository;
@@ -44,12 +42,6 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Autowired
     private OpenTrainingsTestClient client;
 
-    @MockBean
-    private TrainingOfferCatalogue trainingOfferCatalogue;
-
-    @MockBean
-    private DiscountService discountService;
-
     @Autowired
     private OfferAcceptanceSagaEventTestListener testListener;
 
@@ -59,7 +51,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @BeforeEach
     void givenOfferFactory() {
-        given = GivenOfferAcceptance.create(repository, discountService, trainingOfferCatalogue, testListener);
+        given = GivenOfferAcceptance.create(repository, testListener);
         then = new ThenOfferAcceptance(client);
     }
 
@@ -69,56 +61,21 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldAcceptOfferWhenPersonRegistered() {
+    void shouldRejectWhenOfferNotAvailableAnymore() {
         given
-                .initiatedOffer()
-                .personRegistered()
-                .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .declinedOffer()
+                .personRegistered();
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
-                .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
+                .offerDeclined(dto));
     }
 
     @Test
-    void shouldAcceptOfferWhenRegisteredPersonAlreadyFound() {
-        given
-                .initiatedOffer()
-                .alreadyRegisteredPersonFound()
-                .bookableTraining()
-                .discount(DISCOUNT_CODE);
-        dto = given.getOffer();
-
-        client.offers().accept(command(dto));
-
-        await().untilAsserted(() -> then
-                .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
-    }
-
-    @Test
-    void shouldAcceptOfferWhenOfferExpiredAndTrainingPriceNotChanged() {
-        given
-                .expiredOffer()
-                .personRegistered()
-                .trainingPriceNotChanged()
-                .bookableTraining()
-                .discount(DISCOUNT_CODE);
-        dto = given.getOffer();
-
-        client.offers().accept(command(dto));
-
-        await().untilAsserted(() -> then
-                .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
-    }
-
-    @Test
-    void shouldRejectOfferWhenOfferExpiredAndTrainingPriceChanged() {
+    void shouldRejectWhenOfferExpiredAndTrainingPriceChanged() {
         given
                 .expiredOffer()
                 .personRegistered()
@@ -133,38 +90,111 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     }
 
     @Test
-    void shouldRejectOfferWhenTrainingNoLongerAvailable() {
+    void shouldRejectWhenTrainingNoLongerAvailable() {
         given
                 .initiatedOffer()
                 .personRegistered()
-                .nonBookableTraining()
-                .discount(DISCOUNT_CODE);
+                .trainingPriceNotChanged()
+                .discountUsed(DISCOUNT_CODE)
+                .nonBookableTraining();
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Training no longer available")
+                .offerAcceptanceRejected(dto.getOfferId(), "No available training places left")
                 .offerRejected(dto));
     }
 
     @Test
-    void shouldRejectOfferAcceptanceWhenOfferNotAvailableAnymore() {
+    void shouldAcceptWhenDiscountNotGiven() {
         given
-                .declinedOffer()
+                .initiatedOffer()
                 .personRegistered()
-                .bookableTraining()
-                .discount(DISCOUNT_CODE);
+                .trainingPriceNotChanged()
+                .bookableTraining();
+        dto = given.getOffer();
+
+        client.offers().accept(commandWithoutDiscount(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenDiscountCodeAlreadyUsed() {
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
+                .discountAlreadyUsed(DISCOUNT_CODE)
+                .bookableTraining();
         dto = given.getOffer();
 
         client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
-                .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
-                .offerDeclined(dto));
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenPersonRegistered() {
+        given
+                .initiatedOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
+                .bookableTraining()
+                .discountUsed(DISCOUNT_CODE);
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenRegisteredPersonAlreadyFound() {
+        given
+                .initiatedOffer()
+                .alreadyRegisteredPersonFound()
+                .trainingPriceNotChanged()
+                .bookableTraining()
+                .discountUsed(DISCOUNT_CODE);
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
+    }
+
+    @Test
+    void shouldAcceptWhenOfferExpiredAndTrainingPriceNotChanged() {
+        given
+                .expiredOffer()
+                .personRegistered()
+                .trainingPriceNotChanged()
+                .bookableTraining()
+                .discountUsed(DISCOUNT_CODE);
+        dto = given.getOffer();
+
+        client.offers().accept(command(dto));
+
+        await().untilAsserted(() -> then
+                .offerAcceptanceAccepted(dto.getOfferId())
+                .offerAccepted(dto));
     }
 
     private RestAcceptOfferTestCommand command(OfferTestDto dto) {
         return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, DISCOUNT_CODE);
+    }
+
+    private RestAcceptOfferTestCommand commandWithoutDiscount(OfferTestDto dto) {
+        return new RestAcceptOfferTestCommand(dto.getOfferId(), FIRST_NAME, LAST_NAME, EMAIL, NO_DISCOUNT_CODE);
     }
 }

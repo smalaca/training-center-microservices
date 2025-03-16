@@ -8,8 +8,12 @@ import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.context.event.EventListener;
@@ -68,6 +72,30 @@ public class OfferAcceptanceEventListener {
     @EventListener
     @DrivenAdapter
     public void listen(TrainingPriceNotChangedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(DiscountCodeUsedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(DiscountCodeAlreadyUsedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(TrainingPlaceBookedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(NoAvailableTrainingPlacesLeftEvent event) {
         engine.accept(event);
     }
 

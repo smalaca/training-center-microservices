@@ -1,12 +1,8 @@
 package com.smalaca.opentrainings.domain.offer;
 
-import com.google.common.base.Strings;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
-import com.smalaca.opentrainings.domain.discountservice.DiscountCodeDto;
-import com.smalaca.opentrainings.domain.discountservice.DiscountResponse;
-import com.smalaca.opentrainings.domain.discountservice.DiscountService;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
@@ -16,9 +12,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.price.Price;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingDto;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingBookingResponse;
-import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -32,8 +25,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static com.smalaca.opentrainings.domain.commandid.CommandId.nextAfter;
-import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.ACCEPTANCE_IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
@@ -99,17 +90,9 @@ public class Offer {
         }
     }
 
-    public OfferEvent accept(AcceptOfferCommand command, TrainingOfferCatalogue trainingOfferCatalogue, DiscountService discountService) {
+    public OfferEvent accept(AcceptOfferCommand command) {
         if (status.isAcceptanceNotInProgress()) {
             throw InvalidOfferStatusException.acceptanceNotInProgress(offerId);
-        }
-
-        Price finalPrice = finalPrice(command, discountService);
-
-        TrainingBookingResponse booking = trainingOfferCatalogue.book(new TrainingBookingDto(trainingId, command.participantId()));
-
-        if (booking.isFailed()) {
-            return reject(asRejectOfferCommand());
         }
 
         status = OfferStatus.ACCEPTED;
@@ -120,13 +103,8 @@ public class Offer {
                 .withTrainingId(trainingId)
                 .withParticipantId(command.participantId())
                 .withTrainingPrice(trainingPrice)
-                .withFinalPrice(finalPrice)
                 .withDiscountCode(command.discountCode())
                 .build();
-    }
-
-    private RejectOfferCommand asRejectOfferCommand() {
-        return new RejectOfferCommand(nextAfter(newEventId()), offerId, "Training no longer available");
     }
 
     public OfferRejectedEvent reject(RejectOfferCommand command) {
@@ -136,25 +114,6 @@ public class Offer {
 
         status = REJECTED;
         return OfferRejectedEvent.nextAfter(command);
-    }
-
-    private Price finalPrice(AcceptOfferCommand command, DiscountService discountService) {
-        if (hasNoDiscountCode(command)) {
-            return trainingPrice;
-        }
-
-        DiscountCodeDto discountCodeDto = new DiscountCodeDto(command.participantId(), trainingId, trainingPrice, command.discountCode());
-        DiscountResponse discount = discountService.calculatePriceFor(discountCodeDto);
-
-        if (discount.isFailed()) {
-            throw new DiscountException(discount.failureReason());
-        }
-
-        return discount.newPrice();
-    }
-
-    private boolean hasNoDiscountCode(AcceptOfferCommand command) {
-        return Strings.isNullOrEmpty(command.discountCode());
     }
 
     public void decline() {
