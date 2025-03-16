@@ -132,7 +132,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .bookableTraining();
         dto = given.getOffer();
 
-        client.offers().accept(commandWithoutDiscount(dto));
+        client.offers().accept(command(dto));
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
