@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaRepository;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
@@ -47,6 +48,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDtoAssertion.assertThatOfferAcceptanceSagaDto;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommandAssertion.assertThatBookTrainingPlaceCommand;
@@ -1610,6 +1612,67 @@ class OfferAcceptanceSagaEngineTest {
                 .consumedEventAt(discountCodeUsedEvent, NOW.minusSeconds(4))
                 .consumedEventAt(noAvailableTrainingPlacesLeftEvent, NOW.minusSeconds(3))
                 .consumedEventAt(discountCodeReturnedEvent, NOW.minusSeconds(1));
+    }
+
+    @Test
+    void shouldReturnStatusOfInProgressNotCompleted() {
+        givenExistingOfferAcceptanceSaga();
+
+        OfferAcceptanceSagaDto actual = engine.statusOf(OFFER_ID);
+
+        assertThatOfferAcceptanceSagaDto(actual)
+                .hasOfferId(OFFER_ID)
+                .isInProgress()
+                .isNotCompleted()
+                .hasNoRejectionReason();
+    }
+
+    @Test
+    void shouldReturnStatusOfAcceptedCompleted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptedEvent(), givenNowSecondsAgo(13));
+
+        OfferAcceptanceSagaDto actual = engine.statusOf(OFFER_ID);
+
+        assertThatOfferAcceptanceSagaDto(actual)
+                .hasOfferId(OFFER_ID)
+                .isAccepted()
+                .isCompleted()
+                .hasNoRejectionReason();
+    }
+
+    @Test
+    void shouldReturnStatusOfRejectedNotCompleted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        OfferRejectedEvent offerRejectedEvent = randomOfferRejectedEvent();
+        saga.accept(offerRejectedEvent, givenNowSecondsAgo(13));
+
+        OfferAcceptanceSagaDto actual = engine.statusOf(OFFER_ID);
+
+        assertThatOfferAcceptanceSagaDto(actual)
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+                .isCompleted()
+                .hasRejectionReason(offerRejectedEvent.reason());
+    }
+
+    @Test
+    void shouldReturnStatusOfRejectedCompleted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithNoDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        OfferRejectedEvent offerRejectedEvent = randomOfferRejectedEvent();
+        saga.accept(offerRejectedEvent, givenNowSecondsAgo(2));
+
+        OfferAcceptanceSagaDto actual = engine.statusOf(OFFER_ID);
+
+        assertThatOfferAcceptanceSagaDto(actual)
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+                .isCompleted()
+                .hasRejectionReason(offerRejectedEvent.reason());
     }
 
     private Clock givenNowSecondsAgo(int seconds) {

@@ -251,7 +251,7 @@ public class OfferAcceptanceSaga {
     }
 
     public OfferAcceptanceSagaDto asDto() {
-        return new OfferAcceptanceSagaDto(offerId, status.name(), rejectionReason);
+        return new OfferAcceptanceSagaDto(offerId, completed, status.name(), rejectionReason);
     }
 
     boolean isCompleted() {

@@ -2,5 +2,5 @@ package com.smalaca.opentrainings.client.opentrainings.offer;
 
 import java.util.UUID;
 
-public record RestOfferAcceptanceTestDto(UUID offerId, String status, String rejectionReason) {
+public record RestOfferAcceptanceTestDto(UUID offerId, boolean isCompleted, String status, String rejectionReason) {
 }

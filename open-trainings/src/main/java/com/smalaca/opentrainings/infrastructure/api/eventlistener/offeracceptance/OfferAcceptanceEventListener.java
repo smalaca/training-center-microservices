@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -108,6 +109,12 @@ public class OfferAcceptanceEventListener {
     @EventListener
     @DrivenAdapter
     public void listen(OfferRejectedEvent event) {
+        engine.accept(event);
+    }
+
+    @EventListener
+    @DrivenAdapter
+    public void listen(DiscountCodeReturnedEvent event) {
         engine.accept(event);
     }
 }

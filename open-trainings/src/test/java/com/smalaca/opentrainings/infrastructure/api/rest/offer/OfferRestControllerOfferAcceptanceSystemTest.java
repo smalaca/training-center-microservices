@@ -96,7 +96,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
                 .personRegistered()
                 .trainingPriceNotChanged()
                 .discountUsed(DISCOUNT_CODE)
-                .nonBookableTraining();
+                .nonBookableTraining()
+                .discountCodeReturned(DISCOUNT_CODE);
         dto = given.getOffer();
 
         client.offers().accept(command(dto));

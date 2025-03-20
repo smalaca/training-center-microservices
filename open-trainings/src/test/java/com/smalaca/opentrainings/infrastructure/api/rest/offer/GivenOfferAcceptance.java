@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
@@ -63,6 +64,12 @@ class GivenOfferAcceptance {
                 newEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode, offer.getTrainingPrice().amount(), randomAmount(), offer.getTrainingPrice().currencyCode());
         testListener.willReturnAfterUseDiscountCodeCommand(offer.getOfferId(), event);
 
+        return this;
+    }
+
+    GivenOfferAcceptance discountCodeReturned(String discountCode) {
+        DiscountCodeReturnedEvent event = new DiscountCodeReturnedEvent(newEventId(), offer.getOfferId(), participantId, discountCode);
+        testListener.willReturnAfterReturnDiscountCodeCommand(offer.getOfferId(), event);
         return this;
     }
 
