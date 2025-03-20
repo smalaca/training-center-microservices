@@ -35,6 +35,16 @@ public class OfferAcceptanceSagaAssertion {
         return hasStatus(REJECTED);
     }
 
+    public OfferAcceptanceSagaAssertion isCompleted() {
+        assertThat(actual.isCompleted()).isTrue();
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion isNotCompleted() {
+        assertThat(actual.isCompleted()).isFalse();
+        return this;
+    }
+
     private OfferAcceptanceSagaAssertion hasStatus(OfferAcceptanceSagaStatus status) {
         assertThat(actual).extracting("status").isEqualTo(status);
         return this;
@@ -55,13 +65,42 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasDiscountCodeNotUsed() {
+        return hasDiscountCodeUsedEqualTo(false);
+    }
+
     public OfferAcceptanceSagaAssertion hasDiscountCodeUsed() {
-        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(true);
+        return hasDiscountCodeUsedEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasDiscountCodeUsedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(expected);
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasDiscountCodeNotReturned() {
+        return hasDiscountCodeReturnedEqualTo(false);
+    }
+
+    public OfferAcceptanceSagaAssertion hasDiscountCodeReturned() {
+        return hasDiscountCodeReturnedEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasDiscountCodeReturnedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountCodeReturned").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasDiscountCodeNotAlreadyUsed() {
+        return hasDiscountCodeAlreadyUsedEqualTo(false);
+    }
+
     public OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsed() {
-        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(true);
+        return hasDiscountCodeAlreadyUsedEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(expected);
         return this;
     }
 
@@ -75,11 +114,11 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
-    public OfferAcceptanceSagaAssertion isOfferPriceNotConfirmed() {
+    public OfferAcceptanceSagaAssertion hasOfferPriceNotConfirmed() {
         return isOfferPriceConfirmedEqualsTo(false);
     }
 
-    public OfferAcceptanceSagaAssertion isOfferPriceConfirmed() {
+    public OfferAcceptanceSagaAssertion hasOfferPriceConfirmed() {
         return isOfferPriceConfirmedEqualsTo(true);
     }
 
@@ -103,18 +142,44 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoTrainingId() {
+        assertThat(actual).extracting("trainingId").isNull();
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasTrainingPrice(Price expected) {
         assertThat(actual).extracting("trainingPrice").isEqualTo(expected);
         return this;
     }
 
-    public OfferAcceptanceSagaAssertion hasTrainingPlaceBooked() {
-        assertThat(actual).extracting("isTrainingPlaceBooked").isEqualTo(true);
+    public OfferAcceptanceSagaAssertion hasNoTrainingPrice() {
+        assertThat(actual).extracting("trainingPrice").isNull();
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasNoTrainingPlaceBooked() {
+        return hasTrainingPlaceBookedEqualTo(false);
+    }
+
+    public OfferAcceptanceSagaAssertion hasTrainingPlaceBooked() {
+        return hasTrainingPlaceBookedEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasTrainingPlaceBookedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isTrainingPlaceBooked").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasAvailableTrainingPlacesLeft() {
+        return hasNoAvailableTrainingPlacesLeftEqualTo(false);
+    }
+
     public OfferAcceptanceSagaAssertion hasNoAvailableTrainingPlacesLeft() {
-        assertThat(actual).extracting("hasNoAvailableTrainingPlacesLeft").isEqualTo(true);
+        return hasNoAvailableTrainingPlacesLeftEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasNoAvailableTrainingPlacesLeftEqualTo(boolean expected) {
+        assertThat(actual).extracting("hasNoAvailableTrainingPlacesLeft").isEqualTo(expected);
         return this;
     }
 

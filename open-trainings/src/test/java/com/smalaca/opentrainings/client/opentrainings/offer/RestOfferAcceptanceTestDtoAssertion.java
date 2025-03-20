@@ -39,4 +39,9 @@ public class RestOfferAcceptanceTestDtoAssertion {
         assertThat(actual.rejectionReason()).isNull();
         return this;
     }
+
+    public RestOfferAcceptanceTestDtoAssertion isCompleted() {
+        assertThat(actual.isCompleted()).isTrue();
+        return this;
+    }
 }

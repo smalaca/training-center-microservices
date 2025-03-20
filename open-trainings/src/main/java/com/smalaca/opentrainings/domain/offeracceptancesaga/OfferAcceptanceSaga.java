@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDisco
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -50,6 +51,7 @@ public class OfferAcceptanceSaga {
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
     private String discountCode;
     private boolean isDiscountCodeUsed;
+    private boolean isDiscountCodeReturned;
     private boolean isDiscountAlreadyCodeUsed;
     private UUID participantId;
     private UUID trainingId;
@@ -57,6 +59,7 @@ public class OfferAcceptanceSaga {
     private boolean isOfferPriceConfirmed;
     private boolean isTrainingPlaceBooked;
     private boolean hasNoAvailableTrainingPlacesLeft;
+    private boolean completed;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -124,10 +127,6 @@ public class OfferAcceptanceSaga {
         }
     }
 
-    private boolean canStartBooking() {
-        return participantId != null && isOfferPriceConfirmed;
-    }
-
     public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
         consumed(event, clock.now());
         return RejectOfferCommand.nextAfter(event);
@@ -192,6 +191,7 @@ public class OfferAcceptanceSaga {
     public void accept(OfferAcceptedEvent event, Clock clock) {
         consumed(event, clock.now());
         status = ACCEPTED;
+        completed = true;
     }
 
     public void accept(OfferRejectedEvent event, Clock clock) {
@@ -202,10 +202,39 @@ public class OfferAcceptanceSaga {
         reject(event, clock, "Offer already " + event.status());
     }
 
+    public void accept(DiscountCodeReturnedEvent event, Clock clock) {
+        consumed(event, clock.now());
+        isDiscountCodeReturned = true;
+
+        if (status == REJECTED) {
+            completed = true;
+        }
+    }
+
     private void reject(OfferAcceptanceSagaEvent event, Clock clock, String rejectionReason) {
         consumed(event, clock.now());
         this.rejectionReason = rejectionReason;
         status = REJECTED;
+
+        if (isDiscountCodeReturnedIfNeeded()) {
+            completed = true;
+        }
+    }
+
+    private boolean isDiscountCodeReturnedIfNeeded() {
+        if (hasDiscountCode() && isBookingStarted()) {
+            return isDiscountAlreadyCodeUsed || isDiscountCodeReturned;
+        }
+
+        return true;
+    }
+
+    private boolean isBookingStarted() {
+        return canStartBooking();
+    }
+
+    private boolean canStartBooking() {
+        return participantId != null && isOfferPriceConfirmed;
     }
 
     private void consumed(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {
@@ -222,6 +251,10 @@ public class OfferAcceptanceSaga {
     }
 
     public OfferAcceptanceSagaDto asDto() {
-        return new OfferAcceptanceSagaDto(offerId, status.name(), rejectionReason);
+        return new OfferAcceptanceSagaDto(offerId, completed, status.name(), rejectionReason);
+    }
+
+    boolean isCompleted() {
+        return completed;
     }
 }

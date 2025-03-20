@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,6 +21,7 @@ class OfferAcceptanceSagaEventTestListener {
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterConfirmTrainingPriceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterBookTrainingPlaceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterUseDiscountCodeCommand = new HashMap<>();
+    private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterReturnDiscountCodeCommand = new HashMap<>();
 
     OfferAcceptanceSagaEventTestListener(ApplicationEventPublisher publisher) {
         this.publisher = publisher;
@@ -59,5 +61,14 @@ class OfferAcceptanceSagaEventTestListener {
 
     void willReturnAfterUseDiscountCodeCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
         eventsAfterUseDiscountCodeCommand.put(offerId, event);
+    }
+
+    @EventListener
+    void listen(ReturnDiscountCodeCommand command) {
+        publisher.publishEvent(eventsAfterReturnDiscountCodeCommand.get(command.offerId()));
+    }
+
+    void willReturnAfterReturnDiscountCodeCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
+        eventsAfterReturnDiscountCodeCommand.put(offerId, event);
     }
 }

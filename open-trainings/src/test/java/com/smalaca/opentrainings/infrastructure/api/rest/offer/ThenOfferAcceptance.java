@@ -24,6 +24,7 @@ class ThenOfferAcceptance {
         thenOfferAcceptance(offerId)
                 .hasOfferId(offerId)
                 .isAccepted()
+                .isCompleted()
                 .hasNoRejectionReason();
 
         return this;
@@ -33,6 +34,7 @@ class ThenOfferAcceptance {
         thenOfferAcceptance(offerId)
                 .hasOfferId(offerId)
                 .isRejected()
+                .isCompleted()
                 .hasRejectionReason(rejectionReason);
 
         return this;

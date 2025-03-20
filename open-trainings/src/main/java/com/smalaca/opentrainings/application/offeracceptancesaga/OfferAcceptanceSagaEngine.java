@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.OfferAccept
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -204,6 +205,17 @@ public class OfferAcceptanceSagaEngine {
     @DrivenPort
     @CommandOperation
     public void accept(OfferRejectedEvent event) {
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+
+        offerAcceptanceSaga.accept(event, clock);
+
+        repository.save(offerAcceptanceSaga);
+    }
+
+    @Transactional
+    @DrivenPort
+    @CommandOperation
+    public void accept(DiscountCodeReturnedEvent event) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
         offerAcceptanceSaga.accept(event, clock);
