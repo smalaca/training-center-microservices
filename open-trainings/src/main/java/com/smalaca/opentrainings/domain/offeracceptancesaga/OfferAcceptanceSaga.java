@@ -51,6 +51,7 @@ public class OfferAcceptanceSaga {
     private OfferAcceptanceSagaStatus status = IN_PROGRESS;
     private String discountCode;
     private boolean isDiscountCodeUsed;
+    private boolean isDiscountCodeReturned;
     private boolean isDiscountAlreadyCodeUsed;
     private UUID participantId;
     private UUID trainingId;
@@ -124,10 +125,6 @@ public class OfferAcceptanceSaga {
         } else {
             return emptyList();
         }
-    }
-
-    private boolean canStartBooking() {
-        return participantId != null && isOfferPriceConfirmed;
     }
 
     public RejectOfferCommand accept(TrainingPriceChangedEvent event, Clock clock) {
@@ -207,12 +204,37 @@ public class OfferAcceptanceSaga {
 
     public void accept(DiscountCodeReturnedEvent event, Clock clock) {
         consumed(event, clock.now());
+        isDiscountCodeReturned = true;
+
+        if (status == REJECTED) {
+            completed = true;
+        }
     }
 
     private void reject(OfferAcceptanceSagaEvent event, Clock clock, String rejectionReason) {
         consumed(event, clock.now());
         this.rejectionReason = rejectionReason;
         status = REJECTED;
+
+        if (isDiscountCodeReturnedIfNeeded()) {
+            completed = true;
+        }
+    }
+
+    private boolean isDiscountCodeReturnedIfNeeded() {
+        if (hasDiscountCode() && isBookingStarted()) {
+            return isDiscountAlreadyCodeUsed || isDiscountCodeReturned;
+        }
+
+        return true;
+    }
+
+    private boolean isBookingStarted() {
+        return canStartBooking();
+    }
+
+    private boolean canStartBooking() {
+        return participantId != null && isOfferPriceConfirmed;
     }
 
     private void consumed(OfferAcceptanceSagaEvent event, LocalDateTime consumedAt) {

@@ -1257,7 +1257,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldRejectWhenNotAvailableOfferAcceptanceRequestedEventAccepted() {
+    void shouldRejectAndCompleteWhenNotAvailableOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
         saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
@@ -1268,7 +1268,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-                .isNotCompleted()
+                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasNoParticipantId()
                 .hasRejectionReason("Offer already " + event.status())
@@ -1310,7 +1310,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-//                .isCompleted()
+                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasNoParticipantId()
                 .hasRejectionReason(event.reason())
@@ -1339,12 +1339,41 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-//                .isNotCompleted()
+                .isNotCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasRejectionReason(event.reason())
                 .hasDiscountCodeUsed()
                 .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
+    void shouldRejectAndCompleteWhenOfferRejectedEventAcceptedBookingStartedAndDiscountCodeAlreadyUsed() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeAlreadyUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        givenNowSecondsAgo(5);
+        OfferRejectedEvent event = randomOfferRejectedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+                .isCompleted()
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasRejectionReason(event.reason())
+                .hasDiscountCodeNotUsed()
+                .hasDiscountCodeAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
@@ -1368,7 +1397,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-//                .isCompleted()
+                .isCompleted()
                 .hasNoDiscountCode()
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasRejectionReason(event.reason())
@@ -1398,7 +1427,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-//                .isCompleted()
+                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasRejectionReason(event.reason())
@@ -1498,7 +1527,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-//                .isCompleted()
+                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasRejectionReason(offerRejectedEvent.reason())
@@ -1527,7 +1556,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
-//                .isNotCompleted()
+                .isNotCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasNoRejectionReason()
