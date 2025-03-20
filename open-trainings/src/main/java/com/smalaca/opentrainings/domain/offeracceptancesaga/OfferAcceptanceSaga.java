@@ -58,6 +58,7 @@ public class OfferAcceptanceSaga {
     private boolean isOfferPriceConfirmed;
     private boolean isTrainingPlaceBooked;
     private boolean hasNoAvailableTrainingPlacesLeft;
+    private boolean completed;
 
     public OfferAcceptanceSaga(UUID offerId) {
         this.offerId = offerId;
@@ -228,5 +229,9 @@ public class OfferAcceptanceSaga {
 
     public OfferAcceptanceSagaDto asDto() {
         return new OfferAcceptanceSagaDto(offerId, status.name(), rejectionReason);
+    }
+
+    boolean isCompleted() {
+        return completed;
     }
 }
