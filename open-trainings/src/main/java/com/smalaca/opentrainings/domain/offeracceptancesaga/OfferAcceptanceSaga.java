@@ -19,6 +19,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDisco
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -200,6 +201,10 @@ public class OfferAcceptanceSaga {
 
     public void accept(NotAvailableOfferAcceptanceRequestedEvent event, Clock clock) {
         reject(event, clock, "Offer already " + event.status());
+    }
+
+    public void accept(DiscountCodeReturnedEvent event, Clock clock) {
+        consumed(event, clock.now());
     }
 
     private void reject(OfferAcceptanceSagaEvent event, Clock clock, String rejectionReason) {

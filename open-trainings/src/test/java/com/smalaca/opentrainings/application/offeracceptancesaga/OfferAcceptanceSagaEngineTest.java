@@ -21,6 +21,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDisco
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -1375,6 +1376,18 @@ class OfferAcceptanceSagaEngineTest {
                 .consumedEventAt(event, NOW.minusSeconds(3));
     }
 
+    @Test
+    void shouldPublishNoCommandWhenDiscountCodeReturnedEventAccepted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        given(repository.findById(OFFER_ID)).willReturn(saga);
+        givenNowSecondsAgo(5);
+
+        engine.accept(randomDiscountCodeReturnedEvent());
+
+        thenPublishedCommands(0);
+    }
+
     private Clock givenNowSecondsAgo(int seconds) {
         given(clock.now()).willReturn(NOW.minusSeconds(seconds));
         return clock;
@@ -1392,6 +1405,10 @@ class OfferAcceptanceSagaEngineTest {
         then(repository).should().save(captor.capture());
 
         return assertThatOfferAcceptanceSaga(captor.getValue());
+    }
+
+    private DiscountCodeReturnedEvent randomDiscountCodeReturnedEvent() {
+        return new DiscountCodeReturnedEvent(newEventId(), OFFER_ID, PARTICIPANT_ID, DISCOUNT_CODE);
     }
 
     private NotAvailableOfferAcceptanceRequestedEvent randomNotAvailableOfferAcceptanceRequestedEvent() {
