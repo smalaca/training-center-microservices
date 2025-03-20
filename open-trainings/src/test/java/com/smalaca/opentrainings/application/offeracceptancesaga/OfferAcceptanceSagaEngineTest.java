@@ -64,6 +64,7 @@ import static org.mockito.Mockito.times;
 class OfferAcceptanceSagaEngineTest {
     private static final Faker FAKER = new Faker();
     private static final String DISCOUNT_CODE = FAKER.code().imei();
+    private static final String NO_DISCOUNT_CODE = null;
     private static final UUID OFFER_ID = randomId();
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final UUID PARTICIPANT_ID = randomId();
@@ -83,7 +84,7 @@ class OfferAcceptanceSagaEngineTest {
     void shouldCreateOfferAcceptanceSagaWhenOfferAcceptanceRequestedEventWithDiscountAccepted() {
         givenNowSecondsAgo(1);
 
-        engine.accept(randomOfferAcceptanceRequestedEvent());
+        engine.accept(randomOfferAcceptanceRequestedEventWithDiscountCode());
 
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
@@ -127,7 +128,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistOfferAcceptanceRequestedEventWithDiscount() {
         givenNowSecondsAgo(1);
-        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEventWithDiscountCode();
 
         engine.accept(event);
 
@@ -152,7 +153,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishCommandsWhenOfferAcceptanceRequestedEventAccepted() {
         givenNowSecondsAgo(1);
-        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent event = randomOfferAcceptanceRequestedEventWithDiscountCode();
 
         engine.accept(event);
 
@@ -177,7 +178,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldHasParticipantIdWhenPersonRegisteredEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomPersonRegisteredEvent());
@@ -201,7 +202,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistPersonRegisteredEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
@@ -217,7 +218,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenPersonRegisteredEventAcceptedAndOfferPriceNotConfirmed() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomPersonRegisteredEvent());
@@ -228,7 +229,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenPersonRegisteredEventAcceptedAndOfferPriceConfirmed() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(10));
         givenNowSecondsAgo(5);
         PersonRegisteredEvent event = randomPersonRegisteredEvent();
@@ -281,7 +282,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldHasParticipantIdWhenAlreadyRegisteredPersonFoundEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomAlreadyRegisteredPersonFoundEvent());
@@ -305,7 +306,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistAlreadyRegisteredPersonFoundEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         AlreadyRegisteredPersonFoundEvent alreadyRegisteredPersonFoundEvent = randomAlreadyRegisteredPersonFoundEvent();
@@ -321,7 +322,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenAlreadyRegisteredPersonFoundEventAcceptedAndOfferPriceNotConfirmed() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomAlreadyRegisteredPersonFoundEvent());
@@ -332,7 +333,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenAlreadyRegisteredPersonFoundEventAcceptedAndOfferPriceConfirmed() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(10));
         givenNowSecondsAgo(5);
         AlreadyRegisteredPersonFoundEvent event = randomAlreadyRegisteredPersonFoundEvent();
@@ -385,7 +386,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldConfirmOfferPriceWhenUnexpiredOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomUnexpiredOfferAcceptanceRequestedEvent());
@@ -409,7 +410,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistUnexpiredOfferAcceptanceRequestedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
@@ -425,7 +426,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndHasNoParticipantId() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomUnexpiredOfferAcceptanceRequestedEvent());
@@ -436,7 +437,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndPersonRegistered() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         givenNowSecondsAgo(5);
         UnexpiredOfferAcceptanceRequestedEvent event = randomUnexpiredOfferAcceptanceRequestedEvent();
@@ -489,7 +490,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenUnexpiredOfferAcceptanceRequestedEventAcceptedAndPersonAlreadyRegistered() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
         givenNowSecondsAgo(5);
         UnexpiredOfferAcceptanceRequestedEvent event = randomUnexpiredOfferAcceptanceRequestedEvent();
@@ -542,7 +543,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldHasTrainingIdAndTrainingPriceWhenExpiredOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
 
         engine.accept(randomExpiredOfferAcceptanceRequestedEvent());
@@ -566,7 +567,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistExpiredOfferAcceptanceRequestedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent = randomExpiredOfferAcceptanceRequestedEvent();
@@ -582,7 +583,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishConfirmTrainingPriceCommandWhenExpiredOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         ExpiredOfferAcceptanceRequestedEvent event = randomExpiredOfferAcceptanceRequestedEvent();
 
@@ -602,7 +603,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldConfirmOfferPriceWhenTrainingPriceNotChangedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
 
@@ -627,7 +628,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistTrainingPriceNotChangedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent = randomExpiredOfferAcceptanceRequestedEvent();
         saga.accept(expiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(8));
@@ -646,7 +647,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenTrainingPriceNotChangedEventAcceptedAndHasNoParticipantId() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
 
@@ -658,7 +659,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenTrainingPriceNotChangedEventAcceptedAndPersonRegistered() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -713,7 +714,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishBookTrainingPlaceAndUseDiscountCodeCommandsWhenTrainingPriceNotChangedEventAcceptedAndPersonAlreadyRegistered() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -768,7 +769,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldSetDiscountCodeAlreadyUsedWhenDiscountCodeAlreadyUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -794,7 +795,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistDiscountCodeAlreadyUsedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
         UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -816,7 +817,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenTrainingPlacesNotBookedAndDiscountCodeAlreadyUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -829,7 +830,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishAcceptOfferCommandWhenTrainingPlaceBookedAndDiscountCodeAlreadyUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomTrainingPlaceBookedEvent(), givenNowSecondsAgo(8));
@@ -853,7 +854,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldSetDiscountCodeUsedWhenDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -879,7 +880,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistDiscountCodeUsedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
         UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -901,7 +902,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenTrainingPlaceNotBookedAndDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -914,7 +915,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishAcceptOfferCommandWhenTrainingPlaceBookedAndDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomTrainingPlaceBookedEvent(), givenNowSecondsAgo(8));
@@ -938,7 +939,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishReturnDiscountCodeCommandWhenNoAvailableTrainingPlacesLeftEventAndDiscountCodeUsedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(7));
@@ -961,7 +962,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldSetTrainingPlaceBookedWhenTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -987,7 +988,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistTrainingPlaceBookedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
         UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -1009,7 +1010,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishNoCommandWhenTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -1046,7 +1047,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishAcceptOfferCommandWhenDiscountCodeUsedAndTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(8));
@@ -1070,7 +1071,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishAcceptOfferCommandWhenDiscountCodeAlreadyUsedAndTrainingPlaceBookedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomDiscountCodeAlreadyUsedEvent(), givenNowSecondsAgo(8));
@@ -1094,7 +1095,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldSetHasNoAvailableTrainingPlacesLeftWhenNoAvailableTrainingPlacesLeftEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -1120,7 +1121,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistNoAvailableTrainingPlacesLeftEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         PersonRegisteredEvent personRegisteredEvent = randomPersonRegisteredEvent();
         UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
@@ -1142,7 +1143,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishRejectOfferCommandWhenNoAvailableTrainingPlacesLeftEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -1163,7 +1164,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishReturnDiscountCodeAndRejectOfferCommandsWhenDiscountCodeUsedAndNoAvailableTrainingPlacesLeftEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomPersonRegisteredEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(7));
@@ -1193,7 +1194,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldLeaveOfferPriceNotConfirmedWhenTrainingPriceChangedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
 
@@ -1218,7 +1219,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistTrainingPriceChangedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent = randomExpiredOfferAcceptanceRequestedEvent();
         saga.accept(expiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(8));
@@ -1237,7 +1238,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPublishRejectOfferCommandWhenTrainingPriceChangedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(8));
         givenNowSecondsAgo(5);
@@ -1258,7 +1259,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldRejectWhenNotAvailableOfferAcceptanceRequestedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         NotAvailableOfferAcceptanceRequestedEvent event = randomNotAvailableOfferAcceptanceRequestedEvent();
 
@@ -1283,7 +1284,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistNotAvailableOfferAcceptanceRequestedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         givenNowSecondsAgo(5);
         NotAvailableOfferAcceptanceRequestedEvent event = randomNotAvailableOfferAcceptanceRequestedEvent();
@@ -1297,9 +1298,9 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
-    void shouldRejectWhenOfferRejectedEventAccepted() {
+    void shouldRejectAndCompleteWhenOfferRejectedEventAcceptedAndBookingNotStarted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomExpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(9));
         givenNowSecondsAgo(5);
         OfferRejectedEvent event = randomOfferRejectedEvent();
@@ -1309,7 +1310,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
-                .isNotCompleted()
+//                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasNoParticipantId()
                 .hasRejectionReason(event.reason())
@@ -1323,9 +1324,97 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
+    void shouldRejectWhenOfferRejectedEventAcceptedAndBookingStarted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        givenNowSecondsAgo(5);
+        OfferRejectedEvent event = randomOfferRejectedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+//                .isNotCompleted()
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasRejectionReason(event.reason())
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
+    void shouldRejectAndCompleteWhenOfferRejectedEventAcceptedBookingStartedAndDiscountCodeNotGiven() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithNoDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        givenNowSecondsAgo(5);
+        OfferRejectedEvent event = randomOfferRejectedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+//                .isCompleted()
+                .hasNoDiscountCode()
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasRejectionReason(event.reason())
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
+    void shouldRejectAndCompleteWhenOfferRejectedEventAcceptedAndDiscountCodeReturned() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        saga.accept(randomDiscountCodeReturnedEvent(), givenNowSecondsAgo(2));
+        givenNowSecondsAgo(1);
+        OfferRejectedEvent event = randomOfferRejectedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+//                .isCompleted()
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasRejectionReason(event.reason())
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
     void shouldPersistRejectedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         ExpiredOfferAcceptanceRequestedEvent expiredOfferAcceptanceRequestedEvent = randomExpiredOfferAcceptanceRequestedEvent();
         saga.accept(expiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(9));
@@ -1343,13 +1432,12 @@ class OfferAcceptanceSagaEngineTest {
 
     @Test
     void shouldAcceptWhenOfferAcceptedEventConsumed() {
-        OfferAcceptanceSaga saga = new OfferAcceptanceSaga(OFFER_ID);
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
         saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
         saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
         saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
         saga.accept(randomTrainingPlaceBookedEvent(), givenNowSecondsAgo(3));
-        given(repository.findById(OFFER_ID)).willReturn(saga);
         givenNowSecondsAgo(3);
 
         engine.accept(randomOfferAcceptedEvent());
@@ -1373,7 +1461,7 @@ class OfferAcceptanceSagaEngineTest {
     @Test
     void shouldPersistOfferAcceptedEvent() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEvent();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
         saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
         AlreadyRegisteredPersonFoundEvent randomAlreadyRegisteredPersonFoundEvent = randomAlreadyRegisteredPersonFoundEvent();
         saga.accept(randomAlreadyRegisteredPersonFoundEvent, givenNowSecondsAgo(10));
@@ -1393,15 +1481,106 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     @Test
+    void shouldRejectAndCompleteWhenDiscountCodeReturnedEventAcceptedAndOfferRejected() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        OfferRejectedEvent offerRejectedEvent = randomOfferRejectedEvent();
+        saga.accept(offerRejectedEvent, givenNowSecondsAgo(2));
+        givenNowSecondsAgo(1);
+        DiscountCodeReturnedEvent event = randomDiscountCodeReturnedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isRejected()
+//                .isCompleted()
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasRejectionReason(offerRejectedEvent.reason())
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
+    void shouldNotCompleteWhenDiscountCodeReturnedEventAccepted() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        givenNowSecondsAgo(1);
+        DiscountCodeReturnedEvent event = randomDiscountCodeReturnedEvent();
+
+        engine.accept(event);
+
+        thenOfferAcceptanceSagaSaved()
+                .hasOfferId(OFFER_ID)
+                .isInProgress()
+//                .isNotCompleted()
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasNoRejectionReason()
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .hasTrainingId(TRAINING_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasOfferPriceConfirmed()
+                .hasNoTrainingPlaceBooked()
+                .hasNoAvailableTrainingPlacesLeft();
+    }
+
+    @Test
     void shouldPublishNoCommandWhenDiscountCodeReturnedEventAccepted() {
         OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
-        saga.accept(randomOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(13));
-        given(repository.findById(OFFER_ID)).willReturn(saga);
-        givenNowSecondsAgo(5);
+        saga.accept(randomOfferAcceptanceRequestedEventWithDiscountCode(), givenNowSecondsAgo(13));
+        saga.accept(randomAlreadyRegisteredPersonFoundEvent(), givenNowSecondsAgo(10));
+        saga.accept(randomUnexpiredOfferAcceptanceRequestedEvent(), givenNowSecondsAgo(5));
+        saga.accept(randomDiscountCodeUsedEvent(), givenNowSecondsAgo(4));
+        saga.accept(randomNoAvailableTrainingPlacesLeftEvent(), givenNowSecondsAgo(3));
+        givenNowSecondsAgo(1);
 
         engine.accept(randomDiscountCodeReturnedEvent());
 
         thenPublishedCommands(0);
+    }
+
+    @Test
+    void shouldPersistDiscountCodeReturnedEvent() {
+        OfferAcceptanceSaga saga = givenExistingOfferAcceptanceSaga();
+        OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent = randomOfferAcceptanceRequestedEventWithDiscountCode();
+        saga.accept(offerAcceptanceRequestedEvent, givenNowSecondsAgo(13));
+        AlreadyRegisteredPersonFoundEvent alreadyRegisteredPersonFoundEvent = randomAlreadyRegisteredPersonFoundEvent();
+        saga.accept(alreadyRegisteredPersonFoundEvent, givenNowSecondsAgo(10));
+        UnexpiredOfferAcceptanceRequestedEvent unexpiredOfferAcceptanceRequestedEvent = randomUnexpiredOfferAcceptanceRequestedEvent();
+        saga.accept(unexpiredOfferAcceptanceRequestedEvent, givenNowSecondsAgo(5));
+        DiscountCodeUsedEvent discountCodeUsedEvent = randomDiscountCodeUsedEvent();
+        saga.accept(discountCodeUsedEvent, givenNowSecondsAgo(4));
+        NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = randomNoAvailableTrainingPlacesLeftEvent();
+        saga.accept(noAvailableTrainingPlacesLeftEvent, givenNowSecondsAgo(3));
+        givenNowSecondsAgo(1);
+        DiscountCodeReturnedEvent discountCodeReturnedEvent = randomDiscountCodeReturnedEvent();
+
+        engine.accept(discountCodeReturnedEvent);
+
+        thenOfferAcceptanceSagaSaved()
+                .consumedEvents(6)
+                .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
+                .consumedEventAt(alreadyRegisteredPersonFoundEvent, NOW.minusSeconds(10))
+                .consumedEventAt(unexpiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(5))
+                .consumedEventAt(discountCodeUsedEvent, NOW.minusSeconds(4))
+                .consumedEventAt(noAvailableTrainingPlacesLeftEvent, NOW.minusSeconds(3))
+                .consumedEventAt(discountCodeReturnedEvent, NOW.minusSeconds(1));
     }
 
     private Clock givenNowSecondsAgo(int seconds) {
@@ -1431,9 +1610,14 @@ class OfferAcceptanceSagaEngineTest {
         return NotAvailableOfferAcceptanceRequestedEvent.nextAfter(randomBeginOfferAcceptanceCommand(), FAKER.lorem().sentence());
     }
 
-    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent() {
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEventWithDiscountCode() {
         return randomOfferAcceptanceRequestedEventWith(DISCOUNT_CODE);
     }
+
+    private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEventWithNoDiscountCode() {
+        return randomOfferAcceptanceRequestedEventWith(NO_DISCOUNT_CODE);
+    }
+
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEventWith(String discountCode) {
         return OfferAcceptanceRequestedEvent.create(OFFER_ID, FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), discountCode);
@@ -1461,7 +1645,7 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private BeginOfferAcceptanceCommand randomBeginOfferAcceptanceCommand() {
-        return BeginOfferAcceptanceCommand.nextAfter(randomOfferAcceptanceRequestedEvent());
+        return BeginOfferAcceptanceCommand.nextAfter(randomOfferAcceptanceRequestedEventWithDiscountCode());
     }
 
     private OfferRejectedEvent randomOfferRejectedEvent() {
