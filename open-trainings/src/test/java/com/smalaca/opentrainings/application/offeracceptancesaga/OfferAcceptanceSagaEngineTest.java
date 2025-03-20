@@ -180,7 +180,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomPersonRegisteredEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -205,7 +205,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(personRegisteredEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(2)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(5));
@@ -283,7 +283,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomAlreadyRegisteredPersonFoundEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -308,7 +308,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(alreadyRegisteredPersonFoundEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(2)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(alreadyRegisteredPersonFoundEvent, NOW.minusSeconds(5));
@@ -386,7 +386,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomUnexpiredOfferAcceptanceRequestedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -411,7 +411,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(unexpiredOfferAcceptanceRequestedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(2)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(unexpiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(5));
@@ -542,7 +542,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomExpiredOfferAcceptanceRequestedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -567,7 +567,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(expiredOfferAcceptanceRequestedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(2)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(expiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(5));
@@ -602,7 +602,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomTrainingPriceNotChangedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -629,7 +629,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(trainingPriceNotChangedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(3)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(expiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(8))
@@ -768,7 +768,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomDiscountCodeAlreadyUsedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -797,7 +797,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(discountCodeAlreadyUsedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(4)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
@@ -852,7 +852,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomDiscountCodeUsedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -881,7 +881,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(discountCodeUsedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(4)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
@@ -959,7 +959,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomTrainingPlaceBookedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -988,7 +988,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(trainingPlaceBookedEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(4)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
@@ -1091,7 +1091,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomNoAvailableTrainingPlacesLeftEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -1120,7 +1120,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(noAvailableTrainingPlacesLeftEvent);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(4)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(personRegisteredEvent, NOW.minusSeconds(10))
@@ -1188,7 +1188,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomTrainingPriceChangedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isInProgress()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -1215,7 +1215,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(3)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(expiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(8))
@@ -1252,7 +1252,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -1277,7 +1277,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(2)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(event, NOW.minusSeconds(5));
@@ -1293,7 +1293,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isRejected()
                 .hasDiscountCode(DISCOUNT_CODE)
@@ -1320,7 +1320,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(3)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(expiredOfferAcceptanceRequestedEvent, NOW.minusSeconds(9))
@@ -1340,7 +1340,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(randomOfferAcceptedEvent());
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .isAccepted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
@@ -1368,7 +1368,7 @@ class OfferAcceptanceSagaEngineTest {
 
         engine.accept(event);
 
-        assertThatOfferAcceptanceSaga(saga)
+        thenOfferAcceptanceSagaSaved()
                 .consumedEvents(4)
                 .consumedEventAt(offerAcceptanceRequestedEvent, NOW.minusSeconds(13))
                 .consumedEventAt(randomAlreadyRegisteredPersonFoundEvent, NOW.minusSeconds(10))
