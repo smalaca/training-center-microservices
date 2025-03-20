@@ -1357,7 +1357,7 @@ class OfferAcceptanceSagaEngineTest {
         thenOfferAcceptanceSagaSaved()
                 .hasOfferId(OFFER_ID)
                 .isAccepted()
-                .isNotCompleted()
+                .isCompleted()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasNoRejectionReason()

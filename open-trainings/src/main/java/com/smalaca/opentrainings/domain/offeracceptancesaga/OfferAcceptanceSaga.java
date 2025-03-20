@@ -194,6 +194,7 @@ public class OfferAcceptanceSaga {
     public void accept(OfferAcceptedEvent event, Clock clock) {
         consumed(event, clock.now());
         status = ACCEPTED;
+        completed = true;
     }
 
     public void accept(OfferRejectedEvent event, Clock clock) {

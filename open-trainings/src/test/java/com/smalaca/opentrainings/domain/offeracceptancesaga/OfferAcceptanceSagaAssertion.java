@@ -35,6 +35,11 @@ public class OfferAcceptanceSagaAssertion {
         return hasStatus(REJECTED);
     }
 
+    public OfferAcceptanceSagaAssertion isCompleted() {
+        assertThat(actual.isCompleted()).isTrue();
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion isNotCompleted() {
         assertThat(actual.isCompleted()).isFalse();
         return this;
