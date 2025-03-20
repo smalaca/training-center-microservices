@@ -73,8 +73,21 @@ public class OfferAcceptanceSagaAssertion {
         return hasDiscountCodeUsedEqualTo(true);
     }
 
-    private OfferAcceptanceSagaAssertion hasDiscountCodeUsedEqualTo(boolean isDiscountCodeUsed) {
-        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(isDiscountCodeUsed);
+    private OfferAcceptanceSagaAssertion hasDiscountCodeUsedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountCodeUsed").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasDiscountCodeNotReturned() {
+        return hasDiscountCodeReturnedEqualTo(false);
+    }
+
+    public OfferAcceptanceSagaAssertion hasDiscountCodeReturned() {
+        return hasDiscountCodeReturnedEqualTo(true);
+    }
+
+    private OfferAcceptanceSagaAssertion hasDiscountCodeReturnedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountCodeReturned").isEqualTo(expected);
         return this;
     }
 
@@ -86,8 +99,8 @@ public class OfferAcceptanceSagaAssertion {
         return hasDiscountCodeAlreadyUsedEqualTo(true);
     }
 
-    private OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsedEqualTo(boolean isDiscountCodeAlreadyUsed) {
-        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(isDiscountCodeAlreadyUsed);
+    private OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsedEqualTo(boolean expected) {
+        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(expected);
         return this;
     }
 
