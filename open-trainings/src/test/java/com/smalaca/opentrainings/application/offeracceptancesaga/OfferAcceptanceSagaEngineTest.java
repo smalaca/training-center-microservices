@@ -76,6 +76,7 @@ class OfferAcceptanceSagaEngineTest {
     private static final Price TRAINING_PRICE = Price.of(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
     private static final BigDecimal NEW_TRAINING_PRICE_AMOUNT = BigDecimal.valueOf(123.45);
     private static final String NEW_TRAINING_PRICE_CURRENCY_CODE = "USD";
+    private static final Price FINAL_TRAINING_PRICE = Price.of(NEW_TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
 
     private final Clock clock = mock(Clock.class);
     private final OfferAcceptanceSagaRepository repository = mock(OfferAcceptanceSagaRepository.class);
@@ -99,6 +100,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasNoParticipantId()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -123,6 +125,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasNoParticipantId()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -198,6 +201,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -303,6 +307,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -408,6 +413,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -566,6 +572,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -628,6 +635,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -796,6 +804,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -882,6 +891,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -991,6 +1001,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1125,6 +1136,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1224,6 +1236,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1290,6 +1303,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1333,6 +1347,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1363,6 +1378,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1393,6 +1409,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1423,6 +1440,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1454,6 +1472,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1502,6 +1521,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1556,6 +1576,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1586,6 +1607,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();

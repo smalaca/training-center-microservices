@@ -147,6 +147,16 @@ public class OfferAcceptanceSagaAssertion {
         return this;
     }
 
+    public OfferAcceptanceSagaAssertion hasFinalTrainingPrice(Price expected) {
+        assertThat(actual).extracting("finalTrainingPrice").isEqualTo(expected);
+        return this;
+    }
+
+    public OfferAcceptanceSagaAssertion hasNoFinalTrainingPrice() {
+        assertThat(actual).extracting("finalTrainingPrice").isNull();
+        return this;
+    }
+
     public OfferAcceptanceSagaAssertion hasTrainingPrice(Price expected) {
         assertThat(actual).extracting("trainingPrice").isEqualTo(expected);
         return this;

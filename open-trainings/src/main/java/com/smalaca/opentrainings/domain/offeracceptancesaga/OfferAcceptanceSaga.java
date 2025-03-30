@@ -56,6 +56,7 @@ public class OfferAcceptanceSaga {
     private UUID participantId;
     private UUID trainingId;
     private Price trainingPrice;
+    private Price finalTrainingPrice;
     private boolean isOfferPriceConfirmed;
     private boolean isTrainingPlaceBooked;
     private boolean hasNoAvailableTrainingPlacesLeft;
@@ -135,6 +136,7 @@ public class OfferAcceptanceSaga {
     public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountCodeUsed = true;
+        finalTrainingPrice = Price.of(event.newPrice(), event.priceCurrency());
 
         if (hasNoAvailableTrainingPlacesLeft) {
             return Optional.of(ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
