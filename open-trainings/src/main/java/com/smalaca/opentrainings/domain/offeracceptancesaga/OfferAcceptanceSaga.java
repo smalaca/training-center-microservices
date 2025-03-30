@@ -40,6 +40,7 @@ import java.util.function.BiConsumer;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
@@ -159,10 +160,28 @@ public class OfferAcceptanceSaga {
 
     private Optional<OfferAcceptanceSagaCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
         if (canAcceptOffer()) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+            return Optional.of(acceptOfferCommand(event));
         } else {
             return Optional.empty();
         }
+    }
+
+    private AcceptOfferCommand acceptOfferCommand(OfferAcceptanceSagaEvent event) {
+        AcceptOfferCommand.Builder builder = acceptOfferCommandBuilder()
+                .nextAfter(event)
+                .withOfferId(offerId)
+                .withParticipantId(participantId);
+
+        if (hasDiscountCode()) {
+            if (isDiscountCodeUsed) {
+                builder.withDiscountCodeUsed(discountCode);
+                builder.withFinalPrice(finalTrainingPrice);
+            } else if (isDiscountAlreadyCodeUsed) {
+                builder.withDiscountCodeAlreadyUsed(discountCode);
+            }
+        }
+
+        return builder.build();
     }
 
     private boolean canAcceptOffer() {
