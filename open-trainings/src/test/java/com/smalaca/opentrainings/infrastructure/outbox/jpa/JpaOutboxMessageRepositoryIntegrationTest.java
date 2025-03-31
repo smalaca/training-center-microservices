@@ -253,7 +253,15 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomDiscountCode());
+        OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
+
+        return AcceptOfferCommand.acceptOfferCommandBuilder()
+                .nextAfter(event)
+                .withOfferId(event.offerId())
+                .withParticipantId(randomId())
+                .withDiscountCodeUsed(randomDiscountCode())
+                .withFinalPrice(randomPrice())
+                .build();
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {

@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
@@ -12,6 +13,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
 class OfferAcceptedEventTest {
     private static final Faker FAKER = new Faker();
@@ -24,8 +26,7 @@ class OfferAcceptedEventTest {
 
     @Test
     void shouldCreateOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
-
+        AcceptOfferCommand command = acceptOfferCommand();
         OfferAcceptedEvent actual = OfferAcceptedEvent.offerAcceptedEventBuilder()
                 .nextAfter(command)
                 .withOfferId(OFFER_ID)
@@ -44,6 +45,18 @@ class OfferAcceptedEventTest {
                 .hasFinalPrice(FINAL_PRICE)
                 .hasDiscountCode(DISCOUNT_CODE)
                 .isNextAfter(command.commandId());
+    }
+
+    private AcceptOfferCommand acceptOfferCommand() {
+        OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
+
+        return acceptOfferCommandBuilder()
+                .nextAfter(event)
+                .withOfferId(event.offerId())
+                .withParticipantId(PARTICIPANT_ID)
+                .withDiscountCodeUsed(DISCOUNT_CODE)
+                .withFinalPrice(FINAL_PRICE)
+                .build();
     }
 
     private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {

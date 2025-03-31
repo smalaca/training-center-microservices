@@ -8,10 +8,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record AcceptOfferCommand(CommandId commandId, UUID offerId, UUID participantId, String discountCode, boolean isDiscountAlreadyCodeUsed, boolean isDiscountCodeUsed, BigDecimal priceAmount, String priceCurrency) implements OfferAcceptanceSagaCommand {
-    public static AcceptOfferCommand nextAfter(OfferAcceptanceSagaEvent event, UUID participantId, String discountCode) {
-        return new AcceptOfferCommand(event.eventId().nextCommandId(), event.offerId(), participantId, discountCode, false, false, null, null);
-    }
-
     public static AcceptOfferCommand.Builder acceptOfferCommandBuilder() {
         return new AcceptOfferCommand.Builder();
     }

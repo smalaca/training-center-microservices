@@ -26,6 +26,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeR
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
@@ -1766,7 +1767,14 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
+        OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
+        AcceptOfferCommand command = AcceptOfferCommand.acceptOfferCommandBuilder()
+                .nextAfter(event)
+                .withOfferId(OFFER_ID)
+                .withParticipantId(PARTICIPANT_ID)
+                .withDiscountCodeUsed(DISCOUNT_CODE)
+                .withFinalPrice(FINAL_TRAINING_PRICE)
+                .build();
 
         return offerAcceptedEventBuilder()
                 .nextAfter(command)

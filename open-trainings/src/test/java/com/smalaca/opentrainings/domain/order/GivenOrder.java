@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.domain.order;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
 import com.smalaca.opentrainings.domain.paymentmethod.PaymentMethod;
@@ -16,6 +17,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOrder {
@@ -110,7 +112,7 @@ public class GivenOrder {
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
         OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(AcceptOfferCommand.nextAfter(new TrainingPriceNotChangedEvent(newEventId(), offerId, trainingId), participantId, discountCode))
+                .nextAfter(acceptOfferCommand())
                 .withOfferId(offerId)
                 .withTrainingId(trainingId)
                 .withParticipantId(participantId)
@@ -122,6 +124,18 @@ public class GivenOrder {
         order = orderFactory.create(event);
 
         return this;
+    }
+
+    private AcceptOfferCommand acceptOfferCommand() {
+        OfferAcceptanceSagaEvent trainingPriceNotChangedEvent = new TrainingPriceNotChangedEvent(newEventId(), offerId, trainingId);
+
+        return acceptOfferCommandBuilder()
+                .nextAfter(trainingPriceNotChangedEvent)
+                .withOfferId(offerId)
+                .withParticipantId(participantId)
+                .withDiscountCodeUsed(discountCode)
+                .withFinalPrice(finalPrice)
+                .build();
     }
 
     public OrderTestDto getDto() {

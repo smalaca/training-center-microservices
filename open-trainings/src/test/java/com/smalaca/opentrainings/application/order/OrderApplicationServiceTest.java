@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.eventregistry.EventRegistry;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.order.GivenOrder;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
@@ -134,7 +135,15 @@ class OrderApplicationServiceTest {
     }
 
     private AcceptOfferCommand acceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID), PARTICIPANT_ID, DISCOUNT_CODE);
+        OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
+
+        return AcceptOfferCommand.acceptOfferCommandBuilder()
+                .nextAfter(event)
+                .withOfferId(OFFER_ID)
+                .withParticipantId(PARTICIPANT_ID)
+                .withDiscountCodeUsed(DISCOUNT_CODE)
+                .withFinalPrice(FINAL_PRICE)
+                .build();
     }
 
     @Test
