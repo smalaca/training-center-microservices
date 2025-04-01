@@ -39,6 +39,7 @@ import java.util.stream.Stream;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -345,10 +346,7 @@ class OfferApplicationServiceTest {
 
     private AcceptOfferCommand acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
-        return AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(OFFER_ID)
-                .withParticipantId(PARTICIPANT_ID)
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
                 .withDiscountCodeUsed(DISCOUNT_CODE)
                 .withFinalPrice(randomPrice())
                 .build();

@@ -50,6 +50,7 @@ import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDtoAssertion.assertThatOfferAcceptanceSagaDto;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommandAssertion.assertThatBookTrainingPlaceCommand;
@@ -1768,10 +1769,7 @@ class OfferAcceptanceSagaEngineTest {
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
         OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
-        AcceptOfferCommand command = AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(OFFER_ID)
-                .withParticipantId(PARTICIPANT_ID)
+        AcceptOfferCommand command = acceptOfferCommandBuilder(event, PARTICIPANT_ID)
                 .withDiscountCodeUsed(DISCOUNT_CODE)
                 .withFinalPrice(FINAL_TRAINING_PRICE)
                 .build();

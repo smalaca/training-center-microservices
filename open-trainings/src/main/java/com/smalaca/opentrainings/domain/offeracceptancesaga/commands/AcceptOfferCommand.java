@@ -8,33 +8,24 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record AcceptOfferCommand(CommandId commandId, UUID offerId, UUID participantId, String discountCode, boolean isDiscountAlreadyCodeUsed, boolean isDiscountCodeUsed, BigDecimal priceAmount, String priceCurrency) implements OfferAcceptanceSagaCommand {
-    public static AcceptOfferCommand.Builder acceptOfferCommandBuilder() {
-        return new AcceptOfferCommand.Builder();
+    public static AcceptOfferCommand.Builder acceptOfferCommandBuilder(OfferAcceptanceSagaEvent event, UUID participantId) {
+        return new AcceptOfferCommand.Builder(event, participantId);
     }
 
     public static class Builder {
-        private CommandId commandId;
-        private UUID offerId;
-        private UUID participantId;
+        private final CommandId commandId;
+        private final UUID offerId;
+        private final UUID participantId;
         private String discountCode;
         private boolean isDiscountAlreadyCodeUsed;
         private boolean isDiscountCodeUsed;
         private BigDecimal priceAmount;
         private String priceCurrency;
 
-        public Builder nextAfter(OfferAcceptanceSagaEvent event) {
-            this.commandId = event.eventId().nextCommandId();
-            return this;
-        }
-
-        public Builder withOfferId(UUID offerId) {
-            this.offerId = offerId;
-            return this;
-        }
-
-        public Builder withParticipantId(UUID participantId) {
+        private Builder(OfferAcceptanceSagaEvent event, UUID participantId) {
+            commandId = event.eventId().nextCommandId();
+            offerId = event.offerId();
             this.participantId = participantId;
-            return this;
         }
 
         public Builder withDiscountCodeAlreadyUsed(String discountCode) {

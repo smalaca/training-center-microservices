@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -43,10 +44,7 @@ class OutboxMessageMapperTest {
 
     private AcceptOfferCommand givenAcceptOfferCommand() {
         TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(newEventId(), randomId(), randomId());
-        return AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(randomId())
-                .withParticipantId(randomId())
+        return acceptOfferCommandBuilder(event, randomId())
                 .withDiscountCodeUsed(randomDiscountCode())
                 .withFinalPrice(randomPrice())
                 .build();

@@ -49,6 +49,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.infrastructure.outbox.jpa.OutboxMessageAssertion.assertThatOutboxMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -255,10 +256,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     private AcceptOfferCommand randomAcceptOfferCommand() {
         OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
 
-        return AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(event.offerId())
-                .withParticipantId(randomId())
+        return acceptOfferCommandBuilder(event, randomId())
                 .withDiscountCodeUsed(randomDiscountCode())
                 .withFinalPrice(randomPrice())
                 .build();

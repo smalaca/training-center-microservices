@@ -28,6 +28,7 @@ import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOffer {
@@ -144,10 +145,7 @@ public class GivenOffer {
 
     private AcceptOfferCommand acceptOfferCommand(UUID participantId) {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
-        return AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(event.offerId())
-                .withParticipantId(participantId)
+        return acceptOfferCommandBuilder(event, participantId)
                 .withDiscountCodeUsed(randomDiscountCode())
                 .withFinalPrice(randomPrice())
                 .build();

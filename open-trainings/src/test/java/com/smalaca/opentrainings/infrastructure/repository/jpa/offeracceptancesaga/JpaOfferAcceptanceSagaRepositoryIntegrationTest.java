@@ -34,6 +34,7 @@ import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
 @IntegrationTest
 @SpringBootTest
@@ -175,10 +176,7 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
 
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
         OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), offerId, randomId());
-        AcceptOfferCommand command = AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(offerId)
-                .withParticipantId(randomId())
+        AcceptOfferCommand command = acceptOfferCommandBuilder(event, randomId())
                 .withDiscountCodeUsed(randomDiscountCode())
                 .withFinalPrice(randomPrice())
                 .build();

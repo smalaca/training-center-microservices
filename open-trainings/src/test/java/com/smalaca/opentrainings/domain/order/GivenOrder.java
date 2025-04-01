@@ -129,10 +129,7 @@ public class GivenOrder {
     private AcceptOfferCommand acceptOfferCommand() {
         OfferAcceptanceSagaEvent trainingPriceNotChangedEvent = new TrainingPriceNotChangedEvent(newEventId(), offerId, trainingId);
 
-        return acceptOfferCommandBuilder()
-                .nextAfter(trainingPriceNotChangedEvent)
-                .withOfferId(offerId)
-                .withParticipantId(participantId)
+        return acceptOfferCommandBuilder(trainingPriceNotChangedEvent, participantId)
                 .withDiscountCodeUsed(discountCode)
                 .withFinalPrice(finalPrice)
                 .build();

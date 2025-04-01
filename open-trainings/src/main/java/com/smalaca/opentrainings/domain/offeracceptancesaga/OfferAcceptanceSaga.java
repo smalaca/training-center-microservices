@@ -167,10 +167,7 @@ public class OfferAcceptanceSaga {
     }
 
     private AcceptOfferCommand acceptOfferCommand(OfferAcceptanceSagaEvent event) {
-        AcceptOfferCommand.Builder builder = acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(offerId)
-                .withParticipantId(participantId);
+        AcceptOfferCommand.Builder builder = acceptOfferCommandBuilder(event, participantId);
 
         if (hasDiscountCode()) {
             if (isDiscountCodeUsed) {

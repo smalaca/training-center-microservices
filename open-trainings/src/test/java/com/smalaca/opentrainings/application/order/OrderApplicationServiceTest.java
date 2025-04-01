@@ -42,6 +42,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
 import static com.smalaca.opentrainings.domain.order.events.OrderRejectedEventAssertion.assertThatOrderRejectedEvent;
@@ -137,10 +138,7 @@ class OrderApplicationServiceTest {
     private AcceptOfferCommand acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
 
-        return AcceptOfferCommand.acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(OFFER_ID)
-                .withParticipantId(PARTICIPANT_ID)
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
                 .withDiscountCodeUsed(DISCOUNT_CODE)
                 .withFinalPrice(FINAL_PRICE)
                 .build();

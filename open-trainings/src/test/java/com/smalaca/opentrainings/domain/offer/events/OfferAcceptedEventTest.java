@@ -50,10 +50,7 @@ class OfferAcceptedEventTest {
     private AcceptOfferCommand acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
 
-        return acceptOfferCommandBuilder()
-                .nextAfter(event)
-                .withOfferId(event.offerId())
-                .withParticipantId(PARTICIPANT_ID)
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
                 .withDiscountCodeUsed(DISCOUNT_CODE)
                 .withFinalPrice(FINAL_PRICE)
                 .build();
