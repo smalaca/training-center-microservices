@@ -100,7 +100,7 @@ public class OfferAcceptanceSagaAssertion {
     }
 
     private OfferAcceptanceSagaAssertion hasDiscountCodeAlreadyUsedEqualTo(boolean expected) {
-        assertThat(actual).extracting("isDiscountAlreadyCodeUsed").isEqualTo(expected);
+        assertThat(actual).extracting("isDiscountCodeAlreadyUsed").isEqualTo(expected);
         return this;
     }
 

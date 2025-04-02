@@ -53,7 +53,7 @@ public class OfferAcceptanceSaga {
     private String discountCode;
     private boolean isDiscountCodeUsed;
     private boolean isDiscountCodeReturned;
-    private boolean isDiscountAlreadyCodeUsed;
+    private boolean isDiscountCodeAlreadyUsed;
     private UUID participantId;
     private UUID trainingId;
     private Price trainingPrice;
@@ -148,7 +148,7 @@ public class OfferAcceptanceSaga {
 
     public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
-        isDiscountAlreadyCodeUsed = true;
+        isDiscountCodeAlreadyUsed = true;
         return acceptOfferIfPossible(event);
     }
 
@@ -173,7 +173,7 @@ public class OfferAcceptanceSaga {
             if (isDiscountCodeUsed) {
                 builder.withDiscountCodeUsed(discountCode);
                 builder.withFinalPrice(finalTrainingPrice);
-            } else if (isDiscountAlreadyCodeUsed) {
+            } else if (isDiscountCodeAlreadyUsed) {
                 builder.withDiscountCodeAlreadyUsed(discountCode);
             }
         }
@@ -182,7 +182,7 @@ public class OfferAcceptanceSaga {
     }
 
     private boolean canAcceptOffer() {
-        return (hasNoDiscountCode() || isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
+        return (hasNoDiscountCode() || isDiscountCodeAlreadyUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
     }
 
     private boolean hasNoDiscountCode() {
@@ -241,7 +241,7 @@ public class OfferAcceptanceSaga {
 
     private boolean isDiscountCodeReturnedIfNeeded() {
         if (hasDiscountCode() && isBookingStarted()) {
-            return isDiscountAlreadyCodeUsed || isDiscountCodeReturned;
+            return isDiscountCodeAlreadyUsed || isDiscountCodeReturned;
         }
 
         return true;
