@@ -16,7 +16,6 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static org.mockito.BDDMockito.given;
 
@@ -111,17 +110,9 @@ public class GivenOrder {
 
     public GivenOrder initiated() {
         given(clock.now()).willReturn(creationDateTime);
-        OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(acceptOfferCommand())
-                .withOfferId(offerId)
-                .withTrainingId(trainingId)
-                .withParticipantId(participantId)
-                .withTrainingPrice(trainingPrice)
-                .withFinalPrice(finalPrice)
-                .withDiscountCode(discountCode)
-                .build();
+        OfferAcceptedEvent offerAcceptedEvent = OfferAcceptedEvent.nextAfter(acceptOfferCommand(), trainingId, trainingPrice);
 
-        order = orderFactory.create(event);
+        order = orderFactory.create(offerAcceptedEvent);
 
         return this;
     }

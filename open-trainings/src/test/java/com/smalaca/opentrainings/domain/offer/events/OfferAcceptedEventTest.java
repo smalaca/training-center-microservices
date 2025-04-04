@@ -27,15 +27,7 @@ class OfferAcceptedEventTest {
     @Test
     void shouldCreateOfferAcceptedEvent() {
         AcceptOfferCommand command = acceptOfferCommand();
-        OfferAcceptedEvent actual = OfferAcceptedEvent.offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(OFFER_ID)
-                .withTrainingId(TRAINING_ID)
-                .withParticipantId(PARTICIPANT_ID)
-                .withTrainingPrice(TRAINING_PRICE)
-                .withFinalPrice(FINAL_PRICE)
-                .withDiscountCode(DISCOUNT_CODE)
-                .build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
         assertThatOfferAcceptedEvent(actual)
                 .hasOfferId(OFFER_ID)

@@ -32,7 +32,6 @@ import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
@@ -181,10 +180,7 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
                 .withFinalPrice(randomPrice())
                 .build();
 
-        return offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(offerId)
-                .build();
+        return OfferAcceptedEvent.nextAfter(command, randomId(), randomPrice());
     }
 
     private String randomDiscountCode() {

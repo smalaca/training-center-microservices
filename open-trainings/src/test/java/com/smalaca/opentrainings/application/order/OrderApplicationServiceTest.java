@@ -41,7 +41,6 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.domain.order.OrderAssertion.assertThatOrder;
 import static com.smalaca.opentrainings.domain.order.events.OrderCancelledEventAssertion.assertThatOrderCancelledEvent;
@@ -84,15 +83,8 @@ class OrderApplicationServiceTest {
     void shouldInitiateOrderWithDiscountCode() {
         LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
         given(clock.now()).willReturn(creationDateTime);
-        OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(acceptOfferCommand())
-                .withOfferId(OFFER_ID)
-                .withParticipantId(PARTICIPANT_ID)
-                .withTrainingId(TRAINING_ID)
-                .withTrainingPrice(TRAINING_PRICE)
-                .withFinalPrice(FINAL_PRICE)
-                .withDiscountCode(DISCOUNT_CODE)
-                .build();
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE).build();
+        OfferAcceptedEvent event = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
         service.initiate(event);
 
@@ -112,14 +104,7 @@ class OrderApplicationServiceTest {
     void shouldInitiateOrderWithoutDiscountCode() {
         LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2011, 9, 1), LocalTime.now());
         given(clock.now()).willReturn(creationDateTime);
-        OfferAcceptedEvent event = offerAcceptedEventBuilder()
-                .nextAfter(acceptOfferCommand())
-                .withOfferId(OFFER_ID)
-                .withParticipantId(PARTICIPANT_ID)
-                .withTrainingId(TRAINING_ID)
-                .withTrainingPrice(TRAINING_PRICE)
-                .withFinalPrice(FINAL_PRICE)
-                .build();
+        OfferAcceptedEvent event = OfferAcceptedEvent.nextAfter(acceptOfferCommand().build(), TRAINING_ID, TRAINING_PRICE);
 
         service.initiate(event);
 
@@ -135,13 +120,10 @@ class OrderApplicationServiceTest {
                 .hasNoDiscountCode();
     }
 
-    private AcceptOfferCommand acceptOfferCommand() {
+    private AcceptOfferCommand.Builder acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), OFFER_ID, TRAINING_ID);
 
-        return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
-                .withDiscountCodeUsed(DISCOUNT_CODE)
-                .withFinalPrice(FINAL_PRICE)
-                .build();
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID).withFinalPrice(FINAL_PRICE);
     }
 
     @Test

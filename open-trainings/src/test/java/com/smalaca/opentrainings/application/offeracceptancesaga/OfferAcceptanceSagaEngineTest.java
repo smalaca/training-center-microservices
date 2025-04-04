@@ -47,7 +47,6 @@ import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDtoAssertion.assertThatOfferAcceptanceSagaDto;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
@@ -1774,10 +1773,7 @@ class OfferAcceptanceSagaEngineTest {
                 .withFinalPrice(FINAL_TRAINING_PRICE)
                 .build();
 
-        return offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(OFFER_ID)
-                .build();
+        return OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
     }
 
     private UnexpiredOfferAcceptanceRequestedEvent randomUnexpiredOfferAcceptanceRequestedEvent() {
