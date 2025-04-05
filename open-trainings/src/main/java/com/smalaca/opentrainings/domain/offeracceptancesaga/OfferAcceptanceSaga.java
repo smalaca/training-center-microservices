@@ -40,6 +40,7 @@ import java.util.function.BiConsumer;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.ACCEPTED;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.IN_PROGRESS;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaStatus.REJECTED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
@@ -52,10 +53,11 @@ public class OfferAcceptanceSaga {
     private String discountCode;
     private boolean isDiscountCodeUsed;
     private boolean isDiscountCodeReturned;
-    private boolean isDiscountAlreadyCodeUsed;
+    private boolean isDiscountCodeAlreadyUsed;
     private UUID participantId;
     private UUID trainingId;
     private Price trainingPrice;
+    private Price finalTrainingPrice;
     private boolean isOfferPriceConfirmed;
     private boolean isTrainingPlaceBooked;
     private boolean hasNoAvailableTrainingPlacesLeft;
@@ -135,6 +137,7 @@ public class OfferAcceptanceSaga {
     public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeUsedEvent event, Clock clock) {
         consumed(event, clock.now());
         isDiscountCodeUsed = true;
+        finalTrainingPrice = Price.of(event.newPrice(), event.priceCurrency());
 
         if (hasNoAvailableTrainingPlacesLeft) {
             return Optional.of(ReturnDiscountCodeCommand.nextAfter(event, participantId, discountCode));
@@ -145,7 +148,7 @@ public class OfferAcceptanceSaga {
 
     public Optional<OfferAcceptanceSagaCommand> accept(DiscountCodeAlreadyUsedEvent event, Clock clock) {
         consumed(event, clock.now());
-        isDiscountAlreadyCodeUsed = true;
+        isDiscountCodeAlreadyUsed = true;
         return acceptOfferIfPossible(event);
     }
 
@@ -157,14 +160,29 @@ public class OfferAcceptanceSaga {
 
     private Optional<OfferAcceptanceSagaCommand> acceptOfferIfPossible(OfferAcceptanceSagaEvent event) {
         if (canAcceptOffer()) {
-            return Optional.of(AcceptOfferCommand.nextAfter(event, participantId, discountCode));
+            return Optional.of(acceptOfferCommand(event));
         } else {
             return Optional.empty();
         }
     }
 
+    private AcceptOfferCommand acceptOfferCommand(OfferAcceptanceSagaEvent event) {
+        AcceptOfferCommand.Builder builder = acceptOfferCommandBuilder(event, participantId);
+
+        if (hasDiscountCode()) {
+            if (isDiscountCodeUsed) {
+                builder.withDiscountCodeUsed(discountCode);
+                builder.withFinalPrice(finalTrainingPrice);
+            } else if (isDiscountCodeAlreadyUsed) {
+                builder.withDiscountCodeAlreadyUsed(discountCode);
+            }
+        }
+
+        return builder.build();
+    }
+
     private boolean canAcceptOffer() {
-        return (hasNoDiscountCode() || isDiscountAlreadyCodeUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
+        return (hasNoDiscountCode() || isDiscountCodeAlreadyUsed || isDiscountCodeUsed) && isTrainingPlaceBooked;
     }
 
     private boolean hasNoDiscountCode() {
@@ -223,7 +241,7 @@ public class OfferAcceptanceSaga {
 
     private boolean isDiscountCodeReturnedIfNeeded() {
         if (hasDiscountCode() && isBookingStarted()) {
-            return isDiscountAlreadyCodeUsed || isDiscountCodeReturned;
+            return isDiscountCodeAlreadyUsed || isDiscountCodeReturned;
         }
 
         return true;

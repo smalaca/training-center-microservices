@@ -20,15 +20,23 @@ public class OrderFactory {
     }
 
     public Order create(OfferAcceptedEvent event) {
-        return new Order.Builder()
+        Order.Builder builder = new Order.Builder()
                 .withOfferId(event.offerId())
                 .withTrainingId(event.trainingId())
                 .withParticipantId(event.participantId())
                 .withTrainingPrice(Price.of(event.trainingPriceAmount(), event.trainingPriceCurrencyCode()))
                 .withFinalPrice(Price.of(event.finalPriceAmount(), event.finalPriceCurrencyCode()))
-                .withDiscountCode(event.discountCode())
                 .withOrderNumber(orderNumberFactory.createFor(event.participantId()))
-                .withCreationDateTime(clock.now())
-                .build();
+                .withCreationDateTime(clock.now());
+
+        if (event.isDiscountCodeUsed()) {
+            builder.withDiscountCode(DiscountCode.used(event.discountCode()));
+        }
+
+        if (event.isDiscountCodeAlreadyUsed()) {
+            builder.withDiscountCode(DiscountCode.alreadyUsed(event.discountCode()));
+        }
+
+        return builder.build();
     }
 }

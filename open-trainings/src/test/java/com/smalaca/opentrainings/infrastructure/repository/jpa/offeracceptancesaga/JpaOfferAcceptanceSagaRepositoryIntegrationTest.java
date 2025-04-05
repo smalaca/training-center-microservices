@@ -30,9 +30,10 @@ import static com.google.common.collect.ImmutableMap.of;
 import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
 @IntegrationTest
 @SpringBootTest
@@ -173,12 +174,17 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(new TrainingPriceNotChangedEvent(newEventId(), offerId, randomId()), randomId(), FAKER.code().imei());
-
-        return offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(offerId)
+        OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), offerId, randomId());
+        AcceptOfferCommand command = acceptOfferCommandBuilder(event, randomId())
+                .withDiscountCodeUsed(randomDiscountCode())
+                .withFinalPrice(randomPrice())
                 .build();
+
+        return OfferAcceptedEvent.nextAfter(command, randomId(), randomPrice());
+    }
+
+    private String randomDiscountCode() {
+        return FAKER.code().imei();
     }
 
     private OfferAcceptanceRequestedEvent randomOfferAcceptanceRequestedEvent(UUID offerId) {

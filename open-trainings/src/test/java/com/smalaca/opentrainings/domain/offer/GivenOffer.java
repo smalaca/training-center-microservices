@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOffer
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RejectOfferCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
@@ -27,6 +28,7 @@ import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static org.mockito.BDDMockito.given;
 
 public class GivenOffer {
@@ -142,7 +144,11 @@ public class GivenOffer {
     }
 
     private AcceptOfferCommand acceptOfferCommand(UUID participantId) {
-        return AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), participantId, null);
+        OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
+        return acceptOfferCommandBuilder(event, participantId)
+                .withDiscountCodeUsed(randomDiscountCode())
+                .withFinalPrice(randomPrice())
+                .build();
     }
 
     private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {
@@ -162,6 +168,10 @@ public class GivenOffer {
     }
 
     private OfferAcceptanceRequestedEvent offerAcceptanceRequestedEvent() {
-        return OfferAcceptanceRequestedEvent.create(getOfferId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), FAKER.lorem().word());
+        return OfferAcceptanceRequestedEvent.create(getOfferId(), FAKER.name().firstName(), FAKER.name().lastName(), FAKER.internet().emailAddress(), randomDiscountCode());
+    }
+
+    private String randomDiscountCode() {
+        return FAKER.lorem().word();
     }
 }

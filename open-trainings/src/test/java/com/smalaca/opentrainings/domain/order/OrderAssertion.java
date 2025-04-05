@@ -86,8 +86,15 @@ public class OrderAssertion {
         return this;
     }
 
-    public OrderAssertion hasDiscountCode(String expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("discountCode", expected);
+    public OrderAssertion hasDiscountCodeUsed(String expected) {
+        DiscountCode discountCode = DiscountCode.used(expected);
+        assertThat(actual).hasFieldOrPropertyWithValue("discountCode", discountCode);
+        return this;
+    }
+
+    public OrderAssertion hasDiscountCodeAlreadyUsed(String expected) {
+        DiscountCode discountCode = DiscountCode.alreadyUsed(expected);
+        assertThat(actual).hasFieldOrPropertyWithValue("discountCode", discountCode);
         return this;
     }
 

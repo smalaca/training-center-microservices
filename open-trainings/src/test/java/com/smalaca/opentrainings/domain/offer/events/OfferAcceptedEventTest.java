@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.domain.offer.events;
 
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.price.Price;
 import net.datafaker.Faker;
@@ -12,6 +13,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEventAssertion.assertThatOfferAcceptedEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
 class OfferAcceptedEventTest {
     private static final Faker FAKER = new Faker();
@@ -23,18 +25,26 @@ class OfferAcceptedEventTest {
     private static final UUID OFFER_ID = randomId();
 
     @Test
-    void shouldCreateOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(trainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
+    void shouldCreateOfferAcceptedEventWithoutDiscountCode() {
+        AcceptOfferCommand command = acceptOfferCommand().build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
-        OfferAcceptedEvent actual = OfferAcceptedEvent.offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(OFFER_ID)
-                .withTrainingId(TRAINING_ID)
-                .withParticipantId(PARTICIPANT_ID)
-                .withTrainingPrice(TRAINING_PRICE)
-                .withFinalPrice(FINAL_PRICE)
-                .withDiscountCode(DISCOUNT_CODE)
-                .build();
+        assertThatOfferAcceptedEvent(actual)
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasNoDiscountCode()
+                .hasDiscountCodeNotUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .isNextAfter(command.commandId());
+    }
+
+    @Test
+    void shouldCreateOfferAcceptedEventWithDiscountCodeUsed() {
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE).build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
         assertThatOfferAcceptedEvent(actual)
                 .hasOfferId(OFFER_ID)
@@ -43,7 +53,31 @@ class OfferAcceptedEventTest {
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasFinalPrice(FINAL_PRICE)
                 .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
                 .isNextAfter(command.commandId());
+    }
+    @Test
+    void shouldCreateOfferAcceptedEventWithDiscountCodeAlreadyUsed() {
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeAlreadyUsed(DISCOUNT_CODE).build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
+
+        assertThatOfferAcceptedEvent(actual)
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeNotUsed()
+                .hasDiscountCodeAlreadyUsed()
+                .isNextAfter(command.commandId());
+    }
+
+    private AcceptOfferCommand.Builder acceptOfferCommand() {
+        OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
+
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID).withFinalPrice(FINAL_PRICE);
     }
 
     private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {

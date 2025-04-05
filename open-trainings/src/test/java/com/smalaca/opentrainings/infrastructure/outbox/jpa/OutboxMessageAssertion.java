@@ -107,7 +107,11 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"participantId\" : \"" + expected.participantId())
-                .contains("\"discountCode\" : \"" + expected.discountCode());
+                .contains("\"discountCode\" : \"" + expected.discountCode())
+                .contains("\"finalPriceAmount\" : " + expected.finalPriceAmount())
+                .contains("\"finalPriceCurrency\" : \"" + expected.finalPriceCurrency())
+                .contains("\"isDiscountCodeAlreadyUsed\" : " + expected.isDiscountCodeAlreadyUsed())
+                .contains("\"isDiscountCodeUsed\" : " + expected.isDiscountCodeUsed());
         return this;
     }
 

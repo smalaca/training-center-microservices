@@ -26,6 +26,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeR
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
@@ -46,9 +47,9 @@ import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaDtoAssertion.assertThatOfferAcceptanceSagaDto;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommandAssertion.assertThatAcceptOfferCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BeginOfferAcceptanceCommandAssertion.assertThatBeginOfferAcceptanceCommand;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommandAssertion.assertThatBookTrainingPlaceCommand;
@@ -76,6 +77,7 @@ class OfferAcceptanceSagaEngineTest {
     private static final Price TRAINING_PRICE = Price.of(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
     private static final BigDecimal NEW_TRAINING_PRICE_AMOUNT = BigDecimal.valueOf(123.45);
     private static final String NEW_TRAINING_PRICE_CURRENCY_CODE = "USD";
+    private static final Price FINAL_TRAINING_PRICE = Price.of(NEW_TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE);
 
     private final Clock clock = mock(Clock.class);
     private final OfferAcceptanceSagaRepository repository = mock(OfferAcceptanceSagaRepository.class);
@@ -99,6 +101,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasNoParticipantId()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -123,6 +126,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasNoParticipantId()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -198,6 +202,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -303,6 +308,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -408,6 +414,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -566,6 +573,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -628,6 +636,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -796,6 +805,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -854,6 +864,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -882,6 +894,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -940,6 +953,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -991,6 +1006,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1049,6 +1065,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasNoDiscountCode()
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1073,6 +1091,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1097,6 +1117,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1125,6 +1147,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1224,6 +1247,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1290,6 +1314,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasNoTrainingId()
                 .hasNoTrainingPrice()
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1333,6 +1358,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceNotConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1363,6 +1389,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1393,6 +1420,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasNoFinalTrainingPrice()
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1423,6 +1451,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1454,6 +1483,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1502,6 +1532,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasTrainingPlaceBooked()
                 .hasAvailableTrainingPlacesLeft();
@@ -1556,6 +1587,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1586,6 +1618,7 @@ class OfferAcceptanceSagaEngineTest {
                 .hasDiscountCodeNotAlreadyUsed()
                 .hasTrainingId(TRAINING_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalTrainingPrice(FINAL_TRAINING_PRICE)
                 .hasOfferPriceConfirmed()
                 .hasNoTrainingPlaceBooked()
                 .hasNoAvailableTrainingPlacesLeft();
@@ -1744,12 +1777,13 @@ class OfferAcceptanceSagaEngineTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        AcceptOfferCommand command = AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), PARTICIPANT_ID, DISCOUNT_CODE);
-
-        return offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(OFFER_ID)
+        OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
+        AcceptOfferCommand command = acceptOfferCommandBuilder(event, PARTICIPANT_ID)
+                .withDiscountCodeUsed(DISCOUNT_CODE)
+                .withFinalPrice(FINAL_TRAINING_PRICE)
                 .build();
+
+        return OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
     }
 
     private UnexpiredOfferAcceptanceRequestedEvent randomUnexpiredOfferAcceptanceRequestedEvent() {

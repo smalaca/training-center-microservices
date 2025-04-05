@@ -48,7 +48,7 @@ import static com.smalaca.opentrainings.data.Random.randomCurrency;
 import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.data.Random.randomPrice;
 import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 import static com.smalaca.opentrainings.infrastructure.outbox.jpa.OutboxMessageAssertion.assertThatOutboxMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -189,15 +189,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
-        return offerAcceptedEventBuilder()
-                .nextAfter(randomAcceptOfferCommand())
-                .withOfferId(randomId())
-                .withParticipantId(randomId())
-                .withTrainingId(randomId())
-                .withTrainingPrice(randomPrice())
-                .withFinalPrice(randomPrice())
-                .withDiscountCode(randomDiscountCode())
-                .build();
+        return OfferAcceptedEvent.nextAfter(randomAcceptOfferCommand(), randomId(), randomPrice());
     }
 
     private String randomDiscountCode() {
@@ -253,7 +245,12 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private AcceptOfferCommand randomAcceptOfferCommand() {
-        return AcceptOfferCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomDiscountCode());
+        OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
+
+        return acceptOfferCommandBuilder(event, randomId())
+                .withDiscountCodeUsed(randomDiscountCode())
+                .withFinalPrice(randomPrice())
+                .build();
     }
 
     private PersonRegisteredEvent randomPersonRegisteredEvent() {

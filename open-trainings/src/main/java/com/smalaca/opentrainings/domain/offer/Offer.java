@@ -5,6 +5,7 @@ import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.opentrainings.domain.clock.Clock;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offer.events.UnexpiredOfferAcceptanceRequestedEvent;
@@ -30,7 +31,6 @@ import static com.smalaca.opentrainings.domain.offer.OfferStatus.DECLINED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.INITIATED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.REJECTED;
 import static com.smalaca.opentrainings.domain.offer.OfferStatus.TERMINATED;
-import static com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent.offerAcceptedEventBuilder;
 
 @AggregateRoot
 @Entity
@@ -97,14 +97,7 @@ public class Offer {
 
         status = OfferStatus.ACCEPTED;
 
-        return offerAcceptedEventBuilder()
-                .nextAfter(command)
-                .withOfferId(offerId)
-                .withTrainingId(trainingId)
-                .withParticipantId(command.participantId())
-                .withTrainingPrice(trainingPrice)
-                .withDiscountCode(command.discountCode())
-                .build();
+        return OfferAcceptedEvent.nextAfter(command, trainingId, trainingPrice);
     }
 
     public OfferRejectedEvent reject(RejectOfferCommand command) {
