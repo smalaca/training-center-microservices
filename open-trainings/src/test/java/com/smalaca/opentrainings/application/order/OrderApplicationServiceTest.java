@@ -80,7 +80,7 @@ class OrderApplicationServiceTest {
     }
 
     @Test
-    void shouldInitiateOrderWithDiscountCode() {
+    void shouldInitiateOrderWithDiscountCodeUsed() {
         LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
         given(clock.now()).willReturn(creationDateTime);
         AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE).build();
@@ -97,7 +97,28 @@ class OrderApplicationServiceTest {
                 .hasCreationDateTime(creationDateTime)
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasFinalPrice(FINAL_PRICE)
-                .hasDiscountCode(DISCOUNT_CODE);
+                .hasDiscountCodeUsed(DISCOUNT_CODE);
+    }
+
+    @Test
+    void shouldInitiateOrderWithDiscountCodeAlreadyUsed() {
+        LocalDateTime creationDateTime = LocalDateTime.of(LocalDate.of(2024, 11, 1), LocalTime.now());
+        given(clock.now()).willReturn(creationDateTime);
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeAlreadyUsed(DISCOUNT_CODE).build();
+        OfferAcceptedEvent event = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
+
+        service.initiate(event);
+
+        thenOrderSaved()
+                .isInitiated()
+                .hasOrderNumberStartingWith("ORD/2024/11/" + PARTICIPANT_ID + "/")
+                .hasOfferId(OFFER_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasCreationDateTime(creationDateTime)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasDiscountCodeAlreadyUsed(DISCOUNT_CODE);
     }
 
     @Test

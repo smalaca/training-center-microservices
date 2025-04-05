@@ -69,8 +69,11 @@ public class Order {
     @AttributeOverride(name = "currency", column = @Column(name = "FINAL_PRICE_CURRENCY"))
     private Price finalPrice;
 
-    @Column(name = "DISCOUNT_CODE")
-    private String discountCode;
+    @Embedded
+    @AttributeOverride(name = "discountCode", column = @Column(name = "DISCOUNT_CODE"))
+    @AttributeOverride(name = "isUsed", column = @Column(name = "IS_DISCOUNT_CODE_USED"))
+    @AttributeOverride(name = "isAlreadyUsed", column = @Column(name = "IS_DISCOUNT_CODE_ALREADY_USED"))
+    private DiscountCode discountCode;
 
     private Order() {}
 
@@ -157,7 +160,7 @@ public class Order {
         private UUID participantId;
         private Price trainingPrice;
         private Price finalPrice;
-        private String discountCode;
+        private DiscountCode discountCode;
         private OrderNumber orderNumber;
         private LocalDateTime creationDateTime;
         private OrderStatus status = INITIATED;
@@ -187,7 +190,7 @@ public class Order {
             return this;
         }
 
-        Builder withDiscountCode(String discountCode) {
+        Builder withDiscountCode(DiscountCode discountCode) {
             this.discountCode = discountCode;
             return this;
         }
