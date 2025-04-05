@@ -864,6 +864,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -951,6 +953,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1061,6 +1065,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasNoDiscountCode()
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1085,6 +1091,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeUsed()
+                            .hasDiscountCodeNotAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());
@@ -1109,6 +1117,8 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatAcceptOfferCommand((AcceptOfferCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasDiscountCode(DISCOUNT_CODE)
+                            .hasDiscountCodeNotUsed()
+                            .hasDiscountCodeAlreadyUsed()
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
                             .isNextAfter(event.eventId());

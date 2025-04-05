@@ -42,4 +42,24 @@ public class AcceptOfferCommandAssertion {
         assertThatCommandId(actual.commandId()).isNextAfter(eventId);
         return this;
     }
+
+    public AcceptOfferCommandAssertion hasDiscountCodeUsed() {
+        assertThat(actual.isDiscountCodeUsed()).isTrue();
+        return this;
+    }
+
+    public AcceptOfferCommandAssertion hasDiscountCodeNotUsed() {
+        assertThat(actual.isDiscountCodeUsed()).isFalse();
+        return this;
+    }
+
+    public AcceptOfferCommandAssertion hasDiscountCodeAlreadyUsed() {
+        assertThat(actual.isDiscountCodeAlreadyUsed()).isTrue();
+        return this;
+    }
+
+    public AcceptOfferCommandAssertion hasDiscountCodeNotAlreadyUsed() {
+        assertThat(actual.isDiscountCodeAlreadyUsed()).isFalse();
+        return this;
+    }
 }
