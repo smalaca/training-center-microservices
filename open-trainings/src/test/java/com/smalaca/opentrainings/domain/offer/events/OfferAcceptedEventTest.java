@@ -25,8 +25,25 @@ class OfferAcceptedEventTest {
     private static final UUID OFFER_ID = randomId();
 
     @Test
-    void shouldCreateOfferAcceptedEvent() {
-        AcceptOfferCommand command = acceptOfferCommand();
+    void shouldCreateOfferAcceptedEventWithoutDiscountCode() {
+        AcceptOfferCommand command = acceptOfferCommand().build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
+
+        assertThatOfferAcceptedEvent(actual)
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasNoDiscountCode()
+                .hasDiscountCodeNotUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .isNextAfter(command.commandId());
+    }
+
+    @Test
+    void shouldCreateOfferAcceptedEventWithDiscountCodeUsed() {
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE).build();
         OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
         assertThatOfferAcceptedEvent(actual)
@@ -36,16 +53,31 @@ class OfferAcceptedEventTest {
                 .hasTrainingPrice(TRAINING_PRICE)
                 .hasFinalPrice(FINAL_PRICE)
                 .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed()
+                .isNextAfter(command.commandId());
+    }
+    @Test
+    void shouldCreateOfferAcceptedEventWithDiscountCodeAlreadyUsed() {
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeAlreadyUsed(DISCOUNT_CODE).build();
+        OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
+
+        assertThatOfferAcceptedEvent(actual)
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID)
+                .hasTrainingPrice(TRAINING_PRICE)
+                .hasFinalPrice(FINAL_PRICE)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeNotUsed()
+                .hasDiscountCodeAlreadyUsed()
                 .isNextAfter(command.commandId());
     }
 
-    private AcceptOfferCommand acceptOfferCommand() {
+    private AcceptOfferCommand.Builder acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
 
-        return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
-                .withDiscountCodeUsed(DISCOUNT_CODE)
-                .withFinalPrice(FINAL_PRICE)
-                .build();
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID).withFinalPrice(FINAL_PRICE);
     }
 
     private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {

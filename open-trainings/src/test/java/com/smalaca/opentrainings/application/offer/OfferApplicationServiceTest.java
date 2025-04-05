@@ -57,7 +57,7 @@ class OfferApplicationServiceTest {
     private static final UUID TRAINING_ID = randomId();
     private static final UUID PARTICIPANT_ID = randomId();
     private static final Price TRAINING_PRICE = randomPrice();
-    private static final String NO_DISCOUNT_CODE = null;
+    private static final Price FINAL_PRICE = randomPrice();
     private static final String DISCOUNT_CODE = UUID.randomUUID().toString();
     private static final int NO_AVAILABLE_PLACES = 0;
 
@@ -198,15 +198,20 @@ class OfferApplicationServiceTest {
     @Test
     void shouldPublishOfferAcceptedEventWhenOfferAccepted() {
         givenOfferWithAcceptanceInProgress();
+        AcceptOfferCommand command = acceptOfferCommand();
 
-        service.accept(acceptOfferCommand());
+        service.accept(command);
 
         then.offerAcceptedEventPublished()
+                .isNextAfter(command.commandId())
                 .hasOfferId(OFFER_ID)
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
-                .hasDiscountCode(DISCOUNT_CODE);
+                .hasFinalPrice(FINAL_PRICE)
+                .hasDiscountCode(DISCOUNT_CODE)
+                .hasDiscountCodeUsed()
+                .hasDiscountCodeNotAlreadyUsed();
     }
 
     @ParameterizedTest
@@ -348,7 +353,7 @@ class OfferApplicationServiceTest {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
         return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
                 .withDiscountCodeUsed(DISCOUNT_CODE)
-                .withFinalPrice(randomPrice())
+                .withFinalPrice(FINAL_PRICE)
                 .build();
     }
 

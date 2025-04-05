@@ -16,14 +16,14 @@ public record OfferAcceptedEvent(
         EventId eventId, UUID offerId, UUID trainingId, UUID participantId,
         BigDecimal trainingPriceAmount, String trainingPriceCurrencyCode,
         BigDecimal finalPriceAmount, String finalPriceCurrencyCode,
-        String discountCode) implements OfferEvent, OfferAcceptanceSagaEvent {
+        String discountCode, boolean isDiscountCodeUsed, boolean isDiscountCodeAlreadyUsed) implements OfferEvent, OfferAcceptanceSagaEvent {
 
     public static OfferAcceptedEvent nextAfter(AcceptOfferCommand command, UUID trainingId, Price trainingPrice) {
         return new OfferAcceptedEvent(
                 command.commandId().nextEventId(), command.offerId(), trainingId, command.participantId(),
                 trainingPrice.amount(), trainingPrice.currencyCode(),
-                command.finalPriceAmount(), command.finalPriceCurrency(), command.discountCode()
-        );
+                command.finalPriceAmount(), command.finalPriceCurrency(), command.discountCode(),
+                command.isDiscountCodeUsed(), command.isDiscountCodeAlreadyUsed());
     }
 
     @Override
