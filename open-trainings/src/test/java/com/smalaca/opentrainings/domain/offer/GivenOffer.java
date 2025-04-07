@@ -146,8 +146,7 @@ public class GivenOffer {
     private AcceptOfferCommand acceptOfferCommand(UUID participantId) {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
         return acceptOfferCommandBuilder(event, participantId)
-                .withDiscountCodeUsed(randomDiscountCode())
-                .withFinalPrice(randomPrice())
+                .withDiscountCodeUsed(randomDiscountCode(), randomPrice())
                 .build();
     }
 

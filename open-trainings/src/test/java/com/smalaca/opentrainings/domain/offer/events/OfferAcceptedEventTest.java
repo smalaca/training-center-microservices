@@ -34,7 +34,7 @@ class OfferAcceptedEventTest {
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
-                .hasFinalPrice(FINAL_PRICE)
+                .hasNoFinalPrice()
                 .hasNoDiscountCode()
                 .hasDiscountCodeNotUsed()
                 .hasDiscountCodeNotAlreadyUsed()
@@ -43,7 +43,7 @@ class OfferAcceptedEventTest {
 
     @Test
     void shouldCreateOfferAcceptedEventWithDiscountCodeUsed() {
-        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE).build();
+        AcceptOfferCommand command = acceptOfferCommand().withDiscountCodeUsed(DISCOUNT_CODE, FINAL_PRICE).build();
         OfferAcceptedEvent actual = OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
 
         assertThatOfferAcceptedEvent(actual)
@@ -67,7 +67,7 @@ class OfferAcceptedEventTest {
                 .hasTrainingId(TRAINING_ID)
                 .hasParticipantId(PARTICIPANT_ID)
                 .hasTrainingPrice(TRAINING_PRICE)
-                .hasFinalPrice(FINAL_PRICE)
+                .hasNoFinalPrice()
                 .hasDiscountCode(DISCOUNT_CODE)
                 .hasDiscountCodeNotUsed()
                 .hasDiscountCodeAlreadyUsed()
@@ -77,7 +77,7 @@ class OfferAcceptedEventTest {
     private AcceptOfferCommand.Builder acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
 
-        return acceptOfferCommandBuilder(event, PARTICIPANT_ID).withFinalPrice(FINAL_PRICE);
+        return acceptOfferCommandBuilder(event, PARTICIPANT_ID);
     }
 
     private TrainingPriceNotChangedEvent trainingPriceNotChangedEvent() {

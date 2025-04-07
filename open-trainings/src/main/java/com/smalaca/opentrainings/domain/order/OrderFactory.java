@@ -25,12 +25,13 @@ public class OrderFactory {
                 .withTrainingId(event.trainingId())
                 .withParticipantId(event.participantId())
                 .withTrainingPrice(Price.of(event.trainingPriceAmount(), event.trainingPriceCurrencyCode()))
-                .withFinalPrice(Price.of(event.finalPriceAmount(), event.finalPriceCurrencyCode()))
                 .withOrderNumber(orderNumberFactory.createFor(event.participantId()))
                 .withCreationDateTime(clock.now());
 
         if (event.isDiscountCodeUsed()) {
-            builder.withDiscountCode(DiscountCode.used(event.discountCode()));
+            builder
+                    .withDiscountCode(DiscountCode.used(event.discountCode()))
+                    .withFinalPrice(Price.of(event.finalPriceAmount(), event.finalPriceCurrencyCode()));
         }
 
         if (event.isDiscountCodeAlreadyUsed()) {

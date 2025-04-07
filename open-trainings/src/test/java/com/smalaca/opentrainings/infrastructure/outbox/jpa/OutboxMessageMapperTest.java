@@ -45,8 +45,7 @@ class OutboxMessageMapperTest {
     private AcceptOfferCommand givenAcceptOfferCommand() {
         TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(newEventId(), randomId(), randomId());
         return acceptOfferCommandBuilder(event, randomId())
-                .withDiscountCodeUsed(randomDiscountCode())
-                .withFinalPrice(randomPrice())
+                .withDiscountCodeUsed(randomDiscountCode(), randomPrice())
                 .build();
     }
 

@@ -131,7 +131,10 @@ class OutboxMessageAssertion {
                 .contains("\"trainingPriceCurrencyCode\" : \"" + expected.trainingPriceCurrencyCode())
                 .contains("\"finalPriceAmount\" : " + expected.finalPriceAmount())
                 .contains("\"finalPriceCurrencyCode\" : \"" + expected.finalPriceCurrencyCode())
-                .contains("\"discountCode\" : \"" + expected.discountCode());
+                .contains("\"discountCode\" : \"" + expected.discountCode())
+                .contains("\"isDiscountCodeUsed\" : " + expected.isDiscountCodeUsed())
+                .contains("\"isDiscountCodeAlreadyUsed\" : " + expected.isDiscountCodeAlreadyUsed());
+
         return this;
     }
 

@@ -352,8 +352,7 @@ class OfferApplicationServiceTest {
     private AcceptOfferCommand acceptOfferCommand() {
         OfferAcceptanceSagaEvent event = trainingPriceNotChangedEvent();
         return acceptOfferCommandBuilder(event, PARTICIPANT_ID)
-                .withDiscountCodeUsed(DISCOUNT_CODE)
-                .withFinalPrice(FINAL_PRICE)
+                .withDiscountCodeUsed(DISCOUNT_CODE, FINAL_PRICE)
                 .build();
     }
 

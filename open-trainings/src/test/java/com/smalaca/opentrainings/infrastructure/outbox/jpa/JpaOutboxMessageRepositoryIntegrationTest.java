@@ -248,8 +248,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
 
         return acceptOfferCommandBuilder(event, randomId())
-                .withDiscountCodeUsed(randomDiscountCode())
-                .withFinalPrice(randomPrice())
+                .withDiscountCodeUsed(randomDiscountCode(), randomPrice())
                 .build();
     }
 
