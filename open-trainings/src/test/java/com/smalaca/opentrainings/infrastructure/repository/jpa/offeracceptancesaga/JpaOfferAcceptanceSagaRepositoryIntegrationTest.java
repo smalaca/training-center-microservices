@@ -176,8 +176,7 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     private OfferAcceptedEvent randomOfferAcceptedEvent(UUID offerId) {
         OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), offerId, randomId());
         AcceptOfferCommand command = acceptOfferCommandBuilder(event, randomId())
-                .withDiscountCodeUsed(randomDiscountCode())
-                .withFinalPrice(randomPrice())
+                .withDiscountCodeUsed(randomDiscountCode(), randomPrice())
                 .build();
 
         return OfferAcceptedEvent.nextAfter(command, randomId(), randomPrice());

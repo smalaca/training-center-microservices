@@ -86,6 +86,11 @@ public class OrderAssertion {
         return this;
     }
 
+    public OrderAssertion hasNoFinalPrice() {
+        assertThat(actual).extracting("finalPrice").isNull();
+        return this;
+    }
+
     public OrderAssertion hasDiscountCodeUsed(String expected) {
         DiscountCode discountCode = DiscountCode.used(expected);
         assertThat(actual).hasFieldOrPropertyWithValue("discountCode", discountCode);

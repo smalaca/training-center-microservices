@@ -37,15 +37,12 @@ public record AcceptOfferCommand(
             return this;
         }
 
-        public Builder withDiscountCodeUsed(String discountCode) {
+        public Builder withDiscountCodeUsed(String discountCode, Price finalTrainingPrice) {
             this.discountCode = discountCode;
             this.isDiscountCodeUsed = true;
-            return this;
-        }
+            this.finalPriceAmount = finalTrainingPrice.amount();
+            this.finalPriceCurrency = finalTrainingPrice.currencyCode();
 
-        public Builder withFinalPrice(Price price) {
-            this.finalPriceAmount = price.amount();
-            this.finalPriceCurrency = price.currencyCode();
             return this;
         }
 

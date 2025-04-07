@@ -171,8 +171,7 @@ public class OfferAcceptanceSaga {
 
         if (hasDiscountCode()) {
             if (isDiscountCodeUsed) {
-                builder.withDiscountCodeUsed(discountCode);
-                builder.withFinalPrice(finalTrainingPrice);
+                builder.withDiscountCodeUsed(discountCode, finalTrainingPrice);
             } else if (isDiscountCodeAlreadyUsed) {
                 builder.withDiscountCodeAlreadyUsed(discountCode);
             }

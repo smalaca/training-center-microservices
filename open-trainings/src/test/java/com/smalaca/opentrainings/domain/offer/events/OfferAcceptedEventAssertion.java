@@ -46,6 +46,12 @@ public class OfferAcceptedEventAssertion {
         return this;
     }
 
+    public OfferAcceptedEventAssertion hasNoFinalPrice() {
+        assertThat(actual.finalPriceAmount()).isNull();
+        assertThat(actual.finalPriceCurrencyCode()).isNull();
+        return this;
+    }
+
     public OfferAcceptedEventAssertion hasNoDiscountCode() {
         assertThat(actual.discountCode()).isNull();
         return this;

@@ -1779,8 +1779,7 @@ class OfferAcceptanceSagaEngineTest {
     private OfferAcceptedEvent randomOfferAcceptedEvent() {
         OfferAcceptanceSagaEvent event = randomTrainingPriceNotChangedEvent();
         AcceptOfferCommand command = acceptOfferCommandBuilder(event, PARTICIPANT_ID)
-                .withDiscountCodeUsed(DISCOUNT_CODE)
-                .withFinalPrice(FINAL_TRAINING_PRICE)
+                .withDiscountCodeUsed(DISCOUNT_CODE, FINAL_TRAINING_PRICE)
                 .build();
 
         return OfferAcceptedEvent.nextAfter(command, TRAINING_ID, TRAINING_PRICE);
