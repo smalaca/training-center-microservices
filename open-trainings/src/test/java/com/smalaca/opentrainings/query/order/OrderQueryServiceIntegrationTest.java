@@ -76,21 +76,6 @@ class OrderQueryServiceIntegrationTest {
                 .anySatisfy(orderView -> assertThatOrderHasDataEqualTo(orderView, dtoFive).hasStatus("REJECTED"));
     }
 
-    private OrderViewAssertion assertThatOrderHasDataEqualTo(OrderView order, OrderTestDto dto) {
-        return assertThatOrder(order)
-                .hasOrderId(dto.getOrderId())
-                .hasOfferId(dto.getOfferId())
-                .hasTrainingId(dto.getTrainingId())
-                .hasParticipantId(dto.getParticipantId())
-                .hasCreationDateTime(dto.getCreationDateTime())
-                .hasTrainingPriceAmount(dto.getTrainingPrice().amount())
-                .hasTrainingPriceCurrency(dto.getTrainingPrice().currencyCode())
-                .hasFinalPriceAmount(dto.getFinalPrice().amount())
-                .hasFinalPriceCurrency(dto.getFinalPrice().currencyCode())
-                .hasDiscountCode(dto.getDiscountCode())
-                .hasValidOrderNumber();
-    }
-
     @Test
     void shouldFindAllOrderForTermination() {
         transaction.execute(status -> given.order().initiated());
@@ -113,5 +98,42 @@ class OrderQueryServiceIntegrationTest {
                 .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoOne.getOrderId()))
                 .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoTwo.getOrderId()))
                 .anySatisfy(orderView -> assertThatOrder(orderView).hasOrderId(dtoThree.getOrderId()));
+    }
+
+    @Test
+    void shouldFindNoOrderByOfferIdWhenDoesNotExist() {
+        transaction.execute(status -> given.order().initiated());
+        transaction.execute(status -> given.order().initiated());
+        transaction.execute(status -> given.order().initiated());
+
+        Optional<OrderView> actual = queryService.findByOfferId(randomId());
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void shouldFindOrderByOfferId() {
+        transaction.execute(status -> given.order().initiated().getDto());
+        transaction.execute(status -> given.order().initiated().getDto());
+        OrderTestDto dto = transaction.execute(status -> given.order().initiated().getDto());
+
+        Optional<OrderView> actual = queryService.findByOfferId(dto.getOfferId());
+
+        assertThatOrderHasDataEqualTo(actual.get(), dto).hasStatus("INITIATED");
+    }
+
+    private OrderViewAssertion assertThatOrderHasDataEqualTo(OrderView order, OrderTestDto dto) {
+        return assertThatOrder(order)
+                .hasOrderId(dto.getOrderId())
+                .hasOfferId(dto.getOfferId())
+                .hasTrainingId(dto.getTrainingId())
+                .hasParticipantId(dto.getParticipantId())
+                .hasCreationDateTime(dto.getCreationDateTime())
+                .hasTrainingPriceAmount(dto.getTrainingPrice().amount())
+                .hasTrainingPriceCurrency(dto.getTrainingPrice().currencyCode())
+                .hasFinalPriceAmount(dto.getFinalPrice().amount())
+                .hasFinalPriceCurrency(dto.getFinalPrice().currencyCode())
+                .hasDiscountCode(dto.getDiscountCode())
+                .hasValidOrderNumber();
     }
 }
