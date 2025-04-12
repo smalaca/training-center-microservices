@@ -90,8 +90,8 @@ class ThenOfferAcceptance {
     }
 
     ThenOfferAcceptance orderInitiated(OfferTestDto dto) {
-        Optional<OrderView> actual = orderRepository.findByOfferId(dto.getOfferId());
-        assertThatOrderHasDataEqualTo(actual.get(), dto);
+        Optional<OrderView> found = orderRepository.findByOfferId(dto.getOfferId());
+        assertThatOrderHasDataEqualTo(found.get(), dto);
 
         return this;
     }
