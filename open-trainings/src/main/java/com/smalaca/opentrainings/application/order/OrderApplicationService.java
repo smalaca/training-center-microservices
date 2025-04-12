@@ -39,7 +39,7 @@ public class OrderApplicationService {
     @Transactional
     @DrivingPort
     @CommandOperation
-    void initiate(OfferAcceptedEvent event) {
+    public void initiate(OfferAcceptedEvent event) {
         Order order = orderFactory.create(event);
 
         orderRepository.save(order);

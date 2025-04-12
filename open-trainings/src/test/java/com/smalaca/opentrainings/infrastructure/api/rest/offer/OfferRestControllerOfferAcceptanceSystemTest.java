@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestC
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
+import com.smalaca.opentrainings.query.order.OrderViewRepository;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +32,10 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private static final String NO_DISCOUNT_CODE = null;
 
     @Autowired
-    private OfferRepository repository;
+    private OfferRepository offerRepository;
+
+    @Autowired
+    private OrderViewRepository orderRepository;
 
     @Autowired
     private SpringOfferCrudRepository springOfferCrudRepository;
@@ -51,8 +55,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @BeforeEach
     void givenOfferFactory() {
-        given = GivenOfferAcceptance.create(repository, testListener);
-        then = new ThenOfferAcceptance(client);
+        given = GivenOfferAcceptance.create(offerRepository, testListener);
+        then = new ThenOfferAcceptance(client, orderRepository);
     }
 
     @AfterEach
@@ -71,7 +75,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceRejected(dto.getOfferId(), "Offer already DECLINED")
-                .offerDeclined(dto));
+                .offerDeclined(dto)
+                .orderNotInitiated(dto));
     }
 
     @Test
@@ -86,7 +91,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceRejected(dto.getOfferId(), "Training price changed to: 439.21 EUR")
-                .offerRejected(dto));
+                .offerRejected(dto)
+                .orderNotInitiated(dto));
     }
 
     @Test
@@ -104,7 +110,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceRejected(dto.getOfferId(), "No available training places left")
-                .offerRejected(dto));
+                .offerRejected(dto)
+                .orderNotInitiated(dto));
     }
 
     @Test
@@ -120,7 +127,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAccepted(dto)
+                .orderInitiated(dto));
     }
 
     @Test
@@ -137,7 +145,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAccepted(dto)
+                .orderInitiated(dto));
     }
 
     @Test
@@ -154,7 +163,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAccepted(dto)
+                .orderInitiated(dto));
     }
 
     @Test
@@ -171,7 +181,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAccepted(dto)
+                .orderInitiated(dto));
     }
 
     @Test
@@ -188,7 +199,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
         await().untilAsserted(() -> then
                 .offerAcceptanceAccepted(dto.getOfferId())
-                .offerAccepted(dto));
+                .offerAccepted(dto)
+                .orderInitiated(dto));
     }
 
     private RestAcceptOfferTestCommand command(OfferTestDto dto) {

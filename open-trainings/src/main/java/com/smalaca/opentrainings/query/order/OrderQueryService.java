@@ -32,4 +32,9 @@ public class OrderQueryService {
     public List<OrderView> findAllToTerminate() {
         return repository.findInitiatedOrdersOlderThan(clock.now().minusMinutes(10));
     }
+
+    @QueryOperation
+    Optional<OrderView> findByOfferId(UUID offerId) {
+        return repository.findByOfferId(offerId);
+    }
 }
