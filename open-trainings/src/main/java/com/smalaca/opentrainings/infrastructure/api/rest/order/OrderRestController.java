@@ -62,8 +62,15 @@ public class OrderRestController {
 
     @GetMapping("{orderId}")
     public ResponseEntity<OrderView> findById(@PathVariable UUID orderId) {
-        Optional<OrderView> found = queryService.findById(orderId);
+        return getFoundOrMissingFrom(queryService.findById(orderId));
+    }
 
+    @GetMapping("/from-offer/{offerId}")
+    public ResponseEntity<OrderView> findByOfferId(@PathVariable UUID offerId) {
+        return getFoundOrMissingFrom(queryService.findByOfferId(offerId));
+    }
+
+    private ResponseEntity<OrderView> getFoundOrMissingFrom(Optional<OrderView> found) {
         return found
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

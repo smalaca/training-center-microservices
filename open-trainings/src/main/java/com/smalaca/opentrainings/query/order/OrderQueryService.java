@@ -34,7 +34,7 @@ public class OrderQueryService {
     }
 
     @QueryOperation
-    Optional<OrderView> findByOfferId(UUID offerId) {
+    public Optional<OrderView> findByOfferId(UUID offerId) {
         return repository.findByOfferId(offerId);
     }
 }
