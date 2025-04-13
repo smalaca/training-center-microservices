@@ -5,7 +5,6 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestC
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
-import com.smalaca.opentrainings.query.order.OrderViewRepository;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -35,9 +34,6 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     private OfferRepository offerRepository;
 
     @Autowired
-    private OrderViewRepository orderRepository;
-
-    @Autowired
     private SpringOfferCrudRepository springOfferCrudRepository;
 
     @Autowired
@@ -56,7 +52,7 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @BeforeEach
     void givenOfferFactory() {
         given = GivenOfferAcceptance.create(offerRepository, testListener);
-        then = new ThenOfferAcceptance(client, orderRepository);
+        then = new ThenOfferAcceptance(client);
     }
 
     @AfterEach

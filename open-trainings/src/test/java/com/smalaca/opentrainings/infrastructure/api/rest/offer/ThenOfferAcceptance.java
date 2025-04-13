@@ -7,7 +7,6 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestRespons
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion;
 import com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.query.order.OrderViewRepository;
 
 import java.util.UUID;
 
@@ -17,12 +16,10 @@ import static com.smalaca.opentrainings.client.opentrainings.order.RestOrderTest
 
 class ThenOfferAcceptance {
     private final OpenTrainingsTestClient client;
-    private final OrderViewRepository orderRepository;
     private RestOfferAcceptanceTestDto actual;
 
-    ThenOfferAcceptance(OpenTrainingsTestClient client, OrderViewRepository orderRepository) {
+    ThenOfferAcceptance(OpenTrainingsTestClient client) {
         this.client = client;
-        this.orderRepository = orderRepository;
     }
 
     ThenOfferAcceptance offerAcceptanceAccepted(UUID offerId) {
