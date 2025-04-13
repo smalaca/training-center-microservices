@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.client.opentrainings.order;
 
+import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import org.springframework.http.HttpStatus;
 
@@ -97,6 +98,18 @@ public class RestOrderTestResponseAssertion {
         assertThat(actual.finalPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getFinalPrice().amount());
         assertThat(actual.finalPriceCurrency()).isEqualTo(expected.getFinalPrice().currencyCode());
         assertThat(actual.discountCode()).isEqualTo(expected.getDiscountCode());
+    }
+
+    public RestOrderTestResponseAssertion hasInitiatedOrder(OfferTestDto expected) {
+        RestOrderTestDto actual = this.actual.asOrder();
+        assertThat(actual.status()).isEqualTo("INITIATED");
+        assertThat(actual.offerId()).isEqualTo(expected.getOfferId());
+        assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
+        assertThatOrderNumber(actual.orderNumber()).isValid();
+        assertThat(actual.trainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
+        assertThat(actual.trainingPriceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
+
+        return this;
     }
 
     public RestOrderTestResponseAssertion withMessage(String expected) {

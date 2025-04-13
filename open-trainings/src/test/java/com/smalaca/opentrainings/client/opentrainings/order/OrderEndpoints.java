@@ -30,6 +30,10 @@ public class OrderEndpoints {
         return performSafe(get("/order/" + orderId));
     }
 
+    public RestOrderTestResponse findByOfferId(UUID offerId) {
+        return performSafe(get("/order/from-offer/" + offerId));
+    }
+
     public RestOrderTestResponse confirm(RestConfirmOrderTestCommand command) {
         MockHttpServletRequestBuilder request = put("/order/confirm")
                 .contentType(MediaType.APPLICATION_JSON)

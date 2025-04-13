@@ -78,6 +78,24 @@ class OrderRestControllerSystemTest {
     }
 
     @Test
+    void shouldNotFindOrderByNonExistingOfferId() {
+        RestOrderTestResponse actual = client.orders().findByOfferId(UUID.randomUUID());
+
+        assertThatOrderResponse(actual).notFound();
+    }
+
+    @Test
+    void shouldFindOrderByExistingOfferId() {
+        OrderTestDto dto = given.order().initiated().getDto();
+
+        RestOrderTestResponse actual = client.orders().findByOfferId(dto.getOfferId());
+
+        assertThatOrderResponse(actual)
+                .isOk()
+                .hasInitiatedOrder(dto);
+    }
+
+    @Test
     void shouldRecognizeOrderToConfirmDoesNotExist() {
         RestOrderTestResponse actual = client.orders().confirm(confirmOrderCommand(UUID.randomUUID()));
 

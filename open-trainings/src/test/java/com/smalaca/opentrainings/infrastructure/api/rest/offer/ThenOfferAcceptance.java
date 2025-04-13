@@ -5,18 +5,15 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceT
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceTestDtoAssertion;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponse;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion;
+import com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponse;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.query.order.OrderView;
-import com.smalaca.opentrainings.query.order.OrderViewAssertion;
 import com.smalaca.opentrainings.query.order.OrderViewRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferAcceptanceTestDtoAssertion.assertThatOfferAcceptance;
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion.assertThatOfferResponse;
-import static com.smalaca.opentrainings.query.order.OrderViewAssertion.assertThatOrder;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponseAssertion.assertThatOrderResponse;
 
 class ThenOfferAcceptance {
     private final OpenTrainingsTestClient client;
@@ -85,23 +82,17 @@ class ThenOfferAcceptance {
     }
 
     ThenOfferAcceptance orderNotInitiated(OfferTestDto dto) {
-        assertThat(orderRepository.findByOfferId(dto.getOfferId())).isEmpty();
+        RestOrderTestResponse response = client.orders().findByOfferId(dto.getOfferId());
+        assertThatOrderResponse(response).notFound();
+
         return this;
     }
 
     ThenOfferAcceptance orderInitiated(OfferTestDto dto) {
-        Optional<OrderView> found = orderRepository.findByOfferId(dto.getOfferId());
-        assertThatOrderHasDataEqualTo(found.get(), dto);
-
+        RestOrderTestResponse response = client.orders().findByOfferId(dto.getOfferId());
+        assertThatOrderResponse(response)
+                .isOk()
+                .hasInitiatedOrder(dto);
         return this;
-    }
-
-    private OrderViewAssertion assertThatOrderHasDataEqualTo(OrderView order, OfferTestDto dto) {
-        return assertThatOrder(order)
-                .hasOfferId(dto.getOfferId())
-                .hasTrainingId(dto.getTrainingId())
-                .hasTrainingPriceAmount(dto.getTrainingPrice().amount())
-                .hasTrainingPriceCurrency(dto.getTrainingPrice().currencyCode())
-                .hasValidOrderNumber();
     }
 }
