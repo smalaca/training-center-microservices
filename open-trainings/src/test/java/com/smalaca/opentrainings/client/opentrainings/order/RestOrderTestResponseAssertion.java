@@ -101,13 +101,13 @@ public class RestOrderTestResponseAssertion {
     }
 
     public RestOrderTestResponseAssertion hasInitiatedOrder(OfferTestDto expected) {
-        RestOrderTestDto actual = this.actual.asOrder();
-        assertThat(actual.status()).isEqualTo("INITIATED");
-        assertThat(actual.offerId()).isEqualTo(expected.getOfferId());
-        assertThat(actual.trainingId()).isEqualTo(expected.getTrainingId());
-        assertThatOrderNumber(actual.orderNumber()).isValid();
-        assertThat(actual.trainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
-        assertThat(actual.trainingPriceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
+        RestOrderTestDto order = actual.asOrder();
+        assertThat(order.status()).isEqualTo("INITIATED");
+        assertThat(order.offerId()).isEqualTo(expected.getOfferId());
+        assertThat(order.trainingId()).isEqualTo(expected.getTrainingId());
+        assertThatOrderNumber(order.orderNumber()).isValid();
+        assertThat(order.trainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
+        assertThat(order.trainingPriceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
 
         return this;
     }
