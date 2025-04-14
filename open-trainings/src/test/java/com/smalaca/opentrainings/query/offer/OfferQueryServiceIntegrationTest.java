@@ -77,7 +77,7 @@ class OfferQueryServiceIntegrationTest {
     }
 
     @Test
-    void shouldFindAllOrderForTermination() {
+    void shouldFindAllOrderToTerminate() {
         transaction.execute(status -> given.offer().initiated());
         transaction.execute(status -> given.offer().createdMinutesAgo(9).initiated());
         transaction.execute(status -> given.offer().rejected());
