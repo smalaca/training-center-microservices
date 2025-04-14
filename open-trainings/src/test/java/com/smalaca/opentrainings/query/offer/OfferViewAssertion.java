@@ -7,18 +7,18 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.domain.offer.OfferNumberAssertion.assertThatOfferNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OfferViewAssertion {
+public class OfferViewAssertion {
     private final OfferView actual;
 
     private OfferViewAssertion(OfferView actual) {
         this.actual = actual;
     }
 
-    static OfferViewAssertion assertThatOffer(OfferView actual) {
+    public static OfferViewAssertion assertThatOffer(OfferView actual) {
         return new OfferViewAssertion(actual);
     }
 
-    OfferViewAssertion hasStatus(String expected) {
+    public OfferViewAssertion hasStatus(String expected) {
         assertThat(actual.getStatus()).isEqualTo(expected);
         return this;
     }

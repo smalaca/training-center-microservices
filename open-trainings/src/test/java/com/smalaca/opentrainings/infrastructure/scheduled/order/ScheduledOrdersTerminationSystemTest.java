@@ -70,8 +70,8 @@ class ScheduledOrdersTerminationSystemTest {
                 });
     }
 
-    private void assertThatOrderIsTerminated(OrderTestDto dtoOne) {
-        OrderView actual = service.findById(dtoOne.getOrderId()).get();
+    private void assertThatOrderIsTerminated(OrderTestDto dto) {
+        OrderView actual = service.findById(dto.getOrderId()).get();
 
         assertThatOrder(actual).hasStatus("TERMINATED");
     }
