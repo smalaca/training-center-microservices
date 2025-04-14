@@ -70,8 +70,8 @@ class ScheduledOffersTerminationSystemTest {
                 });
     }
 
-    private void assertThatOfferIsTerminated(OfferTestDto dtoOne) {
-        OfferView actual = service.findById(dtoOne.getOfferId()).get();
+    private void assertThatOfferIsTerminated(OfferTestDto dto) {
+        OfferView actual = service.findById(dto.getOfferId()).get();
 
         assertThatOffer(actual).hasStatus("TERMINATED");
     }
