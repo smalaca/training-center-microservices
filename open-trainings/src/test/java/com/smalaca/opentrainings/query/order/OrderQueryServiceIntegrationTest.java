@@ -87,7 +87,6 @@ class OrderQueryServiceIntegrationTest {
         transaction.execute(status -> given.order().rejected());
         transaction.execute(status -> given.order().createdMinutesAgo(17).rejected());
         transaction.execute(status -> given.order().createdMinutesAgo(17).terminated());
-
         OrderTestDto dtoOne = transaction.execute(status -> given.order().createdMinutesAgo(17).initiated().getDto());
         OrderTestDto dtoTwo = transaction.execute(status -> given.order().createdMinutesAgo(11).initiated().getDto());
         OrderTestDto dtoThree = transaction.execute(status -> given.order().createdMinutesAgo(22).initiated().getDto());
