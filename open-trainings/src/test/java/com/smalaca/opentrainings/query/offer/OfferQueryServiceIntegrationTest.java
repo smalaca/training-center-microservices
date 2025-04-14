@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.query.offer;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
+import com.smalaca.opentrainings.infrastructure.clock.localdatetime.LocalDateTimeClock;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.JpaOfferRepository;
 import com.smalaca.test.type.RepositoryTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,7 @@ import static com.smalaca.opentrainings.query.offer.OfferViewAssertion.assertTha
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
-@Import({JpaOfferRepository.class, OfferQueryService.class})
+@Import({JpaOfferRepository.class, OfferQueryService.class, LocalDateTimeClock.class})
 class OfferQueryServiceIntegrationTest {
     @Autowired
     private OfferRepository repository;
@@ -73,6 +74,27 @@ class OfferQueryServiceIntegrationTest {
                 .anySatisfy(offerView -> assertThatOfferHasDataEqualTo(offerView, dtoThree).hasStatus("ACCEPTED"))
                 .anySatisfy(offerView -> assertThatOfferHasDataEqualTo(offerView, dtoFour).hasStatus("DECLINED"))
                 .anySatisfy(offerView -> assertThatOfferHasDataEqualTo(offerView, dtoFive).hasStatus("REJECTED"));
+    }
+
+    @Test
+    void shouldFindAllOrderForTermination() {
+        transaction.execute(status -> given.offer().initiated());
+        transaction.execute(status -> given.offer().createdMinutesAgo(9).initiated());
+        transaction.execute(status -> given.offer().rejected());
+        transaction.execute(status -> given.offer().declined());
+        transaction.execute(status -> given.offer().rejected());
+        transaction.execute(status -> given.offer().createdMinutesAgo(17).rejected());
+        transaction.execute(status -> given.offer().createdMinutesAgo(17).terminated());
+        OfferTestDto dtoOne = transaction.execute(status -> given.offer().createdMinutesAgo(17).initiated().getDto());
+        OfferTestDto dtoTwo = transaction.execute(status -> given.offer().createdMinutesAgo(11).initiated().getDto());
+        OfferTestDto dtoThree = transaction.execute(status -> given.offer().createdMinutesAgo(22).initiated().getDto());
+
+        Iterable<OfferView> actual = queryService.findAllToTerminate();
+
+        assertThat(actual).hasSize(3)
+                .anySatisfy(orderView -> assertThatOffer(orderView).hasOfferId(dtoOne.getOfferId()))
+                .anySatisfy(orderView -> assertThatOffer(orderView).hasOfferId(dtoTwo.getOfferId()))
+                .anySatisfy(orderView -> assertThatOffer(orderView).hasOfferId(dtoThree.getOfferId()));
     }
 
     private OfferViewAssertion assertThatOfferHasDataEqualTo(OfferView offer, OfferTestDto dto) {
