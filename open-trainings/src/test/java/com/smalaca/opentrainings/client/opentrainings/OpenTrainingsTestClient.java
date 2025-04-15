@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.client.opentrainings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.opentrainings.client.opentrainings.offer.OfferEndpoints;
 import com.smalaca.opentrainings.client.opentrainings.order.OrderEndpoints;
+import com.smalaca.opentrainings.client.opentrainings.training.TrainingEndpoints;
 import org.springframework.test.web.servlet.MockMvc;
 
 public class OpenTrainingsTestClient {
@@ -20,5 +21,9 @@ public class OpenTrainingsTestClient {
 
     public OfferEndpoints offers() {
         return new OfferEndpoints(mockMvc, objectMapper);
+    }
+
+    public TrainingEndpoints trainings() {
+        return new TrainingEndpoints(mockMvc, objectMapper);
     }
 }
