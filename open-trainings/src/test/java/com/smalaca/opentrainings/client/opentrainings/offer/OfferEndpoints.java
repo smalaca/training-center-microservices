@@ -42,6 +42,10 @@ public class OfferEndpoints {
         performSafe(request);
     }
 
+    public RestOfferTestResponse decline(UUID offerId) {
+        return performSafe(put("/offer/decline/" + offerId));
+    }
+
     private String asJson(Object command) {
         try {
             return objectMapper.writeValueAsString(command);

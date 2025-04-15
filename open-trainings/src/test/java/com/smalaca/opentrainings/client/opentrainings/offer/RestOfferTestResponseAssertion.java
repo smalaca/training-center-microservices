@@ -8,6 +8,7 @@ import java.util.List;
 
 import static com.smalaca.opentrainings.domain.offer.OfferNumberAssertion.assertThatOfferNumber;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -21,6 +22,10 @@ public class RestOfferTestResponseAssertion {
 
     public static RestOfferTestResponseAssertion assertThatOfferResponse(RestOfferTestResponse actual) {
         return new RestOfferTestResponseAssertion(actual);
+    }
+
+    public RestOfferTestResponseAssertion isConflict() {
+        return hasStatus(CONFLICT);
     }
 
     public RestOfferTestResponseAssertion notFound() {
@@ -103,5 +108,10 @@ public class RestOfferTestResponseAssertion {
         assertThat(actual.creationDateTime()).isEqualToIgnoringNanos(expected.getCreationDateTime());
         assertThat(actual.trainingPriceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getTrainingPrice().amount());
         assertThat(actual.trainingPriceCurrency()).isEqualTo(expected.getTrainingPrice().currencyCode());
+    }
+
+    public RestOfferTestResponseAssertion withMessage(String expected) {
+        assertThat(actual.asString()).isEqualTo(expected);
+        return this;
     }
 }

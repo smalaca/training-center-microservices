@@ -46,7 +46,7 @@ public class RestOfferTestResponse {
         }
     }
 
-    private String asString() {
+    String asString() {
         try {
             return response.getContentAsString();
         } catch (UnsupportedEncodingException exception) {

@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.UUID;
+
 import static com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponseAssertion.assertThatOfferResponse;
 import static com.smalaca.opentrainings.data.Random.randomId;
 
@@ -81,5 +83,28 @@ class OfferRestControllerSystemTest {
                 .containsAcceptedOffer(dtoThree)
                 .containsTerminatedOffer(dtoFour)
                 .containsRejectedOffer(dtoFive);
+    }
+
+    @Test
+    void shouldDeclineOffer() {
+        OfferTestDto dto = given.offer().initiated().getDto();
+
+        RestOfferTestResponse actual = client.offers().decline(dto.getOfferId());
+
+        assertThatOfferResponse(actual).isOk();
+        assertThatOfferResponse(client.offers().findById(dto.getOfferId()))
+                .isOk()
+                .hasDeclinedOffer(dto);
+    }
+
+    @Test
+    void shouldReturnConflictWhenDecliningAlreadyAcceptedOffer() {
+        UUID offerId = given.offer().accepted().getDto().getOfferId();
+
+        RestOfferTestResponse response = client.offers().decline(offerId);
+
+        assertThatOfferResponse(response)
+                .isConflict()
+                .withMessage("Offer: " + offerId + " not in INITIATED status.");
     }
 }
