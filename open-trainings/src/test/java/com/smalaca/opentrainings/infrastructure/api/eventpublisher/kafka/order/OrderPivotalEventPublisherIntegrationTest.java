@@ -1,0 +1,107 @@
+package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
+
+import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
+import com.smalaca.opentrainings.domain.order.OrderRepository;
+import com.smalaca.opentrainings.domain.order.OrderTestDto;
+import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
+import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventTestConfiguration.TrainingPurchasedPivotalEventTestConsumer;
+import com.smalaca.opentrainings.query.order.OrderQueryService;
+import com.smalaca.opentrainings.query.order.OrderView;
+import com.smalaca.test.type.SystemTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.context.TestPropertySource;
+
+import java.time.Duration;
+import java.util.Optional;
+import java.util.UUID;
+
+import static com.smalaca.opentrainings.data.Random.randomId;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventAssertion.assertThatTrainingPurchasedPivotalEvent;
+
+@SystemTest
+@EmbeddedKafka(
+        partitions = 1,
+        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" },
+        topics = {"test-training-purchased-topic"})
+@TestPropertySource(properties = {
+        "kafka.topics.order.pivotal.training-purchased=test-training-purchased-topic",
+        "scheduled.outbox.message.rate=100000"
+})
+@Import(TrainingPurchasedPivotalEventTestConfiguration.class)
+class OrderPivotalEventPublisherIntegrationTest {
+    @Autowired
+    private OrderPivotalEventPublisher publisher;
+
+    @Autowired
+    private TrainingPurchasedPivotalEventTestConsumer consumer;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderQueryService orderQueryService;
+
+    private GivenOrderFactory given;
+
+    @BeforeEach
+    void init() {
+        given = GivenOrderFactory.create(orderRepository);
+    }
+
+    @Test
+    void shouldPublishTrainingPurchasedPivotalEvent() {
+        OrderTestDto dto = given.order().confirmed().getDto();
+        TrainingPurchasedEvent event = TrainingPurchasedEvent.create(dto.getOrderId(), dto.getOfferId(), dto.getTrainingId(), dto.getParticipantId());
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<TrainingPurchasedPivotalEvent> actual = consumer.getFor(dto.getOrderId());
+            assertThat(actual).isPresent();
+            OrderView expected = orderQueryService.findById(dto.getOrderId()).get();
+
+            assertThatTrainingPurchasedPivotalEvent(actual.get())
+                .isNextAfter(event.eventId())
+                .hasOrderId(expected.getOrderId())
+                .hasOfferId(expected.getOfferId())
+                .hasTrainingId(expected.getTrainingId())
+                .hasParticipantId(expected.getParticipantId())
+                .hasOrderNumber(expected.getOrderNumber())
+                .hasTrainingPriceAmount(expected.getTrainingPriceAmount())
+                .hasTrainingPriceCurrency(expected.getTrainingPriceCurrency())
+                .hasFinalPriceAmount(expected.getFinalPriceAmount())
+                .hasFinalPriceCurrency(expected.getFinalPriceCurrency())
+                .hasOrderCreationDateTime(expected.getCreationDateTime())
+                .hasDiscountCode(expected.getDiscountCode());
+        });
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenOrderNotFound() {
+        UUID orderId = randomId();
+        TrainingPurchasedEvent event = TrainingPurchasedEvent.create(orderId, randomId(), randomId(), randomId());
+
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> publisher.consume(event));
+
+        assertThat(actual).hasMessage("Order not found for ID: " + orderId);
+    }
+
+    @Test
+    void shouldPublishNoEventWhenOrderNotFound() {
+        UUID orderId = randomId();
+        TrainingPurchasedEvent event = TrainingPurchasedEvent.create(orderId, randomId(), randomId(), randomId());
+
+        assertThrows(IllegalArgumentException.class, () -> publisher.consume(event));
+
+        await()
+                .pollDelay(Duration.ofMillis(500))
+                .untilAsserted(() -> assertThat(consumer.getFor(orderId)).isEmpty());
+    }
+}
