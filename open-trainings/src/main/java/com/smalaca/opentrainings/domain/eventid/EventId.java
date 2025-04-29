@@ -20,6 +20,10 @@ public record EventId(UUID eventId, UUID traceId, UUID correlationId, LocalDateT
         return CommandId.nextAfter(this);
     }
 
+    public EventId nextEventId() {
+        return new EventId(id(), traceId, correlationId, now());
+    }
+
     private static UUID id() {
         return UUID.randomUUID();
     }

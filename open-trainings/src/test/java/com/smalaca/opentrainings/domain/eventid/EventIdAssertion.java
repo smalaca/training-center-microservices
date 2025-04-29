@@ -2,6 +2,9 @@ package com.smalaca.opentrainings.domain.eventid;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventIdAssertion {
@@ -15,30 +18,37 @@ public class EventIdAssertion {
         return new EventIdAssertion(actual);
     }
 
-    public EventIdAssertion isNextAfter(CommandId commandId) {
-        return hasTraceIdSameAs(commandId)
-            .hasCorrelationIdSameAs(commandId)
-            .hasDifferentIdThan(commandId)
-            .hasCreationDateTimeAfterOrEqual(commandId);
+    public void isNextAfter(CommandId commandId) {
+        hasTraceIdSameAs(commandId.traceId())
+            .hasCorrelationIdSameAs(commandId.correlationId())
+            .hasDifferentIdThan(commandId.commandId())
+            .hasCreationDateTimeAfterOrEqual(commandId.creationDateTime());
+    }
+
+    public void isNextAfter(EventId eventId) {
+        hasTraceIdSameAs(eventId.traceId())
+            .hasCorrelationIdSameAs(eventId.correlationId())
+            .hasDifferentIdThan(eventId.eventId())
+            .hasCreationDateTimeAfterOrEqual(eventId.creationDateTime());
     }
     
-    public EventIdAssertion hasTraceIdSameAs(CommandId commandId) {
-        assertThat(actual.traceId()).isEqualTo(commandId.traceId());
+    private EventIdAssertion hasTraceIdSameAs(UUID expected) {
+        assertThat(actual.traceId()).isEqualTo(expected);
         return this;
     }
 
-    public EventIdAssertion hasCorrelationIdSameAs(CommandId commandId) {
-        assertThat(actual.correlationId()).isEqualTo(commandId.correlationId());
+    private EventIdAssertion hasCorrelationIdSameAs(UUID expected) {
+        assertThat(actual.correlationId()).isEqualTo(expected);
         return this;
     }
 
-    public EventIdAssertion hasDifferentIdThan(CommandId commandId) {
-        assertThat(actual.eventId()).isNotEqualTo(commandId.commandId());
+    private EventIdAssertion hasDifferentIdThan(UUID expected) {
+        assertThat(actual.eventId()).isNotEqualTo(expected);
         return this;
     }
 
-    public EventIdAssertion hasCreationDateTimeAfterOrEqual(CommandId commandId) {
-        assertThat(actual.creationDateTime()).isAfterOrEqualTo(commandId.creationDateTime());
+    private EventIdAssertion hasCreationDateTimeAfterOrEqual(LocalDateTime expected) {
+        assertThat(actual.creationDateTime()).isAfterOrEqualTo(expected);
         return this;
     }
 }
