@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -54,7 +53,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootIntegrationTest
 @Import(JpaOutboxMessageRepositoryFactory.class)
-@DisabledAllIntegrations
 class JpaOutboxMessageRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
 

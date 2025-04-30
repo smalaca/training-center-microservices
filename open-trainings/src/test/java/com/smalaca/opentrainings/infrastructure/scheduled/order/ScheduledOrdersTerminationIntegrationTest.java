@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.scheduled.order;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledKafkaIntegration;
 import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
@@ -25,7 +24,6 @@ import static org.mockito.Mockito.never;
 
 @SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.order.termination.rate=100")
-@DisabledKafkaIntegration
 class ScheduledOrdersTerminationIntegrationTest {
     @SpyBean
     private OrderApplicationService applicationService;

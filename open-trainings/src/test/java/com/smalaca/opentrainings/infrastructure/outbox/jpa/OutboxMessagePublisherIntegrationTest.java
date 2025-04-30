@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smalaca.opentrainings.annotation.disable.DisabledKafkaIntegration;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
@@ -27,7 +26,6 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.outbox.message.rate=100")
-@DisabledKafkaIntegration
 class OutboxMessagePublisherIntegrationTest {
     @Autowired
     private SpringOutboxMessageCrudRepository repository;

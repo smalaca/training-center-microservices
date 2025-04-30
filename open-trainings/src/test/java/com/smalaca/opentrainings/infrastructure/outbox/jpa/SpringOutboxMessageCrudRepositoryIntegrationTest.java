@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
@@ -20,7 +19,6 @@ import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootIntegrationTest
-@DisabledAllIntegrations
 class SpringOutboxMessageCrudRepositoryIntegrationTest {
     @Autowired
     private SpringOutboxMessageCrudRepository repository;

@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledSchedulerIntegrations;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
@@ -16,7 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 
 import java.util.Optional;
 
@@ -28,14 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @SpringBootIntegrationTest
-@EmbeddedKafka(
-        partitions = 1,
-        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
+@EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @Import(TrainingPurchasedPivotalEventTestConfiguration.class)
-@DisabledSchedulerIntegrations
 class OrderPivotalEventPublisherIntegrationTest {
     @Autowired
     private OrderPivotalEventPublisher publisher;
+
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     @Autowired
     private TrainingPurchasedPivotalEventTestConsumer consumer;
@@ -51,6 +52,8 @@ class OrderPivotalEventPublisherIntegrationTest {
     @BeforeEach
     void init() {
         given = GivenOrderFactory.create(orderRepository);
+        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
+                listenerContainer -> ContainerTestUtils.waitForAssignment(listenerContainer, 1));
     }
 
     @Test
