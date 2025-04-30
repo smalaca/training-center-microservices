@@ -4,9 +4,9 @@ import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.query.offer.OfferView;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
-import com.smalaca.test.type.SystemTest;
+import com.smalaca.opentrainings.query.offer.OfferView;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-@SystemTest
+@SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.offer.termination.rate=100")
-class ScheduledOffersTerminationSystemTest {
+class ScheduledOffersTerminationIntegrationTest {
     @SpyBean
     private OfferApplicationService applicationService;
 

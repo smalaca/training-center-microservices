@@ -4,9 +4,9 @@ import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
-import com.smalaca.opentrainings.query.order.OrderView;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
-import com.smalaca.test.type.SystemTest;
+import com.smalaca.opentrainings.query.order.OrderView;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-@SystemTest
+@SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.order.termination.rate=100")
-class ScheduledOrdersTerminationSystemTest {
+class ScheduledOrdersTerminationIntegrationTest {
     @SpyBean
     private OrderApplicationService applicationService;
 
