@@ -1,11 +1,11 @@
 package com.smalaca.opentrainings.infrastructure.outbox.jpa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smalaca.opentrainings.annotation.disable.DisabledKafkaIntegration;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderPivotalEventPublisher;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,6 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.outbox.message.rate=100")
-@DisabledKafkaIntegration
 class OutboxMessagePublisherIntegrationTest {
     @Autowired
     private SpringOutboxMessageCrudRepository repository;
@@ -42,6 +41,9 @@ class OutboxMessagePublisherIntegrationTest {
 
     @MockBean
     private OfferAcceptanceSagaEngine engine;
+
+    @MockBean
+    private OrderPivotalEventPublisher publisher;
 
     private OutboxMessageMapper factory;
 

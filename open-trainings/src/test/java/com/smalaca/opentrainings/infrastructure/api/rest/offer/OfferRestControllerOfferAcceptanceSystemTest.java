@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledKafkaIntegration;
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestCommand;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -21,8 +20,7 @@ import java.util.UUID;
 import static org.awaitility.Awaitility.await;
 
 @SystemTest
-@Import(OpenTrainingsTestClient.class)
-@DisabledKafkaIntegration
+@Import({OpenTrainingsTestClient.class, OfferAcceptanceSagaEventTestListener.class})
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();
 

@@ -9,53 +9,58 @@ import java.util.UUID;
 import static com.smalaca.opentrainings.domain.eventid.EventIdAssertion.assertThatEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TrainingPurchasedPivotalEventAssertion {
-    private final TrainingPurchasedPivotalEvent actual;
+class OrderRejectedPivotalEventAssertion {
+    private final OrderRejectedPivotalEvent actual;
 
-    private TrainingPurchasedPivotalEventAssertion(TrainingPurchasedPivotalEvent actual) {
+    private OrderRejectedPivotalEventAssertion(OrderRejectedPivotalEvent actual) {
         this.actual = actual;
     }
 
-    static TrainingPurchasedPivotalEventAssertion assertThatTrainingPurchasedPivotalEvent(TrainingPurchasedPivotalEvent actual) {
-        return new TrainingPurchasedPivotalEventAssertion(actual);
+    static OrderRejectedPivotalEventAssertion assertThatOrderRejectedPivotalEvent(OrderRejectedPivotalEvent actual) {
+        return new OrderRejectedPivotalEventAssertion(actual);
     }
 
-    TrainingPurchasedPivotalEventAssertion hasOrderId(UUID expected) {
+    OrderRejectedPivotalEventAssertion hasOrderId(UUID expected) {
         assertThat(actual.orderId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasOfferId(UUID expected) {
+    OrderRejectedPivotalEventAssertion hasReason(String expected) {
+        assertThat(actual.reason()).isEqualTo(expected);
+        return this;
+    }
+
+    OrderRejectedPivotalEventAssertion hasOfferId(UUID expected) {
         assertThat(actual.offerId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasTrainingId(UUID expected) {
+    OrderRejectedPivotalEventAssertion hasTrainingId(UUID expected) {
         assertThat(actual.trainingId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasParticipantId(UUID expected) {
+    OrderRejectedPivotalEventAssertion hasParticipantId(UUID expected) {
         assertThat(actual.participantId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasOrderNumber(String expected) {
+    OrderRejectedPivotalEventAssertion hasOrderNumber(String expected) {
         assertThat(actual.orderNumber()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasTrainingPriceAmount(BigDecimal expected) {
+    OrderRejectedPivotalEventAssertion hasTrainingPriceAmount(BigDecimal expected) {
         hasEqualPriceAmount(actual.trainingPriceAmount(), expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasTrainingPriceCurrency(String expected) {
+    OrderRejectedPivotalEventAssertion hasTrainingPriceCurrency(String expected) {
         assertThat(actual.trainingPriceCurrency()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasFinalPriceAmount(BigDecimal expected) {
+    OrderRejectedPivotalEventAssertion hasFinalPriceAmount(BigDecimal expected) {
         hasEqualPriceAmount(actual.finalPriceAmount(), expected);
         return this;
     }
@@ -64,22 +69,22 @@ class TrainingPurchasedPivotalEventAssertion {
         assertThat(actual).usingComparator(BigDecimal::compareTo).isEqualTo(expected);
     }
 
-    TrainingPurchasedPivotalEventAssertion hasFinalPriceCurrency(String expected) {
+    OrderRejectedPivotalEventAssertion hasFinalPriceCurrency(String expected) {
         assertThat(actual.finalPriceCurrency()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasOrderCreationDateTime(LocalDateTime expected) {
+    OrderRejectedPivotalEventAssertion hasOrderCreationDateTime(LocalDateTime expected) {
         assertThat(actual.orderCreationDateTime()).isEqualToIgnoringNanos(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion hasDiscountCode(String expected) {
+    OrderRejectedPivotalEventAssertion hasDiscountCode(String expected) {
         assertThat(actual.discountCode()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPurchasedPivotalEventAssertion isNextAfter(EventId eventId) {
+    OrderRejectedPivotalEventAssertion isNextAfter(EventId eventId) {
         assertThatEventId(actual.eventId()).isNextAfter(eventId);
         return this;
     }

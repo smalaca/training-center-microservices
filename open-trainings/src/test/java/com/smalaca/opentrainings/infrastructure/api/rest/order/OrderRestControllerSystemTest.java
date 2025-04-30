@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.order;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.order.RestConfirmOrderTestCommand;
 import com.smalaca.opentrainings.client.opentrainings.order.RestOrderTestResponse;
@@ -28,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
-@DisabledAllIntegrations
 class OrderRestControllerSystemTest {
     private static final String VALID_PAYMENT_METHOD = "CREDIT_CARD";
     private static final String UNSUPPORTED_PAYMENT_METHOD = "NOT SUPPORTED";

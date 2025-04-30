@@ -8,13 +8,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscount
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Component
 class OfferAcceptanceSagaEventTestListener {
     private final ApplicationEventPublisher publisher;
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterRegisterPersonCommand = new HashMap<>();

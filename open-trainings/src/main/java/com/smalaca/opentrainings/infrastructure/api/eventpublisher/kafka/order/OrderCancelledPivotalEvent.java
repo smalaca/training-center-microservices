@@ -1,18 +1,18 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
 import com.smalaca.opentrainings.domain.eventid.EventId;
-import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.query.order.OrderView;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record TrainingPurchasedPivotalEvent(
+public record OrderCancelledPivotalEvent(
         EventId eventId, UUID orderId, UUID offerId, UUID trainingId, UUID participantId, String orderNumber,
         BigDecimal trainingPriceAmount, String trainingPriceCurrency, BigDecimal finalPriceAmount,
         String finalPriceCurrency, LocalDateTime orderCreationDateTime, String discountCode) {
-    TrainingPurchasedPivotalEvent(TrainingPurchasedEvent event, OrderView order) {
+    OrderCancelledPivotalEvent(OrderCancelledEvent event, OrderView order) {
         this(
                 event.eventId().nextEventId(),
                 event.orderId(),
