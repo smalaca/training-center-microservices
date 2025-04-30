@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.configuration;
 
-import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEvent;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,7 @@ import java.util.Map;
 @Configuration
 public class KafkaConfiguration {
     @Bean
-    public KafkaTemplate<String, TrainingPurchasedPivotalEvent> producerFactory(@Value("${kafka.bootstrap-servers}") String bootstrapServers) {
+    public KafkaTemplate<String, Object> producerFactory(@Value("${kafka.bootstrap-servers}") String bootstrapServers) {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

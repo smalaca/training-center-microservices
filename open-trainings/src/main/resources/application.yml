@@ -33,3 +33,4 @@ kafka:
     order:
       pivotal:
         training-purchased: open-training-training-purchased-topic
+        order-rejected: open-training-order-rejected-topic
