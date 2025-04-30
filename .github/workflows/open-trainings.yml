@@ -48,7 +48,7 @@ jobs:
 
       - name: Tests
         working-directory: ./open-trainings
-        run: mvn clean verify
+        run: mvn clean verify -Dsurefire.parallel=none
 
       - name: SonarCloud Scan
         working-directory: ./open-trainings
