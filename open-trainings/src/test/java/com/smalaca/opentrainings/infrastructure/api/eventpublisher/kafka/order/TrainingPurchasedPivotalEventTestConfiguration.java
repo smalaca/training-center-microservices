@@ -36,8 +36,9 @@ class TrainingPurchasedPivotalEventTestConfiguration {
 
     static class TrainingPurchasedPivotalEventTestConsumer {
         private final Map<UUID, TrainingPurchasedPivotalEvent> trainingPurchasedPivotalEvents = new HashMap<>();
-        private final Map<UUID, OrderRejectedPivotalEvent> orderRejectedPivotalEventEvents = new HashMap<>();
-        private final Map<UUID, OrderTerminatedPivotalEvent> orderTerminatedPivotalEventEvents = new HashMap<>();
+        private final Map<UUID, OrderRejectedPivotalEvent> orderRejectedPivotalEvents = new HashMap<>();
+        private final Map<UUID, OrderTerminatedPivotalEvent> orderTerminatedPivotalEvents = new HashMap<>();
+        private final Map<UUID, OrderCancelledPivotalEvent> orderCancelledPivotalEvents = new HashMap<>();
 
         @KafkaListener(
                 topics = "${kafka.topics.order.pivotal.training-purchased}",
@@ -52,7 +53,7 @@ class TrainingPurchasedPivotalEventTestConfiguration {
                 groupId = "test-order-rejected-group",
                 containerFactory = "testListenerContainerFactory")
         public void consume(OrderRejectedPivotalEvent event) {
-            orderRejectedPivotalEventEvents.put(event.orderId(), event);
+            orderRejectedPivotalEvents.put(event.orderId(), event);
         }
 
         @KafkaListener(
@@ -60,7 +61,15 @@ class TrainingPurchasedPivotalEventTestConfiguration {
                 groupId = "test-order-terminated-group",
                 containerFactory = "testListenerContainerFactory")
         public void consume(OrderTerminatedPivotalEvent event) {
-            orderTerminatedPivotalEventEvents.put(event.orderId(), event);
+            orderTerminatedPivotalEvents.put(event.orderId(), event);
+        }
+
+        @KafkaListener(
+                topics = "${kafka.topics.order.pivotal.order-cancelled}",
+                groupId = "test-order-cancelled-group",
+                containerFactory = "testListenerContainerFactory")
+        public void consume(OrderCancelledPivotalEvent event) {
+            orderCancelledPivotalEvents.put(event.orderId(), event);
         }
 
         Optional<TrainingPurchasedPivotalEvent> trainingPurchasedPivotalEventFor(UUID orderId) {
@@ -68,11 +77,15 @@ class TrainingPurchasedPivotalEventTestConfiguration {
         }
 
         Optional<OrderRejectedPivotalEvent> orderRejectedPivotalEventFor(UUID orderId) {
-            return Optional.ofNullable(orderRejectedPivotalEventEvents.get(orderId));
+            return Optional.ofNullable(orderRejectedPivotalEvents.get(orderId));
         }
 
         Optional<OrderTerminatedPivotalEvent> orderTerminatedPivotalEventFor(UUID orderId) {
-            return Optional.ofNullable(orderTerminatedPivotalEventEvents.get(orderId));
+            return Optional.ofNullable(orderTerminatedPivotalEvents.get(orderId));
+        }
+
+        Optional<OrderCancelledPivotalEvent> orderCancelledPivotalEventFor(UUID orderId) {
+            return Optional.ofNullable(orderCancelledPivotalEvents.get(orderId));
         }
     }
 }

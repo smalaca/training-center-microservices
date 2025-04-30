@@ -1,8 +1,9 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
-import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import com.smalaca.opentrainings.query.order.OrderView;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomId;
+import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderCancelledPivotalEventAssertion.assertThatOrderCancelledPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderRejectedPivotalEventAssertion.assertThatOrderRejectedPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderTerminatedPivotalEventAssertion.assertThatOrderTerminatedPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventAssertion.assertThatTrainingPurchasedPivotalEvent;
@@ -28,6 +30,7 @@ import static org.mockito.Mockito.never;
 class OrderPivotalEventPublisherTest {
     private static final String TRAINING_PURCHASED_TOPIC = "test-training-purchased-topic";
     private static final String ORDER_REJECTED_TOPIC = "test-order-rejected-topic";
+    private static final String ORDER_CANCELLED_TOPIC = "test-order-cancelled-topic";
     private static final String ORDER_TERMINATED_TOPIC = "test-order-terminated-topic";
     private static final UUID ORDER_ID = randomId();
     private static final UUID OFFER_ID = randomId();
@@ -37,7 +40,7 @@ class OrderPivotalEventPublisherTest {
     private final OrderQueryService orderQueryService = mock(OrderQueryService.class);
     private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
     private final OrderPivotalEventPublisher publisher = new OrderPivotalEventPublisherFactory().createOrderPivotalEventPublisher(
-            orderQueryService, kafkaTemplate, TRAINING_PURCHASED_TOPIC, ORDER_REJECTED_TOPIC, ORDER_TERMINATED_TOPIC);
+            orderQueryService, kafkaTemplate, TRAINING_PURCHASED_TOPIC, ORDER_REJECTED_TOPIC, ORDER_TERMINATED_TOPIC, ORDER_CANCELLED_TOPIC);
 
     @Test
     void shouldPublishTrainingPurchasedPivotalEvent() {
@@ -167,6 +170,50 @@ class OrderPivotalEventPublisherTest {
 
     private OrderTerminatedEvent orderTerminatedEvent() {
         return OrderTerminatedEvent.create(ORDER_ID, OFFER_ID, TRAINING_ID, PARTICIPANT_ID);
+    }
+
+    @Test
+    void shouldPublishOrderCancelledPivotalEvent() {
+        givenExistingOrder();
+        OrderCancelledEvent event = orderCancelledEvent();
+
+        publisher.consume(event);
+
+        thenOrderCancelledPivotalEventPublished()
+                .isNextAfter(event.eventId())
+                .hasOrderId(ORDER_ID)
+                .hasOfferId(OFFER_ID)
+                .hasTrainingId(TRAINING_ID)
+                .hasParticipantId(PARTICIPANT_ID);
+    }
+
+    private OrderCancelledPivotalEventAssertion thenOrderCancelledPivotalEventPublished() {
+        ArgumentCaptor<OrderCancelledPivotalEvent> captor = ArgumentCaptor.forClass(OrderCancelledPivotalEvent.class);
+        then(kafkaTemplate).should().send(eq(ORDER_CANCELLED_TOPIC), captor.capture());
+
+        return assertThatOrderCancelledPivotalEvent(captor.getValue());
+    }
+
+    @Test
+    void shouldThrowIllegalArgumentExceptionWhenOrderNotFoundAfterOrderCancelledEventConsumed() {
+        givenNoExistingOrder();
+
+        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> publisher.consume(orderCancelledEvent()));
+
+        assertThat(actual).hasMessage("Order not found for ID: " + ORDER_ID);
+    }
+
+    @Test
+    void shouldPublishNoEventWhenOrderNotFoundAfterOrderCancelledEventConsumed() {
+        givenNoExistingOrder();
+
+        assertThrows(IllegalArgumentException.class, () -> publisher.consume(orderCancelledEvent()));
+
+        then(kafkaTemplate).should(never()).send(any(), any());
+    }
+
+    private OrderCancelledEvent orderCancelledEvent() {
+        return OrderCancelledEvent.create(ORDER_ID, OFFER_ID, TRAINING_ID, PARTICIPANT_ID);
     }
 
     private void givenExistingOrder() {

@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
+import com.smalaca.opentrainings.domain.order.events.OrderCancelledEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
@@ -19,6 +20,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import java.util.Optional;
 
+import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderCancelledPivotalEventAssertion.assertThatOrderCancelledPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderRejectedPivotalEventAssertion.assertThatOrderRejectedPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderTerminatedPivotalEventAssertion.assertThatOrderTerminatedPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventAssertion.assertThatTrainingPurchasedPivotalEvent;
@@ -121,6 +123,34 @@ class OrderPivotalEventPublisherIntegrationTest {
             OrderView expected = orderQueryService.findById(dto.getOrderId()).get();
 
             assertThatOrderTerminatedPivotalEvent(actual.get())
+                .isNextAfter(event.eventId())
+                .hasOrderId(expected.getOrderId())
+                .hasOfferId(expected.getOfferId())
+                .hasTrainingId(expected.getTrainingId())
+                .hasParticipantId(expected.getParticipantId())
+                .hasOrderNumber(expected.getOrderNumber())
+                .hasTrainingPriceAmount(expected.getTrainingPriceAmount())
+                .hasTrainingPriceCurrency(expected.getTrainingPriceCurrency())
+                .hasFinalPriceAmount(expected.getFinalPriceAmount())
+                .hasFinalPriceCurrency(expected.getFinalPriceCurrency())
+                .hasOrderCreationDateTime(expected.getCreationDateTime())
+                .hasDiscountCode(expected.getDiscountCode());
+        });
+    }
+
+    @Test
+    void shouldPublishOrderCancelledPivotalEvent() {
+        OrderTestDto dto = given.order().rejected().getDto();
+        OrderCancelledEvent event = OrderCancelledEvent.create(dto.getOrderId(), dto.getOfferId(), dto.getTrainingId(), dto.getParticipantId());
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<OrderCancelledPivotalEvent> actual = consumer.orderCancelledPivotalEventFor(dto.getOrderId());
+            assertThat(actual).isPresent();
+            OrderView expected = orderQueryService.findById(dto.getOrderId()).get();
+
+            assertThatOrderCancelledPivotalEvent(actual.get())
                 .isNextAfter(event.eventId())
                 .hasOrderId(expected.getOrderId())
                 .hasOfferId(expected.getOfferId())
