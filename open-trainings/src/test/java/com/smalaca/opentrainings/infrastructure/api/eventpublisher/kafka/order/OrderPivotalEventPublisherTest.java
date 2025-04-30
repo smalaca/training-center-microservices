@@ -33,7 +33,7 @@ class OrderPivotalEventPublisherTest {
 
     private final OrderQueryService orderQueryService = mock(OrderQueryService.class);
     private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
-    private final OrderPivotalEventPublisher publisher = new OrderPivotalEventPublisher(orderQueryService, kafkaTemplate, TRAINING_PURCHASED_TOPIC, ORDER_REJECTED_TOPIC);
+    private final OrderPivotalEventPublisher publisher = new OrderPivotalEventPublisherFactory().createOrderPivotalEventPublisher(orderQueryService, kafkaTemplate, TRAINING_PURCHASED_TOPIC, ORDER_REJECTED_TOPIC);
 
     @Test
     void shouldPublishTrainingPurchasedPivotalEvent() {
