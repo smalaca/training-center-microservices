@@ -11,7 +11,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
-class OrderPivotalEventPublisher {
+public class OrderPivotalEventPublisher {
     private final OrderQueryService orderQueryService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final Topics topics;

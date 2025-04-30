@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptance
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderPivotalEventPublisher;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,9 @@ class OutboxMessagePublisherIntegrationTest {
 
     @MockBean
     private OfferAcceptanceSagaEngine engine;
+
+    @MockBean
+    private OrderPivotalEventPublisher publisher;
 
     private OutboxMessageMapper factory;
 

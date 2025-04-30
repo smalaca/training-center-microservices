@@ -1,6 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
-import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
+import com.smalaca.opentrainings.annotation.disable.DisabledSchedulerIntegrations;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
@@ -32,7 +32,7 @@ import static org.awaitility.Awaitility.await;
         partitions = 1,
         brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" })
 @Import(TrainingPurchasedPivotalEventTestConfiguration.class)
-@DisabledAllIntegrations
+@DisabledSchedulerIntegrations
 class OrderPivotalEventPublisherIntegrationTest {
     @Autowired
     private OrderPivotalEventPublisher publisher;
