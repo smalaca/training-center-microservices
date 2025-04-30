@@ -11,12 +11,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
-import com.smalaca.test.type.IntegrationTest;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -35,8 +34,7 @@ import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSagaAssertion.assertThatOfferAcceptanceSaga;
 import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.AcceptOfferCommand.acceptOfferCommandBuilder;
 
-@IntegrationTest
-@SpringBootTest
+@SpringBootIntegrationTest
 @Import(JpaOfferAcceptanceSagaRepositoryFactory.class)
 class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();

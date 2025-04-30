@@ -6,11 +6,10 @@ import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
-import com.smalaca.test.type.IntegrationTest;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -23,8 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 
-@SpringBootTest
-@IntegrationTest
+@SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.offer.termination.rate=100")
 class ScheduledOffersTerminationIntegrationTest {
     @SpyBean

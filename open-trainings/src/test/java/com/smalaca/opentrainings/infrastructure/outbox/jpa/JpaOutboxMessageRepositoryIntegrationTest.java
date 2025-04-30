@@ -30,12 +30,11 @@ import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
-import com.smalaca.test.type.IntegrationTest;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -52,8 +51,7 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.Acce
 import static com.smalaca.opentrainings.infrastructure.outbox.jpa.OutboxMessageAssertion.assertThatOutboxMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@IntegrationTest
-@SpringBootTest
+@SpringBootIntegrationTest
 @Import(JpaOutboxMessageRepositoryFactory.class)
 class JpaOutboxMessageRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();

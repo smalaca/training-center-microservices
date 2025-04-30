@@ -5,12 +5,11 @@ import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptance
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
-import com.smalaca.test.type.IntegrationTest;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -24,8 +23,7 @@ import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest
-@IntegrationTest
+@SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.outbox.message.rate=100")
 class OutboxMessagePublisherIntegrationTest {
     @Autowired
