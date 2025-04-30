@@ -37,6 +37,7 @@ class TrainingPurchasedPivotalEventTestConfiguration {
     static class TrainingPurchasedPivotalEventTestConsumer {
         private final Map<UUID, TrainingPurchasedPivotalEvent> trainingPurchasedPivotalEvents = new HashMap<>();
         private final Map<UUID, OrderRejectedPivotalEvent> orderRejectedPivotalEventEvents = new HashMap<>();
+        private final Map<UUID, OrderTerminatedPivotalEvent> orderTerminatedPivotalEventEvents = new HashMap<>();
 
         @KafkaListener(
                 topics = "${kafka.topics.order.pivotal.training-purchased}",
@@ -45,6 +46,7 @@ class TrainingPurchasedPivotalEventTestConfiguration {
         public void consume(TrainingPurchasedPivotalEvent event) {
             trainingPurchasedPivotalEvents.put(event.orderId(), event);
         }
+
         @KafkaListener(
                 topics = "${kafka.topics.order.pivotal.order-rejected}",
                 groupId = "test-order-rejected-group",
@@ -53,12 +55,24 @@ class TrainingPurchasedPivotalEventTestConfiguration {
             orderRejectedPivotalEventEvents.put(event.orderId(), event);
         }
 
+        @KafkaListener(
+                topics = "${kafka.topics.order.pivotal.order-terminated}",
+                groupId = "test-order-terminated-group",
+                containerFactory = "testListenerContainerFactory")
+        public void consume(OrderTerminatedPivotalEvent event) {
+            orderTerminatedPivotalEventEvents.put(event.orderId(), event);
+        }
+
         Optional<TrainingPurchasedPivotalEvent> trainingPurchasedPivotalEventFor(UUID orderId) {
             return Optional.ofNullable(trainingPurchasedPivotalEvents.get(orderId));
         }
 
         Optional<OrderRejectedPivotalEvent> orderRejectedPivotalEventFor(UUID orderId) {
             return Optional.ofNullable(orderRejectedPivotalEventEvents.get(orderId));
+        }
+
+        Optional<OrderTerminatedPivotalEvent> orderTerminatedPivotalEventFor(UUID orderId) {
+            return Optional.ofNullable(orderTerminatedPivotalEventEvents.get(orderId));
         }
     }
 }

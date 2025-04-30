@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import com.smalaca.opentrainings.query.order.OrderView;
@@ -32,6 +33,13 @@ class OrderPivotalEventPublisher {
         OrderRejectedPivotalEvent pivotalEvent = new OrderRejectedPivotalEvent(event, orderFor(event.orderId()));
 
         kafkaTemplate.send(topics.orderRejected(), pivotalEvent);
+    }
+
+    @EventListener
+    public void consume(OrderTerminatedEvent event) {
+        OrderTerminatedPivotalEvent pivotalEvent = new OrderTerminatedPivotalEvent(event, orderFor(event.orderId()));
+
+        kafkaTemplate.send(topics.orderTerminated(), pivotalEvent);
     }
 
     private OrderView orderFor(UUID orderId) {

@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.order.events.OrderRejectedEvent;
+import com.smalaca.opentrainings.domain.order.events.OrderTerminatedEvent;
 import com.smalaca.opentrainings.domain.order.events.TrainingPurchasedEvent;
 import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventTestConfiguration.TrainingPurchasedPivotalEventTestConsumer;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
@@ -19,6 +20,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import java.util.Optional;
 
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderRejectedPivotalEventAssertion.assertThatOrderRejectedPivotalEvent;
+import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.OrderTerminatedPivotalEventAssertion.assertThatOrderTerminatedPivotalEvent;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventAssertion.assertThatTrainingPurchasedPivotalEvent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -93,6 +95,34 @@ class OrderPivotalEventPublisherIntegrationTest {
                 .isNextAfter(event.eventId())
                 .hasOrderId(expected.getOrderId())
                 .hasReason(event.reason())
+                .hasOfferId(expected.getOfferId())
+                .hasTrainingId(expected.getTrainingId())
+                .hasParticipantId(expected.getParticipantId())
+                .hasOrderNumber(expected.getOrderNumber())
+                .hasTrainingPriceAmount(expected.getTrainingPriceAmount())
+                .hasTrainingPriceCurrency(expected.getTrainingPriceCurrency())
+                .hasFinalPriceAmount(expected.getFinalPriceAmount())
+                .hasFinalPriceCurrency(expected.getFinalPriceCurrency())
+                .hasOrderCreationDateTime(expected.getCreationDateTime())
+                .hasDiscountCode(expected.getDiscountCode());
+        });
+    }
+
+    @Test
+    void shouldPublishOrderTerminatedPivotalEvent() {
+        OrderTestDto dto = given.order().rejected().getDto();
+        OrderTerminatedEvent event = OrderTerminatedEvent.create(dto.getOrderId(), dto.getOfferId(), dto.getTrainingId(), dto.getParticipantId());
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<OrderTerminatedPivotalEvent> actual = consumer.orderTerminatedPivotalEventFor(dto.getOrderId());
+            assertThat(actual).isPresent();
+            OrderView expected = orderQueryService.findById(dto.getOrderId()).get();
+
+            assertThatOrderTerminatedPivotalEvent(actual.get())
+                .isNextAfter(event.eventId())
+                .hasOrderId(expected.getOrderId())
                 .hasOfferId(expected.getOfferId())
                 .hasTrainingId(expected.getTrainingId())
                 .hasParticipantId(expected.getParticipantId())
