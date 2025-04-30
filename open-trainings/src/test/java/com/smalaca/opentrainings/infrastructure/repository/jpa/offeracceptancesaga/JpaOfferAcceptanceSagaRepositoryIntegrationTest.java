@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.repository.jpa.offeracceptancesaga;
 
+import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferRejectedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.OfferAcceptanceSaga;
@@ -36,6 +37,7 @@ import static com.smalaca.opentrainings.domain.offeracceptancesaga.commands.Acce
 
 @SpringBootIntegrationTest
 @Import(JpaOfferAcceptanceSagaRepositoryFactory.class)
+@DisabledAllIntegrations
 class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
     private static final Faker FAKER = new Faker();
     private static final LocalDateTime NOW = LocalDateTime.now();

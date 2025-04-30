@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order;
 
+import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -30,11 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         partitions = 1,
         brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" },
         topics = {"test-training-purchased-topic"})
-@TestPropertySource(properties = {
-        "kafka.topics.order.pivotal.training-purchased=test-training-purchased-topic",
-        "scheduled.outbox.message.rate=100000"
-})
 @Import(TrainingPurchasedPivotalEventTestConfiguration.class)
+@DisabledAllIntegrations
 class OrderPivotalEventPublisherIntegrationTest {
     @Autowired
     private OrderPivotalEventPublisher publisher;

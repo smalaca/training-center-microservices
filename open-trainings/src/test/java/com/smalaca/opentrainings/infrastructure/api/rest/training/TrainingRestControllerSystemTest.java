@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.training;
 
+import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestResponse;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
@@ -17,6 +18,7 @@ import static com.smalaca.opentrainings.data.Random.randomId;
 
 @SystemTest
 @Import(OpenTrainingsTestClient.class)
+@DisabledAllIntegrations
 class TrainingRestControllerSystemTest {
 
     @Autowired

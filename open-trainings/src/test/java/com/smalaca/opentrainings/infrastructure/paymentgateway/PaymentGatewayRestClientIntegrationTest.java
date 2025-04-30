@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.infrastructure.paymentgateway;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import com.smalaca.opentrainings.annotation.disable.DisabledAllIntegrations;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @IntegrationTest
 @SpringBootTest(properties = "services.payment-gateway.url=http://localhost:1234")
 @WireMockTest(httpPort = 1234)
+@DisabledAllIntegrations
 class PaymentGatewayRestClientIntegrationTest {
     private static final String SUCCESSFUL = "true";
     private static final String FAILURE = "false";
