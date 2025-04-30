@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@TestPropertySource(properties = "spring.kafka.bootstrap-servers=")
+@TestPropertySource(properties = "kafka.bootstrap-servers=")
 public @interface DisabledKafkaIntegration {
 }
