@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.scheduled.offer;
 
+import com.smalaca.opentrainings.annotation.disable.DisabledKafkaIntegration;
 import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.never;
 
 @SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.offer.termination.rate=100")
+@DisabledKafkaIntegration
 class ScheduledOffersTerminationIntegrationTest {
     @SpyBean
     private OfferApplicationService applicationService;
