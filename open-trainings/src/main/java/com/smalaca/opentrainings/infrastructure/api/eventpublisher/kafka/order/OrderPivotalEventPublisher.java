@@ -12,28 +12,26 @@ import java.util.UUID;
 class OrderPivotalEventPublisher {
     private final OrderQueryService orderQueryService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final String trainingPurchasedTopic;
-    private final String orderRejectedTopic;
+    private final Topics topics;
 
-    OrderPivotalEventPublisher(OrderQueryService orderQueryService, KafkaTemplate<String, Object> kafkaTemplate, String trainingPurchasedTopic, String orderRejectedTopic) {
+    OrderPivotalEventPublisher(OrderQueryService orderQueryService, KafkaTemplate<String, Object> kafkaTemplate, Topics topics) {
         this.orderQueryService = orderQueryService;
         this.kafkaTemplate = kafkaTemplate;
-        this.trainingPurchasedTopic = trainingPurchasedTopic;
-        this.orderRejectedTopic = orderRejectedTopic;
+        this.topics = topics;
     }
 
     @EventListener
     public void consume(TrainingPurchasedEvent event) {
         TrainingPurchasedPivotalEvent pivotalEvent = new TrainingPurchasedPivotalEvent(event, orderFor(event.orderId()));
 
-        kafkaTemplate.send(trainingPurchasedTopic, pivotalEvent);
+        kafkaTemplate.send(topics.trainingPurchased(), pivotalEvent);
     }
 
     @EventListener
     public void consume(OrderRejectedEvent event) {
         OrderRejectedPivotalEvent pivotalEvent = new OrderRejectedPivotalEvent(event, orderFor(event.orderId()));
 
-        kafkaTemplate.send(orderRejectedTopic, pivotalEvent);
+        kafkaTemplate.send(topics.orderRejected(), pivotalEvent);
     }
 
     private OrderView orderFor(UUID orderId) {

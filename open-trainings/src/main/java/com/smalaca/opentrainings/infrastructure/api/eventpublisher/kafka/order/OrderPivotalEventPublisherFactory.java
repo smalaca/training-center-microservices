@@ -14,6 +14,8 @@ class OrderPivotalEventPublisherFactory {
             KafkaTemplate<String, Object> kafkaTemplate,
             @Value("${kafka.topics.order.pivotal.training-purchased}") String trainingPurchasedTopic,
             @Value("${kafka.topics.order.pivotal.order-rejected}") String orderRejectedTopic) {
-        return new OrderPivotalEventPublisher(orderQueryService, kafkaTemplate, trainingPurchasedTopic, orderRejectedTopic);
+        Topics topics = new Topics(trainingPurchasedTopic, orderRejectedTopic);
+
+        return new OrderPivotalEventPublisher(orderQueryService, kafkaTemplate, topics);
     }
 }
