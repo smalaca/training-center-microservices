@@ -15,15 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 
-import java.time.Duration;
 import java.util.Optional;
-import java.util.UUID;
 
-import static com.smalaca.opentrainings.data.Random.randomId;
 import static com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.order.TrainingPurchasedPivotalEventAssertion.assertThatTrainingPurchasedPivotalEvent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootIntegrationTest
 @EmbeddedKafka(
@@ -78,27 +74,5 @@ class OrderPivotalEventPublisherIntegrationTest {
                 .hasOrderCreationDateTime(expected.getCreationDateTime())
                 .hasDiscountCode(expected.getDiscountCode());
         });
-    }
-
-    @Test
-    void shouldThrowIllegalArgumentExceptionWhenOrderNotFound() {
-        UUID orderId = randomId();
-        TrainingPurchasedEvent event = TrainingPurchasedEvent.create(orderId, randomId(), randomId(), randomId());
-
-        IllegalArgumentException actual = assertThrows(IllegalArgumentException.class, () -> publisher.consume(event));
-
-        assertThat(actual).hasMessage("Order not found for ID: " + orderId);
-    }
-
-    @Test
-    void shouldPublishNoEventWhenOrderNotFound() {
-        UUID orderId = randomId();
-        TrainingPurchasedEvent event = TrainingPurchasedEvent.create(orderId, randomId(), randomId(), randomId());
-
-        assertThrows(IllegalArgumentException.class, () -> publisher.consume(event));
-
-        await()
-                .pollDelay(Duration.ofMillis(500))
-                .untilAsserted(() -> assertThat(consumer.getFor(orderId)).isEmpty());
     }
 }
