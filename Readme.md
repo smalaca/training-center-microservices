@@ -12,6 +12,12 @@
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
 
+3. **Personal Data Management:**
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
+
 ## Goal
 The purpose of this repository is to show how to build and maintain the project using following solutions:
 - microservices 
