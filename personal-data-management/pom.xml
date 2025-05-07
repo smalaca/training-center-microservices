@@ -21,6 +21,8 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <datafaker.version>2.3.0</datafaker.version>
+
         <sonar.organization>smalaca-github</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.projectName>Training Center: Personal Data Management</sonar.projectName>
@@ -56,6 +58,13 @@
             <groupId>com.smalaca</groupId>
             <artifactId>annotations</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>${datafaker.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
