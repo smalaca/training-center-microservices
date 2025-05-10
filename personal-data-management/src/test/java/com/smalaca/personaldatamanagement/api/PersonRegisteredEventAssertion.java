@@ -26,6 +26,11 @@ class PersonRegisteredEventAssertion {
         return this;
     }
 
+    PersonRegisteredEventAssertion hasParticipantId() {
+        assertThat(actual.participantId()).isNotNull();
+        return this;
+    }
+
     PersonRegisteredEventAssertion isNextAfter(CommandId expected) {
         assertThatEventId(actual.eventId()).isNextAfter(expected);
         return this;
