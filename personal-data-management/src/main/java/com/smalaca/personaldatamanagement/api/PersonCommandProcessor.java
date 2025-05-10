@@ -11,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PersonCommandProcessor {
-    private static final UUID PARTICIPANT_ID = UUID.randomUUID();
-
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String alreadyRegisteredPersonTopic;
     private final String personRegisteredTopic;
