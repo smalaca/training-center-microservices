@@ -5,3 +5,12 @@ spring:
   jackson:
     serialization:
       indent_output: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  topics:
+    command:
+      register-person: personal-data-management-register-person-command-topic
+    event:
+      already-registered-person: personal-data-management-already-registered-person-event-topic
+      person-registered: personal-data-management-person-registered-event-topic
