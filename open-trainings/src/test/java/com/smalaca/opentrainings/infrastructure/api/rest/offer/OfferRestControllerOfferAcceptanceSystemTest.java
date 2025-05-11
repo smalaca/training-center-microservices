@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.client.opentrainings.OpenTrainingsTestClient;
 import com.smalaca.opentrainings.client.opentrainings.offer.RestAcceptOfferTestCommand;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
+import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer.OfferAcceptanceCommandPublisher;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -44,6 +46,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @Autowired
     private OfferAcceptanceSagaEventTestListener testListener;
+
+    @MockBean
+    private OfferAcceptanceCommandPublisher offerAcceptanceCommandPublisher;
 
     private GivenOfferAcceptance given;
     private OfferTestDto dto;

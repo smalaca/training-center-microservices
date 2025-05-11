@@ -30,6 +30,9 @@ scheduled:
 kafka:
   bootstrap-servers: localhost:9092
   topics:
+    offer-acceptance:
+      commands:
+        register-person: personal-data-management-register-person-command-topic
     order:
       pivotal:
         training-purchased: open-training-training-purchased-topic
