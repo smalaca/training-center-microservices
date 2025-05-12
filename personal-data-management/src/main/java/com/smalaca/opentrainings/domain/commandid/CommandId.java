@@ -1,4 +1,4 @@
-package com.smalaca.personaldatamanagement.api;
+package com.smalaca.opentrainings.domain.commandid;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

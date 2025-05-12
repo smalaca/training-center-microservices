@@ -11,7 +11,7 @@ kafka:
   group-id: personal-data-management
   topics:
     command:
-      register-person: personal-data-management-register-person-command-topic
+      register-person: open-training-offer-acceptance-register-person-command-topic
     event:
-      already-registered-person: personal-data-management-already-registered-person-event-topic
-      person-registered: personal-data-management-person-registered-event-topic
+      already-registered-person: open-training-offer-acceptance-already-registered-person-event-topic
+      person-registered: open-training-offer-acceptance-person-registered-event-topic

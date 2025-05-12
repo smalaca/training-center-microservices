@@ -1,37 +1,39 @@
-package com.smalaca.personaldatamanagement.api;
+package com.smalaca.opentrainings.domain.offeracceptancesaga.events;
+
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 
 import java.util.UUID;
 
-import static com.smalaca.personaldatamanagement.api.EventIdAssertion.assertThatEventId;
+import static com.smalaca.opentrainings.domain.eventid.EventIdAssertion.assertThatEventId;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PersonRegisteredEventAssertion {
+public class PersonRegisteredEventAssertion {
     private final PersonRegisteredEvent actual;
 
     private PersonRegisteredEventAssertion(PersonRegisteredEvent actual) {
         this.actual = actual;
     }
 
-    static PersonRegisteredEventAssertion assertThatPersonRegisteredEvent(PersonRegisteredEvent actual) {
+    public static PersonRegisteredEventAssertion assertThatPersonRegisteredEvent(PersonRegisteredEvent actual) {
         return new PersonRegisteredEventAssertion(actual);
     }
 
-    PersonRegisteredEventAssertion hasOfferId(UUID expected) {
+    public PersonRegisteredEventAssertion hasOfferId(UUID expected) {
         assertThat(actual.offerId()).isEqualTo(expected);
         return this;
     }
 
-    PersonRegisteredEventAssertion hasParticipantId(UUID expected) {
+    public PersonRegisteredEventAssertion hasParticipantId(UUID expected) {
         assertThat(actual.participantId()).isEqualTo(expected);
         return this;
     }
 
-    PersonRegisteredEventAssertion hasParticipantId() {
+    public PersonRegisteredEventAssertion hasParticipantId() {
         assertThat(actual.participantId()).isNotNull();
         return this;
     }
 
-    PersonRegisteredEventAssertion isNextAfter(CommandId expected) {
+    public PersonRegisteredEventAssertion isNextAfter(CommandId expected) {
         assertThatEventId(actual.eventId()).isNextAfter(expected);
         return this;
     }

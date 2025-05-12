@@ -1,5 +1,10 @@
 package com.smalaca.personaldatamanagement.api;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEventAssertion;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -7,8 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
-import static com.smalaca.personaldatamanagement.api.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
-import static com.smalaca.personaldatamanagement.api.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
 import static java.time.LocalDateTime.now;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.eq;
