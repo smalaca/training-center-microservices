@@ -8,6 +8,7 @@ spring:
 
 kafka:
   bootstrap-servers: localhost:9092
+  group-id: personal-data-management
   topics:
     command:
       register-person: personal-data-management-register-person-command-topic
