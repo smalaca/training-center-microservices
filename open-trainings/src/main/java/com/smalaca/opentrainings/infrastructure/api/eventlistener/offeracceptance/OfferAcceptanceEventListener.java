@@ -18,6 +18,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlace
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,8 +35,11 @@ public class OfferAcceptanceEventListener {
         engine.accept(event);
     }
 
-    @EventListener
     @DrivenAdapter
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.person-registered}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
     public void listen(PersonRegisteredEvent event) {
         engine.accept(event);
     }

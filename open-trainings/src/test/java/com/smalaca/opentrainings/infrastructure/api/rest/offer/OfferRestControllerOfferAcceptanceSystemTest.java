@@ -14,6 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -22,7 +26,11 @@ import java.util.UUID;
 import static org.awaitility.Awaitility.await;
 
 @SystemTest
+@EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @Import({OpenTrainingsTestClient.class, OfferAcceptanceSagaEventTestListener.class})
+@TestPropertySource(properties = {
+        "kafka.topics.offer-acceptance.events.person-registered=offer-acceptance-person-registered-event-topic",
+})
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();
 
@@ -47,6 +55,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     @Autowired
     private OfferAcceptanceSagaEventTestListener testListener;
 
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
     @MockBean
     private OfferAcceptanceCommandPublisher offerAcceptanceCommandPublisher;
 
@@ -58,6 +69,8 @@ class OfferRestControllerOfferAcceptanceSystemTest {
     void givenOfferFactory() {
         given = GivenOfferAcceptance.create(offerRepository, testListener);
         then = new ThenOfferAcceptance(client);
+        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
+                listenerContainer -> ContainerTestUtils.waitForAssignment(listenerContainer, 1));
     }
 
     @AfterEach

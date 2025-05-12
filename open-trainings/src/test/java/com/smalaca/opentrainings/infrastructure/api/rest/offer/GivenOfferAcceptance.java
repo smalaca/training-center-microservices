@@ -103,14 +103,14 @@ class GivenOfferAcceptance {
 
     GivenOfferAcceptance alreadyRegisteredPersonFound() {
         AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(newEventId(), offer.getOfferId(), participantId);
-        testListener.willReturnAfterRegisterPersonCommand(offer.getOfferId(), event);
+        testListener.willReturnAlreadyRegisteredPersonFoundEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance personRegistered() {
         PersonRegisteredEvent event = new PersonRegisteredEvent(newEventId(), offer.getOfferId(), participantId);
-        testListener.willReturnAfterRegisterPersonCommand(offer.getOfferId(), event);
+        testListener.willReturnPersonRegisteredEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }

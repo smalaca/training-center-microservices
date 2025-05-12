@@ -29,10 +29,14 @@ scheduled:
 
 kafka:
   bootstrap-servers: localhost:9092
+  group-id: open-training
   topics:
     offer-acceptance:
       commands:
         register-person: personal-data-management-register-person-command-topic
+      events:
+        person-registered: personal-data-management-person-registered-event-topic
+        already-registered-person: personal-data-management-already-registered-person-event-topic
     order:
       pivotal:
         training-purchased: open-training-training-purchased-topic

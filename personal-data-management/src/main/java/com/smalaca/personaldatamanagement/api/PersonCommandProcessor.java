@@ -27,7 +27,7 @@ public class PersonCommandProcessor {
 
     @KafkaListener(
             topics = "${kafka.topics.command.register-person}",
-            groupId = "personal-data-management",
+            groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void process(RegisterPersonCommand command) {
         String fullName = asFullName(command);

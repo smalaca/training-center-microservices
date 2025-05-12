@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class KafkaConfiguration {
+public class KafkaProducerConfiguration {
     @Bean
     public KafkaTemplate<String, Object> producerFactory(@Value("${kafka.bootstrap-servers}") String bootstrapServers) {
         Map<String, Object> properties = new HashMap<>();
