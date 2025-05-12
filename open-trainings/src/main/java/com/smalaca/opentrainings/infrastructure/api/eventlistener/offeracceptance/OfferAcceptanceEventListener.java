@@ -38,7 +38,7 @@ public class OfferAcceptanceEventListener {
     @DrivenAdapter
     @KafkaListener(
             topics = "${kafka.topics.offer-acceptance.events.person-registered}",
-            groupId = "open-trainings",
+            groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void listen(PersonRegisteredEvent event) {
         engine.accept(event);

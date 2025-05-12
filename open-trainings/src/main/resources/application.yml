@@ -29,6 +29,7 @@ scheduled:
 
 kafka:
   bootstrap-servers: localhost:9092
+  group-id: open-training
   topics:
     offer-acceptance:
       commands:
