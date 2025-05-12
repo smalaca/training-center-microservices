@@ -5,33 +5,52 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrai
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 class OfferAcceptanceSagaEventTestListener {
+    private final KafkaTemplate<String, Object> producerFactory;
     private final ApplicationEventPublisher publisher;
-    private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterRegisterPersonCommand = new HashMap<>();
+    private final String registerPersonCommandTopic;
+    private final Map<UUID, AlreadyRegisteredPersonFoundEvent> alreadyRegisteredPersonFoundEvents = new HashMap<>();
+    private final Map<UUID, PersonRegisteredEvent> personRegisteredEvents = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterConfirmTrainingPriceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterBookTrainingPlaceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterUseDiscountCodeCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterReturnDiscountCodeCommand = new HashMap<>();
 
-    OfferAcceptanceSagaEventTestListener(ApplicationEventPublisher publisher) {
+    OfferAcceptanceSagaEventTestListener(
+            KafkaTemplate<String, Object> producerFactory, ApplicationEventPublisher publisher,
+            @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registerPersonCommandTopic) {
+        this.producerFactory = producerFactory;
         this.publisher = publisher;
+        this.registerPersonCommandTopic = registerPersonCommandTopic;
     }
 
     @EventListener
     void listen(RegisterPersonCommand command) {
-        publisher.publishEvent(eventsAfterRegisterPersonCommand.get(command.offerId()));
+        if (alreadyRegisteredPersonFoundEvents.containsKey(command.offerId())) {
+            publisher.publishEvent(alreadyRegisteredPersonFoundEvents.get(command.offerId()));
+        } else {
+            producerFactory.send(registerPersonCommandTopic, personRegisteredEvents.get(command.offerId()));
+        }
     }
 
-    void willReturnAfterRegisterPersonCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
-        eventsAfterRegisterPersonCommand.put(offerId, event);
+    void willReturnAlreadyRegisteredPersonFoundEventAfterRegisterPersonCommand(UUID offerId, AlreadyRegisteredPersonFoundEvent event) {
+        alreadyRegisteredPersonFoundEvents.put(offerId, event);
+    }
+
+    void willReturnPersonRegisteredEventAfterRegisterPersonCommand(UUID offerId, PersonRegisteredEvent event) {
+        personRegisteredEvents.put(offerId, event);
     }
 
     @EventListener
