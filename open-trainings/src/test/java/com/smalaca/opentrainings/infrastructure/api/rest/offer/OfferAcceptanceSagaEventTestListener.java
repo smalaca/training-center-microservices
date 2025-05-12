@@ -21,6 +21,7 @@ class OfferAcceptanceSagaEventTestListener {
     private final KafkaTemplate<String, Object> producerFactory;
     private final ApplicationEventPublisher publisher;
     private final String registerPersonCommandTopic;
+    private final String alreadyRegisteredPersonCommandTopic;
     private final Map<UUID, AlreadyRegisteredPersonFoundEvent> alreadyRegisteredPersonFoundEvents = new HashMap<>();
     private final Map<UUID, PersonRegisteredEvent> personRegisteredEvents = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterConfirmTrainingPriceCommand = new HashMap<>();
@@ -30,16 +31,18 @@ class OfferAcceptanceSagaEventTestListener {
 
     OfferAcceptanceSagaEventTestListener(
             KafkaTemplate<String, Object> producerFactory, ApplicationEventPublisher publisher,
-            @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registerPersonCommandTopic) {
+            @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registerPersonCommandTopic,
+            @Value("${kafka.topics.offer-acceptance.events.already-registered-person}") String alreadyRegisteredPersonCommandTopic) {
         this.producerFactory = producerFactory;
         this.publisher = publisher;
         this.registerPersonCommandTopic = registerPersonCommandTopic;
+        this.alreadyRegisteredPersonCommandTopic = alreadyRegisteredPersonCommandTopic;
     }
 
     @EventListener
     void listen(RegisterPersonCommand command) {
         if (alreadyRegisteredPersonFoundEvents.containsKey(command.offerId())) {
-            publisher.publishEvent(alreadyRegisteredPersonFoundEvents.get(command.offerId()));
+            producerFactory.send(alreadyRegisteredPersonCommandTopic, alreadyRegisteredPersonFoundEvents.get(command.offerId()));
         } else {
             producerFactory.send(registerPersonCommandTopic, personRegisteredEvents.get(command.offerId()));
         }

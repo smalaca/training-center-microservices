@@ -30,6 +30,7 @@ import static org.awaitility.Awaitility.await;
 @Import({OpenTrainingsTestClient.class, OfferAcceptanceSagaEventTestListener.class})
 @TestPropertySource(properties = {
         "kafka.topics.offer-acceptance.events.person-registered=offer-acceptance-person-registered-event-topic",
+        "kafka.topics.offer-acceptance.events.already-registered-person=offer-acceptance-already-registered-person-event-topic",
 })
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();
