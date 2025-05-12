@@ -19,7 +19,7 @@ services:
 scheduled:
   outbox:
     message:
-      rate: 100
+      rate: 1000
   order:
     termination:
       rate: 60000

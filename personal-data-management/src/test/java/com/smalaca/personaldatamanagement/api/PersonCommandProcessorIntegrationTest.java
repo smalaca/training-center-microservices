@@ -1,5 +1,9 @@
 package com.smalaca.personaldatamanagement.api;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.personaldatamanagement.api.PersonalDataManagementPivotalEventTestConfiguration.PersonalDataManagementPivotalEventTestConsumer;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
@@ -16,8 +20,8 @@ import org.springframework.test.context.TestPropertySource;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.smalaca.personaldatamanagement.api.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
-import static com.smalaca.personaldatamanagement.api.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;

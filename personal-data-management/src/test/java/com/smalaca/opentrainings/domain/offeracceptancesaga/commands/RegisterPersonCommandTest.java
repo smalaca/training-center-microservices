@@ -1,12 +1,15 @@
-package com.smalaca.personaldatamanagement.api;
+package com.smalaca.opentrainings.domain.offeracceptancesaga.commands;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static com.smalaca.personaldatamanagement.api.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
-import static com.smalaca.personaldatamanagement.api.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEventAssertion.assertThatAlreadyRegisteredPersonFoundEvent;
+import static com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEventAssertion.assertThatPersonRegisteredEvent;
 import static java.time.LocalDateTime.now;
 
 class RegisterPersonCommandTest {
