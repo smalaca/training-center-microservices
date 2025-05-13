@@ -1,8 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
-import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer.OfferAcceptanceTestKafkaListenerConfiguration.OfferAcceptanceTestKafkaListener;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
-@Import(OfferAcceptanceTestKafkaListenerConfiguration.class)
+@Import(OfferAcceptanceTestKafkaListener.class)
 class OfferAcceptanceCommandPublisherIntegrationTest {
     private static final Faker FAKER = new Faker();
 
@@ -47,10 +47,25 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         publisher.consume(command);
 
         await().untilAsserted(() -> {
-            Optional<RegisterPersonCommand> actual = consumer.registerPersonCommandFor(command.offerId());
+            Optional<com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand> actual = consumer.registerPersonCommandFor(command.offerId());
             assertThat(actual).isPresent();
-            assertThat(actual.get()).isEqualTo(command);
+            assertThatContainsSameData(actual.get(), command);
         });
+    }
+
+    private void assertThatContainsSameData(com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand actual, RegisterPersonCommand expected) {
+        assertThatContainsSameData(actual.commandId(), expected.commandId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.firstName()).isEqualTo(expected.firstName());
+        assertThat(actual.lastName()).isEqualTo(expected.lastName());
+        assertThat(actual.email()).isEqualTo(expected.email());
+    }
+
+    private void assertThatContainsSameData(com.smalaca.contracts.metadata.CommandId actual, CommandId expected) {
+        assertThat(actual.commandId()).isEqualTo(expected.commandId());
+        assertThat(actual.traceId()).isEqualTo(expected.traceId());
+        assertThat(actual.correlationId()).isEqualTo(expected.correlationId());
+        assertThat(actual.creationDateTime()).isEqualTo(expected.creationDateTime());
     }
 
     private RegisterPersonCommand registerPersonCommand() {
