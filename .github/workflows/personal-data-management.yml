@@ -46,6 +46,10 @@ jobs:
         working-directory: ./annotations
         run: mvn clean install
 
+      - name: Build Contracts
+        working-directory: ./contracts
+        run: mvn clean install
+
       - name: Tests
         working-directory: ./personal-data-management
         run: mvn clean verify
