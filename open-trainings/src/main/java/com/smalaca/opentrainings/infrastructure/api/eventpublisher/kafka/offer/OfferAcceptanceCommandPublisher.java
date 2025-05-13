@@ -1,5 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
+import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,6 +16,23 @@ public class OfferAcceptanceCommandPublisher {
 
     @EventListener
     public void consume(RegisterPersonCommand command) {
-        kafkaTemplate.send(topics.registerPerson(), command);
+        kafkaTemplate.send(topics.registerPerson(), asExternalRegisterPersonCommand(command));
+    }
+
+    private com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand asExternalRegisterPersonCommand(RegisterPersonCommand command) {
+        return new com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand(
+                asExternalCommandId(command.commandId()),
+                command.offerId(),
+                command.firstName(),
+                command.lastName(),
+                command.email());
+    }
+
+    private com.smalaca.contracts.metadata.CommandId asExternalCommandId(CommandId commandId) {
+        return new com.smalaca.contracts.metadata.CommandId(
+                commandId.commandId(),
+                commandId.traceId(),
+                commandId.correlationId(),
+                commandId.creationDateTime());
     }
 }

@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
 
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,7 @@ class OfferAcceptanceTestKafkaListenerConfiguration {
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        properties.put(JsonDeserializer.TRUSTED_PACKAGES, "com.smalaca.opentrainings.domain.offeracceptancesaga.commands");
+        properties.put(JsonDeserializer.TRUSTED_PACKAGES, "com.smalaca.contracts.*");
 
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(properties));
@@ -36,17 +35,17 @@ class OfferAcceptanceTestKafkaListenerConfiguration {
     }
 
     static class OfferAcceptanceTestKafkaListener {
-        private final Map<UUID, RegisterPersonCommand> registerPersonCommands = new HashMap<>();
+        private final Map<UUID, com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand> registerPersonCommands = new HashMap<>();
 
         @KafkaListener(
                 topics = "${kafka.topics.offer-acceptance.commands.register-person}",
                 groupId = "test-offer-acceptance-group",
                 containerFactory = "offerAcceptanceTestKafkaListenerContainerFactory")
-        public void consume(RegisterPersonCommand command) {
+        public void consume(com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand command) {
             registerPersonCommands.put(command.offerId(), command);
         }
 
-        Optional<RegisterPersonCommand> registerPersonCommandFor(UUID offerId) {
+        Optional<com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand> registerPersonCommandFor(UUID offerId) {
             return Optional.ofNullable(registerPersonCommands.get(offerId));
         }
     }
