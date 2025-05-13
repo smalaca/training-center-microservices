@@ -1,6 +1,5 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
-import com.smalaca.contracts.metadata.EventId;
 import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
