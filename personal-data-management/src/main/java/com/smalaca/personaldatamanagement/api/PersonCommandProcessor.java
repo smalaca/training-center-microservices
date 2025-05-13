@@ -1,8 +1,8 @@
 package com.smalaca.personaldatamanagement.api;
 
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -36,13 +36,21 @@ public class PersonCommandProcessor {
         String fullName = asFullName(command);
 
         if (participants.containsKey(fullName)) {
-            AlreadyRegisteredPersonFoundEvent event = command.alreadyRegisteredPersonFoundEvent(participants.get(fullName));
+            AlreadyRegisteredPersonFoundEvent event = alreadyRegisteredPersonFoundEvent(command, participants.get(fullName));
             kafkaTemplate.send(alreadyRegisteredPersonTopic, event);
         } else {
             participants.put(fullName, registerPerson());
-            PersonRegisteredEvent event = command.personRegisteredEvent(participants.get(fullName));
+            PersonRegisteredEvent event = personRegisteredEvent(command, participants.get(fullName));
             kafkaTemplate.send(personRegisteredTopic, event);
         }
+    }
+
+    private AlreadyRegisteredPersonFoundEvent alreadyRegisteredPersonFoundEvent(RegisterPersonCommand command, UUID participantId) {
+        return new AlreadyRegisteredPersonFoundEvent(command.commandId().nextEventId(), command.offerId(), participantId);
+    }
+
+    private PersonRegisteredEvent personRegisteredEvent(RegisterPersonCommand command, UUID participantId) {
+        return new PersonRegisteredEvent(command.commandId().nextEventId(), command.offerId(), participantId);
     }
 
     private UUID registerPerson() {

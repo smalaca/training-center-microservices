@@ -1,15 +1,15 @@
-name: Personal Data Management Module
+name: Open Trainings Module
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'personal-data-management/**'
+      - 'contracts/**'
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'personal-data-management/**'
+      - 'contracts/**'
 
 permissions:
   pull-requests: read
@@ -42,22 +42,14 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build Annotations
-        working-directory: ./annotations
-        run: mvn clean install
-
-      - name: Build Contracts
-        working-directory: ./contracts
-        run: mvn clean install
-
       - name: Tests
-        working-directory: ./personal-data-management
+        working-directory: ./contracts
         run: mvn clean verify
 
       - name: SonarCloud Scan
-        working-directory: ./personal-data-management
+        working-directory: ./contracts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-personal-data-management
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-contracts

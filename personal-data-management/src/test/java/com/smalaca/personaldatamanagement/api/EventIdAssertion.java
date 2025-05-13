@@ -1,21 +1,22 @@
-package com.smalaca.opentrainings.domain.eventid;
+package com.smalaca.personaldatamanagement.api;
 
-import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.contracts.metadata.CommandId;
+import com.smalaca.contracts.metadata.EventId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EventIdAssertion {
+class EventIdAssertion {
     private final EventId actual;
 
     private EventIdAssertion(EventId actual) {
         this.actual = actual;
     }
 
-    public static EventIdAssertion assertThatEventId(EventId actual) {
+    static EventIdAssertion assertThatEventId(EventId actual) {
         return new EventIdAssertion(actual);
     }
 
-    public void isNextAfter(CommandId commandId) {
+    void isNextAfter(CommandId commandId) {
         assertThat(actual.traceId()).isEqualTo(commandId.traceId());
         assertThat(actual.correlationId()).isEqualTo(commandId.correlationId());
         assertThat(actual.eventId()).isNotEqualTo(commandId.commandId());

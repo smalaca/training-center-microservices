@@ -14,5 +14,6 @@
         <module>open-trainings</module>
         <module>payment-gateway</module>
         <module>personal-data-management</module>
+        <module>contracts</module>
     </modules>
 </project>

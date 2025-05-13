@@ -1,6 +1,6 @@
-package com.smalaca.opentrainings.domain.offeracceptancesaga.events;
+package com.smalaca.contracts.offeracceptancesaga.events;
 
-import com.smalaca.opentrainings.domain.eventid.EventId;
+import com.smalaca.contracts.metadata.EventId;
 
 import java.util.UUID;
 
