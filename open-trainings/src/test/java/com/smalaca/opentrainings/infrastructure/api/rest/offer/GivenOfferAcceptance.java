@@ -1,15 +1,16 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
+import com.smalaca.contracts.metadata.EventId;
+import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
@@ -102,18 +103,23 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance alreadyRegisteredPersonFound() {
-        AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(newEventId(), offer.getOfferId(), participantId);
+        AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(externaNewEventId(), offer.getOfferId(), participantId);
         testListener.willReturnAlreadyRegisteredPersonFoundEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance personRegistered() {
-        PersonRegisteredEvent event = new PersonRegisteredEvent(newEventId(), offer.getOfferId(), participantId);
+        PersonRegisteredEvent event = new PersonRegisteredEvent(externaNewEventId(), offer.getOfferId(), participantId);
         testListener.willReturnPersonRegisteredEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }
+
+    private com.smalaca.contracts.metadata.EventId externaNewEventId() {
+        return com.smalaca.contracts.metadata.EventId.newEventId();
+    }
+
 
     OfferTestDto getOffer() {
         return offer;

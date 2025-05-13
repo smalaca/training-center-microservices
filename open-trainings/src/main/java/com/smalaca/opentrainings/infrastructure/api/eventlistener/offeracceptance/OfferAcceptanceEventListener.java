@@ -2,6 +2,7 @@ package com.smalaca.opentrainings.infrastructure.api.eventlistener.offeracceptan
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
+import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.OfferAcceptedEvent;
@@ -40,8 +41,15 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.person-registered}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(PersonRegisteredEvent event) {
-        engine.accept(event);
+    public void listen(com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent event) {
+        engine.accept(asPersonRegisteredEvent(event));
+    }
+
+    private PersonRegisteredEvent asPersonRegisteredEvent(com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent event) {
+        return new PersonRegisteredEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId());
     }
 
     @DrivenAdapter
@@ -49,8 +57,19 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.already-registered-person}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(AlreadyRegisteredPersonFoundEvent event) {
-        engine.accept(event);
+    public void listen(com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
+        engine.accept(asAlreadyRegisteredPersonFoundEvent(event));
+    }
+
+    private AlreadyRegisteredPersonFoundEvent asAlreadyRegisteredPersonFoundEvent(com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
+        return new AlreadyRegisteredPersonFoundEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId());
+    }
+
+    private EventId asEventId(com.smalaca.contracts.metadata.EventId eventId) {
+        return new EventId(eventId.eventId(), eventId.traceId(), eventId.correlationId(), eventId.creationDateTime());
     }
 
     @EventListener
