@@ -102,20 +102,20 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance alreadyRegisteredPersonFound() {
-        AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(externaNewEventId(), offer.getOfferId(), participantId);
+        AlreadyRegisteredPersonFoundEvent event = new AlreadyRegisteredPersonFoundEvent(externalNewEventId(), offer.getOfferId(), participantId);
         testListener.willReturnAlreadyRegisteredPersonFoundEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance personRegistered() {
-        PersonRegisteredEvent event = new PersonRegisteredEvent(externaNewEventId(), offer.getOfferId(), participantId);
+        PersonRegisteredEvent event = new PersonRegisteredEvent(externalNewEventId(), offer.getOfferId(), participantId);
         testListener.willReturnPersonRegisteredEventAfterRegisterPersonCommand(offer.getOfferId(), event);
 
         return this;
     }
 
-    private com.smalaca.contracts.metadata.EventId externaNewEventId() {
+    private com.smalaca.contracts.metadata.EventId externalNewEventId() {
         return com.smalaca.contracts.metadata.EventId.newEventId();
     }
 
