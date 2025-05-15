@@ -14,7 +14,7 @@ public record CommandId(UUID commandId, UUID traceId, UUID correlationId, LocalD
         return EventId.nextAfter(this);
     }
 
-    static CommandId nextAfter(EventId eventId) {
+    public static CommandId nextAfter(EventId eventId) {
         return new CommandId(id(), eventId.traceId(), eventId.correlationId(), now());
     }
 
