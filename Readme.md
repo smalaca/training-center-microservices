@@ -37,7 +37,7 @@ This documentation provides insights into the tools, techniques, and decisions m
 ### Prerequisites
 - Java 21
 - Docker and Docker Compose
-- Maven or Gradle
+- Maven
 
 ### Installation
 1. Clone the repository:
@@ -69,7 +69,6 @@ This documentation provides insights into the tools, techniques, and decisions m
 - **Spring Data JPA** - Data access
 - **Kafka** - Event streaming
 - **Docker** - Containerization
-- **Lombok** - Boilerplate code reduction
 
 ## 📋 Project Artifacts
 
