@@ -1,99 +1,135 @@
-# Training Center
-## CI/CD
-1. **Open Trainings:** 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings)
- 
-2. **Payment Gateway:**
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway)
+# 🎓 Training Center
+> A microservices-based educational platform demonstrating DDD and modern software architecture
 
-3. **Personal Data Management:**
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
-[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management)
+## 📊 Quality & CI/CD Status
 
-## Goal
-The purpose of this repository is to show how to build and maintain the project using following solutions:
-- microservices 
-- event storming 
-- port and adapters architecture
-- domain-driven design
+| Microservice | Quality Gate | Coverage | Bugs | Code Smells |
+|--------------|--------------|----------|------|-------------|
+| **Open Trainings** | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings) | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-open-trainings&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-open-trainings) |
+| **Payment Gateway** | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway) | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-payment-gateway&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-payment-gateway) |
+| **Personal Data** | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management) | [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=coverage)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management) | [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=bugs)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management) | [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=smalaca-github_training-center-microservices-personal-data-management&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=smalaca-github_training-center-microservices-personal-data-management) |
 
-## Table of Content
-Below you can find a link to articles that explains used tools and techniques, how the project was developed, and how the decision were made:
-1. [Technology](#technology)
-2. [Artefacts](#artefacts)
-3. [Business Overview](#business-overview)
-   1. [Brief description](#brief-description)
-   2. [High-level requirements](#high-level-requirements)
-4. [Education](#education)
-   1. [Articles](#articles)
-   2. [Books worth reading](#books-worth-reading)
-   2. [Resources](#resources)
+## 🎯 Project Goal
+This repository demonstrates how to build and maintain a modern microservices architecture following best practices and industry-standard patterns:
 
-## Technology
-- Docker
-- Kafka
-- Java 17
-- Spring Boot
+- **Microservices Architecture** - Decomposing a complex domain into manageable, independently deployable services
+- **Event Storming** - Collaborative domain exploration technique to identify bounded contexts
+- **Port and Adapters Architecture** (Hexagonal) - Separation of business logic from external concerns
+- **Domain-Driven Design** - Designing software to reflect the business domain and ubiquitous language
 
-## Artefacts
-- [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254) covers:
-  - Big Picture Event Storming
-  - Bounded Contexts
-  - Core Domains, Supporting and Generic subdomains
-  - Process Level Event Storming
-- [Architecture Decision Record](/documentation/architecture-decision-record)
+## 📑 Table of Contents
+This documentation provides insights into the tools, techniques, and decisions made throughout the project:
 
-## Business Overview
-### Brief description
-Institution that provides structured training and education in various fields.
+1. [Getting Started](#getting-started) - Setup and installation instructions
+2. [Technology Stack](#technology-stack) - Core technologies used in the project
+3. [Project Artifacts](#project-artifacts) - Event storming outputs and architecture decisions
+4. [Business Overview](#business-overview) - Domain understanding and requirements
+   1. [Brief Description](#brief-description)
+   2. [High-level Requirements](#high-level-requirements)
+5. [Educational Resources](#educational-resources)
+   1. [Articles](#articles) - Blog posts explaining project evolution
+   2. [Books Worth Reading](#books-worth-reading)
+   3. [External Resources](#external-resources)
+6. [Contributing](#contributing) - Guidelines for contributors
 
-### High-level requirements
-#### Trainings
-Trainings ready to be conducted and those under preparation.
-1. Viewing trainings by those who are interested in participation.
-2. Adding new and modifying existing trainings.
-3. Each training needs to have its supervisors.
+## 🚀 Getting Started
 
-#### Advertisement
-Activities made to attract potential attendees to participate in a training:
-1. Webinars.
-2. Talks on Conferences.
-3. Talks on internal events.
+### Prerequisites
+- Java 21
+- Docker and Docker Compose
+- Maven or Gradle
 
-#### Trainers
-Trainers the Training Center is working with.
-1. What trainings trainer can conduct.
-2. What skills a trainer has.
-3. Trainers' rates.
-4. History of conducted trainings with received feedback.
-5. Agreement between Trainer and the Training Center.
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/training-center.git
+   cd training-center
+   ```
 
-#### Open trainings
-Trainings anyone can join.
-1. Trainings' harmonogram.
-2. Payment.
-3. Resignation.
-4. Agreement with the Trainer who should conduct the training.
-5. Group limits.
-6. Cancellation.
+2. Build the project:
+   ```bash
+   ./mvnw clean install
+   ```
 
-#### Dedicated trainings
-Trainings organized for employees of other companies:
-1. Training adjustment and modifications.
-2. Conversations with company's representative.
-3. Non-Disclosure Agreement.
+3. Start the infrastructure services:
+   ```bash
+   docker-compose up -d
+   ```
 
-## Education
+4. Start each microservice:
+   ```bash
+   ./mvnw spring-boot:run -pl open-trainings
+   ./mvnw spring-boot:run -pl payment-gateway
+   ./mvnw spring-boot:run -pl personal-data-management
+   ```
+
+## 🛠️ Technology Stack
+- **Java 21** - Core programming language
+- **Spring Boot** - Application framework
+- **Spring Data JPA** - Data access
+- **Kafka** - Event streaming
+- **Docker** - Containerization
+- **Lombok** - Boilerplate code reduction
+
+## 📋 Project Artifacts
+
+### Event Storming
+All event storming sessions are documented in our [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254), which includes:
+- **Big Picture Event Storming** - Holistic view of the domain
+- **Bounded Contexts** - Service boundary identification
+- **Core/Supporting/Generic Domains** - Domain categorization
+- **Process Level Event Storming** - Detailed workflow mapping
+
+### Architecture Decisions
+We document significant architectural decisions in our [Architecture Decision Records (ADRs)](/documentation/architecture-decision-record) to provide context for future development.
+
+## 🏢 Business Overview
+
+### Brief Description
+The Training Center is an institution that provides structured training and education in various professional fields, connecting qualified trainers with individuals and organizations seeking to develop their skills.
+
+### High-level Requirements
+
+#### 📚 Trainings Management
+Management of training programs that are ready for delivery or in preparation:
+- **Discoverability**: Allow potential participants to browse available trainings
+- **Administration**: Support for creating and modifying training content
+- **Supervision**: Each training program has designated supervisors
+
+#### 📣 Marketing & Advertisement
+Activities designed to attract potential attendees:
+- **Webinars**: Free introductory sessions on relevant topics
+- **Conference Presentations**: Professional talks at industry events
+- **Internal Events**: Knowledge-sharing sessions within organizations
+
+#### 👨‍🏫 Trainer Management
+System for managing relationships with training professionals:
+- **Expertise Tracking**: Record of which trainings each trainer can conduct
+- **Skills Database**: Comprehensive skills inventory for each trainer
+- **Financial Management**: Tracking of trainer rates and payments
+- **Performance History**: Record of past trainings with participant feedback
+- **Contractual Management**: Handling trainer agreements and terms
+
+#### 🌐 Open Trainings
+Public training sessions open to individual registration:
+- **Scheduling**: Management of training dates and times
+- **Payment Processing**: Handling of participant payments
+- **Cancellation Handling**: Process for participant resignations
+- **Trainer Agreements**: Management of contracts with training providers
+- **Capacity Planning**: Enforcement of minimum/maximum group sizes
+- **Cancellation Policies**: Rules for training cancellations
+
+#### 🏭 Dedicated Trainings
+Custom training programs for corporate clients:
+- **Customization**: Ability to adjust training content to company needs
+- **Client Communication**: Interface for discussions with company representatives
+- **Confidentiality**: Management of Non-Disclosure Agreements
+
+## 📚 Educational Resources
+The following resources explain the evolution of this project and the reasoning behind key decisions:
+
 ### Articles
-List of the articles that explains how the project evolved and explains how decisions were made:
+A chronological series of blog posts documenting the project journey:
 1. **Introduction**
    1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
    2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
@@ -172,7 +208,7 @@ List of the articles that explains how the project evolved and explains how deci
 - **Testing**
    - [Developer Testing: Building Quality into Software](https://www.oreilly.com/library/view/developer-testing-building/9780134291109/) by Alexander Tarlinder
 
-### Resources
+### External Resources
 - **Architecture Decision Record**
   - [Architecture decision record](https://github.com/joelparkerhenderson/architecture-decision-record) (ADR) by Joel Parker Henderson
 - **Event Storming**
@@ -180,3 +216,22 @@ List of the articles that explains how the project evolved and explains how deci
   - [Introducing Event Storming](https://ziobrando.blogspot.com/2013/11/introducing-event-storming.html) by Alberto Brandolini
 - **Testing**
   - [ArchUnit](https://www.archunit.org/)
+
+## 🤝 Contributing
+Contributions are welcome! Here's how you can help improve this project:
+
+### Development Process
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Guidelines
+- Follow the existing code style and architectural patterns
+- Write tests for new features
+- Update documentation as needed
+- Adhere to DDD principles when implementing domain logic
+
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
