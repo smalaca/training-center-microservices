@@ -34,9 +34,12 @@ kafka:
     offer-acceptance:
       commands:
         register-person: open-training-offer-acceptance-register-person-command-topic
+        use-discount-code: open-training-offer-acceptance-use-discount-code-command-topic
       events:
         person-registered: open-training-offer-acceptance-person-registered-event-topic
         already-registered-person: open-training-offer-acceptance-already-registered-person-event-topic
+        discount-code-used: open-training-offer-acceptance-discount-code-used-event-topic
+        discount-code-already-used: open-training-offer-acceptance-discount-code-already-used-event-topic
     order:
       pivotal:
         training-purchased: open-training-training-purchased-topic

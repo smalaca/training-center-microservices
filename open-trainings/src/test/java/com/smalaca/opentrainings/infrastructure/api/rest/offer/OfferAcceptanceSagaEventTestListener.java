@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
 import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
@@ -22,21 +24,28 @@ class OfferAcceptanceSagaEventTestListener {
     private final ApplicationEventPublisher publisher;
     private final String registerPersonCommandTopic;
     private final String alreadyRegisteredPersonCommandTopic;
+    private final String discountCodeUsedEventTopic;
+    private final String discountCodeAlreadyUsedEventTopic;
     private final Map<UUID, AlreadyRegisteredPersonFoundEvent> alreadyRegisteredPersonFoundEvents = new HashMap<>();
     private final Map<UUID, PersonRegisteredEvent> personRegisteredEvents = new HashMap<>();
+    private final Map<UUID, DiscountCodeUsedEvent> discountCodeUsedEvents = new HashMap<>();
+    private final Map<UUID, DiscountCodeAlreadyUsedEvent> discountCodeAlreadyUsedEvents = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterConfirmTrainingPriceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterBookTrainingPlaceCommand = new HashMap<>();
-    private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterUseDiscountCodeCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterReturnDiscountCodeCommand = new HashMap<>();
 
     OfferAcceptanceSagaEventTestListener(
             KafkaTemplate<String, Object> producerFactory, ApplicationEventPublisher publisher,
-            @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registerPersonCommandTopic,
-            @Value("${kafka.topics.offer-acceptance.events.already-registered-person}") String alreadyRegisteredPersonCommandTopic) {
+            @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registeredPersonEventTopic,
+            @Value("${kafka.topics.offer-acceptance.events.already-registered-person}") String alreadyRegisteredPersonEventTopic,
+            @Value("${kafka.topics.offer-acceptance.events.discount-code-used}") String discountCodeUsedEventTopic,
+            @Value("${kafka.topics.offer-acceptance.events.discount-code-already-used}") String discountCodeAlreadyUsedEventTopic) {
         this.producerFactory = producerFactory;
         this.publisher = publisher;
-        this.registerPersonCommandTopic = registerPersonCommandTopic;
-        this.alreadyRegisteredPersonCommandTopic = alreadyRegisteredPersonCommandTopic;
+        this.registerPersonCommandTopic = registeredPersonEventTopic;
+        this.alreadyRegisteredPersonCommandTopic = alreadyRegisteredPersonEventTopic;
+        this.discountCodeUsedEventTopic = discountCodeUsedEventTopic;
+        this.discountCodeAlreadyUsedEventTopic = discountCodeAlreadyUsedEventTopic;
     }
 
     @EventListener
@@ -57,6 +66,23 @@ class OfferAcceptanceSagaEventTestListener {
     }
 
     @EventListener
+    void listen(UseDiscountCodeCommand command) {
+        if (discountCodeUsedEvents.containsKey(command.offerId())) {
+            producerFactory.send(discountCodeUsedEventTopic, discountCodeUsedEvents.get(command.offerId()));
+        } else {
+            producerFactory.send(discountCodeAlreadyUsedEventTopic, discountCodeAlreadyUsedEvents.get(command.offerId()));
+        }
+    }
+
+    void willReturnDiscountCodeUsedEventAfterUseDiscountCodeCommand(UUID offerId, DiscountCodeUsedEvent event) {
+        discountCodeUsedEvents.put(offerId, event);
+    }
+
+    void willReturnDiscountCodeAlreadyUsedEventAfterUseDiscountCodeCommand(UUID offerId, DiscountCodeAlreadyUsedEvent event) {
+        discountCodeAlreadyUsedEvents.put(offerId, event);
+    }
+
+    @EventListener
     void listen(ConfirmTrainingPriceCommand command) {
         publisher.publishEvent(eventsAfterConfirmTrainingPriceCommand.get(command.offerId()));
     }
@@ -72,15 +98,6 @@ class OfferAcceptanceSagaEventTestListener {
 
     void willReturnAfterBookTrainingPlaceCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
         eventsAfterBookTrainingPlaceCommand.put(offerId, event);
-    }
-
-    @EventListener
-    void listen(UseDiscountCodeCommand command) {
-        publisher.publishEvent(eventsAfterUseDiscountCodeCommand.get(command.offerId()));
-    }
-
-    void willReturnAfterUseDiscountCodeCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
-        eventsAfterUseDiscountCodeCommand.put(offerId, event);
     }
 
     @EventListener

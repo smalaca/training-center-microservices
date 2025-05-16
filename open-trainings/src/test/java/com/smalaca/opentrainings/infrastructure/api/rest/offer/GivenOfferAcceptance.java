@@ -1,13 +1,13 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
 import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
@@ -53,16 +53,16 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance discountAlreadyUsed(String discountCode) {
-        OfferAcceptanceSagaEvent event = new DiscountCodeAlreadyUsedEvent(newEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode);
-        testListener.willReturnAfterUseDiscountCodeCommand(offer.getOfferId(), event);
+        DiscountCodeAlreadyUsedEvent event = new DiscountCodeAlreadyUsedEvent(externalNewEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode);
+        testListener.willReturnDiscountCodeAlreadyUsedEventAfterUseDiscountCodeCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance discountUsed(String discountCode) {
-        OfferAcceptanceSagaEvent event = new DiscountCodeUsedEvent(
-                newEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode, offer.getTrainingPrice().amount(), randomAmount(), offer.getTrainingPrice().currencyCode());
-        testListener.willReturnAfterUseDiscountCodeCommand(offer.getOfferId(), event);
+        DiscountCodeUsedEvent event = new DiscountCodeUsedEvent(
+                externalNewEventId(), offer.getOfferId(), participantId, offer.getTrainingId(), discountCode, offer.getTrainingPrice().amount(), randomAmount(), offer.getTrainingPrice().currencyCode());
+        testListener.willReturnDiscountCodeUsedEventAfterUseDiscountCodeCommand(offer.getOfferId(), event);
 
         return this;
     }
