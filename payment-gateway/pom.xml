@@ -54,8 +54,9 @@
 
         <dependency>
             <groupId>com.smalaca</groupId>
-            <artifactId>annotations</artifactId>
+            <artifactId>annotations-test</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

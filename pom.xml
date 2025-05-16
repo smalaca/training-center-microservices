@@ -11,6 +11,7 @@
 
     <modules>
         <module>annotations</module>
+        <module>annotations-test</module>
         <module>contracts</module>
         <module>discount-management</module>
         <module>open-trainings</module>
