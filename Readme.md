@@ -62,6 +62,7 @@ This documentation provides insights into the tools, techniques, and decisions m
    ./mvnw spring-boot:run -pl open-trainings
    ./mvnw spring-boot:run -pl payment-gateway
    ./mvnw spring-boot:run -pl personal-data-management
+   ./mvnw spring-boot:run -pl discount-management
    ```
 
 ## 🛠️ Technology Stack
