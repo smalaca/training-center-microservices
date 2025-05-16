@@ -1,0 +1,17 @@
+server:
+  port: 9030
+
+spring:
+  jackson:
+    serialization:
+      indent_output: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  group-id: discount-management
+  topics:
+    command:
+      use-discount-code: open-training-offer-acceptance-use-discount-code-command-topic
+    event:
+      discount-code-used: open-training-offer-acceptance-discount-code-used-event-topic
+      discount-code-already-used: open-training-offer-acceptance-discount-code-already-used-event-topic
