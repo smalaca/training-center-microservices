@@ -102,16 +102,43 @@ public class OfferAcceptanceEventListener {
         engine.accept(event);
     }
 
-    @EventListener
     @DrivenAdapter
-    public void listen(DiscountCodeUsedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.discount-code-used}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
+        engine.accept(asDiscountCodeUsedEvent(event));
     }
 
-    @EventListener
+    private DiscountCodeUsedEvent asDiscountCodeUsedEvent(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
+        return new DiscountCodeUsedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId(),
+                event.trainingId(),
+                event.discountCode(),
+                event.originalPrice(),
+                event.newPrice(),
+                event.priceCurrency());
+    }
+
     @DrivenAdapter
-    public void listen(DiscountCodeAlreadyUsedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.discount-code-already-used}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
+        engine.accept(asDiscountCodeAlreadyUsedEvent(event));
+    }
+
+    private DiscountCodeAlreadyUsedEvent asDiscountCodeAlreadyUsedEvent(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
+        return new DiscountCodeAlreadyUsedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId(),
+                event.trainingId(),
+                event.discountCode());
     }
 
     @EventListener

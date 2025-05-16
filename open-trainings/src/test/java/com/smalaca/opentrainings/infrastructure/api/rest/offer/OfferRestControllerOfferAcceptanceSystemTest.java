@@ -31,6 +31,8 @@ import static org.awaitility.Awaitility.await;
 @TestPropertySource(properties = {
         "kafka.topics.offer-acceptance.events.person-registered=offer-acceptance-person-registered-event-topic",
         "kafka.topics.offer-acceptance.events.already-registered-person=offer-acceptance-already-registered-person-event-topic",
+        "kafka.topics.offer-acceptance.events.discount-code-used=offer-acceptance-discount-code-used-event-topic",
+        "kafka.topics.offer-acceptance.events.discount-code-already-used=offer-acceptance-discount-code-already-used-event-topic",
 })
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();

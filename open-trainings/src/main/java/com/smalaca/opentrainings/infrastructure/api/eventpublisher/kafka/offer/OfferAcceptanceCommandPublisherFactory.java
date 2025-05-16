@@ -10,8 +10,9 @@ class OfferAcceptanceCommandPublisherFactory {
     @Bean
     OfferAcceptanceCommandPublisher offerAcceptanceCommandPublisher(
             KafkaTemplate<String, Object> kafkaTemplate,
-            @Value("${kafka.topics.offer-acceptance.commands.register-person}") String registerPersonTopic) {
-        Topics topics = new Topics(registerPersonTopic);
+            @Value("${kafka.topics.offer-acceptance.commands.register-person}") String registerPersonTopic,
+            @Value("${kafka.topics.offer-acceptance.commands.use-discount-code}") String useDiscountCodeTopic) {
+        Topics topics = new Topics(registerPersonTopic, useDiscountCodeTopic);
 
         return new OfferAcceptanceCommandPublisher(kafkaTemplate, topics);
     }
