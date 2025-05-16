@@ -6,11 +6,14 @@ import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedE
 import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
@@ -47,7 +50,16 @@ class DiscountCommandProcessorIntegrationTest {
     private KafkaTemplate<String, Object> producerFactory;
 
     @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+    @Autowired
     private DiscountManagementPivotalEventTestConsumer consumer;
+
+    @BeforeEach
+    void init() {
+        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
+                listenerContainer -> ContainerTestUtils.waitForAssignment(listenerContainer, 1));
+    }
 
     @Test
     void shouldPublishDiscountCodeUsedEvent() {
