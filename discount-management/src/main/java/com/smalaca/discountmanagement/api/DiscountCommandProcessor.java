@@ -9,8 +9,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 @Service
 public class DiscountCommandProcessor {
@@ -19,7 +19,7 @@ public class DiscountCommandProcessor {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String discountCodeUsedTopic;
     private final String discountCodeAlreadyUsedTopic;
-    private final Set<String> usedDiscountCodes = new HashSet<>();
+    private final Set<String> usedDiscountCodes = new ConcurrentSkipListSet<>();
 
     DiscountCommandProcessor(
             KafkaTemplate<String, Object> kafkaTemplate,
