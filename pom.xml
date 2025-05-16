@@ -11,9 +11,10 @@
 
     <modules>
         <module>annotations</module>
+        <module>contracts</module>
+        <module>discount-management</module>
         <module>open-trainings</module>
         <module>payment-gateway</module>
         <module>personal-data-management</module>
-        <module>contracts</module>
     </modules>
 </project>
