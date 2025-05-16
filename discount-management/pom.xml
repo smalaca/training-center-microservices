@@ -136,7 +136,7 @@
                         <configuration>
                             <dataFile>${project.basedir}/target/coverage-reports/jacoco-ut.exec</dataFile>
                             <excludes>
-                                <exclude>com/smalaca/discount/management/DiscountManagementApplication.class</exclude>
+                                <exclude>com/smalaca/discountmanagement/DiscountManagementApplication.class</exclude>
                             </excludes>
                             <rules>
                                 <rule>
