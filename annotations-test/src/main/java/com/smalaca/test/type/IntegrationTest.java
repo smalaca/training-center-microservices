@@ -1,6 +1,6 @@
 package com.smalaca.test.type;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.Tag;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,7 +9,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@IntegrationTest
-@SpringBootTest
-public @interface SpringBootIntegrationTest {
+@Tag("IntegrationTest")
+public @interface IntegrationTest {
 }
