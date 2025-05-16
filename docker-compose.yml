@@ -35,6 +35,9 @@ services:
       kafka-topics --create --topic open-training-offer-acceptance-register-person-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic open-training-offer-acceptance-already-registered-person-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic open-training-offer-acceptance-person-registered-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
+      kafka-topics --create --topic open-training-offer-acceptance-use-discount-code-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
+      kafka-topics --create --topic open-training-offer-acceptance-discount-code-used-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
+      kafka-topics --create --topic open-training-offer-acceptance-discount-code-already-used-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
       "
 volumes:
   kafka-data:
