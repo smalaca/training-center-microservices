@@ -6,15 +6,20 @@ import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedE
 import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.smalaca.discountmanagement.api.DiscountCodeAlreadyUsedEventAssertion.assertThatDiscountCodeAlreadyUsedEvent;
@@ -39,12 +44,22 @@ class DiscountCommandProcessorIntegrationTest {
     protected static final String USE_DISCOUNT_CODE_COMMAND_TOPIC = "use-discount-code-command-topic";
     protected static final String DISCOUNT_CODE_ALREADY_USED_EVENT_TOPIC = "discount-code-already-used-event-topic";
     protected static final String DISCOUNT_CODE_USED_EVENT_TOPIC = "discount-code-used-event-topic";
+    private final Set<String> discountCodes = new HashSet<>();
 
     @Autowired
     private KafkaTemplate<String, Object> producerFactory;
 
     @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+    @Autowired
     private DiscountManagementPivotalEventTestConsumer consumer;
+
+    @BeforeEach
+    void init() {
+        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
+                listenerContainer -> ContainerTestUtils.waitForAssignment(listenerContainer, 1));
+    }
 
     @Test
     void shouldPublishDiscountCodeUsedEvent() {
@@ -112,7 +127,14 @@ class DiscountCommandProcessorIntegrationTest {
     }
 
     private String randomDiscountCode() {
-        return FAKER.commerce().promotionCode();
+        String discountCode = FAKER.commerce().promotionCode();
+
+        if (discountCodes.contains(discountCode)) {
+            return randomDiscountCode();
+        }
+
+        discountCodes.add(discountCode);
+        return discountCode;
     }
 
     private static UUID randomId() {
