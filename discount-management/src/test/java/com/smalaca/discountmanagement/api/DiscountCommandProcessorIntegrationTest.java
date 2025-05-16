@@ -14,8 +14,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.smalaca.discountmanagement.api.DiscountCodeAlreadyUsedEventAssertion.assertThatDiscountCodeAlreadyUsedEvent;
@@ -40,7 +41,7 @@ class DiscountCommandProcessorIntegrationTest {
     protected static final String USE_DISCOUNT_CODE_COMMAND_TOPIC = "use-discount-code-command-topic";
     protected static final String DISCOUNT_CODE_ALREADY_USED_EVENT_TOPIC = "discount-code-already-used-event-topic";
     protected static final String DISCOUNT_CODE_USED_EVENT_TOPIC = "discount-code-used-event-topic";
-    private final ArrayList<Object> discountCodes = new ArrayList<>();
+    private final Set<String> discountCodes = new HashSet<>();
 
     @Autowired
     private KafkaTemplate<String, Object> producerFactory;
