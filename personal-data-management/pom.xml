@@ -61,12 +61,6 @@
 
         <dependency>
             <groupId>com.smalaca</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.smalaca</groupId>
             <artifactId>contracts</artifactId>
             <version>${project.version}</version>
         </dependency>

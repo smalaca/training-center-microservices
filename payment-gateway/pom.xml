@@ -51,12 +51,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.smalaca</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
