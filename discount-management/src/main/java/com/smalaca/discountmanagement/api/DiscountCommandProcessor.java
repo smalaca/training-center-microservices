@@ -1,0 +1,76 @@
+package com.smalaca.discountmanagement.api;
+
+import com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+
+@Service
+public class DiscountCommandProcessor {
+    private static final BigDecimal DEFAULT_DISCOUNT_PERCENTAGE = new BigDecimal("0.10");
+    
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final String discountCodeUsedTopic;
+    private final String discountCodeAlreadyUsedTopic;
+    private final Set<String> usedDiscountCodes = new HashSet<>();
+
+    DiscountCommandProcessor(
+            KafkaTemplate<String, Object> kafkaTemplate,
+            @Value("${kafka.topics.event.discount-code-used}") String discountCodeUsedTopic,
+            @Value("${kafka.topics.event.discount-code-already-used}") String discountCodeAlreadyUsedTopic) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.discountCodeUsedTopic = discountCodeUsedTopic;
+        this.discountCodeAlreadyUsedTopic = discountCodeAlreadyUsedTopic;
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topics.command.use-discount-code}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void process(UseDiscountCodeCommand command) {
+        String discountCode = command.discountCode();
+
+        if (usedDiscountCodes.contains(discountCode)) {
+            DiscountCodeAlreadyUsedEvent event = createDiscountCodeAlreadyUsedEvent(command);
+            kafkaTemplate.send(discountCodeAlreadyUsedTopic, event);
+        } else {
+            usedDiscountCodes.add(discountCode);
+            DiscountCodeUsedEvent event = createDiscountCodeUsedEvent(command);
+            kafkaTemplate.send(discountCodeUsedTopic, event);
+        }
+    }
+
+    private DiscountCodeAlreadyUsedEvent createDiscountCodeAlreadyUsedEvent(UseDiscountCodeCommand command) {
+        return new DiscountCodeAlreadyUsedEvent(
+                command.commandId().nextEventId(),
+                command.offerId(),
+                command.participantId(),
+                command.trainingId(),
+                command.discountCode()
+        );
+    }
+
+    private DiscountCodeUsedEvent createDiscountCodeUsedEvent(UseDiscountCodeCommand command) {
+        BigDecimal originalPrice = command.priceAmount();
+        BigDecimal discountAmount = originalPrice.multiply(DEFAULT_DISCOUNT_PERCENTAGE);
+        BigDecimal newPrice = originalPrice.subtract(discountAmount);
+
+        return new DiscountCodeUsedEvent(
+                command.commandId().nextEventId(),
+                command.offerId(),
+                command.participantId(),
+                command.trainingId(),
+                command.discountCode(),
+                originalPrice,
+                newPrice,
+                command.priceCurrencyCode()
+        );
+    }
+}
