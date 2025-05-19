@@ -1,7 +1,7 @@
 package com.smalaca.discountmanagement.api;
 
-import com.smalaca.contracts.metadata.CommandId;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 
 import java.util.UUID;
 

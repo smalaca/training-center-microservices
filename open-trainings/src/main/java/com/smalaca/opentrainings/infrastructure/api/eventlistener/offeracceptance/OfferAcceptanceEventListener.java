@@ -41,11 +41,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.person-registered}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent event) {
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent event) {
         engine.accept(asPersonRegisteredEvent(event));
     }
 
-    private PersonRegisteredEvent asPersonRegisteredEvent(com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent event) {
+    private PersonRegisteredEvent asPersonRegisteredEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent event) {
         return new PersonRegisteredEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
@@ -57,18 +57,18 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.already-registered-person}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
         engine.accept(asAlreadyRegisteredPersonFoundEvent(event));
     }
 
-    private AlreadyRegisteredPersonFoundEvent asAlreadyRegisteredPersonFoundEvent(com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
+    private AlreadyRegisteredPersonFoundEvent asAlreadyRegisteredPersonFoundEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent event) {
         return new AlreadyRegisteredPersonFoundEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
                 event.participantId());
     }
 
-    private EventId asEventId(com.smalaca.contracts.metadata.EventId eventId) {
+    private EventId asEventId(com.smalaca.schemaregistry.metadata.EventId eventId) {
         return new EventId(eventId.eventId(), eventId.traceId(), eventId.correlationId(), eventId.creationDateTime());
     }
 
@@ -107,11 +107,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.discount-code-used}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
         engine.accept(asDiscountCodeUsedEvent(event));
     }
 
-    private DiscountCodeUsedEvent asDiscountCodeUsedEvent(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
+    private DiscountCodeUsedEvent asDiscountCodeUsedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent event) {
         return new DiscountCodeUsedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
@@ -128,11 +128,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.discount-code-already-used}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
         engine.accept(asDiscountCodeAlreadyUsedEvent(event));
     }
 
-    private DiscountCodeAlreadyUsedEvent asDiscountCodeAlreadyUsedEvent(com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
+    private DiscountCodeAlreadyUsedEvent asDiscountCodeAlreadyUsedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent event) {
         return new DiscountCodeAlreadyUsedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),

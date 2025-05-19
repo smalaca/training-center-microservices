@@ -1,7 +1,7 @@
 package com.smalaca.discountmanagement.api;
 
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;

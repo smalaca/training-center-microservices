@@ -25,8 +25,8 @@ public class OfferAcceptanceCommandPublisher {
         kafkaTemplate.send(topics.useDiscountCode(), asExternalUseDiscountCodeCommand(command));
     }
 
-    private com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand asExternalRegisterPersonCommand(RegisterPersonCommand command) {
-        return new com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand(
+    private com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand asExternalRegisterPersonCommand(RegisterPersonCommand command) {
+        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.firstName(),
@@ -34,8 +34,8 @@ public class OfferAcceptanceCommandPublisher {
                 command.email());
     }
 
-    private com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand asExternalUseDiscountCodeCommand(UseDiscountCodeCommand command) {
-        return new com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand(
+    private com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand asExternalUseDiscountCodeCommand(UseDiscountCodeCommand command) {
+        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.participantId(),
@@ -45,8 +45,8 @@ public class OfferAcceptanceCommandPublisher {
                 command.discountCode());
     }
 
-    private com.smalaca.contracts.metadata.CommandId asExternalCommandId(CommandId commandId) {
-        return new com.smalaca.contracts.metadata.CommandId(
+    private com.smalaca.schemaregistry.metadata.CommandId asExternalCommandId(CommandId commandId) {
+        return new com.smalaca.schemaregistry.metadata.CommandId(
                 commandId.commandId(),
                 commandId.traceId(),
                 commandId.correlationId(),

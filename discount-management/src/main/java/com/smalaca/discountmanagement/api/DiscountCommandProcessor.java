@@ -1,8 +1,8 @@
 package com.smalaca.discountmanagement.api;
 
-import com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;

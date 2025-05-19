@@ -1,8 +1,8 @@
 package com.smalaca.personaldatamanagement.api;
 
 
-import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;

@@ -52,7 +52,7 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         publisher.consume(command);
 
         await().untilAsserted(() -> {
-            Optional<com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand> actual = consumer.registerPersonCommandFor(command.offerId());
+            Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand> actual = consumer.registerPersonCommandFor(command.offerId());
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), command);
         });
@@ -70,7 +70,7 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         return FAKER.code().ean13();
     }
 
-    private void assertThatContainsSameData(com.smalaca.contracts.offeracceptancesaga.commands.RegisterPersonCommand actual, RegisterPersonCommand expected) {
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand actual, RegisterPersonCommand expected) {
         assertThatContainsSameData(actual.commandId(), expected.commandId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.firstName()).isEqualTo(expected.firstName());
@@ -85,13 +85,13 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         publisher.consume(command);
 
         await().untilAsserted(() -> {
-            Optional<com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand> actual = consumer.useDiscountCodeCommandFor(command.offerId());
+            Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand> actual = consumer.useDiscountCodeCommandFor(command.offerId());
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), command);
         });
     }
 
-    private void assertThatContainsSameData(com.smalaca.contracts.offeracceptancesaga.commands.UseDiscountCodeCommand actual, UseDiscountCodeCommand expected) {
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand actual, UseDiscountCodeCommand expected) {
         assertThatContainsSameData(actual.commandId(), expected.commandId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.participantId()).isEqualTo(expected.participantId());
@@ -109,7 +109,7 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         return new TrainingPriceNotChangedEvent(newEventId(), randomId(), randomId());
     }
 
-    private void assertThatContainsSameData(com.smalaca.contracts.metadata.CommandId actual, CommandId expected) {
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.metadata.CommandId actual, CommandId expected) {
         assertThat(actual.commandId()).isEqualTo(expected.commandId());
         assertThat(actual.traceId()).isEqualTo(expected.traceId());
         assertThat(actual.correlationId()).isEqualTo(expected.correlationId());
