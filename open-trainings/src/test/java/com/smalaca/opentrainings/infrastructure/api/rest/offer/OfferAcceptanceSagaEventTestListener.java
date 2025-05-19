@@ -1,9 +1,9 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
-import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.DiscountCodeUsedEvent;
-import com.smalaca.contracts.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;

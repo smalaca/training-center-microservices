@@ -1,7 +1,7 @@
 package com.smalaca.personaldatamanagement.api;
 
-import com.smalaca.contracts.metadata.CommandId;
-import com.smalaca.contracts.metadata.EventId;
+import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.metadata.EventId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

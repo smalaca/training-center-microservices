@@ -12,7 +12,7 @@
     <modules>
         <module>annotations</module>
         <module>annotations-test</module>
-        <module>contracts</module>
+        <module>schema-registry</module>
         <module>discount-management</module>
         <module>open-trainings</module>
         <module>payment-gateway</module>

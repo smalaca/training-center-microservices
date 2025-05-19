@@ -1,7 +1,7 @@
 package com.smalaca.personaldatamanagement.api;
 
-import com.smalaca.contracts.metadata.CommandId;
-import com.smalaca.contracts.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
+import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 
 import java.util.UUID;
 

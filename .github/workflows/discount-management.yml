@@ -42,8 +42,8 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build Contracts
-        working-directory: ./contracts
+      - name: Build Schema Registry
+        working-directory: ./schema-registry
         run: mvn clean install
 
       - name: Build Test Annotations

@@ -68,7 +68,7 @@
 
         <dependency>
             <groupId>com.smalaca</groupId>
-            <artifactId>contracts</artifactId>
+            <artifactId>schema-registry</artifactId>
             <version>${project.version}</version>
         </dependency>
 

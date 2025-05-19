@@ -46,8 +46,8 @@ jobs:
         working-directory: ./annotations-test
         run: mvn clean install
 
-      - name: Build Contracts
-        working-directory: ./contracts
+      - name: Build Schema Registry
+        working-directory: ./schema-registry
         run: mvn clean install
 
       - name: Tests
