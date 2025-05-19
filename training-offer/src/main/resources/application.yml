@@ -1,0 +1,17 @@
+server:
+  port: 9040
+
+spring:
+  jackson:
+    serialization:
+      indent_output: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  group-id: training-offer
+  topics:
+    command:
+      confirm-training-price: open-training-offer-acceptance-confirm-training-price-command-topic
+    event:
+      training-price-changed: open-training-offer-acceptance-training-price-changed-event-topic
+      training-price-not-changed: open-training-offer-acceptance-training-price-not-changed-event-topic
