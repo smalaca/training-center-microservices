@@ -72,6 +72,11 @@ This documentation provides insights into the tools, techniques, and decisions m
 - **Kafka** - Event streaming
 - **Docker** - Containerization
 
+## 📦 Modules
+- **annotations** - Java annotations for marking architectural patterns like CQRS and Ports and Adapters, as well as domain-driven design concepts
+- **annotations-test** - Annotations for categorizing and organizing tests, particularly in a JUnit and Spring Boot context
+- **schema-registry** - Classes for managing metadata and schemas in an event-driven architecture
+
 ## 📋 Project Artifacts
 
 ### Event Storming
