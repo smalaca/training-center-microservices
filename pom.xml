@@ -18,5 +18,7 @@
         <module>payment-gateway</module>
         <module>personal-data-management</module>
         <module>training-offer</module>
+        <module>training-management</module>
+        <module>training-portfolio</module>
     </modules>
 </project>
