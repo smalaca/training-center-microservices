@@ -4,6 +4,8 @@ import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPe
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
@@ -26,11 +28,14 @@ class OfferAcceptanceSagaEventTestListener {
     private final String alreadyRegisteredPersonCommandTopic;
     private final String discountCodeUsedEventTopic;
     private final String discountCodeAlreadyUsedEventTopic;
+    private final String trainingPriceChangedEventTopic;
+    private final String trainingPriceNotChangedEventTopic;
     private final Map<UUID, AlreadyRegisteredPersonFoundEvent> alreadyRegisteredPersonFoundEvents = new HashMap<>();
     private final Map<UUID, PersonRegisteredEvent> personRegisteredEvents = new HashMap<>();
     private final Map<UUID, DiscountCodeUsedEvent> discountCodeUsedEvents = new HashMap<>();
     private final Map<UUID, DiscountCodeAlreadyUsedEvent> discountCodeAlreadyUsedEvents = new HashMap<>();
-    private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterConfirmTrainingPriceCommand = new HashMap<>();
+    private final Map<UUID, TrainingPriceChangedEvent> trainingPriceChangedEvents = new HashMap<>();
+    private final Map<UUID, TrainingPriceNotChangedEvent> trainingPriceNotChangedEvents = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterBookTrainingPlaceCommand = new HashMap<>();
     private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterReturnDiscountCodeCommand = new HashMap<>();
 
@@ -39,13 +44,17 @@ class OfferAcceptanceSagaEventTestListener {
             @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registeredPersonEventTopic,
             @Value("${kafka.topics.offer-acceptance.events.already-registered-person}") String alreadyRegisteredPersonEventTopic,
             @Value("${kafka.topics.offer-acceptance.events.discount-code-used}") String discountCodeUsedEventTopic,
-            @Value("${kafka.topics.offer-acceptance.events.discount-code-already-used}") String discountCodeAlreadyUsedEventTopic) {
+            @Value("${kafka.topics.offer-acceptance.events.discount-code-already-used}") String discountCodeAlreadyUsedEventTopic,
+            @Value("${kafka.topics.offer-acceptance.events.training-price-changed}") String trainingPriceChangedEventTopic,
+            @Value("${kafka.topics.offer-acceptance.events.training-price-not-changed}") String trainingPriceNotChangedEventTopic) {
         this.producerFactory = producerFactory;
         this.publisher = publisher;
         this.registerPersonCommandTopic = registeredPersonEventTopic;
         this.alreadyRegisteredPersonCommandTopic = alreadyRegisteredPersonEventTopic;
         this.discountCodeUsedEventTopic = discountCodeUsedEventTopic;
         this.discountCodeAlreadyUsedEventTopic = discountCodeAlreadyUsedEventTopic;
+        this.trainingPriceChangedEventTopic = trainingPriceChangedEventTopic;
+        this.trainingPriceNotChangedEventTopic = trainingPriceNotChangedEventTopic;
     }
 
     @EventListener
@@ -84,11 +93,19 @@ class OfferAcceptanceSagaEventTestListener {
 
     @EventListener
     void listen(ConfirmTrainingPriceCommand command) {
-        publisher.publishEvent(eventsAfterConfirmTrainingPriceCommand.get(command.offerId()));
+        if (trainingPriceChangedEvents.containsKey(command.offerId())) {
+            producerFactory.send(trainingPriceChangedEventTopic, trainingPriceChangedEvents.get(command.offerId()));
+        } else {
+            producerFactory.send(trainingPriceNotChangedEventTopic, trainingPriceNotChangedEvents.get(command.offerId()));
+        }
     }
 
-    void willReturnAfterConfirmTrainingPriceCommand(UUID offerId, OfferAcceptanceSagaEvent event) {
-        eventsAfterConfirmTrainingPriceCommand.put(offerId, event);
+    void willReturnTrainingPriceChangedEventAfterConfirmTrainingPriceCommand(UUID offerId, TrainingPriceChangedEvent event) {
+        trainingPriceChangedEvents.put(offerId, event);
+    }
+
+    void willReturnTrainingPriceNotChangedEventAfterConfirmTrainingPriceCommand(UUID offerId, TrainingPriceNotChangedEvent event) {
+        trainingPriceNotChangedEvents.put(offerId, event);
     }
 
     @EventListener

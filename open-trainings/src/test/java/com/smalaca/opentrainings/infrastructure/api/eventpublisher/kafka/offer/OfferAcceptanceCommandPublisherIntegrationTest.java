@@ -1,6 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
@@ -91,6 +93,27 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         });
     }
 
+    @Test
+    void shouldPublishConfirmTrainingPriceCommand() {
+        ConfirmTrainingPriceCommand command = confirmTrainingPriceCommand();
+
+        publisher.consume(command);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand> actual = consumer.confirmTrainingPriceCommandFor(command.offerId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), command);
+        });
+    }
+
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand actual, ConfirmTrainingPriceCommand expected) {
+        assertThatContainsSameData(actual.commandId(), expected.commandId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
+        assertThat(actual.priceAmount()).isEqualTo(expected.priceAmount());
+        assertThat(actual.priceCurrencyCode()).isEqualTo(expected.priceCurrencyCode());
+    }
+
     private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand actual, UseDiscountCodeCommand expected) {
         assertThatContainsSameData(actual.commandId(), expected.commandId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
@@ -99,6 +122,14 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         assertThat(actual.priceAmount()).isEqualTo(expected.priceAmount());
         assertThat(actual.priceCurrencyCode()).isEqualTo(expected.priceCurrencyCode());
         assertThat(actual.discountCode()).isEqualTo(expected.discountCode());
+    }
+
+    private ConfirmTrainingPriceCommand confirmTrainingPriceCommand() {
+        return ConfirmTrainingPriceCommand.nextAfter(randomExpiredOfferAcceptanceRequestedEvent());
+    }
+
+    private ExpiredOfferAcceptanceRequestedEvent randomExpiredOfferAcceptanceRequestedEvent() {
+        return new ExpiredOfferAcceptanceRequestedEvent(newEventId(), randomId(), randomId(), randomAmount(), randomCurrency());
     }
 
     private UseDiscountCodeCommand useDiscountCodeCommand() {

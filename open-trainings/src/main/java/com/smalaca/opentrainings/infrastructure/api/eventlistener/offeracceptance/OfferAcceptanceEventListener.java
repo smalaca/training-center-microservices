@@ -90,16 +90,38 @@ public class OfferAcceptanceEventListener {
         engine.accept(event);
     }
 
-    @EventListener
     @DrivenAdapter
-    public void listen(TrainingPriceChangedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.training-price-changed}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent event) {
+        engine.accept(asTrainingPriceChangedEvent(event));
     }
 
-    @EventListener
+    private TrainingPriceChangedEvent asTrainingPriceChangedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent event) {
+        return new TrainingPriceChangedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.trainingId(),
+                event.priceAmount(),
+                event.priceCurrencyCode());
+    }
+
     @DrivenAdapter
-    public void listen(TrainingPriceNotChangedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.training-price-not-changed}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent event) {
+        engine.accept(asTrainingPriceNotChangedEvent(event));
+    }
+
+    private TrainingPriceNotChangedEvent asTrainingPriceNotChangedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent event) {
+        return new TrainingPriceNotChangedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.trainingId());
     }
 
     @DrivenAdapter

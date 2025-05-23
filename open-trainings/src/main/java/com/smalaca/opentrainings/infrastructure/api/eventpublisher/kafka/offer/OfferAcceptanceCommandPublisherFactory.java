@@ -11,8 +11,9 @@ class OfferAcceptanceCommandPublisherFactory {
     OfferAcceptanceCommandPublisher offerAcceptanceCommandPublisher(
             KafkaTemplate<String, Object> kafkaTemplate,
             @Value("${kafka.topics.offer-acceptance.commands.register-person}") String registerPersonTopic,
-            @Value("${kafka.topics.offer-acceptance.commands.use-discount-code}") String useDiscountCodeTopic) {
-        Topics topics = new Topics(registerPersonTopic, useDiscountCodeTopic);
+            @Value("${kafka.topics.offer-acceptance.commands.use-discount-code}") String useDiscountCodeTopic,
+            @Value("${kafka.topics.offer-acceptance.commands.confirm-training-price}") String confirmTrainingPriceTopic) {
+        Topics topics = new Topics(registerPersonTopic, useDiscountCodeTopic, confirmTrainingPriceTopic);
 
         return new OfferAcceptanceCommandPublisher(kafkaTemplate, topics);
     }
