@@ -4,6 +4,8 @@ import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPe
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
@@ -11,8 +13,6 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeR
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -88,15 +88,15 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance trainingPriceNotChanged() {
-        OfferAcceptanceSagaEvent event = new TrainingPriceNotChangedEvent(newEventId(), offer.getOfferId(), offer.getTrainingId());
-        testListener.willReturnAfterConfirmTrainingPriceCommand(offer.getOfferId(), event);
+        TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(externalNewEventId(), offer.getOfferId(), offer.getTrainingId());
+        testListener.willReturnTrainingPriceNotChangedEventAfterConfirmTrainingPriceCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance trainingPriceChanged(BigDecimal price, String currency) {
-        OfferAcceptanceSagaEvent event = new TrainingPriceChangedEvent(newEventId(), offer.getOfferId(), offer.getTrainingId(), price, currency);
-        testListener.willReturnAfterConfirmTrainingPriceCommand(offer.getOfferId(), event);
+        TrainingPriceChangedEvent event = new TrainingPriceChangedEvent(externalNewEventId(), offer.getOfferId(), offer.getTrainingId(), price, currency);
+        testListener.willReturnTrainingPriceChangedEventAfterConfirmTrainingPriceCommand(offer.getOfferId(), event);
 
         return this;
     }

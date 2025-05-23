@@ -11,6 +11,7 @@ import java.util.UUID;
 class OfferAcceptanceTestKafkaListener {
     private final Map<UUID, com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand> registerPersonCommands = new HashMap<>();
     private final Map<UUID, com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand> useDiscountCodeCommands = new HashMap<>();
+    private final Map<UUID, com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand> confirmTrainingPriceCommands = new HashMap<>();
 
     @KafkaListener(
             topics = "${kafka.topics.offer-acceptance.commands.register-person}",
@@ -28,11 +29,23 @@ class OfferAcceptanceTestKafkaListener {
         useDiscountCodeCommands.put(command.offerId(), command);
     }
 
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.commands.confirm-training-price}",
+            groupId = "test-offer-acceptance-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand command) {
+        confirmTrainingPriceCommands.put(command.offerId(), command);
+    }
+
     Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand> registerPersonCommandFor(UUID offerId) {
         return Optional.ofNullable(registerPersonCommands.get(offerId));
     }
 
     Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand> useDiscountCodeCommandFor(UUID offerId) {
         return Optional.ofNullable(useDiscountCodeCommands.get(offerId));
+    }
+
+    Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand> confirmTrainingPriceCommandFor(UUID offerId) {
+        return Optional.ofNullable(confirmTrainingPriceCommands.get(offerId));
     }
 }

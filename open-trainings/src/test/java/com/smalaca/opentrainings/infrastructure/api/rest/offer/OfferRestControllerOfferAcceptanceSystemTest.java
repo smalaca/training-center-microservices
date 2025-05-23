@@ -33,6 +33,8 @@ import static org.awaitility.Awaitility.await;
         "kafka.topics.offer-acceptance.events.already-registered-person=offer-acceptance-already-registered-person-event-topic",
         "kafka.topics.offer-acceptance.events.discount-code-used=offer-acceptance-discount-code-used-event-topic",
         "kafka.topics.offer-acceptance.events.discount-code-already-used=offer-acceptance-discount-code-already-used-event-topic",
+        "kafka.topics.offer-acceptance.events.training-price-changed=offer-acceptance-training-price-changed-event-topic",
+        "kafka.topics.offer-acceptance.events.training-price-not-changed=offer-acceptance-training-price-not-changed-event-topic",
 })
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();
