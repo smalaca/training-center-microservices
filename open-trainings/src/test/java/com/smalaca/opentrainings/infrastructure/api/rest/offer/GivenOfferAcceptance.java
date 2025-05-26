@@ -3,16 +3,15 @@ package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -74,15 +73,15 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance bookableTraining() {
-        OfferAcceptanceSagaEvent event = new TrainingPlaceBookedEvent(newEventId(), offer.getOfferId(), offer.getTrainingId(), participantId);
-        testListener.willReturnAfterBookTrainingPlaceCommand(offer.getOfferId(), event);
+        TrainingPlaceBookedEvent event = new TrainingPlaceBookedEvent(externalNewEventId(), offer.getOfferId(), participantId, offer.getTrainingId());
+        testListener.willReturnTrainingPlaceBookedEventAfterBookTrainingPlaceCommand(offer.getOfferId(), event);
 
         return this;
     }
 
     GivenOfferAcceptance nonBookableTraining() {
-        OfferAcceptanceSagaEvent event = new NoAvailableTrainingPlacesLeftEvent(newEventId(), offer.getOfferId(), offer.getTrainingId(), participantId);
-        testListener.willReturnAfterBookTrainingPlaceCommand(offer.getOfferId(), event);
+        NoAvailableTrainingPlacesLeftEvent event = new NoAvailableTrainingPlacesLeftEvent(externalNewEventId(), offer.getOfferId(), participantId, offer.getTrainingId());
+        testListener.willReturnNoAvailableTrainingPlacesLeftEventAfterBookTrainingPlaceCommand(offer.getOfferId(), event);
 
         return this;
     }
