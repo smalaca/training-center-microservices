@@ -12,6 +12,9 @@ kafka:
   topics:
     command:
       confirm-training-price: open-training-offer-acceptance-confirm-training-price-command-topic
+      book-training-place: open-training-offer-acceptance-book-training-place-command-topic
     event:
       training-price-changed: open-training-offer-acceptance-training-price-changed-event-topic
       training-price-not-changed: open-training-offer-acceptance-training-price-not-changed-event-topic
+      training-place-booked: open-training-offer-acceptance-training-place-booked-event-topic
+      no-available-training-places-left: open-training-offer-acceptance-no-available-training-places-left-event-topic
