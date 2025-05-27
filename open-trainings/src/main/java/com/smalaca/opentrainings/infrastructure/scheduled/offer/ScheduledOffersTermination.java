@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-class ScheduledOffersTermination {
+public class ScheduledOffersTermination {
     private final OfferApplicationService applicationService;
     private final OfferQueryService queryService;
 
