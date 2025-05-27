@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventlistener.offeracceptance;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
-import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
@@ -20,13 +19,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPrice
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
-@Component
 public class OfferAcceptanceEventListener {
-    private final OfferAcceptanceSagaEngine engine;
+    private final ThreadSafeOfferAcceptanceSagaEngine engine;
 
-    OfferAcceptanceEventListener(OfferAcceptanceSagaEngine engine) {
+    OfferAcceptanceEventListener(ThreadSafeOfferAcceptanceSagaEngine engine) {
         this.engine = engine;
     }
 
