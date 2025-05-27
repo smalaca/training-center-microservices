@@ -31,8 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @ApplicationLayer
@@ -40,6 +42,7 @@ public class OfferAcceptanceSagaEngine {
     private final Clock clock;
     private final OfferAcceptanceSagaRepository repository;
     private final CommandRegistry commandRegistry;
+    private final Map<UUID, Object> locks = new ConcurrentHashMap<>();
 
     OfferAcceptanceSagaEngine(Clock clock, OfferAcceptanceSagaRepository repository, CommandRegistry commandRegistry) {
         this.clock = clock;
@@ -47,187 +50,248 @@ public class OfferAcceptanceSagaEngine {
         this.commandRegistry = commandRegistry;
     }
 
+    private <T> T synchronizedExecute(UUID offerId, SagaOperation<T> operation) {
+        Object lock = locks.computeIfAbsent(offerId, k -> new Object());
+        synchronized (lock) {
+            try {
+                return operation.execute();
+            } finally {
+                locks.remove(offerId);
+            }
+        }
+    }
+
+    private interface SagaOperation<T> {
+        T execute();
+    }
+
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(OfferAcceptanceRequestedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = new OfferAcceptanceSaga(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(PersonRegisteredEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(AlreadyRegisteredPersonFoundEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(UnexpiredOfferAcceptanceRequestedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(ExpiredOfferAcceptanceRequestedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        ConfirmTrainingPriceCommand command = offerAcceptanceSaga.accept(event, clock);
+            ConfirmTrainingPriceCommand command = offerAcceptanceSaga.accept(event, clock);
 
-        commandRegistry.publish(command);
-        repository.save(offerAcceptanceSaga);
+            commandRegistry.publish(command);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(TrainingPriceNotChangedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(TrainingPriceChangedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        RejectOfferCommand command = offerAcceptanceSaga.accept(event, clock);
+            RejectOfferCommand command = offerAcceptanceSaga.accept(event, clock);
 
-        commandRegistry.publish(command);
-        repository.save(offerAcceptanceSaga);
+            commandRegistry.publish(command);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(DiscountCodeUsedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
+            Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            command.ifPresent(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(DiscountCodeAlreadyUsedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
+            Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            command.ifPresent(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(TrainingPlaceBookedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
+            Optional<OfferAcceptanceSagaCommand> command = offerAcceptanceSaga.accept(event, clock);
 
-        command.ifPresent(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            command.ifPresent(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(NoAvailableTrainingPlacesLeftEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
+            List<OfferAcceptanceSagaCommand> commands = offerAcceptanceSaga.accept(event, clock);
 
-        commands.forEach(commandRegistry::publish);
-        repository.save(offerAcceptanceSaga);
+            commands.forEach(commandRegistry::publish);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(NotAvailableOfferAcceptanceRequestedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+            offerAcceptanceSaga.accept(event, clock);
 
-        repository.save(offerAcceptanceSaga);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(OfferAcceptedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+            offerAcceptanceSaga.accept(event, clock);
 
-        repository.save(offerAcceptanceSaga);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(OfferRejectedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+            offerAcceptanceSaga.accept(event, clock);
 
-        repository.save(offerAcceptanceSaga);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @Transactional
     @DrivenPort
     @CommandOperation
     public void accept(DiscountCodeReturnedEvent event) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
+        synchronizedExecute(event.offerId(), () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(event.offerId());
 
-        offerAcceptanceSaga.accept(event, clock);
+            offerAcceptanceSaga.accept(event, clock);
 
-        repository.save(offerAcceptanceSaga);
+            repository.save(offerAcceptanceSaga);
+            return null;
+        });
     }
 
     @DrivenPort
     @QueryOperation
     public OfferAcceptanceSagaDto statusOf(UUID offerId) {
-        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
-
-        return offerAcceptanceSaga.asDto();
+        return synchronizedExecute(offerId, () -> {
+            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
+            return offerAcceptanceSaga.asDto();
+        });
     }
 }
