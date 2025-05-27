@@ -1,7 +1,6 @@
 package com.smalaca.opentrainings.infrastructure.api.eventlistener.offeracceptance;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
-import com.smalaca.opentrainings.application.offeracceptancesaga.OfferAcceptanceSagaEngine;
 import com.smalaca.opentrainings.domain.eventid.EventId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offer.events.NotAvailableOfferAcceptanceRequestedEvent;
@@ -20,13 +19,11 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPrice
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 
-@Component
 public class OfferAcceptanceEventListener {
-    private final OfferAcceptanceSagaEngine engine;
+    private final ThreadSafeOfferAcceptanceSagaEngine engine;
 
-    OfferAcceptanceEventListener(OfferAcceptanceSagaEngine engine) {
+    OfferAcceptanceEventListener(ThreadSafeOfferAcceptanceSagaEngine engine) {
         this.engine = engine;
     }
 
@@ -163,16 +160,38 @@ public class OfferAcceptanceEventListener {
                 event.discountCode());
     }
 
-    @EventListener
     @DrivenAdapter
-    public void listen(TrainingPlaceBookedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.training-place-booked}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent event) {
+        engine.accept(asTrainingPlaceBookedEvent(event));
     }
 
-    @EventListener
+    private TrainingPlaceBookedEvent asTrainingPlaceBookedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent event) {
+        return new TrainingPlaceBookedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId(),
+                event.trainingId());
+    }
+
     @DrivenAdapter
-    public void listen(NoAvailableTrainingPlacesLeftEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.no-available-training-places-left}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent event) {
+        engine.accept(asNoAvailableTrainingPlacesLeftEvent(event));
+    }
+
+    private NoAvailableTrainingPlacesLeftEvent asNoAvailableTrainingPlacesLeftEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent event) {
+        return new NoAvailableTrainingPlacesLeftEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId(),
+                event.trainingId());
     }
 
     @EventListener

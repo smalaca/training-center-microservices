@@ -36,6 +36,7 @@ kafka:
         register-person: open-training-offer-acceptance-register-person-command-topic
         use-discount-code: open-training-offer-acceptance-use-discount-code-command-topic
         confirm-training-price: open-training-offer-acceptance-confirm-training-price-command-topic
+        book-training-place: open-training-offer-acceptance-book-training-place-command-topic
       events:
         person-registered: open-training-offer-acceptance-person-registered-event-topic
         already-registered-person: open-training-offer-acceptance-already-registered-person-event-topic
@@ -43,6 +44,8 @@ kafka:
         discount-code-already-used: open-training-offer-acceptance-discount-code-already-used-event-topic
         training-price-changed: open-training-offer-acceptance-training-price-changed-event-topic
         training-price-not-changed: open-training-offer-acceptance-training-price-not-changed-event-topic
+        training-place-booked: open-training-offer-acceptance-training-place-booked-event-topic
+        no-available-training-places-left: open-training-offer-acceptance-no-available-training-places-left-event-topic
     order:
       pivotal:
         training-purchased: open-training-training-purchased-topic

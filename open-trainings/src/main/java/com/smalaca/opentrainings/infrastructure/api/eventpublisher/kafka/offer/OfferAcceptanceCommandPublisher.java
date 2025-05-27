@@ -1,6 +1,7 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
@@ -31,6 +32,11 @@ public class OfferAcceptanceCommandPublisher {
         kafkaTemplate.send(topics.confirmTrainingPrice(), asExternalConfirmTrainingPriceCommand(command));
     }
 
+    @EventListener
+    public void consume(BookTrainingPlaceCommand command) {
+        kafkaTemplate.send(topics.bookTrainingPlace(), asExternalBookTrainingPlaceCommand(command));
+    }
+
     private com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand asExternalRegisterPersonCommand(RegisterPersonCommand command) {
         return new com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand(
                 asExternalCommandId(command.commandId()),
@@ -58,6 +64,14 @@ public class OfferAcceptanceCommandPublisher {
                 command.trainingId(),
                 command.priceAmount(),
                 command.priceCurrencyCode());
+    }
+
+    private com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand asExternalBookTrainingPlaceCommand(BookTrainingPlaceCommand command) {
+        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand(
+                asExternalCommandId(command.commandId()),
+                command.offerId(),
+                command.participantId(),
+                command.trainingId());
     }
 
     private com.smalaca.schemaregistry.metadata.CommandId asExternalCommandId(CommandId commandId) {

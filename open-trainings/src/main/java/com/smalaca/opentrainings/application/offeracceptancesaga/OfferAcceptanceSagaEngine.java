@@ -227,7 +227,6 @@ public class OfferAcceptanceSagaEngine {
     @QueryOperation
     public OfferAcceptanceSagaDto statusOf(UUID offerId) {
         OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
-
         return offerAcceptanceSaga.asDto();
     }
 }

@@ -6,6 +6,7 @@ import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer.OfferAcceptanceCommandPublisher;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
+import com.smalaca.opentrainings.infrastructure.scheduled.offer.ScheduledOffersTermination;
 import com.smalaca.test.type.SystemTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +36,9 @@ import static org.awaitility.Awaitility.await;
         "kafka.topics.offer-acceptance.events.discount-code-already-used=offer-acceptance-discount-code-already-used-event-topic",
         "kafka.topics.offer-acceptance.events.training-price-changed=offer-acceptance-training-price-changed-event-topic",
         "kafka.topics.offer-acceptance.events.training-price-not-changed=offer-acceptance-training-price-not-changed-event-topic",
+        "kafka.topics.offer-acceptance.events.training-place-booked=offer-acceptance-training-place-booked-event-topic",
+        "kafka.topics.offer-acceptance.events.no-available-training-places-left=offer-acceptance-no-available-training-places-left-event-topic",
+        "kafka.topics.offer-acceptance.commands.book-training-place=offer-acceptance-book-training-place-command-topic",
 })
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();
@@ -65,6 +69,9 @@ class OfferRestControllerOfferAcceptanceSystemTest {
 
     @MockBean
     private OfferAcceptanceCommandPublisher offerAcceptanceCommandPublisher;
+
+    @MockBean
+    private ScheduledOffersTermination scheduledOffersTermination;
 
     private GivenOfferAcceptance given;
     private OfferTestDto dto;
