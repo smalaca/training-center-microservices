@@ -50,19 +50,19 @@ public class OfferAcceptanceSagaEngine {
         this.commandRegistry = commandRegistry;
     }
 
-    private <T> T synchronizedExecute(UUID offerId, SagaOperation<T> operation) {
+    private void synchronizedExecute(UUID offerId, SagaOperation operation) {
         Object lock = locks.computeIfAbsent(offerId, k -> new Object());
         synchronized (lock) {
             try {
-                return operation.execute();
+                operation.execute();
             } finally {
                 locks.remove(offerId);
             }
         }
     }
 
-    private interface SagaOperation<T> {
-        T execute();
+    private interface SagaOperation {
+        void execute();
     }
 
     @Transactional
@@ -76,7 +76,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -91,7 +90,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -106,7 +104,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -121,7 +118,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -136,7 +132,6 @@ public class OfferAcceptanceSagaEngine {
 
             commandRegistry.publish(command);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -151,7 +146,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -166,7 +160,6 @@ public class OfferAcceptanceSagaEngine {
 
             commandRegistry.publish(command);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -181,7 +174,6 @@ public class OfferAcceptanceSagaEngine {
 
             command.ifPresent(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -196,7 +188,6 @@ public class OfferAcceptanceSagaEngine {
 
             command.ifPresent(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -211,7 +202,6 @@ public class OfferAcceptanceSagaEngine {
 
             command.ifPresent(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -226,7 +216,6 @@ public class OfferAcceptanceSagaEngine {
 
             commands.forEach(commandRegistry::publish);
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -240,7 +229,6 @@ public class OfferAcceptanceSagaEngine {
             offerAcceptanceSaga.accept(event, clock);
 
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -254,7 +242,6 @@ public class OfferAcceptanceSagaEngine {
             offerAcceptanceSaga.accept(event, clock);
 
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -268,7 +255,6 @@ public class OfferAcceptanceSagaEngine {
             offerAcceptanceSaga.accept(event, clock);
 
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
@@ -282,16 +268,14 @@ public class OfferAcceptanceSagaEngine {
             offerAcceptanceSaga.accept(event, clock);
 
             repository.save(offerAcceptanceSaga);
-            return null;
         });
     }
 
     @DrivenPort
     @QueryOperation
     public OfferAcceptanceSagaDto statusOf(UUID offerId) {
-        return synchronizedExecute(offerId, () -> {
-            OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
-            return offerAcceptanceSaga.asDto();
-        });
+        OfferAcceptanceSaga offerAcceptanceSaga = repository.findById(offerId);
+
+        return offerAcceptanceSaga.asDto();
     }
 }
