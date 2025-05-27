@@ -5,6 +5,7 @@ import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceReque
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
@@ -104,6 +105,30 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), command);
         });
+    }
+
+    @Test
+    void shouldPublishBookTrainingPlaceCommand() {
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        publisher.consume(command);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand> actual = consumer.bookTrainingPlaceCommandFor(command.offerId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), command);
+        });
+    }
+
+    private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
+        return BookTrainingPlaceCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomId());
+    }
+
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand actual, BookTrainingPlaceCommand expected) {
+        assertThatContainsSameData(actual.commandId(), expected.commandId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.participantId()).isEqualTo(expected.participantId());
+        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
     }
 
     private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand actual, ConfirmTrainingPriceCommand expected) {
