@@ -43,7 +43,9 @@ services:
       kafka-topics --create --topic open-training-offer-acceptance-training-price-not-changed-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic open-training-offer-acceptance-book-training-place-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic open-training-offer-acceptance-training-place-booked-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
-      kafka-topics --create --topic open-training-offer-acceptance-no-available-training-places-left-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
+      kafka-topics --create --topic open-training-offer-acceptance-no-available-training-places-left-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+      kafka-topics --create --topic open-training-offer-acceptance-return-discount-code-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+      kafka-topics --create --topic open-training-offer-acceptance-discount-code-returned-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
       "
 volumes:
   kafka-data:
