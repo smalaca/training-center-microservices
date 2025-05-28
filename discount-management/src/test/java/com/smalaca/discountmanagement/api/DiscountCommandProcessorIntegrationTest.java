@@ -132,6 +132,33 @@ class DiscountCommandProcessorIntegrationTest {
         );
     }
 
+    @Test
+    void shouldPublishDiscountCodeReturnedEvent() {
+        ReturnDiscountCodeCommand command = randomDiscountCodeCommand();
+
+        producerFactory.send(RETURN_DISCOUNT_CODE_COMMAND_TOPIC, command);
+
+        await().untilAsserted(() -> {
+            Optional<DiscountCodeReturnedEvent> actual = consumer.discountCodeReturnedEventFor(command.offerId());
+            assertThat(actual).isPresent();
+
+            assertThatDiscountCodeReturnedEvent(actual.get())
+                    .isNextAfter(command.commandId())
+                    .hasOfferId(command.offerId())
+                    .hasParticipantId(command.participantId())
+                    .hasDiscountCode(command.discountCode());
+        });
+    }
+
+    private ReturnDiscountCodeCommand randomDiscountCodeCommand() {
+        return new ReturnDiscountCodeCommand(
+                randomCommandId(),
+                randomId(),
+                randomId(),
+                randomDiscountCode()
+        );
+    }
+
     private String randomDiscountCode() {
         String discountCode = FAKER.commerce().promotionCode();
 
@@ -143,41 +170,11 @@ class DiscountCommandProcessorIntegrationTest {
         return discountCode;
     }
 
-    private static UUID randomId() {
-        return UUID.randomUUID();
-    }
-
-    @Test
-    void shouldPublishDiscountCodeReturnedEvent() {
-        String discountCode = randomDiscountCode();
-        UUID offerId = randomId();
-        producerFactory.send(USE_DISCOUNT_CODE_COMMAND_TOPIC, useDiscountCodeCommand(discountCode, offerId));
-        ReturnDiscountCodeCommand command = returnDiscountCodeCommand(discountCode, offerId);
-
-        producerFactory.send(RETURN_DISCOUNT_CODE_COMMAND_TOPIC, command);
-
-        await().untilAsserted(() -> {
-            Optional<DiscountCodeReturnedEvent> actual = consumer.discountCodeReturnedEventFor(offerId);
-            assertThat(actual).isPresent();
-
-            assertThatDiscountCodeReturnedEvent(actual.get())
-                    .isNextAfter(command.commandId())
-                    .hasOfferId(offerId)
-                    .hasParticipantId(command.participantId())
-                    .hasDiscountCode(discountCode);
-        });
-    }
-
-    private ReturnDiscountCodeCommand returnDiscountCodeCommand(String discountCode, UUID offerId) {
-        return new ReturnDiscountCodeCommand(
-                randomCommandId(),
-                offerId,
-                randomId(),
-                discountCode
-        );
-    }
-
     private CommandId randomCommandId() {
         return new CommandId(randomId(), randomId(), randomId(), now());
+    }
+
+    private UUID randomId() {
+        return UUID.randomUUID();
     }
 }
