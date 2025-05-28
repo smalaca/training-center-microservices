@@ -2,10 +2,11 @@ package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
 import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offer.events.ExpiredOfferAcceptanceRequestedEvent;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
@@ -120,6 +121,19 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         });
     }
 
+    @Test
+    void shouldPublishReturnDiscountCodeCommand() {
+        ReturnDiscountCodeCommand command = returnDiscountCodeCommand();
+
+        publisher.consume(command);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand> actual = consumer.returnDiscountCodeCommandFor(command.offerId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), command);
+        });
+    }
+
     private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
         return BookTrainingPlaceCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomId());
     }
@@ -170,5 +184,16 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         assertThat(actual.traceId()).isEqualTo(expected.traceId());
         assertThat(actual.correlationId()).isEqualTo(expected.correlationId());
         assertThat(actual.creationDateTime()).isEqualTo(expected.creationDateTime());
+    }
+
+    private ReturnDiscountCodeCommand returnDiscountCodeCommand() {
+        return ReturnDiscountCodeCommand.nextAfter(randomTrainingPriceNotChangedEvent(), randomId(), randomDiscountCode());
+    }
+
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand actual, ReturnDiscountCodeCommand expected) {
+        assertThatContainsSameData(actual.commandId(), expected.commandId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.participantId()).isEqualTo(expected.participantId());
+        assertThat(actual.discountCode()).isEqualTo(expected.discountCode());
     }
 }

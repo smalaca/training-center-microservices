@@ -4,6 +4,7 @@ import com.smalaca.opentrainings.domain.commandid.CommandId;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -35,6 +36,11 @@ public class OfferAcceptanceCommandPublisher {
     @EventListener
     public void consume(BookTrainingPlaceCommand command) {
         kafkaTemplate.send(topics.bookTrainingPlace(), asExternalBookTrainingPlaceCommand(command));
+    }
+
+    @EventListener
+    public void consume(ReturnDiscountCodeCommand command) {
+        kafkaTemplate.send(topics.returnDiscountCode(), asExternalReturnDiscountCodeCommand(command));
     }
 
     private com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand asExternalRegisterPersonCommand(RegisterPersonCommand command) {
@@ -72,6 +78,14 @@ public class OfferAcceptanceCommandPublisher {
                 command.offerId(),
                 command.participantId(),
                 command.trainingId());
+    }
+
+    private com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand asExternalReturnDiscountCodeCommand(ReturnDiscountCodeCommand command) {
+        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand(
+                asExternalCommandId(command.commandId()),
+                command.offerId(),
+                command.participantId(),
+                command.discountCode());
     }
 
     private com.smalaca.schemaregistry.metadata.CommandId asExternalCommandId(CommandId commandId) {

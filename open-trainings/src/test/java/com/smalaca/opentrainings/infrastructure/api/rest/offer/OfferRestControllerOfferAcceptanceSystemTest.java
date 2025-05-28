@@ -34,11 +34,13 @@ import static org.awaitility.Awaitility.await;
         "kafka.topics.offer-acceptance.events.already-registered-person=offer-acceptance-already-registered-person-event-topic",
         "kafka.topics.offer-acceptance.events.discount-code-used=offer-acceptance-discount-code-used-event-topic",
         "kafka.topics.offer-acceptance.events.discount-code-already-used=offer-acceptance-discount-code-already-used-event-topic",
+        "kafka.topics.offer-acceptance.events.discount-code-returned=offer-acceptance-discount-code-returned-event-topic",
         "kafka.topics.offer-acceptance.events.training-price-changed=offer-acceptance-training-price-changed-event-topic",
         "kafka.topics.offer-acceptance.events.training-price-not-changed=offer-acceptance-training-price-not-changed-event-topic",
         "kafka.topics.offer-acceptance.events.training-place-booked=offer-acceptance-training-place-booked-event-topic",
         "kafka.topics.offer-acceptance.events.no-available-training-places-left=offer-acceptance-no-available-training-places-left-event-topic",
         "kafka.topics.offer-acceptance.commands.book-training-place=offer-acceptance-book-training-place-command-topic",
+        "kafka.topics.offer-acceptance.commands.return-discount-code=offer-acceptance-return-discount-code-command-topic",
 })
 class OfferRestControllerOfferAcceptanceSystemTest {
     private static final Faker FAKER = new Faker();

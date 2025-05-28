@@ -1,5 +1,8 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
+import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
+import com.smalaca.opentrainings.domain.offer.OfferRepository;
+import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
@@ -8,17 +11,12 @@ import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEve
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
-import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
-import com.smalaca.opentrainings.domain.offer.OfferRepository;
-import com.smalaca.opentrainings.domain.offer.OfferTestDto;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.smalaca.opentrainings.data.Random.randomAmount;
 import static com.smalaca.opentrainings.data.Random.randomId;
-import static com.smalaca.opentrainings.domain.eventid.EventId.newEventId;
 
 class GivenOfferAcceptance {
     private final GivenOfferFactory givenOfferFactory;
@@ -67,7 +65,7 @@ class GivenOfferAcceptance {
     }
 
     GivenOfferAcceptance discountCodeReturned(String discountCode) {
-        DiscountCodeReturnedEvent event = new DiscountCodeReturnedEvent(newEventId(), offer.getOfferId(), participantId, discountCode);
+        com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent event = new com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent(externalNewEventId(), offer.getOfferId(), participantId, discountCode);
         testListener.willReturnAfterReturnDiscountCodeCommand(offer.getOfferId(), event);
         return this;
     }
