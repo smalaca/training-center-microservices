@@ -107,7 +107,7 @@ class DiscountCommandProcessorTest {
 
     @Test
     void shouldPublishDiscountCodeReturnedEventWhenDiscountCodeIsUsed() {
-        ReturnDiscountCodeCommand command = returnDiscountCodeCommand(randomDiscountCode());
+        ReturnDiscountCodeCommand command = returnDiscountCodeCommand();
 
         processor.process(command);
 
@@ -137,14 +137,13 @@ class DiscountCommandProcessorTest {
     }
 
     private UseDiscountCodeCommand useDiscountCodeCommand(BigDecimal originalPrice, String discountCode) {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
         return new UseDiscountCodeCommand(
-                commandId,
+                randomCommandId(),
                 randomId(),
                 randomId(),
                 randomId(),
                 originalPrice,
-                "USD",
+                FAKER.currency().code(),
                 discountCode
         );
     }
@@ -154,20 +153,19 @@ class DiscountCommandProcessorTest {
     }
 
     private ReturnDiscountCodeCommand returnDiscountCodeCommand() {
-        return returnDiscountCodeCommand(randomDiscountCode());
-    }
-
-    private ReturnDiscountCodeCommand returnDiscountCodeCommand(String discountCode) {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
         return new ReturnDiscountCodeCommand(
-                commandId,
+                randomCommandId(),
                 randomId(),
                 randomId(),
-                discountCode
+                randomDiscountCode()
         );
     }
 
-    private static UUID randomId() {
+    private CommandId randomCommandId() {
+        return new CommandId(randomId(), randomId(), randomId(), now());
+    }
+
+    private UUID randomId() {
         return UUID.randomUUID();
     }
 }
