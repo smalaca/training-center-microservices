@@ -1,8 +1,10 @@
 package com.smalaca.discountmanagement.api;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.smalaca.discountmanagement.api.DiscountCodeAlreadyUsedEventAssertion.assertThatDiscountCodeAlreadyUsedEvent;
+import static com.smalaca.discountmanagement.api.DiscountCodeReturnedEventAssertion.assertThatDiscountCodeReturnedEvent;
 import static com.smalaca.discountmanagement.api.DiscountCodeUsedEventAssertion.assertThatDiscountCodeUsedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,11 +29,12 @@ class DiscountCommandProcessorTest {
     private static final Faker FAKER = new Faker();
     private static final String DISCOUNT_CODE_USED_TOPIC = "discount-code-used-topic";
     private static final String DISCOUNT_CODE_ALREADY_USED_TOPIC = "discount-code-already-used-topic";
+    private static final String DISCOUNT_CODE_RETURNED_TOPIC = "discount-code-returned-topic";
     private static final BigDecimal ORIGINAL_PRICE = new BigDecimal("200.00");
     private static final BigDecimal NEW_PRICE = new BigDecimal("180.00");
-    
+
     private final KafkaTemplate<String, Object> kafkaTemplate = mock(KafkaTemplate.class);
-    private final DiscountCommandProcessor processor = new DiscountCommandProcessor(kafkaTemplate, DISCOUNT_CODE_USED_TOPIC, DISCOUNT_CODE_ALREADY_USED_TOPIC);
+    private final DiscountCommandProcessor processor = new DiscountCommandProcessor(kafkaTemplate, DISCOUNT_CODE_USED_TOPIC, DISCOUNT_CODE_ALREADY_USED_TOPIC, DISCOUNT_CODE_RETURNED_TOPIC);
 
     @Test
     void shouldPublishDiscountCodeUsedEventForNewDiscountCode() {
@@ -101,8 +105,27 @@ class DiscountCommandProcessorTest {
         return captor.getValue();
     }
 
+    @Test
+    void shouldPublishDiscountCodeReturnedEventWhenDiscountCodeIsUsed() {
+        ReturnDiscountCodeCommand command = returnDiscountCodeCommand(randomDiscountCode());
+
+        processor.process(command);
+
+        assertThatDiscountCodeReturnedEvent(publishedDiscountCodeReturnedEvent())
+                .isNextAfter(command.commandId())
+                .hasOfferId(command.offerId())
+                .hasParticipantId(command.participantId())
+                .hasDiscountCode(command.discountCode());
+    }
+
     private UseDiscountCodeCommand useDiscountCodeCommand() {
         return useDiscountCodeCommand(ORIGINAL_PRICE, randomDiscountCode());
+    }
+
+    private DiscountCodeReturnedEvent publishedDiscountCodeReturnedEvent() {
+        ArgumentCaptor<DiscountCodeReturnedEvent> captor = ArgumentCaptor.forClass(DiscountCodeReturnedEvent.class);
+        then(kafkaTemplate).should().send(eq(DISCOUNT_CODE_RETURNED_TOPIC), captor.capture());
+        return captor.getValue();
     }
 
     private UseDiscountCodeCommand useDiscountCodeCommand(String discountCode) {
@@ -121,13 +144,27 @@ class DiscountCommandProcessorTest {
                 randomId(),
                 randomId(),
                 originalPrice,
-                FAKER.currency().code(),
+                "USD",
                 discountCode
         );
     }
 
     private String randomDiscountCode() {
         return FAKER.commerce().promotionCode();
+    }
+
+    private ReturnDiscountCodeCommand returnDiscountCodeCommand() {
+        return returnDiscountCodeCommand(randomDiscountCode());
+    }
+
+    private ReturnDiscountCodeCommand returnDiscountCodeCommand(String discountCode) {
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
+        return new ReturnDiscountCodeCommand(
+                commandId,
+                randomId(),
+                randomId(),
+                discountCode
+        );
     }
 
     private static UUID randomId() {
