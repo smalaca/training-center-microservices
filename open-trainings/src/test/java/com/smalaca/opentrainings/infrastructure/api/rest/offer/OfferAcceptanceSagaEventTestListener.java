@@ -1,5 +1,10 @@
 package com.smalaca.opentrainings.infrastructure.api.rest.offer;
 
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
+import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
@@ -8,14 +13,7 @@ import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEve
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.RegisterPersonCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
-import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -25,7 +23,6 @@ import java.util.UUID;
 
 class OfferAcceptanceSagaEventTestListener {
     private final KafkaTemplate<String, Object> producerFactory;
-    private final ApplicationEventPublisher publisher;
     private final String registeredPersonEventTopic;
     private final String alreadyRegisteredPersonEventTopic;
     private final String discountCodeUsedEventTopic;
@@ -44,10 +41,9 @@ class OfferAcceptanceSagaEventTestListener {
     private final Map<UUID, TrainingPriceNotChangedEvent> trainingPriceNotChangedEvents = new HashMap<>();
     private final Map<UUID, TrainingPlaceBookedEvent> trainingPlaceBookedEvents = new HashMap<>();
     private final Map<UUID, NoAvailableTrainingPlacesLeftEvent> noAvailableTrainingPlacesLeftEvents = new HashMap<>();
-    private final Map<UUID, OfferAcceptanceSagaEvent> eventsAfterReturnDiscountCodeCommand = new HashMap<>();
 
     OfferAcceptanceSagaEventTestListener(
-            KafkaTemplate<String, Object> producerFactory, ApplicationEventPublisher publisher,
+            KafkaTemplate<String, Object> producerFactory,
             @Value("${kafka.topics.offer-acceptance.events.person-registered}") String registeredPersonEventTopic,
             @Value("${kafka.topics.offer-acceptance.events.already-registered-person}") String alreadyRegisteredPersonEventTopic,
             @Value("${kafka.topics.offer-acceptance.events.discount-code-used}") String discountCodeUsedEventTopic,
@@ -58,7 +54,6 @@ class OfferAcceptanceSagaEventTestListener {
             @Value("${kafka.topics.offer-acceptance.events.training-place-booked}") String trainingPlaceBookedEventTopic,
             @Value("${kafka.topics.offer-acceptance.events.no-available-training-places-left}") String noAvailableTrainingPlacesLeftEventTopic) {
         this.producerFactory = producerFactory;
-        this.publisher = publisher;
         this.registeredPersonEventTopic = registeredPersonEventTopic;
         this.alreadyRegisteredPersonEventTopic = alreadyRegisteredPersonEventTopic;
         this.discountCodeUsedEventTopic = discountCodeUsedEventTopic;
