@@ -13,8 +13,9 @@ class OfferAcceptanceCommandPublisherFactory {
             @Value("${kafka.topics.offer-acceptance.commands.register-person}") String registerPersonTopic,
             @Value("${kafka.topics.offer-acceptance.commands.use-discount-code}") String useDiscountCodeTopic,
             @Value("${kafka.topics.offer-acceptance.commands.confirm-training-price}") String confirmTrainingPriceTopic,
-            @Value("${kafka.topics.offer-acceptance.commands.book-training-place}") String bookTrainingPlaceTopic) {
-        Topics topics = new Topics(registerPersonTopic, useDiscountCodeTopic, confirmTrainingPriceTopic, bookTrainingPlaceTopic);
+            @Value("${kafka.topics.offer-acceptance.commands.book-training-place}") String bookTrainingPlaceTopic,
+            @Value("${kafka.topics.offer-acceptance.commands.return-discount-code}") String returnDiscountCodeTopic) {
+        Topics topics = new Topics(registerPersonTopic, useDiscountCodeTopic, confirmTrainingPriceTopic, bookTrainingPlaceTopic, returnDiscountCodeTopic);
 
         return new OfferAcceptanceCommandPublisher(kafkaTemplate, topics);
     }

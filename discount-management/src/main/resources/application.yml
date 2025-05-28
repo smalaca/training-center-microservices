@@ -12,6 +12,8 @@ kafka:
   topics:
     command:
       use-discount-code: open-training-offer-acceptance-use-discount-code-command-topic
+      return-discount-code: open-training-offer-acceptance-return-discount-code-command-topic
     event:
       discount-code-used: open-training-offer-acceptance-discount-code-used-event-topic
       discount-code-already-used: open-training-offer-acceptance-discount-code-already-used-event-topic
+      discount-code-returned: open-training-offer-acceptance-discount-code-returned-event-topic

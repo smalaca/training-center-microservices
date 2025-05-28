@@ -3,6 +3,7 @@ package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand;
+import com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import org.springframework.kafka.annotation.KafkaListener;
 
@@ -16,6 +17,7 @@ class OfferAcceptanceTestKafkaListener {
     private final Map<UUID, UseDiscountCodeCommand> useDiscountCodeCommands = new HashMap<>();
     private final Map<UUID, ConfirmTrainingPriceCommand> confirmTrainingPriceCommands = new HashMap<>();
     private final Map<UUID, BookTrainingPlaceCommand> bookTrainingPlaceCommands = new HashMap<>();
+    private final Map<UUID, ReturnDiscountCodeCommand> returnDiscountCodeCommands = new HashMap<>();
 
     @KafkaListener(
             topics = "${kafka.topics.offer-acceptance.commands.register-person}",
@@ -63,5 +65,17 @@ class OfferAcceptanceTestKafkaListener {
 
     Optional<BookTrainingPlaceCommand> bookTrainingPlaceCommandFor(UUID offerId) {
         return Optional.ofNullable(bookTrainingPlaceCommands.get(offerId));
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.commands.return-discount-code}",
+            groupId = "test-offer-acceptance-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(ReturnDiscountCodeCommand command) {
+        returnDiscountCodeCommands.put(command.offerId(), command);
+    }
+
+    Optional<ReturnDiscountCodeCommand> returnDiscountCodeCommandFor(UUID offerId) {
+        return Optional.ofNullable(returnDiscountCodeCommands.get(offerId));
     }
 }

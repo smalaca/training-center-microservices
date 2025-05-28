@@ -1,8 +1,10 @@
 package com.smalaca.discountmanagement.api;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
+import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
@@ -23,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.smalaca.discountmanagement.api.DiscountCodeAlreadyUsedEventAssertion.assertThatDiscountCodeAlreadyUsedEvent;
+import static com.smalaca.discountmanagement.api.DiscountCodeReturnedEventAssertion.assertThatDiscountCodeReturnedEvent;
 import static com.smalaca.discountmanagement.api.DiscountCodeUsedEventAssertion.assertThatDiscountCodeUsedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,8 +35,10 @@ import static org.awaitility.Awaitility.await;
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.command.use-discount-code=" + DiscountCommandProcessorIntegrationTest.USE_DISCOUNT_CODE_COMMAND_TOPIC,
+        "kafka.topics.command.return-discount-code=" + DiscountCommandProcessorIntegrationTest.RETURN_DISCOUNT_CODE_COMMAND_TOPIC,
         "kafka.topics.event.discount-code-already-used=" + DiscountCommandProcessorIntegrationTest.DISCOUNT_CODE_ALREADY_USED_EVENT_TOPIC,
-        "kafka.topics.event.discount-code-used=" + DiscountCommandProcessorIntegrationTest.DISCOUNT_CODE_USED_EVENT_TOPIC
+        "kafka.topics.event.discount-code-used=" + DiscountCommandProcessorIntegrationTest.DISCOUNT_CODE_USED_EVENT_TOPIC,
+        "kafka.topics.event.discount-code-returned=" + DiscountCommandProcessorIntegrationTest.DISCOUNT_CODE_RETURNED_EVENT_TOPIC
 })
 @Import(DiscountManagementPivotalEventTestConsumer.class)
 class DiscountCommandProcessorIntegrationTest {
@@ -42,8 +47,10 @@ class DiscountCommandProcessorIntegrationTest {
     private static final BigDecimal FINAL_PRICE = new BigDecimal("90.00");
 
     protected static final String USE_DISCOUNT_CODE_COMMAND_TOPIC = "use-discount-code-command-topic";
+    protected static final String RETURN_DISCOUNT_CODE_COMMAND_TOPIC = "return-discount-code-command-topic";
     protected static final String DISCOUNT_CODE_ALREADY_USED_EVENT_TOPIC = "discount-code-already-used-event-topic";
     protected static final String DISCOUNT_CODE_USED_EVENT_TOPIC = "discount-code-used-event-topic";
+    protected static final String DISCOUNT_CODE_RETURNED_EVENT_TOPIC = "discount-code-returned-event-topic";
     private final Set<String> discountCodes = new HashSet<>();
 
     @Autowired
@@ -114,15 +121,41 @@ class DiscountCommandProcessorIntegrationTest {
     }
 
     private UseDiscountCodeCommand useDiscountCodeCommand(String discountCode, UUID offerId) {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
         return new UseDiscountCodeCommand(
-                commandId,
+                randomCommandId(),
                 offerId,
                 randomId(),
                 randomId(),
                 ORIGINAL_PRICE,
                 FAKER.currency().code(),
                 discountCode
+        );
+    }
+
+    @Test
+    void shouldPublishDiscountCodeReturnedEvent() {
+        ReturnDiscountCodeCommand command = randomDiscountCodeCommand();
+
+        producerFactory.send(RETURN_DISCOUNT_CODE_COMMAND_TOPIC, command);
+
+        await().untilAsserted(() -> {
+            Optional<DiscountCodeReturnedEvent> actual = consumer.discountCodeReturnedEventFor(command.offerId());
+            assertThat(actual).isPresent();
+
+            assertThatDiscountCodeReturnedEvent(actual.get())
+                    .isNextAfter(command.commandId())
+                    .hasOfferId(command.offerId())
+                    .hasParticipantId(command.participantId())
+                    .hasDiscountCode(command.discountCode());
+        });
+    }
+
+    private ReturnDiscountCodeCommand randomDiscountCodeCommand() {
+        return new ReturnDiscountCodeCommand(
+                randomCommandId(),
+                randomId(),
+                randomId(),
+                randomDiscountCode()
         );
     }
 
@@ -137,7 +170,11 @@ class DiscountCommandProcessorIntegrationTest {
         return discountCode;
     }
 
-    private static UUID randomId() {
+    private CommandId randomCommandId() {
+        return new CommandId(randomId(), randomId(), randomId(), now());
+    }
+
+    private UUID randomId() {
         return UUID.randomUUID();
     }
 }

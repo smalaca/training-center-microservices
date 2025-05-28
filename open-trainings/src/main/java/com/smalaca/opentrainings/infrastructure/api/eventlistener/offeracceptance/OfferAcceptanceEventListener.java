@@ -206,9 +206,20 @@ public class OfferAcceptanceEventListener {
         engine.accept(event);
     }
 
-    @EventListener
     @DrivenAdapter
-    public void listen(DiscountCodeReturnedEvent event) {
-        engine.accept(event);
+    @KafkaListener(
+            topics = "${kafka.topics.offer-acceptance.events.discount-code-returned}",
+            groupId = "${kafka.group-id}",
+            containerFactory = "listenerContainerFactory")
+    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent event) {
+        engine.accept(asDiscountCodeReturnedEvent(event));
+    }
+
+    private DiscountCodeReturnedEvent asDiscountCodeReturnedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeReturnedEvent event) {
+        return new DiscountCodeReturnedEvent(
+                asEventId(event.eventId()),
+                event.offerId(),
+                event.participantId(),
+                event.discountCode());
     }
 }
