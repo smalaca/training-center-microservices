@@ -1,4 +1,4 @@
-# 0005: Outbox Pattern for Reliable Event Publishing
+# 0006: Outbox Pattern for Reliable Event Publishing
 
 ## Status
 

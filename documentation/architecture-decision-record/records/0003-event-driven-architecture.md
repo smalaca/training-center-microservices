@@ -1,4 +1,4 @@
-# 0004: Event-Driven Architecture
+# 0003: Event-Driven Architecture
 
 ## Status
 
