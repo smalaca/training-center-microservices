@@ -82,7 +82,11 @@ This documentation provides insights into the tools, techniques, and decisions m
 - **annotations** - Java annotations for marking architectural patterns like CQRS and Ports and Adapters, as well as domain-driven design concepts
 - **annotations-test** - Annotations for categorizing and organizing tests, particularly in a JUnit and Spring Boot context
 - **schema-registry** - Classes for managing metadata and schemas in an event-driven architecture
+- **discount-management** - Responsible for managing discount codes for training offers
+- **open-trainings** - Responsible for managing open training sessions, including registration, booking, and order processing
+- **payment-gateway** - Responsible for processing payments for training purchases
 - **personal-data-management** - Responsible for managing personal data of users, trainers, and participants
+- **training-offer** - Responsible for managing training offers, including pricing and availability
 - **training-programs** - Responsible for managing training programs
 - **reviews** - Responsible for reviewing training programs
 
