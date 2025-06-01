@@ -19,5 +19,6 @@
         <module>personal-data-management</module>
         <module>training-offer</module>
         <module>training-programs</module>
+        <module>reviews</module>
     </modules>
 </project>
