@@ -1,0 +1,63 @@
+name: Reviews Module
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'reviews/**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'reviews/**'
+
+permissions:
+  pull-requests: read
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build Test Annotations
+        working-directory: ./annotations-test
+        run: mvn clean install
+
+      - name: Build Schema Registry
+        working-directory: ./schema-registry
+        run: mvn clean install
+
+      - name: Tests
+        working-directory: ./reviews
+        run: mvn clean verify
+
+      - name: SonarCloud Scan
+        working-directory: ./reviews
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-reviews
