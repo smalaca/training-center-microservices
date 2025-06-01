@@ -13,10 +13,12 @@
         <module>annotations</module>
         <module>annotations-test</module>
         <module>schema-registry</module>
+
         <module>discount-management</module>
         <module>open-trainings</module>
         <module>payment-gateway</module>
         <module>personal-data-management</module>
+        <module>trainings-catalogue</module>
         <module>training-offer</module>
         <module>training-programs</module>
         <module>reviews</module>
