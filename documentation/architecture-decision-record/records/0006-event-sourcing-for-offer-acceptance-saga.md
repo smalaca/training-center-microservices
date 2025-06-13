@@ -1,4 +1,4 @@
-# 0005: Event Sourcing for Offer Acceptance Saga
+# 0006: Event Sourcing for Offer Acceptance Saga
 
 ## Status
 
