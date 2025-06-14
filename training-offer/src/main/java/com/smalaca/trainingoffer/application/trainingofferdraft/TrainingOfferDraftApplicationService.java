@@ -3,8 +3,10 @@ package com.smalaca.trainingoffer.application.trainingofferdraft;
 import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
+import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -12,9 +14,11 @@ import java.util.UUID;
 @ApplicationLayer
 public class TrainingOfferDraftApplicationService {
     private final TrainingOfferDraftRepository repository;
+    private final EventRegistry eventRegistry;
 
-    TrainingOfferDraftApplicationService(TrainingOfferDraftRepository repository) {
+    TrainingOfferDraftApplicationService(TrainingOfferDraftRepository repository, EventRegistry eventRegistry) {
         this.repository = repository;
+        this.eventRegistry = eventRegistry;
     }
 
     @Transactional
@@ -23,8 +27,9 @@ public class TrainingOfferDraftApplicationService {
     public void publish(UUID trainingOfferDraftId) {
         TrainingOfferDraft draft = repository.findById(trainingOfferDraftId);
 
-        draft.publish();
+        TrainingOfferPublishedEvent event = draft.publish();
 
         repository.save(draft);
+        eventRegistry.publish(event);
     }
 }
