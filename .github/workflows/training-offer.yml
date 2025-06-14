@@ -42,6 +42,10 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
+      - name: Build Annotations
+        working-directory: ./annotations
+        run: mvn clean install
+
       - name: Build Test Annotations
         working-directory: ./annotations-test
         run: mvn clean install
