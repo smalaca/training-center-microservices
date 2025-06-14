@@ -5,6 +5,7 @@ import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -12,7 +13,7 @@ import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion.assertThatTrainingOfferDraft;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion.assertThatTrainingOfferPublishedEvent;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -40,9 +41,9 @@ class TrainingOfferDraftApplicationServiceTest {
 
         service.publish(TRAINING_OFFER_DRAFT_ID);
 
-        TrainingOfferPublishedEvent event = thenTrainingOfferPublishedEventPublished();
-        assertThat(event.trainingOfferDraftId()).isEqualTo(TRAINING_OFFER_DRAFT_ID);
-        assertThat(event.trainingProgramId()).isEqualTo(TRAINING_PROGRAM_ID);
+        thenTrainingOfferPublishedEventPublished()
+                .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID);
     }
 
     private void givenExistingTrainingOfferDraft() {
@@ -69,10 +70,10 @@ class TrainingOfferDraftApplicationServiceTest {
         return assertThatTrainingOfferDraft(captor.getValue());
     }
 
-    private TrainingOfferPublishedEvent thenTrainingOfferPublishedEventPublished() {
+    private TrainingOfferPublishedEventAssertion thenTrainingOfferPublishedEventPublished() {
         ArgumentCaptor<TrainingOfferPublishedEvent> captor = ArgumentCaptor.forClass(TrainingOfferPublishedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
 
-        return captor.getValue();
+        return assertThatTrainingOfferPublishedEvent(captor.getValue());
     }
 }
