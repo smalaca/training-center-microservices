@@ -31,6 +31,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco/jacoco-ut/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>**/TrainingOfferApplication.java</sonar.coverage.exclusions>
         <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
+        <equalsverifier.version>3.16.1</equalsverifier.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,13 @@
 
         <dependency>
             <groupId>com.smalaca</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.smalaca</groupId>
             <artifactId>schema-registry</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -80,6 +88,13 @@
         </dependency>
 
         <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <version>${equalsverifier.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
@@ -89,12 +104,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.smalaca</groupId>
-            <artifactId>annotations</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
