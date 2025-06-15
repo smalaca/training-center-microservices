@@ -1,7 +1,6 @@
 package com.smalaca.trainingoffer.application.trainingofferdraft;
 
 import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
-import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
@@ -26,7 +25,8 @@ class TrainingOfferDraftApplicationServiceTest {
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
-    private static final Price PRICE = Price.of(BigDecimal.valueOf(1000), "USD");
+    private static final String CURRENCY = "USD";
+    private static final BigDecimal PRICE_AMOUNT = BigDecimal.valueOf(1000);
     private static final int MINIMUM_PARTICIPANTS = 5;
     private static final int MAXIMUM_PARTICIPANTS = 20;
     private static final LocalDate START_DATE = LocalDate.of(2023, 10, 1);
@@ -57,7 +57,8 @@ class TrainingOfferDraftApplicationServiceTest {
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
                 .hasTrainerId(TRAINER_ID)
-                .hasPrice(PRICE)
+                .hasPriceAmount(PRICE_AMOUNT)
+                .hasPriceCurrency(CURRENCY)
                 .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
                 .hasStartDate(START_DATE)
@@ -70,7 +71,7 @@ class TrainingOfferDraftApplicationServiceTest {
         TrainingOfferDraft draft = new TrainingOfferDraft.Builder()
                 .withTrainingProgramId(TRAINING_PROGRAM_ID)
                 .withTrainerId(TRAINER_ID)
-                .withPrice(PRICE)
+                .withPrice(PRICE_AMOUNT, CURRENCY)
                 .withMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .withMaximumParticipants(MAXIMUM_PARTICIPANTS)
                 .withTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)

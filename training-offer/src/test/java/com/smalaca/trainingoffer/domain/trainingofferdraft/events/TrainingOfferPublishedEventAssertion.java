@@ -1,7 +1,6 @@
 package com.smalaca.trainingoffer.domain.trainingofferdraft.events;
 
-import com.smalaca.trainingoffer.domain.price.Price;
-
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -34,8 +33,13 @@ public class TrainingOfferPublishedEventAssertion {
         return this;
     }
 
-    public TrainingOfferPublishedEventAssertion hasPrice(Price expected) {
-        assertThat(actual.price()).isEqualTo(expected);
+    public TrainingOfferPublishedEventAssertion hasPriceAmount(BigDecimal expected) {
+        assertThat(actual.priceAmount()).isEqualTo(expected);
+        return this;
+    }
+
+    public TrainingOfferPublishedEventAssertion hasPriceCurrency(String expected) {
+        assertThat(actual.priceCurrencyCode()).isEqualTo(expected);
         return this;
     }
 

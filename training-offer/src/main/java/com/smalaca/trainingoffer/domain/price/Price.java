@@ -16,6 +16,14 @@ public class Price {
         this.currency = currency;
     }
 
+    public BigDecimal amount() {
+        return amount;
+    }
+
+    public String currencyCode() {
+        return currency.getCurrencyCode();
+    }
+
     @Factory
     public static Price of(BigDecimal amount, String currency) {
         return new Price(amount, Currency.getInstance(currency));

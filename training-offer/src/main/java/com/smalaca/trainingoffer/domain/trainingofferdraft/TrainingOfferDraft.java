@@ -6,6 +6,7 @@ import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -38,7 +39,8 @@ public class TrainingOfferDraft {
             trainingOfferDraftId, 
             trainingProgramId, 
             trainerId, 
-            price, 
+            price.amount(),
+            price.currencyCode(),
             minimumParticipants, 
             maximumParticipants, 
             trainingSessionPeriod.startDate(), 
@@ -67,8 +69,8 @@ public class TrainingOfferDraft {
             return this;
         }
 
-        public Builder withPrice(Price price) {
-            this.price = price;
+        public Builder withPrice(BigDecimal amount, String currency) {
+            this.price = Price.of(amount, currency);
             return this;
         }
 
