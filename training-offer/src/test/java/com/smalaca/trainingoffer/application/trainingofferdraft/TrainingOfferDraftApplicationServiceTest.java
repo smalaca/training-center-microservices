@@ -10,6 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion.assertThatTrainingOfferDraft;
@@ -21,6 +24,15 @@ import static org.mockito.Mockito.mock;
 class TrainingOfferDraftApplicationServiceTest {
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
+    private static final UUID TRAINER_ID = UUID.randomUUID();
+    private static final String CURRENCY = "USD";
+    private static final BigDecimal PRICE_AMOUNT = BigDecimal.valueOf(1000);
+    private static final int MINIMUM_PARTICIPANTS = 5;
+    private static final int MAXIMUM_PARTICIPANTS = 20;
+    private static final LocalDate START_DATE = LocalDate.of(2023, 10, 1);
+    private static final LocalDate END_DATE = LocalDate.of(2023, 10, 5);
+    private static final LocalTime START_TIME = LocalTime.of(9, 0);
+    private static final LocalTime END_TIME = LocalTime.of(17, 0);
 
     private final TrainingOfferDraftRepository repository = mock(TrainingOfferDraftRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -43,11 +55,27 @@ class TrainingOfferDraftApplicationServiceTest {
 
         thenTrainingOfferPublishedEventPublished()
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
-                .hasTrainingProgramId(TRAINING_PROGRAM_ID);
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPriceAmount(PRICE_AMOUNT)
+                .hasPriceCurrency(CURRENCY)
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasStartDate(START_DATE)
+                .hasEndDate(END_DATE)
+                .hasStartTime(START_TIME)
+                .hasEndTime(END_TIME);
     }
 
     private void givenExistingTrainingOfferDraft() {
-        TrainingOfferDraft draft = new TrainingOfferDraft(TRAINING_PROGRAM_ID);
+        TrainingOfferDraft draft = new TrainingOfferDraft.Builder()
+                .withTrainingProgramId(TRAINING_PROGRAM_ID)
+                .withTrainerId(TRAINER_ID)
+                .withPrice(PRICE_AMOUNT, CURRENCY)
+                .withMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .withMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .withTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)
+                .build();
         assignTrainingOfferDraftId(draft);
 
         given(repository.findById(TRAINING_OFFER_DRAFT_ID)).willReturn(draft);
