@@ -3,6 +3,7 @@ package com.smalaca.trainingoffer.domain.trainingofferdraft;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.price.Price;
+import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 
 import java.time.LocalDate;
@@ -17,10 +18,7 @@ public class TrainingOfferDraft {
     private final Price price;
     private final int minimumParticipants;
     private final int maximumParticipants;
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final LocalTime startTime;
-    private final LocalTime endTime;
+    private final TrainingSessionPeriod trainingSessionPeriod;
     private boolean published;
 
     private TrainingOfferDraft(Builder builder) {
@@ -29,10 +27,7 @@ public class TrainingOfferDraft {
         this.price = builder.price;
         this.minimumParticipants = builder.minimumParticipants;
         this.maximumParticipants = builder.maximumParticipants;
-        this.startDate = builder.startDate;
-        this.endDate = builder.endDate;
-        this.startTime = builder.startTime;
-        this.endTime = builder.endTime;
+        this.trainingSessionPeriod = builder.trainingSessionPeriod;
         this.published = false;
     }
 
@@ -46,10 +41,10 @@ public class TrainingOfferDraft {
             price, 
             minimumParticipants, 
             maximumParticipants, 
-            startDate, 
-            endDate, 
-            startTime, 
-            endTime
+            trainingSessionPeriod.startDate(), 
+            trainingSessionPeriod.endDate(), 
+            trainingSessionPeriod.startTime(), 
+            trainingSessionPeriod.endTime()
         );
     }
 
@@ -60,10 +55,7 @@ public class TrainingOfferDraft {
         private Price price;
         private int minimumParticipants;
         private int maximumParticipants;
-        private LocalDate startDate;
-        private LocalDate endDate;
-        private LocalTime startTime;
-        private LocalTime endTime;
+        private TrainingSessionPeriod trainingSessionPeriod;
 
         public Builder withTrainingProgramId(UUID trainingProgramId) {
             this.trainingProgramId = trainingProgramId;
@@ -90,23 +82,8 @@ public class TrainingOfferDraft {
             return this;
         }
 
-        public Builder withStartDate(LocalDate startDate) {
-            this.startDate = startDate;
-            return this;
-        }
-
-        public Builder withEndDate(LocalDate endDate) {
-            this.endDate = endDate;
-            return this;
-        }
-
-        public Builder withStartTime(LocalTime startTime) {
-            this.startTime = startTime;
-            return this;
-        }
-
-        public Builder withEndTime(LocalTime endTime) {
-            this.endTime = endTime;
+        public Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+            this.trainingSessionPeriod = new TrainingSessionPeriod(startDate, endDate, startTime, endTime);
             return this;
         }
 

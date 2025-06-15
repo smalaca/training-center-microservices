@@ -73,10 +73,7 @@ class TrainingOfferDraftApplicationServiceTest {
                 .withPrice(PRICE)
                 .withMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .withMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                .withStartDate(START_DATE)
-                .withEndDate(END_DATE)
-                .withStartTime(START_TIME)
-                .withEndTime(END_TIME)
+                .withTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)
                 .build();
         assignTrainingOfferDraftId(draft);
 

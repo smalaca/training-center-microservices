@@ -8,7 +8,8 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 public record TrainingOfferPublishedEvent(
-        EventId eventId, UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId, Price price,
+        EventId eventId, UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId,
+        Price price,
         int minimumParticipants, int maximumParticipants,
         LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
     public static TrainingOfferPublishedEvent create(
