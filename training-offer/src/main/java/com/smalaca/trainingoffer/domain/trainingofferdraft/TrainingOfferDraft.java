@@ -65,7 +65,7 @@ public class TrainingOfferDraft {
         this.published = false;
     }
 
-    protected TrainingOfferDraft() {}
+    private TrainingOfferDraft() {}
 
     public TrainingOfferPublishedEvent publish() {
         if (published) {
