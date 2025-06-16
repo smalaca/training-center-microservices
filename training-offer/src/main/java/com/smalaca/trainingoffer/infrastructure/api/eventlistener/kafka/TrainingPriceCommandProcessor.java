@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.api;
+package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.google.common.collect.ImmutableSet;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;

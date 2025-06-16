@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.api;
+package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
