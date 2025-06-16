@@ -52,6 +52,7 @@ public class GivenTrainingOfferDraft {
 
     public TrainingOfferDraftTestDto getDto() {
         return new TrainingOfferDraftTestDto.Builder()
+                .withTrainingOfferDraftId(trainingOfferDraft.trainingOfferDraftId())
                 .withTrainingProgramId(trainingProgramId)
                 .withTrainerId(trainerId)
                 .withPrice(priceAmount, priceCurrency)

@@ -47,7 +47,7 @@ class JpaTrainingOfferDraftRepositoryIntegrationTest {
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOfferDraft.getTrainingOfferDraft()));
 
-        thenSavedTrainingOfferDraftHasDataEqualTo(trainingOfferDraft);
+        thenSavedTrainingOfferDraftHasDataEqualTo(trainingOfferDraft.getDto());
     }
 
     @Test
@@ -58,13 +58,12 @@ class JpaTrainingOfferDraftRepositoryIntegrationTest {
         GivenTrainingOfferDraft publishedDraft = given.trainingOfferDraft().published();
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(publishedDraft.getTrainingOfferDraft()));
 
-        thenSavedTrainingOfferDraftHasDataEqualTo(unpublishedDraft).isNotPublished();
-        thenSavedTrainingOfferDraftHasDataEqualTo(publishedDraft).isPublished();
+        thenSavedTrainingOfferDraftHasDataEqualTo(unpublishedDraft.getDto()).isNotPublished();
+        thenSavedTrainingOfferDraftHasDataEqualTo(publishedDraft.getDto()).isPublished();
     }
 
-    private TrainingOfferDraftAssertion thenSavedTrainingOfferDraftHasDataEqualTo(GivenTrainingOfferDraft givenTrainingOfferDraft) {
-        TrainingOfferDraft saved = repository.findById(givenTrainingOfferDraft.getTrainingOfferDraft().trainingOfferDraftId());
-        TrainingOfferDraftTestDto expected = givenTrainingOfferDraft.getDto();
+    private TrainingOfferDraftAssertion thenSavedTrainingOfferDraftHasDataEqualTo(TrainingOfferDraftTestDto expected) {
+        TrainingOfferDraft saved = repository.findById(expected.trainingOfferDraftId());
 
         return assertThatTrainingOfferDraft(saved)
                 .hasTrainingOfferDraftId(saved.trainingOfferDraftId())
