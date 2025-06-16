@@ -68,6 +68,10 @@ public class TrainingOfferDraft {
     private TrainingOfferDraft() {}
 
     public TrainingOfferPublishedEvent publish() {
+        if (published) {
+            throw new TrainingOfferDraftAlreadyPublishedException(trainingOfferDraftId);
+        }
+
         this.published = true;
 
         return TrainingOfferPublishedEvent.create(

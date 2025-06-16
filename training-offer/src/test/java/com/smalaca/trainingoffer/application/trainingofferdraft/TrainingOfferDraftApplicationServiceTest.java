@@ -2,6 +2,7 @@ package com.smalaca.trainingoffer.application.trainingofferdraft;
 
 import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAlreadyPublishedException;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
@@ -17,6 +18,8 @@ import java.util.UUID;
 
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion.assertThatTrainingOfferDraft;
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion.assertThatTrainingOfferPublishedEvent;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -40,7 +43,7 @@ class TrainingOfferDraftApplicationServiceTest {
 
     @Test
     void shouldMarkTrainingOfferDraftAsPublished() {
-        givenExistingTrainingOfferDraft();
+        givenExisting(trainingOfferDraft());
 
         service.publish(TRAINING_OFFER_DRAFT_ID);
 
@@ -49,7 +52,7 @@ class TrainingOfferDraftApplicationServiceTest {
 
     @Test
     void shouldPublishTrainingOfferPublishedEventWhenTrainingOfferDraftIsPublished() {
-        givenExistingTrainingOfferDraft();
+        givenExisting(trainingOfferDraft());
 
         service.publish(TRAINING_OFFER_DRAFT_ID);
 
@@ -67,8 +70,19 @@ class TrainingOfferDraftApplicationServiceTest {
                 .hasEndTime(END_TIME);
     }
 
-    private void givenExistingTrainingOfferDraft() {
-        TrainingOfferDraft draft = new TrainingOfferDraft.Builder()
+    @Test
+    void shouldThrowExceptionWhenTrainingOfferDraftAlreadyPublished() {
+        TrainingOfferDraft trainingOfferDraft = trainingOfferDraft();
+        trainingOfferDraft.publish();
+        givenExisting(trainingOfferDraft);
+
+        TrainingOfferDraftAlreadyPublishedException actual = assertThrows(TrainingOfferDraftAlreadyPublishedException.class, () -> service.publish(TRAINING_OFFER_DRAFT_ID));
+
+        assertThat(actual).hasMessage("Training offer draft: " + TRAINING_OFFER_DRAFT_ID + " already published.");
+    }
+
+    private TrainingOfferDraft trainingOfferDraft() {
+        TrainingOfferDraft trainingOfferDraft = new TrainingOfferDraft.Builder()
                 .withTrainingProgramId(TRAINING_PROGRAM_ID)
                 .withTrainerId(TRAINER_ID)
                 .withPrice(PRICE_AMOUNT, CURRENCY)
@@ -76,16 +90,20 @@ class TrainingOfferDraftApplicationServiceTest {
                 .withMaximumParticipants(MAXIMUM_PARTICIPANTS)
                 .withTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)
                 .build();
-        assignTrainingOfferDraftId(draft);
 
+        return assignTrainingOfferDraftIdTo(trainingOfferDraft);
+    }
+
+    private void givenExisting(TrainingOfferDraft draft) {
         given(repository.findById(TRAINING_OFFER_DRAFT_ID)).willReturn(draft);
     }
 
-    private void assignTrainingOfferDraftId(TrainingOfferDraft trainingOfferDraft) {
+    private TrainingOfferDraft assignTrainingOfferDraftIdTo(TrainingOfferDraft trainingOfferDraft) {
         try {
             Field offerIdField = trainingOfferDraft.getClass().getDeclaredField("trainingOfferDraftId");
             offerIdField.setAccessible(true);
             offerIdField.set(trainingOfferDraft, TRAINING_OFFER_DRAFT_ID);
+            return trainingOfferDraft;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
