@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.api;
+package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
@@ -21,8 +21,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.smalaca.trainingoffer.api.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
-import static com.smalaca.trainingoffer.api.TrainingPriceNotChangedEventAssertion.assertThatTrainingPriceNotChangedEvent;
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPriceNotChangedEventAssertion.assertThatTrainingPriceNotChangedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;

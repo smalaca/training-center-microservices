@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.api;
+package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

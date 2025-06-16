@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.api;
+package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
@@ -12,8 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
-import static com.smalaca.trainingoffer.api.NoAvailableTrainingPlacesLeftEventAssertion.assertThatNoAvailableTrainingPlacesLeftEvent;
-import static com.smalaca.trainingoffer.api.TrainingPlaceBookedEventAssertion.assertThatTrainingPlaceBookedEvent;
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.NoAvailableTrainingPlacesLeftEventAssertion.assertThatNoAvailableTrainingPlacesLeftEvent;
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPlaceBookedEventAssertion.assertThatTrainingPlaceBookedEvent;
 import static java.time.LocalDateTime.now;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
