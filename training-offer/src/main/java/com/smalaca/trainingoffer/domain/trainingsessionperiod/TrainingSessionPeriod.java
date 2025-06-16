@@ -1,16 +1,18 @@
 package com.smalaca.trainingoffer.domain.trainingsessionperiod;
 
 import com.smalaca.domaindrivendesign.ValueObject;
+import jakarta.persistence.Embeddable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @ValueObject
+@Embeddable
 public class TrainingSessionPeriod {
-    private final LocalDate startDate;
-    private final LocalDate endDate;
-    private final LocalTime startTime;
-    private final LocalTime endTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
 
     public TrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         this.startDate = startDate;
@@ -18,6 +20,8 @@ public class TrainingSessionPeriod {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    private TrainingSessionPeriod() {}
 
     public LocalDate startDate() {
         return startDate;

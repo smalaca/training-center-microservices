@@ -2,19 +2,23 @@ package com.smalaca.trainingoffer.domain.price;
 
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.domaindrivendesign.ValueObject;
+import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
 import java.util.Currency;
 
 @ValueObject
+@Embeddable
 public class Price {
-    private final BigDecimal amount;
-    private final Currency currency;
+    private BigDecimal amount;
+    private Currency currency;
 
     private Price(BigDecimal amount, Currency currency) {
         this.amount = amount;
         this.currency = currency;
     }
+
+    private Price() {}
 
     public BigDecimal amount() {
         return amount;

@@ -6,20 +6,53 @@ import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @AggregateRoot
+@Entity
+@Table(name = "TRAINING_OFFER_DRAFTS")
 public class TrainingOfferDraft {
+    @Id
+    @GeneratedValue
+    @Column(name = "TRAINING_OFFER_DRAFT_ID")
     private UUID trainingOfferDraftId;
-    private final UUID trainingProgramId;
-    private final UUID trainerId;
-    private final Price price;
-    private final int minimumParticipants;
-    private final int maximumParticipants;
-    private final TrainingSessionPeriod trainingSessionPeriod;
+
+    @Column(name = "TRAINING_PROGRAM_ID")
+    private UUID trainingProgramId;
+
+    @Column(name = "TRAINER_ID")
+    private UUID trainerId;
+
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT"))
+    @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+    private Price price;
+
+    @Column(name = "MINIMUM_PARTICIPANTS")
+    private int minimumParticipants;
+
+    @Column(name = "MAXIMUM_PARTICIPANTS")
+    private int maximumParticipants;
+
+    @Embedded
+    @AttributeOverride(name = "startDate", column = @Column(name = "START_DATE"))
+    @AttributeOverride(name = "endDate", column = @Column(name = "END_DATE"))
+    @AttributeOverride(name = "startTime", column = @Column(name = "START_TIME"))
+    @AttributeOverride(name = "endTime", column = @Column(name = "END_TIME"))
+    private TrainingSessionPeriod trainingSessionPeriod;
+
+    @Column(name = "PUBLISHED")
     private boolean published;
 
     private TrainingOfferDraft(Builder builder) {
@@ -31,6 +64,8 @@ public class TrainingOfferDraft {
         this.trainingSessionPeriod = builder.trainingSessionPeriod;
         this.published = false;
     }
+
+    private TrainingOfferDraft() {}
 
     public TrainingOfferPublishedEvent publish() {
         this.published = true;
@@ -48,6 +83,10 @@ public class TrainingOfferDraft {
             trainingSessionPeriod.startTime(), 
             trainingSessionPeriod.endTime()
         );
+    }
+
+    public UUID trainingOfferDraftId() {
+        return trainingOfferDraftId;
     }
 
     @Factory
