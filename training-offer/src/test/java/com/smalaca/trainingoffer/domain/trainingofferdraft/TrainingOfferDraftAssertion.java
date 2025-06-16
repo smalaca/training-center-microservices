@@ -1,5 +1,10 @@
 package com.smalaca.trainingoffer.domain.trainingofferdraft;
 
+import com.smalaca.trainingoffer.domain.price.Price;
+import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
+
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrainingOfferDraftAssertion {
@@ -13,10 +18,48 @@ public class TrainingOfferDraftAssertion {
         return new TrainingOfferDraftAssertion(actual);
     }
 
+    public TrainingOfferDraftAssertion hasTrainingOfferDraftId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferDraftId", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasTrainingProgramId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingProgramId", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasTrainerId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainerId", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasPrice(Price expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("price", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasMinimumParticipants(int expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("minimumParticipants", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasMaximumParticipants(int expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("maximumParticipants", expected);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion hasTrainingSessionPeriod(TrainingSessionPeriod expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingSessionPeriod", expected);
+        return this;
+    }
+
     public TrainingOfferDraftAssertion isPublished() {
-        assertThat(actual).extracting("published").satisfies(field -> {
-            assertThat((boolean) field).isTrue();
-        });
+        assertThat(actual).hasFieldOrPropertyWithValue("published", true);
+        return this;
+    }
+
+    public TrainingOfferDraftAssertion isNotPublished() {
+        assertThat(actual).hasFieldOrPropertyWithValue("published", false);
         return this;
     }
 }

@@ -108,6 +108,7 @@ public class GivenOffer {
 
         return this;
     }
+
     public GivenOffer terminated() {
         initiated();
         status = TERMINATED;
