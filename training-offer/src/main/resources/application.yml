@@ -6,6 +6,11 @@ spring:
     serialization:
       indent_output: true
 
+scheduled:
+  outbox:
+    message:
+      rate: 1000
+
 kafka:
   bootstrap-servers: localhost:9092
   group-id: training-offer

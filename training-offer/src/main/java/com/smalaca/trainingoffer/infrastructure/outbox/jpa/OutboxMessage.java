@@ -40,6 +40,10 @@ class OutboxMessage {
 
     private OutboxMessage() {}
 
+    void published() {
+        isPublished = true;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
