@@ -1,4 +1,4 @@
-# 0007: Outbox Pattern for Reliable Event Publishing
+# 0009: Outbox Pattern for Reliable Event Publishing in Training Offer Service
 
 ## Status
 
@@ -6,17 +6,18 @@ Accepted
 
 ## Date
 
-2024-12-17
+2024-12-20
 
 ## Decision
 
-Implement the Outbox Pattern to ensure reliable event publishing in our event-driven architecture.
+Implement the Outbox Pattern to ensure reliable event publishing in the Training Offer service.
 
 ## Context
 
-* Our system uses an event-driven architecture where services communicate through events.
+* The Training Offer service uses an event-driven architecture where it communicates with other services through events.
+* The service needs to publish events such as TrainingOfferPublishedEvent when a training offer is published.
 * Ensuring reliable event delivery is critical for maintaining data consistency across services.
-* We need to avoid the dual-write problem where a service might update its database but fail to publish an event.
+* We need to avoid the dual-write problem where the service might update its database but fail to publish an event.
 * Events must be published exactly once to avoid duplicate processing.
 * The system should be resilient to temporary failures in the messaging infrastructure.
 
@@ -24,13 +25,13 @@ Implement the Outbox Pattern to ensure reliable event publishing in our event-dr
 
 ### Outbox Pattern
 
-* When a service needs to publish an event, it first stores the event in an "outbox" table within its own database as part of the same transaction that updates the service's state.
+* When the Training Offer service needs to publish an event, it first stores the event in an "outbox" table within its own database as part of the same transaction that updates the service's state.
 * A separate process periodically polls the outbox table for unpublished events, publishes them to the message broker, and marks them as published.
 * This ensures that the database update and event creation are atomic, and the event will eventually be published even if there are temporary failures.
 
 ### Direct Publishing
 
-* Services publish events directly to the message broker after updating their database.
+* The service publishes events directly to the message broker after updating its database.
 * This approach is simpler but can lead to inconsistencies if the event publishing fails after the database update succeeds.
 
 ### Two-Phase Commit
@@ -45,6 +46,7 @@ Implement the Outbox Pattern to ensure reliable event publishing in our event-dr
 * **Exactly-Once Semantics** - The pattern helps ensure that events are published exactly once, avoiding duplicate processing.
 * **Simplicity** - The pattern is relatively simple to implement and doesn't require distributed transactions.
 * **Compatibility** - The pattern works with any message broker and doesn't require special transaction support.
+* **Consistency with Other Services** - Using the same pattern as the Open Trainings service ensures consistency across our codebase, making it easier for developers to work across different services.
 
 ## Consequences
 
@@ -57,6 +59,7 @@ Implement the Outbox Pattern to ensure reliable event publishing in our event-dr
 * The pattern naturally provides an audit trail of all events that have been published.
 * The pattern can be extended to support event ordering and idempotent processing.
 * The outbox table can be used for debugging and monitoring purposes.
+* Consistency with other services in the system simplifies the overall architecture.
 
 ### Negative Risks and Considerations
 
