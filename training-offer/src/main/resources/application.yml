@@ -6,6 +6,11 @@ spring:
     serialization:
       indent_output: true
 
+scheduled:
+  outbox:
+    message:
+      rate: 1000
+
 kafka:
   bootstrap-servers: localhost:9092
   group-id: training-offer
@@ -18,3 +23,6 @@ kafka:
       training-price-not-changed: open-training-offer-acceptance-training-price-not-changed-event-topic
       training-place-booked: open-training-offer-acceptance-training-place-booked-event-topic
       no-available-training-places-left: open-training-offer-acceptance-no-available-training-places-left-event-topic
+    trainingoffer:
+      events:
+        training-offer-published: training-offer-training-offer-published-event-topic
