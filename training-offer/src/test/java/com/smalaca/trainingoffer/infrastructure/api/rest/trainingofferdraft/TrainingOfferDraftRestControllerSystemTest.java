@@ -2,24 +2,21 @@ package com.smalaca.trainingoffer.infrastructure.api.rest.trainingofferdraft;
 
 import com.smalaca.test.type.SystemTest;
 import com.smalaca.trainingoffer.client.trainingoffer.TrainingOfferTestClient;
-import com.smalaca.trainingoffer.domain.trainingofferdraft.GivenTrainingOfferDraft;
+import com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponse;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.GivenTrainingOfferDraftFactory;
-import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftTestDto;
 import com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingofferdraft.SpringTrainingOfferDraftCrudRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.OK;
+import static com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponseAssertion.assertThatTrainingOfferDraftResponse;
 
 @SystemTest
 @Import(TrainingOfferTestClient.class)
@@ -41,7 +38,7 @@ class TrainingOfferDraftRestControllerSystemTest {
 
     @BeforeEach
     void givenTrainingOfferDraftFactory() {
-        given = GivenTrainingOfferDraftFactory.create();
+        given = GivenTrainingOfferDraftFactory.create(repository);
     }
 
     @AfterEach
@@ -51,26 +48,56 @@ class TrainingOfferDraftRestControllerSystemTest {
 
     @Test
     void shouldPublishTrainingOfferDraft() {
-        UUID trainingOfferDraftId = existing(given.trainingOfferDraft().initiated());
+        TrainingOfferDraftTestDto dto = given.trainingOfferDraft().initiated().getDto();
 
-        MockHttpServletResponse actual = client.trainingOfferDrafts().publish(trainingOfferDraftId);
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.trainingOfferDraftId());
 
-        assertThat(actual.getStatus()).isEqualTo(OK.value());
+        assertThatTrainingOfferDraftResponse(actual).isOk();
+        assertThatTrainingOfferDraftResponse(client.trainingOfferDrafts().findById(dto.trainingOfferDraftId()))
+                .isOk()
+                .hasPublishedTrainingOfferDraft(dto);
     }
 
     @Test
     void shouldReturnConflictWhenPublishingAlreadyPublishedTrainingOfferDraft() {
-        UUID trainingOfferDraftId = existing(given.trainingOfferDraft().published());
+        UUID trainingOfferDraftId = given.trainingOfferDraft().published().getDto().trainingOfferDraftId();
 
-        MockHttpServletResponse actual = client.trainingOfferDrafts().publish(trainingOfferDraftId);
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(trainingOfferDraftId);
 
-        assertThat(actual.getStatus()).isEqualTo(CONFLICT.value());
+        assertThatTrainingOfferDraftResponse(actual)
+                .isConflict()
+                .withMessage("Training offer draft: " + trainingOfferDraftId + " already published.");
     }
 
-    private UUID existing(GivenTrainingOfferDraft givenTrainingOfferDraft) {
-        TrainingOfferDraft trainingOfferDraft = givenTrainingOfferDraft.getTrainingOfferDraft();
-        repository.save(trainingOfferDraft);
+    @Test
+    void shouldNotFindNotExistingTrainingOfferDraft() {
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().findById(UUID.randomUUID());
 
-        return trainingOfferDraft.trainingOfferDraftId();
+        assertThatTrainingOfferDraftResponse(actual).notFound();
+    }
+
+    @Test
+    void shouldFindExistingTrainingOfferDraft() {
+        TrainingOfferDraftTestDto dto = given.trainingOfferDraft().initiated().getDto();
+
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().findById(dto.trainingOfferDraftId());
+
+        assertThatTrainingOfferDraftResponse(actual)
+                .isOk()
+                .hasUnpublishedTrainingOfferDraft(dto);
+    }
+
+    @Test
+    void shouldFindAllTrainingOfferDrafts() {
+        TrainingOfferDraftTestDto dtoOne = given.trainingOfferDraft().initiated().getDto();
+        TrainingOfferDraftTestDto dtoTwo = given.trainingOfferDraft().published().getDto();
+
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().findAll();
+
+        assertThatTrainingOfferDraftResponse(actual)
+                .isOk()
+                .hasTrainingOfferDrafts(2)
+                .containsUnpublishedTrainingOfferDraft(dtoOne)
+                .containsPublishedTrainingOfferDraft(dtoTwo);
     }
 }

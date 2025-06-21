@@ -23,8 +23,8 @@ public class OfferQueryService {
     }
 
     @QueryOperation
-    public Optional<OfferView> findById(UUID orderId) {
-        return repository.findById(orderId);
+    public Optional<OfferView> findById(UUID offerId) {
+        return repository.findById(offerId);
     }
 
     @QueryOperation
