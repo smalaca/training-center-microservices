@@ -8,18 +8,18 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TrainingProgramProposalCreatedEventAssertion {
+public class TrainingProgramProposedEventAssertion {
     private final TrainingProgramProposedEvent actual;
 
-    private TrainingProgramProposalCreatedEventAssertion(TrainingProgramProposedEvent actual) {
+    private TrainingProgramProposedEventAssertion(TrainingProgramProposedEvent actual) {
         this.actual = actual;
     }
 
-    public static TrainingProgramProposalCreatedEventAssertion assertThatTrainingProgramProposalCreatedEvent(TrainingProgramProposedEvent actual) {
-        return new TrainingProgramProposalCreatedEventAssertion(actual);
+    public static TrainingProgramProposedEventAssertion assertThatTrainingProgramProposedEvent(TrainingProgramProposedEvent actual) {
+        return new TrainingProgramProposedEventAssertion(actual);
     }
 
-    public TrainingProgramProposalCreatedEventAssertion isNextAfter(CommandId commandId) {
+    public TrainingProgramProposedEventAssertion isNextAfter(CommandId commandId) {
         assertThat(actual.eventId().eventId()).isNotEqualTo(commandId.commandId());
         assertThat(actual.eventId().traceId()).isEqualTo(commandId.traceId());
         assertThat(actual.eventId().correlationId()).isEqualTo(commandId.correlationId());
@@ -27,37 +27,37 @@ public class TrainingProgramProposalCreatedEventAssertion {
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasTrainingProgramProposalIdNotNull() {
+    public TrainingProgramProposedEventAssertion hasTrainingProgramProposalIdNotNull() {
         assertThat(actual.trainingProgramProposalId()).isNotNull();
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasName(String expected) {
+    public TrainingProgramProposedEventAssertion hasName(String expected) {
         assertThat(actual.name()).isEqualTo(expected);
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasDescription(String expected) {
+    public TrainingProgramProposedEventAssertion hasDescription(String expected) {
         assertThat(actual.description()).isEqualTo(expected);
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasAgenda(String expected) {
+    public TrainingProgramProposedEventAssertion hasAgenda(String expected) {
         assertThat(actual.agenda()).isEqualTo(expected);
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasPlan(String expected) {
+    public TrainingProgramProposedEventAssertion hasPlan(String expected) {
         assertThat(actual.plan()).isEqualTo(expected);
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasAuthorId(UUID expected) {
+    public TrainingProgramProposedEventAssertion hasAuthorId(UUID expected) {
         assertThat(actual.authorId()).isEqualTo(expected);
         return this;
     }
 
-    public TrainingProgramProposalCreatedEventAssertion hasCategoriesIds(List<UUID> expected) {
+    public TrainingProgramProposedEventAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual.categoriesIds()).isEqualTo(expected);
         return this;
     }

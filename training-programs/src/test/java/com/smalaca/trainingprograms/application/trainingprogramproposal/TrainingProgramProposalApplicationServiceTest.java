@@ -14,7 +14,7 @@ import org.mockito.ArgumentCaptor;
 import java.util.List;
 import java.util.UUID;
 
-import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposalCreatedEventAssertion.assertThatTrainingProgramProposalCreatedEvent;
+import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
 import static org.mockito.BDDMockito.then;
@@ -33,7 +33,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
         service.propose(command);
 
-        thenPublishedTrainingProgramProposalCreatedEvent()
+        thenPublishedTrainingProgramProposedEvent()
                 .isNextAfter(command.commandId())
                 .hasTrainingProgramProposalIdNotNull()
                 .hasName(command.name())
@@ -44,11 +44,11 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(command.categoriesIds());
     }
 
-    private TrainingProgramProposalCreatedEventAssertion thenPublishedTrainingProgramProposalCreatedEvent() {
+    private TrainingProgramProposedEventAssertion thenPublishedTrainingProgramProposedEvent() {
         ArgumentCaptor<TrainingProgramProposedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
 
-        return assertThatTrainingProgramProposalCreatedEvent(captor.getValue());
+        return assertThatTrainingProgramProposedEvent(captor.getValue());
     }
 
     @Test
