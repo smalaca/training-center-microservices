@@ -61,15 +61,21 @@
 
         <dependency>
             <groupId>com.smalaca</groupId>
-            <artifactId>annotations-test</artifactId>
+            <artifactId>annotations</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.smalaca</groupId>
             <artifactId>schema-registry</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.smalaca</groupId>
+            <artifactId>annotations-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
