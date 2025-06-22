@@ -8,7 +8,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 @ApplicationLayer
@@ -27,7 +27,7 @@ public class TrainingProgramProposalApplicationService {
     @CommandOperation
     @DrivingPort
     public void propose(CreateTrainingProgramProposalCommand command) {
-        TrainingProgramProposalCreatedEvent event = factory.create(command);
+        TrainingProgramProposedEvent event = factory.create(command);
 
         eventRegistry.publish(event);
     }
@@ -35,7 +35,7 @@ public class TrainingProgramProposalApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void create(TrainingProgramProposalCreatedEvent event) {
+    public void create(TrainingProgramProposedEvent event) {
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
 
         repository.save(trainingProgramProposal);

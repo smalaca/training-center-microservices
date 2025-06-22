@@ -5,7 +5,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,7 +45,7 @@ class TrainingProgramProposalApplicationServiceTest {
     }
 
     private TrainingProgramProposalCreatedEventAssertion thenPublishedTrainingProgramProposalCreatedEvent() {
-        ArgumentCaptor<TrainingProgramProposalCreatedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposalCreatedEvent.class);
+        ArgumentCaptor<TrainingProgramProposedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatTrainingProgramProposalCreatedEvent(captor.getValue());
@@ -53,7 +53,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
     @Test
     void shouldCreateTrainingProgramProposalFromEvent() {
-        TrainingProgramProposalCreatedEvent event = createTrainingProgramProposalCreatedEvent();
+        TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
 
         service.create(event);
 
@@ -67,15 +67,15 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(event.categoriesIds());
     }
 
-    private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(TrainingProgramProposalCreatedEvent event) {
+    private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(TrainingProgramProposedEvent event) {
         ArgumentCaptor<TrainingProgramProposal> captor = ArgumentCaptor.forClass(TrainingProgramProposal.class);
         then(repository).should().save(captor.capture());
 
         return assertThatTrainingProgramProposal(captor.getValue());
     }
 
-    private TrainingProgramProposalCreatedEvent createTrainingProgramProposalCreatedEvent() {
-        return TrainingProgramProposalCreatedEvent.create(UUID.randomUUID(), randomCreateTrainingProgramProposalCommand());
+    private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
+        return TrainingProgramProposedEvent.create(UUID.randomUUID(), randomCreateTrainingProgramProposalCommand());
     }
 
     private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {

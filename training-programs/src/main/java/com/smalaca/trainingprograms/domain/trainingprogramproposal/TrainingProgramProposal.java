@@ -1,7 +1,7 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class TrainingProgramProposal {
     private final UUID authorId;
     private final List<UUID> categoriesIds;
 
-    public TrainingProgramProposal(TrainingProgramProposalCreatedEvent event) {
+    public TrainingProgramProposal(TrainingProgramProposedEvent event) {
         trainingProgramProposalId = event.trainingProgramProposalId();
         name = event.name();
         description = event.description();

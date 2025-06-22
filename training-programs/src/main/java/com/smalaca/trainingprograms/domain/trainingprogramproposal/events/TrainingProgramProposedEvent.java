@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.UUID;
 
 @DomainEvent
-public record TrainingProgramProposalCreatedEvent(
+public record TrainingProgramProposedEvent(
         EventId eventId, UUID trainingProgramProposalId, String name, String description, String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
 
-    public static TrainingProgramProposalCreatedEvent create(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
-        return new TrainingProgramProposalCreatedEvent(
+    public static TrainingProgramProposedEvent create(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
+        return new TrainingProgramProposedEvent(
                 EventId.newEventId(), trainingProgramProposalId, command.name(), command.description(), command.agenda(),
                 command.plan(), command.authorId(), command.categoriesIds()
         );

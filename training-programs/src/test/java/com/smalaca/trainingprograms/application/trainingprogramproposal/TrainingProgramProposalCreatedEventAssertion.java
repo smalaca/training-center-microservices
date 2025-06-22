@@ -1,6 +1,6 @@
 package com.smalaca.trainingprograms.application.trainingprogramproposal;
 
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 
 import java.util.List;
 import java.util.UUID;
@@ -8,13 +8,13 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrainingProgramProposalCreatedEventAssertion {
-    private final TrainingProgramProposalCreatedEvent actual;
+    private final TrainingProgramProposedEvent actual;
 
-    private TrainingProgramProposalCreatedEventAssertion(TrainingProgramProposalCreatedEvent actual) {
+    private TrainingProgramProposalCreatedEventAssertion(TrainingProgramProposedEvent actual) {
         this.actual = actual;
     }
 
-    public static TrainingProgramProposalCreatedEventAssertion assertThatTrainingProgramProposalCreatedEvent(TrainingProgramProposalCreatedEvent actual) {
+    public static TrainingProgramProposalCreatedEventAssertion assertThatTrainingProgramProposalCreatedEvent(TrainingProgramProposedEvent actual) {
         return new TrainingProgramProposalCreatedEventAssertion(actual);
     }
 
