@@ -4,27 +4,40 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.trainingprograms.domain.eventregistry.EventRegistry;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalFactory;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 @ApplicationLayer
 public class TrainingProgramProposalApplicationService {
     private final TrainingProgramProposalFactory factory;
     private final EventRegistry eventRegistry;
+    private final TrainingProgramProposalRepository repository;
 
-    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry) {
+    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry, TrainingProgramProposalRepository repository) {
         this.factory = factory;
         this.eventRegistry = eventRegistry;
+        this.repository = repository;
     }
 
     @Transactional
     @CommandOperation
     @DrivingPort
     public void propose(CreateTrainingProgramProposalCommand command) {
-        TrainingProgramProposalCreatedEvent event = factory.create(command);
+        TrainingProgramProposedEvent event = factory.create(command);
 
         eventRegistry.publish(event);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void create(TrainingProgramProposedEvent event) {
+        TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
+
+        repository.save(trainingProgramProposal);
     }
 }

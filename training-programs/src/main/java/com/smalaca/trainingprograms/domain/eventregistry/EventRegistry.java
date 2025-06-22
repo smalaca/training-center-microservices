@@ -1,7 +1,7 @@
 package com.smalaca.trainingprograms.domain.eventregistry;
 
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 
 public interface EventRegistry {
-    void publish(TrainingProgramProposalCreatedEvent event);
+    void publish(TrainingProgramProposedEvent event);
 }
