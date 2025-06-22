@@ -1,6 +1,9 @@
 package com.smalaca.trainingprograms.application.trainingprogramproposal;
 
 import com.smalaca.trainingprograms.domain.eventregistry.EventRegistry;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalCreatedEvent;
 import net.datafaker.Faker;
@@ -11,14 +14,19 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposalCreatedEventAssertion.assertThatTrainingProgramProposalCreatedEvent;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class TrainingProgramProposalApplicationServiceTest {
     private static final Faker FAKER = new Faker();
+    private static final String PLAN = FAKER.lorem().paragraph();
+    private static final UUID AUTHOR_ID = UUID.randomUUID();
+    private static final List<UUID> CATEGORIES_IDS = List.of(UUID.randomUUID(), UUID.randomUUID());
 
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final TrainingProgramProposalApplicationService service = new TrainingProgramProposalApplicationServiceFactory().trainingProgramProposalApplicationService(eventRegistry);
+    private final TrainingProgramProposalRepository repository = mock(TrainingProgramProposalRepository.class);
+    private final TrainingProgramProposalApplicationService service = new TrainingProgramProposalApplicationServiceFactory().trainingProgramProposalApplicationService(eventRegistry, repository);
 
     @Test
     void shouldPublishTrainingProgramProposalCreatedEvent() {
@@ -41,6 +49,33 @@ class TrainingProgramProposalApplicationServiceTest {
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatTrainingProgramProposalCreatedEvent(captor.getValue());
+    }
+
+    @Test
+    void shouldCreateTrainingProgramProposalFromEvent() {
+        TrainingProgramProposalCreatedEvent event = createTrainingProgramProposalCreatedEvent();
+
+        service.create(event);
+
+        thenTrainingProgramProposalSaved(event)
+                .hasTrainingProgramProposalId(event.trainingProgramProposalId())
+                .hasName(event.name())
+                .hasDescription(event.description())
+                .hasAgenda(event.agenda())
+                .hasPlan(event.plan())
+                .hasAuthorId(event.authorId())
+                .hasCategoriesIds(event.categoriesIds());
+    }
+
+    private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(TrainingProgramProposalCreatedEvent event) {
+        ArgumentCaptor<TrainingProgramProposal> captor = ArgumentCaptor.forClass(TrainingProgramProposal.class);
+        then(repository).should().save(captor.capture());
+
+        return assertThatTrainingProgramProposal(captor.getValue());
+    }
+
+    private TrainingProgramProposalCreatedEvent createTrainingProgramProposalCreatedEvent() {
+        return TrainingProgramProposalCreatedEvent.create(UUID.randomUUID(), randomCreateTrainingProgramProposalCommand());
     }
 
     private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
