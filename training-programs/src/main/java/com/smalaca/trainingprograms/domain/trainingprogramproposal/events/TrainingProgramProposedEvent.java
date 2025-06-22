@@ -13,7 +13,7 @@ public record TrainingProgramProposedEvent(
 
     public static TrainingProgramProposedEvent create(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
         return new TrainingProgramProposedEvent(
-                EventId.newEventId(), trainingProgramProposalId, command.name(), command.description(), command.agenda(),
+                command.commandId().nextEventId(), trainingProgramProposalId, command.name(), command.description(), command.agenda(),
                 command.plan(), command.authorId(), command.categoriesIds()
         );
     }

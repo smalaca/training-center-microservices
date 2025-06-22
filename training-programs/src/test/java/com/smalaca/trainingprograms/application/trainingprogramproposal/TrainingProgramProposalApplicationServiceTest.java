@@ -1,5 +1,6 @@
 package com.smalaca.trainingprograms.application.trainingprogramproposal;
 
+import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion;
@@ -15,14 +16,12 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposalCreatedEventAssertion.assertThatTrainingProgramProposalCreatedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
+import static java.time.LocalDateTime.now;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class TrainingProgramProposalApplicationServiceTest {
     private static final Faker FAKER = new Faker();
-    private static final String PLAN = FAKER.lorem().paragraph();
-    private static final UUID AUTHOR_ID = UUID.randomUUID();
-    private static final List<UUID> CATEGORIES_IDS = List.of(UUID.randomUUID(), UUID.randomUUID());
 
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final TrainingProgramProposalRepository repository = mock(TrainingProgramProposalRepository.class);
@@ -35,6 +34,7 @@ class TrainingProgramProposalApplicationServiceTest {
         service.propose(command);
 
         thenPublishedTrainingProgramProposalCreatedEvent()
+                .isNextAfter(command.commandId())
                 .hasTrainingProgramProposalIdNotNull()
                 .hasName(command.name())
                 .hasDescription(command.description())
@@ -75,12 +75,17 @@ class TrainingProgramProposalApplicationServiceTest {
     }
 
     private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
-        return TrainingProgramProposedEvent.create(UUID.randomUUID(), randomCreateTrainingProgramProposalCommand());
+        return TrainingProgramProposedEvent.create(randomId(), randomCreateTrainingProgramProposalCommand());
     }
 
     private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
         return new CreateTrainingProgramProposalCommand(
-                UUID.randomUUID(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
-                List.of(UUID.randomUUID(), UUID.randomUUID()));
+                commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(), List.of(UUID.randomUUID(), UUID.randomUUID()));
+    }
+
+    private UUID randomId() {
+        return UUID.randomUUID();
     }
 }
