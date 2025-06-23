@@ -6,6 +6,7 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
@@ -22,20 +23,23 @@ public class TrainingProgramProposalView {
     @Column(name = "TRAINING_PROGRAM_PROPOSAL_ID")
     private UUID trainingProgramProposalId;
 
+    @Column(name = "AUTHOR_ID")
+    private UUID authorId;
+
     @Column(name = "NAME")
     private String name;
 
-    @Column(name = "DESCRIPTION")
-    private String description;
-
+    @Lob
     @Column(name = "AGENDA")
     private String agenda;
 
+    @Lob
+    @Column(name = "DESCRIPTION")
+    private String description;
+
+    @Lob
     @Column(name = "PLAN")
     private String plan;
-
-    @Column(name = "AUTHOR_ID")
-    private UUID authorId;
 
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "TRAINING_PROGRAM_PROPOSAL_CATEGORIES", joinColumns = @JoinColumn(name = "TRAINING_PROGRAM_PROPOSAL_ID"))
