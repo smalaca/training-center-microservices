@@ -47,7 +47,10 @@ public class TrainingProgramProposalAssertion {
     }
 
     public TrainingProgramProposalAssertion hasCategoriesIds(List<UUID> expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("categoriesIds", expected);
+        assertThat(actual)
+                .extracting("categoriesIds")
+                .satisfies(categoriesIds -> assertThat((List<UUID>) categoriesIds).containsExactlyInAnyOrderElementsOf(expected));
+
         return this;
     }
 }
