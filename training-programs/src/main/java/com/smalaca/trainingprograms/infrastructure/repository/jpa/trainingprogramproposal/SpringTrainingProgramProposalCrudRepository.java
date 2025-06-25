@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-interface SpringTrainingProgramProposalCrudRepository extends CrudRepository<TrainingProgramProposal, UUID> {
+public interface SpringTrainingProgramProposalCrudRepository extends CrudRepository<TrainingProgramProposal, UUID> {
 }
