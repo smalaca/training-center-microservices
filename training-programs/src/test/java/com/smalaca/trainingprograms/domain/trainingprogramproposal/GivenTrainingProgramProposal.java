@@ -41,7 +41,7 @@ public class GivenTrainingProgramProposal {
         return this;
     }
 
-    protected TrainingProgramProposal getTrainingProgramProposal() {
+    public TrainingProgramProposal getTrainingProgramProposal() {
         return trainingProgramProposal;
     }
 

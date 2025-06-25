@@ -1,29 +1,24 @@
 package com.smalaca.trainingprograms.infrastructure.repository.jpa.trainingprogramproposal;
 
 import com.smalaca.test.type.RepositoryTest;
-import com.smalaca.trainingprograms.domain.commandid.CommandId;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.GivenTrainingProgramProposal;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.GivenTrainingProgramProposalFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import net.datafaker.Faker;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalTestDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
-import static java.time.LocalDateTime.now;
 
 @RepositoryTest
 @Import(JpaTrainingProgramProposalRepository.class)
 class JpaTrainingProgramProposalRepositoryIntegrationTest {
-    private static final Faker FAKER = new Faker();
-
     @Autowired
     private TrainingProgramProposalRepository repository;
 
@@ -33,35 +28,23 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private final GivenTrainingProgramProposalFactory given = GivenTrainingProgramProposalFactory.create();
+
     @Test
     void shouldSaveTrainingProgramProposal() {
-        TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
+        GivenTrainingProgramProposal trainingProgramProposal = this.given.trainingProgramProposal().proposed();
+        TrainingProgramProposalTestDto expected = trainingProgramProposal.getDto();
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(new TrainingProgramProposal(event)));
+        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgramProposal.getTrainingProgramProposal()));
 
-        thenTrainingProgramProposalSaved(event.trainingProgramProposalId())
-                .hasTrainingProgramProposalId(event.trainingProgramProposalId())
-                .hasName(event.name())
-                .hasDescription(event.description())
-                .hasAgenda(event.agenda())
-                .hasPlan(event.plan())
-                .hasAuthorId(event.authorId())
-                .hasCategoriesIds(event.categoriesIds());
-    }
-
-    private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
-        return TrainingProgramProposedEvent.create(randomId(), randomCreateTrainingProgramProposalCommand());
-    }
-
-    private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
-        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
-        return new CreateTrainingProgramProposalCommand(
-                commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
-                FAKER.lorem().paragraph(), List.of(UUID.randomUUID(), UUID.randomUUID()));
-    }
-
-    private UUID randomId() {
-        return UUID.randomUUID();
+        thenTrainingProgramProposalSaved(expected.trainingProgramProposalId())
+                .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
+                .hasName(expected.name())
+                .hasDescription(expected.description())
+                .hasAgenda(expected.agenda())
+                .hasPlan(expected.plan())
+                .hasAuthorId(expected.authorId())
+                .hasCategoriesIds(expected.categoriesIds());
     }
 
     private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(UUID trainingProgramProposalId) {
