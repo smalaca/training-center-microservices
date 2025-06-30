@@ -31,6 +31,7 @@
         <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/jacoco/jacoco-ut/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.coverage.exclusions>**/TrainingProgramsApplication.java</sonar.coverage.exclusions>
         <sonar.test.exclusions>**/*Test.java</sonar.test.exclusions>
+        <equalsverifier.version>3.16.1</equalsverifier.version>
     </properties>
 
     <dependencies>
@@ -98,6 +99,13 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <version>${equalsverifier.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
