@@ -26,12 +26,4 @@ class OutboxMessageMapper {
             throw new InvalidOutboxMessageException(exception);
         }
     }
-
-    Object message(OutboxMessage outboxMessage) {
-        try {
-            return objectMapper.readValue(outboxMessage.getPayload(), Class.forName(outboxMessage.getMessageType()));
-        } catch (JsonProcessingException | ClassNotFoundException exception) {
-            throw new InvalidOutboxMessageException(exception);
-        }
-    }
 }
