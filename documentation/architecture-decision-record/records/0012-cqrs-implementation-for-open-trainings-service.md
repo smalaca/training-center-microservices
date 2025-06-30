@@ -51,7 +51,7 @@ Implement CQRS (Command Query Responsibility Segregation) pattern within the Ope
 
 * **Code Organization** - The service has distinct packages: `query` for read operations and `application`/`domain` for write operations.
 * **Annotation-Based Separation** - Uses `@QueryOperation` and `@CommandOperation` annotations to clearly mark the separation.
-* **Dual Entity Mapping** - Domain entities (e.g., `Offer`, `Order`) and view entities (e.g., `OfferView`, `OrderView`) both map to the same database tables.
+* **Dual Entity Mapping** - Domain entities (`Offer`, `Order`) and view entities (`OfferView`, `OrderView`) both map to the same database tables (`OFFERS`, `ORDERS`).
 * **Repository Separation** - Separate repository interfaces for command operations (`OfferRepository`, `OrderRepository`) and query operations (`OfferViewRepository`, `OrderViewRepository`).
 
 ### Positive Risks and Considerations:
