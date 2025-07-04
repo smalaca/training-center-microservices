@@ -22,6 +22,8 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.client.trainingprogram.trainingprogramproposal.RestTrainingProgramProposalTestResponseAssertion.assertThatTrainingProgramProposalResponse;
 import static java.time.LocalDateTime.now;
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SystemTest
 @Import(TrainingProgramTestClient.class)
@@ -54,9 +56,21 @@ class TrainingProgramProposalRestControllerSystemTest {
 
     @Test
     void shouldProposeTrainingProgram() {
-        RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().propose(randomCreateTrainingProgramProposalCommand());
+        CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
+        
+        RestTrainingProgramProposalTestResponse response = client.trainingProgramProposals().propose(command);
 
-        assertThatTrainingProgramProposalResponse(actual).isOk();
+        assertThatTrainingProgramProposalResponse(response).isOk();
+        
+        await().atMost(10, SECONDS)
+                .untilAsserted(() -> {
+                    UUID trainingProgramProposalId = response.asTrainingProgramProposalId();
+                    RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().findById(trainingProgramProposalId);
+                    
+                    assertThatTrainingProgramProposalResponse(actual).isOk();
+                    assertThatTrainingProgramProposalResponse(actual)
+                            .hasTrainingProgramProposal(asTrainingProgramProposalTestDto(trainingProgramProposalId, command));
+                });
     }
 
     private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
@@ -64,6 +78,18 @@ class TrainingProgramProposalRestControllerSystemTest {
         return new CreateTrainingProgramProposalCommand(
                 commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(), List.of(UUID.randomUUID(), UUID.randomUUID()));
+    }
+    
+    private TrainingProgramProposalTestDto asTrainingProgramProposalTestDto(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
+        return new TrainingProgramProposalTestDto(
+                trainingProgramProposalId,
+                command.authorId(),
+                command.name(),
+                command.description(),
+                command.agenda(),
+                command.plan(),
+                command.categoriesIds()
+        );
     }
 
     @Test

@@ -33,9 +33,9 @@ public class TrainingProgramProposalRestController {
 
     @PostMapping
     @DrivingAdapter
-    public ResponseEntity<Void> propose(@RequestBody CreateTrainingProgramProposalCommand command) {
-        trainingProgramProposalApplicationService.propose(command);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UUID> propose(@RequestBody CreateTrainingProgramProposalCommand command) {
+        UUID trainingProgramProposalId = trainingProgramProposalApplicationService.propose(command);
+        return ResponseEntity.ok(trainingProgramProposalId);
     }
 
     @GetMapping("{trainingProgramProposalId}")

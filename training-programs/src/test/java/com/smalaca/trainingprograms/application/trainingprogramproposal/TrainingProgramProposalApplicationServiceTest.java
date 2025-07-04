@@ -44,6 +44,15 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(command.categoriesIds());
     }
 
+    @Test
+    void shouldReturnTrainingProgramProposalId() {
+        CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
+
+        UUID actual = service.propose(command);
+
+        thenPublishedTrainingProgramProposedEvent().hasTrainingProgramProposalId(actual);
+    }
+
     private TrainingProgramProposedEventAssertion thenPublishedTrainingProgramProposedEvent() {
         ArgumentCaptor<TrainingProgramProposedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
