@@ -62,26 +62,13 @@ class TrainingProgramProposalRestControllerSystemTest {
 
         assertThatTrainingProgramProposalResponse(response).isOk();
         
-        UUID proposalId = response.asUuid();
-        
-        // Use awaitility to wait for the proposal to be created via event listener
         await().atMost(10, SECONDS)
                 .untilAsserted(() -> {
+                    UUID proposalId = response.asTrainingProgramProposalId();
                     RestTrainingProgramProposalTestResponse findResponse = client.trainingProgramProposals().findById(proposalId);
-                    assertThatTrainingProgramProposalResponse(findResponse).isOk();
-                    
-                    TrainingProgramProposalTestDto expectedDto = new TrainingProgramProposalTestDto(
-                            proposalId,
-                            command.authorId(),
-                            command.name(),
-                            command.description(),
-                            command.agenda(),
-                            command.plan(),
-                            command.categoriesIds()
-                    );
                     
                     assertThatTrainingProgramProposalResponse(findResponse)
-                            .hasTrainingProgramProposal(expectedDto);
+                            .hasTrainingProgramProposal(asTrainingProgramProposalTestDto(proposalId, command));
                 });
     }
 
@@ -90,6 +77,18 @@ class TrainingProgramProposalRestControllerSystemTest {
         return new CreateTrainingProgramProposalCommand(
                 commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(), List.of(UUID.randomUUID(), UUID.randomUUID()));
+    }
+    
+    private TrainingProgramProposalTestDto asTrainingProgramProposalTestDto(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
+        return new TrainingProgramProposalTestDto(
+                trainingProgramProposalId,
+                command.authorId(),
+                command.name(),
+                command.description(),
+                command.agenda(),
+                command.plan(),
+                command.categoriesIds()
+        );
     }
 
     @Test

@@ -39,7 +39,7 @@ public class RestTrainingProgramProposalTestResponse {
         }
     }
 
-    public UUID asUuid() {
+    public UUID asTrainingProgramProposalId() {
         try {
             return objectMapper.readValue(asString(), UUID.class);
         } catch (JsonProcessingException exception) {
