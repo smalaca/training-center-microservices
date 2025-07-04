@@ -12,6 +12,7 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,7 +64,7 @@ class TrainingProgramProposedEventPublisherIntegrationTest {
         String plan = faker.lorem().paragraph();
         List<UUID> categoriesIds = List.of(UUID.randomUUID(), UUID.randomUUID());
         
-        EventId eventId = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), faker.date().birthday().toLocalDateTime());
+        EventId eventId = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
         
         return new TrainingProgramProposedEvent(
                 eventId, trainingProgramProposalId, name, description, agenda, plan, authorId, categoriesIds);
