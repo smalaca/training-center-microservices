@@ -6,6 +6,7 @@ import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootIntegrationTest
 class SpringOutboxMessageCrudRepositoryIntegrationTest {
+    private static final Faker FAKER = new Faker();
+    
     @Autowired
     private SpringOutboxMessageCrudRepository repository;
 
@@ -60,10 +63,10 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
         CreateTrainingProgramProposalCommand command = new CreateTrainingProgramProposalCommand(
                 commandId,
                 UUID.randomUUID(),
-                "Test Training Program",
-                "This is a test training program description",
-                "Test agenda",
-                "Test plan",
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
                 List.of(UUID.randomUUID(), UUID.randomUUID())
         );
         return TrainingProgramProposedEvent.create(UUID.randomUUID(), command);
