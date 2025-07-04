@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.eventid.EventId;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
+import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -35,6 +37,9 @@ class OutboxMessagePublisherIntegrationTest {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @MockBean
+    private TrainingOfferDraftEventPublisher publisher;
 
     private OutboxMessageMapper factory;
 

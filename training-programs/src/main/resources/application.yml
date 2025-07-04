@@ -10,3 +10,11 @@ scheduled:
   outbox:
     message:
       rate: 1000
+
+kafka:
+  bootstrap-servers: localhost:9092
+  group-id: training-programs
+  topics:
+    trainingprogram:
+      events:
+        training-program-proposed: training-programs-training-program-proposed-event-topic
