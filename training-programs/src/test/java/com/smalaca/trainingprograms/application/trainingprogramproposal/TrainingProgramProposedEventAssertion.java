@@ -32,6 +32,11 @@ public class TrainingProgramProposedEventAssertion {
         return this;
     }
 
+    public TrainingProgramProposedEventAssertion hasTrainingProgramProposalId(UUID actual) {
+        assertThat(this.actual.trainingProgramProposalId()).isEqualTo(actual);
+        return this;
+    }
+
     public TrainingProgramProposedEventAssertion hasName(String expected) {
         assertThat(actual.name()).isEqualTo(expected);
         return this;

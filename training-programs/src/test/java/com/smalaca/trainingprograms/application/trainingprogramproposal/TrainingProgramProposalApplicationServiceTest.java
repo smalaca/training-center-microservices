@@ -17,8 +17,6 @@ import java.util.UUID;
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
@@ -50,14 +48,9 @@ class TrainingProgramProposalApplicationServiceTest {
     void shouldReturnTrainingProgramProposalId() {
         CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
 
-        UUID result = service.propose(command);
+        UUID actual = service.propose(command);
 
-        assertNotNull(result);
-        thenPublishedTrainingProgramProposedEvent()
-                .hasTrainingProgramProposalIdNotNull();
-        ArgumentCaptor<TrainingProgramProposedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        assertThat(result).isEqualTo(captor.getValue().trainingProgramProposalId());
+        thenPublishedTrainingProgramProposedEvent().hasTrainingProgramProposalId(actual);
     }
 
     private TrainingProgramProposedEventAssertion thenPublishedTrainingProgramProposedEvent() {
