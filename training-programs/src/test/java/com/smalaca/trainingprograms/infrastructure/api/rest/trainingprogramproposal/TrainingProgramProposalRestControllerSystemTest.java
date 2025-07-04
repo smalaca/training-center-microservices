@@ -64,11 +64,12 @@ class TrainingProgramProposalRestControllerSystemTest {
         
         await().atMost(10, SECONDS)
                 .untilAsserted(() -> {
-                    UUID proposalId = response.asTrainingProgramProposalId();
-                    RestTrainingProgramProposalTestResponse findResponse = client.trainingProgramProposals().findById(proposalId);
+                    UUID trainingProgramProposalId = response.asTrainingProgramProposalId();
+                    RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().findById(trainingProgramProposalId);
                     
-                    assertThatTrainingProgramProposalResponse(findResponse)
-                            .hasTrainingProgramProposal(asTrainingProgramProposalTestDto(proposalId, command));
+                    assertThatTrainingProgramProposalResponse(actual).isOk();
+                    assertThatTrainingProgramProposalResponse(actual)
+                            .hasTrainingProgramProposal(asTrainingProgramProposalTestDto(trainingProgramProposalId, command));
                 });
     }
 
