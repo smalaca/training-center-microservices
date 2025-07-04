@@ -12,6 +12,8 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.Traini
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @ApplicationLayer
 public class TrainingProgramProposalApplicationService {
@@ -28,10 +30,12 @@ public class TrainingProgramProposalApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void propose(CreateTrainingProgramProposalCommand command) {
+    public UUID propose(CreateTrainingProgramProposalCommand command) {
         TrainingProgramProposedEvent event = factory.create(command);
 
         eventRegistry.publish(event);
+        
+        return event.trainingProgramProposalId();
     }
 
     @Transactional

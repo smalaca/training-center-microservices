@@ -22,6 +22,8 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.client.trainingprogram.trainingprogramproposal.RestTrainingProgramProposalTestResponseAssertion.assertThatTrainingProgramProposalResponse;
 import static java.time.LocalDateTime.now;
+import static org.awaitility.Awaitility.await;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @SystemTest
 @Import(TrainingProgramTestClient.class)
@@ -54,9 +56,33 @@ class TrainingProgramProposalRestControllerSystemTest {
 
     @Test
     void shouldProposeTrainingProgram() {
-        RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().propose(randomCreateTrainingProgramProposalCommand());
+        CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
+        
+        RestTrainingProgramProposalTestResponse response = client.trainingProgramProposals().propose(command);
 
-        assertThatTrainingProgramProposalResponse(actual).isOk();
+        assertThatTrainingProgramProposalResponse(response).isOk();
+        
+        UUID proposalId = response.asUuid();
+        
+        // Use awaitility to wait for the proposal to be created via event listener
+        await().atMost(10, SECONDS)
+                .untilAsserted(() -> {
+                    RestTrainingProgramProposalTestResponse findResponse = client.trainingProgramProposals().findById(proposalId);
+                    assertThatTrainingProgramProposalResponse(findResponse).isOk();
+                    
+                    TrainingProgramProposalTestDto expectedDto = new TrainingProgramProposalTestDto(
+                            proposalId,
+                            command.authorId(),
+                            command.name(),
+                            command.description(),
+                            command.agenda(),
+                            command.plan(),
+                            command.categoriesIds()
+                    );
+                    
+                    assertThatTrainingProgramProposalResponse(findResponse)
+                            .hasTrainingProgramProposal(expectedDto);
+                });
     }
 
     private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
