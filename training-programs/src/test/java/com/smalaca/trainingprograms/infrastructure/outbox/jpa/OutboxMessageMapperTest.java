@@ -39,6 +39,28 @@ class OutboxMessageMapperTest {
         assertThat(actual).hasRootCause(exception);
     }
 
+    @Test
+    void shouldThrowInvalidOutboxMessageExceptionWhenInvalidEventType() {
+        OutboxMessage message = randomOutboxMessage(INVALID_MESSAGE_TYPE);
+        Executable executable = () -> mapper.message(message);
+
+        InvalidOutboxMessageException actual = assertThrows(InvalidOutboxMessageException.class, executable);
+
+        assertThat(actual).hasCauseInstanceOf(ClassNotFoundException.class);
+    }
+
+    @Test
+    void shouldThrowInvalidOutboxMessageExceptionWhenInvalidPayload() throws JsonProcessingException {
+        OutboxMessage message = randomOutboxMessage(VALID_MESSAGE_TYPE);
+        JsonGenerationException cause = new JsonGenerationException("DUMMY");
+        given(objectMapper.readValue(message.getPayload(), VALID_MESSAGE_CLASS)).willThrow(cause);
+        Executable executable = () -> mapper.message(message);
+
+        InvalidOutboxMessageException actual = assertThrows(InvalidOutboxMessageException.class, executable);
+
+        assertThat(actual).hasCause(cause);
+    }
+
     private TrainingProgramProposedEvent givenTrainingProgramProposedEvent() {
         CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
         CreateTrainingProgramProposalCommand command = new CreateTrainingProgramProposalCommand(
@@ -57,5 +79,9 @@ class OutboxMessageMapperTest {
         JsonProcessingException exception = new JsonGenerationException("DUMMY");
         given(objectMapper.writeValueAsString(event)).willThrow(exception);
         return exception;
+    }
+
+    private OutboxMessage randomOutboxMessage(String messageType) {
+        return new OutboxMessage(UUID.randomUUID(), LocalDateTime.now(), messageType, FAKER.code().isbn10());
     }
 }
