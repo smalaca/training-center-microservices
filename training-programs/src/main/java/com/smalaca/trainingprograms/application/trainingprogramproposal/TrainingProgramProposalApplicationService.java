@@ -9,6 +9,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class TrainingProgramProposalApplicationService {
         TrainingProgramProposedEvent event = factory.create(command);
 
         eventRegistry.publish(event);
-        
+
         return event.trainingProgramProposalId();
     }
 
@@ -45,5 +46,17 @@ public class TrainingProgramProposalApplicationService {
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
 
         repository.save(trainingProgramProposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public UUID release(UUID trainingProgramProposalId) {
+        TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
+
+        TrainingProgramReleasedEvent event = trainingProgramProposal.release();
+
+        eventRegistry.publish(event);
+        return event.trainingProgramId();
     }
 }

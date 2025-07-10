@@ -4,6 +4,8 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootIntegrationTest
 @Import(JpaOutboxMessageRepositoryFactory.class)
 class JpaOutboxMessageRepositoryIntegrationTest {
+    private static final Faker FAKER = new Faker();
 
     @Autowired
     private JpaOutboxMessageRepository repository;
@@ -42,13 +45,24 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
     @Test
     void shouldFindAllOutboxMessages() {
-        TrainingProgramProposedEvent trainingProgramProposedEvent = publish(randomTrainingProgramProposedEvent());
+        TrainingProgramReleasedEvent trainingProgramReleasedEvent = publishReleasedEvent(randomTrainingProgramReleasedEvent());
+        TrainingProgramProposedEvent trainingProgramProposedEvent = publishProposedEvent(randomTrainingProgramProposedEvent());
 
         assertThat(springRepository.findAll())
+                .hasSize(2)
+                .anySatisfy(actual -> assertTrainingProgramReleasedEventSaved(actual, trainingProgramReleasedEvent))
                 .anySatisfy(actual -> assertTrainingProgramProposedEventSaved(actual, trainingProgramProposedEvent));
     }
 
-    private <T extends TrainingProgramProposedEvent> T publish(T event) {
+    private <T extends TrainingProgramProposedEvent> T publishProposedEvent(T event) {
+        return transactionTemplate.execute(transactionStatus -> {
+            repository.publish(event);
+            messagesIds.add(event.eventId().eventId());
+            return event;
+        });
+    }
+
+    private <T extends TrainingProgramReleasedEvent> T publishReleasedEvent(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
             messagesIds.add(event.eventId().eventId());
@@ -57,17 +71,34 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), LocalDateTime.now());
         CreateTrainingProgramProposalCommand command = new CreateTrainingProgramProposalCommand(
                 commandId,
-                UUID.randomUUID(),
-                "Test Training Program",
-                "This is a test training program description",
-                "Test agenda",
-                "Test plan",
-                List.of(UUID.randomUUID(), UUID.randomUUID())
+                randomId(),
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                List.of(randomId(), randomId())
         );
-        return TrainingProgramProposedEvent.create(UUID.randomUUID(), command);
+        return TrainingProgramProposedEvent.create(randomId(), command);
+    }
+
+    private TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
+        return TrainingProgramReleasedEvent.create(
+                randomId(),
+                randomId(),
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                randomId(),
+                List.of(randomId(), randomId())
+        );
+    }
+
+    private UUID randomId() {
+        return UUID.randomUUID();
     }
 
     private void assertTrainingProgramProposedEventSaved(OutboxMessage actual, TrainingProgramProposedEvent expected) {
@@ -75,6 +106,14 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.eventId().eventId())
                 .hasOccurredOn(expected.eventId().creationDateTime())
                 .hasMessageType("com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertTrainingProgramReleasedEventSaved(OutboxMessage actual, TrainingProgramReleasedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }

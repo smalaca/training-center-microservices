@@ -2,6 +2,7 @@ package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -59,4 +60,19 @@ public class TrainingProgramProposal {
     }
 
     private TrainingProgramProposal() {}
+
+    public TrainingProgramReleasedEvent release() {
+        UUID trainingProgramId = UUID.randomUUID();
+
+        return TrainingProgramReleasedEvent.create(
+                trainingProgramProposalId,
+                trainingProgramId,
+                name,
+                description,
+                agenda,
+                plan,
+                authorId,
+                new ArrayList<>(categoriesIds)
+        );
+    }
 }
