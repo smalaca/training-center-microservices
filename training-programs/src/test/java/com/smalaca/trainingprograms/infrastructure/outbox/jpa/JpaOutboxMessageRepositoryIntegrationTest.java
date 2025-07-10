@@ -6,6 +6,7 @@ import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootIntegrationTest
 @Import(JpaOutboxMessageRepositoryFactory.class)
 class JpaOutboxMessageRepositoryIntegrationTest {
+    private static final Faker FAKER = new Faker();
 
     @Autowired
     private JpaOutboxMessageRepository repository;
@@ -70,35 +72,37 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), LocalDateTime.now());
         CreateTrainingProgramProposalCommand command = new CreateTrainingProgramProposalCommand(
                 commandId,
-                UUID.randomUUID(),
-                "Test Training Program",
-                "This is a test training program description",
-                "Test agenda",
-                "Test plan",
-                List.of(UUID.randomUUID(), UUID.randomUUID())
+                randomId(),
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                List.of(randomId(), randomId())
         );
-        return TrainingProgramProposedEvent.create(UUID.randomUUID(), command);
+        return TrainingProgramProposedEvent.create(randomId(), command);
     }
 
     private TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
-        UUID trainingProgramProposalId = UUID.randomUUID();
-        UUID trainingProgramId = UUID.randomUUID();
-        EventId eventId = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        EventId eventId = new EventId(randomId(), randomId(), randomId(), LocalDateTime.now());
 
         return TrainingProgramReleasedEvent.create(
                 eventId,
-                trainingProgramProposalId,
-                trainingProgramId,
-                "Test Training Program",
-                "This is a test training program description",
-                "Test agenda",
-                "Test plan",
-                UUID.randomUUID(),
-                List.of(UUID.randomUUID(), UUID.randomUUID())
+                randomId(),
+                randomId(),
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                randomId(),
+                List.of(randomId(), randomId())
         );
+    }
+
+    private UUID randomId() {
+        return UUID.randomUUID();
     }
 
     private void assertTrainingProgramProposedEventSaved(OutboxMessage actual, TrainingProgramProposedEvent expected) {
