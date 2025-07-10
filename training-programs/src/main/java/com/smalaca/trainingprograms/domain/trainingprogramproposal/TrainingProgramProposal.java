@@ -7,6 +7,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
@@ -44,6 +46,10 @@ public class TrainingProgramProposal {
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private TrainingProgramProposalStatus status;
+
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "TRAINING_PROGRAM_PROPOSAL_CATEGORIES", joinColumns = @JoinColumn(name = "TRAINING_PROGRAM_PROPOSAL_ID"))
     @Column(name = "CATEGORY_ID")
@@ -57,6 +63,7 @@ public class TrainingProgramProposal {
         plan = event.plan();
         authorId = event.authorId();
         categoriesIds = new ArrayList<>(event.categoriesIds());
+        status = TrainingProgramProposalStatus.PROPOSED;
     }
 
     private TrainingProgramProposal() {}

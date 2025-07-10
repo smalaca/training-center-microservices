@@ -26,6 +26,9 @@ public class TrainingProgramProposalView {
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
 
+    @Column(name = "STATUS")
+    private String status;
+
     @Column(name = "NAME")
     private String name;
 

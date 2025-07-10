@@ -70,6 +70,7 @@ class TrainingProgramProposalApplicationServiceTest {
         service.create(event);
 
         thenTrainingProgramProposalSaved(event)
+                .isProposed()
                 .hasTrainingProgramProposalId(event.trainingProgramProposalId())
                 .hasName(event.name())
                 .hasDescription(event.description())

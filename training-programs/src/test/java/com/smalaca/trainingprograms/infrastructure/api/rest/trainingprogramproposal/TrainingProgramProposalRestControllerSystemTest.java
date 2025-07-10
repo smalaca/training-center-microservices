@@ -21,9 +21,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.client.trainingprogram.trainingprogramproposal.RestTrainingProgramProposalTestResponseAssertion.assertThatTrainingProgramProposalResponse;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
 import static java.time.LocalDateTime.now;
-import static org.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 
 @SystemTest
 @Import(TrainingProgramTestClient.class)
@@ -57,16 +58,16 @@ class TrainingProgramProposalRestControllerSystemTest {
     @Test
     void shouldProposeTrainingProgram() {
         CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
-        
+
         RestTrainingProgramProposalTestResponse response = client.trainingProgramProposals().propose(command);
 
         assertThatTrainingProgramProposalResponse(response).isOk();
-        
+
         await().atMost(10, SECONDS)
                 .untilAsserted(() -> {
                     UUID trainingProgramProposalId = response.asTrainingProgramProposalId();
                     RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().findById(trainingProgramProposalId);
-                    
+
                     assertThatTrainingProgramProposalResponse(actual).isOk();
                     assertThatTrainingProgramProposalResponse(actual)
                             .hasTrainingProgramProposal(asTrainingProgramProposalTestDto(trainingProgramProposalId, command));
@@ -79,7 +80,7 @@ class TrainingProgramProposalRestControllerSystemTest {
                 commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(), List.of(UUID.randomUUID(), UUID.randomUUID()));
     }
-    
+
     private TrainingProgramProposalTestDto asTrainingProgramProposalTestDto(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
         return new TrainingProgramProposalTestDto(
                 trainingProgramProposalId,
@@ -88,7 +89,8 @@ class TrainingProgramProposalRestControllerSystemTest {
                 command.description(),
                 command.agenda(),
                 command.plan(),
-                command.categoriesIds()
+                command.categoriesIds(),
+                PROPOSED
         );
     }
 

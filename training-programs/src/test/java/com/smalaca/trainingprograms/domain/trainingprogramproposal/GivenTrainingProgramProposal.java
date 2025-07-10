@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
 import static java.util.UUID.randomUUID;
 
 public class GivenTrainingProgramProposal {
@@ -53,7 +54,8 @@ public class GivenTrainingProgramProposal {
                 description,
                 agenda,
                 plan,
-                categoriesIds
+                categoriesIds,
+                PROPOSED
         );
     }
 }

@@ -47,7 +47,8 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .isProposed();
     }
 
     @Test
@@ -75,7 +76,8 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasStatus(expected.status());
     }
 
     private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(UUID trainingProgramProposalId) {

@@ -6,5 +6,5 @@ import java.util.UUID;
 public record RestTrainingProgramProposalTestDto(
         UUID trainingProgramProposalId, UUID authorId, String name, 
         String description, String agenda, String plan, 
-        List<UUID> categoriesIds) {
+        List<UUID> categoriesIds, String status) {
 }

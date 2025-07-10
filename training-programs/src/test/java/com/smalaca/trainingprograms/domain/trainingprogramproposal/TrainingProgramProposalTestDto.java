@@ -11,11 +11,12 @@ public class TrainingProgramProposalTestDto {
     private final String agenda;
     private final String plan;
     private final List<UUID> categoriesIds;
+    private final TrainingProgramProposalStatus status;
 
     public TrainingProgramProposalTestDto(
             UUID trainingProgramProposalId, UUID authorId, String name,
             String description, String agenda, String plan,
-            List<UUID> categoriesIds) {
+            List<UUID> categoriesIds, TrainingProgramProposalStatus status) {
         this.trainingProgramProposalId = trainingProgramProposalId;
         this.authorId = authorId;
         this.name = name;
@@ -23,6 +24,7 @@ public class TrainingProgramProposalTestDto {
         this.agenda = agenda;
         this.plan = plan;
         this.categoriesIds = categoriesIds;
+        this.status = status;
     }
 
     public UUID trainingProgramProposalId() {
@@ -51,5 +53,9 @@ public class TrainingProgramProposalTestDto {
 
     public List<UUID> categoriesIds() {
         return categoriesIds;
+    }
+
+    public TrainingProgramProposalStatus status() {
+        return status;
     }
 }

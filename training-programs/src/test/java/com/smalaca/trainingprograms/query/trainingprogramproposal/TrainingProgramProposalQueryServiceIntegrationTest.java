@@ -80,6 +80,7 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasStatus(expected.status());
     }
 }
