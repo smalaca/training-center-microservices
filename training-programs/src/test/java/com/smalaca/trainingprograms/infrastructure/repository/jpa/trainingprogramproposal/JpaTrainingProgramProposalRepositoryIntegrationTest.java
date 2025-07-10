@@ -8,6 +8,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalTestDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -15,6 +16,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RepositoryTest
 @Import(JpaTrainingProgramProposalRepository.class)
@@ -45,6 +48,16 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
                 .hasCategoriesIds(expected.categoriesIds());
+    }
+
+    @Test
+    void shouldFindNoOrderWhenDoesNotExist() {
+        UUID trainingProgramProposalId = UUID.randomUUID();
+        Executable executable = () -> repository.findById(trainingProgramProposalId);
+
+        RuntimeException actual = assertThrows(TrainingProgramProposalDoesNotExistException.class, executable);
+
+        assertThat(actual).hasMessage("Training Program Proposal with id " + trainingProgramProposalId + " does not exist.");
     }
 
     @Test

@@ -23,6 +23,6 @@ public class JpaTrainingProgramProposalRepository implements TrainingProgramProp
 
     @Override
     public TrainingProgramProposal findById(UUID trainingProgramProposalId) {
-        return repository.findById(trainingProgramProposalId).get();
+        return repository.findById(trainingProgramProposalId).orElseThrow(() -> new TrainingProgramProposalDoesNotExistException(trainingProgramProposalId));
     }
 }
