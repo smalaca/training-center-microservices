@@ -51,7 +51,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldFindNoOrderWhenDoesNotExist() {
+    void shouldFindNoTrainingProgramProposalWhenDoesNotExist() {
         UUID trainingProgramProposalId = UUID.randomUUID();
         Executable executable = () -> repository.findById(trainingProgramProposalId);
 
