@@ -5,6 +5,9 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 @DrivenAdapter
 public class JpaTrainingProgramProposalRepository implements TrainingProgramProposalRepository {
@@ -17,5 +20,10 @@ public class JpaTrainingProgramProposalRepository implements TrainingProgramProp
     @Override
     public void save(TrainingProgramProposal trainingProgramProposal) {
         repository.save(trainingProgramProposal);
+    }
+
+    @Override
+    public Optional<TrainingProgramProposal> findById(UUID trainingProgramProposalId) {
+        return repository.findById(trainingProgramProposalId);
     }
 }

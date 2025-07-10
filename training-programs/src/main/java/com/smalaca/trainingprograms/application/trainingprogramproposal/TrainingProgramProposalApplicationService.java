@@ -9,9 +9,11 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -34,7 +36,7 @@ public class TrainingProgramProposalApplicationService {
         TrainingProgramProposedEvent event = factory.create(command);
 
         eventRegistry.publish(event);
-        
+
         return event.trainingProgramProposalId();
     }
 
@@ -45,5 +47,23 @@ public class TrainingProgramProposalApplicationService {
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
 
         repository.save(trainingProgramProposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public UUID release(UUID trainingProgramProposalId) {
+        Optional<TrainingProgramProposal> found = repository.findById(trainingProgramProposalId);
+
+        if (found.isPresent()) {
+            TrainingProgramProposal trainingProgramProposal = found.get();
+            TrainingProgramReleasedEvent event = trainingProgramProposal.release();
+
+            eventRegistry.publish(event);
+
+            return event.trainingProgramId();
+        } else {
+            throw new IllegalArgumentException("Training Program Proposal with id: " + trainingProgramProposalId + " not found");
+        }
     }
 }
