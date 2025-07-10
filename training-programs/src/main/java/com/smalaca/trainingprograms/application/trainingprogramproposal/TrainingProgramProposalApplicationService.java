@@ -13,7 +13,6 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.Traini
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -53,17 +52,12 @@ public class TrainingProgramProposalApplicationService {
     @CommandOperation
     @DrivingPort
     public UUID release(UUID trainingProgramProposalId) {
-        Optional<TrainingProgramProposal> found = repository.findById(trainingProgramProposalId);
+        TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId)
+                .orElseThrow(() -> new IllegalArgumentException("Training Program Proposal with id: " + trainingProgramProposalId + " not found"));
 
-        if (found.isPresent()) {
-            TrainingProgramProposal trainingProgramProposal = found.get();
-            TrainingProgramReleasedEvent event = trainingProgramProposal.release();
+        TrainingProgramReleasedEvent event = trainingProgramProposal.release();
 
-            eventRegistry.publish(event);
-
-            return event.trainingProgramId();
-        } else {
-            throw new IllegalArgumentException("Training Program Proposal with id: " + trainingProgramProposalId + " not found");
-        }
+        eventRegistry.publish(event);
+        return event.trainingProgramId();
     }
 }
