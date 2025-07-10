@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
@@ -131,7 +130,7 @@ class TrainingProgramProposalApplicationServiceTest {
     private TrainingProgramProposedEvent givenExistingTrainingProgramProposed() {
         TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
-        given(repository.findById(event.trainingProgramProposalId())).willReturn(Optional.of(trainingProgramProposal));
+        given(repository.findById(event.trainingProgramProposalId())).willReturn(trainingProgramProposal);
 
         return event;
     }

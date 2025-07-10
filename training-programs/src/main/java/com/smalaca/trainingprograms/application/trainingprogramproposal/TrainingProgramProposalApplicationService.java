@@ -52,8 +52,7 @@ public class TrainingProgramProposalApplicationService {
     @CommandOperation
     @DrivingPort
     public UUID release(UUID trainingProgramProposalId) {
-        TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId)
-                .orElseThrow(() -> new IllegalArgumentException("Training Program Proposal with id: " + trainingProgramProposalId + " not found"));
+        TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
 
         TrainingProgramReleasedEvent event = trainingProgramProposal.release();
 
