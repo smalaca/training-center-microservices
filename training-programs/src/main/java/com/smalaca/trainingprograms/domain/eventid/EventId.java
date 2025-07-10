@@ -12,6 +12,10 @@ public record EventId(UUID eventId, UUID traceId, UUID correlationId, LocalDateT
         return new EventId(id(), commandId.traceId(), commandId.correlationId(), now());
     }
 
+    public static EventId newEventId() {
+        return new EventId(id(), id(), id(), now());
+    }
+
     private static UUID id() {
         return UUID.randomUUID();
     }

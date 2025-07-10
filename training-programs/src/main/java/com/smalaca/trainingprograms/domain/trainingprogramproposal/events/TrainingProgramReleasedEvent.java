@@ -12,10 +12,10 @@ public record TrainingProgramReleasedEvent(
         String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
 
     public static TrainingProgramReleasedEvent create(
-            EventId eventId, UUID trainingProgramProposalId, UUID trainingProgramId, String name, String description, 
+            UUID trainingProgramProposalId, UUID trainingProgramId, String name, String description, 
             String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
         return new TrainingProgramReleasedEvent(
-                eventId, trainingProgramProposalId, trainingProgramId, name, description, agenda,
+                EventId.newEventId(), trainingProgramProposalId, trainingProgramId, name, description, agenda,
                 plan, authorId, categoriesIds
         );
     }

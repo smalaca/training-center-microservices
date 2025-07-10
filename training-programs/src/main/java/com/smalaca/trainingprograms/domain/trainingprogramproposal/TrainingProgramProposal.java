@@ -1,7 +1,6 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
-import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import jakarta.persistence.CollectionTable;
@@ -13,7 +12,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -67,7 +65,6 @@ public class TrainingProgramProposal {
         UUID trainingProgramId = UUID.randomUUID();
 
         return TrainingProgramReleasedEvent.create(
-                new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now()),
                 trainingProgramProposalId,
                 trainingProgramId,
                 name,

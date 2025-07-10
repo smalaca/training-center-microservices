@@ -2,7 +2,6 @@ package com.smalaca.trainingprograms.infrastructure.outbox.jpa;
 
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
-import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
@@ -86,10 +85,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     }
 
     private TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
-        EventId eventId = new EventId(randomId(), randomId(), randomId(), LocalDateTime.now());
-
         return TrainingProgramReleasedEvent.create(
-                eventId,
                 randomId(),
                 randomId(),
                 FAKER.book().title(),
