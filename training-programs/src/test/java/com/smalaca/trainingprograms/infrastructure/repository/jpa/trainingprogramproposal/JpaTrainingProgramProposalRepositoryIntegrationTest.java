@@ -47,7 +47,8 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .isProposed();
     }
 
     @Test
@@ -62,9 +63,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
 
     @Test
     void shouldFindTrainingProgramProposalById() {
-        GivenTrainingProgramProposal trainingProgramProposal = given.trainingProgramProposal().proposed();
-        TrainingProgramProposalTestDto expected = trainingProgramProposal.getDto();
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgramProposal.getTrainingProgramProposal()));
+        TrainingProgramProposalTestDto expected = givenExisting(given.trainingProgramProposal().proposed());
 
         TrainingProgramProposal actual = repository.findById(expected.trainingProgramProposalId());
 
@@ -75,7 +74,32 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasStatus(expected.status());
+    }
+
+    @Test
+    void shouldFindReleasedTrainingProgramProposalById() {
+        TrainingProgramProposalTestDto expected = givenExisting(given.trainingProgramProposal().released());
+
+        TrainingProgramProposal actual = repository.findById(expected.trainingProgramProposalId());
+
+        assertThatTrainingProgramProposal(actual)
+                .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
+                .hasName(expected.name())
+                .hasDescription(expected.description())
+                .hasAgenda(expected.agenda())
+                .hasPlan(expected.plan())
+                .hasAuthorId(expected.authorId())
+                .hasCategoriesIds(expected.categoriesIds())
+                .isReleased();
+    }
+
+    private TrainingProgramProposalTestDto givenExisting(GivenTrainingProgramProposal trainingProgramProposal) {
+        TrainingProgramProposalTestDto expected = trainingProgramProposal.getDto();
+        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgramProposal.getTrainingProgramProposal()));
+
+        return expected;
     }
 
     private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(UUID trainingProgramProposalId) {

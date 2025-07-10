@@ -65,5 +65,6 @@ public class RestTrainingProgramProposalTestResponseAssertion {
         assertThat(actual.agenda()).isEqualTo(expected.agenda());
         assertThat(actual.plan()).isEqualTo(expected.plan());
         assertThat(actual.categoriesIds()).containsExactlyInAnyOrderElementsOf(expected.categoriesIds());
+        assertThat(actual.status()).isEqualTo(expected.status().name());
     }
 }

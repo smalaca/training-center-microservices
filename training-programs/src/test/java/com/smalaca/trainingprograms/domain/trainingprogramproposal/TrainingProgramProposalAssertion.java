@@ -3,6 +3,8 @@ package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrainingProgramProposalAssertion {
@@ -51,6 +53,19 @@ public class TrainingProgramProposalAssertion {
                 .extracting("categoriesIds")
                 .satisfies(categoriesIds -> assertThat((List<UUID>) categoriesIds).containsExactlyInAnyOrderElementsOf(expected));
 
+        return this;
+    }
+
+    public TrainingProgramProposalAssertion isProposed() {
+        return hasStatus(PROPOSED);
+    }
+
+    public TrainingProgramProposalAssertion isReleased() {
+        return hasStatus(RELEASED);
+    }
+
+    public TrainingProgramProposalAssertion hasStatus(TrainingProgramProposalStatus expected) {
+        assertThat(actual).extracting("status").isEqualTo(expected);
         return this;
     }
 }

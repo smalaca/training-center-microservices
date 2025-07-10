@@ -7,6 +7,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
@@ -44,6 +48,10 @@ public class TrainingProgramProposal {
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private TrainingProgramProposalStatus status;
+
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "TRAINING_PROGRAM_PROPOSAL_CATEGORIES", joinColumns = @JoinColumn(name = "TRAINING_PROGRAM_PROPOSAL_ID"))
     @Column(name = "CATEGORY_ID")
@@ -57,6 +65,7 @@ public class TrainingProgramProposal {
         plan = event.plan();
         authorId = event.authorId();
         categoriesIds = new ArrayList<>(event.categoriesIds());
+        status = PROPOSED;
     }
 
     private TrainingProgramProposal() {}
@@ -74,5 +83,9 @@ public class TrainingProgramProposal {
                 authorId,
                 new ArrayList<>(categoriesIds)
         );
+    }
+
+    public void released() {
+        status = RELEASED;
     }
 }

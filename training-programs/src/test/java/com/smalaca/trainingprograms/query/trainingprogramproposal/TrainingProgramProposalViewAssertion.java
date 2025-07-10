@@ -1,5 +1,7 @@
 package com.smalaca.trainingprograms.query.trainingprogramproposal;
 
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -48,6 +50,11 @@ class TrainingProgramProposalViewAssertion {
 
     TrainingProgramProposalViewAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual.getCategoriesIds()).containsExactlyInAnyOrderElementsOf(expected);
+        return this;
+    }
+
+    TrainingProgramProposalViewAssertion hasStatus(TrainingProgramProposalStatus expected) {
+        assertThat(actual.getStatus()).isEqualTo(expected.name());
         return this;
     }
 }

@@ -15,6 +15,13 @@ class GivenTrainingProgramProposalWithRepository extends GivenTrainingProgramPro
         return this;
     }
 
+    @Override
+    public GivenTrainingProgramProposal released() {
+        super.released();
+        saveTrainingProgramProposal();
+        return this;
+    }
+
     private void saveTrainingProgramProposal() {
         TrainingProgramProposal trainingProgramProposal = getTrainingProgramProposal();
         repository.save(trainingProgramProposal);

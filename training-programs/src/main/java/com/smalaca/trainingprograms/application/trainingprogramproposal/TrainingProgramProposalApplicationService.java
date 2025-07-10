@@ -59,4 +59,15 @@ public class TrainingProgramProposalApplicationService {
         eventRegistry.publish(event);
         return event.trainingProgramId();
     }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void apply(TrainingProgramReleasedEvent event) {
+        TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
+
+        trainingProgramProposal.released();
+
+        repository.save(trainingProgramProposal);
+    }
 }

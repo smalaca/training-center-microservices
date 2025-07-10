@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static java.util.UUID.randomUUID;
 
 public class GivenTrainingProgramProposal {
@@ -22,6 +24,7 @@ public class GivenTrainingProgramProposal {
     private final String plan = FAKER.lorem().paragraph();
     private final List<UUID> categoriesIds = List.of(randomUUID(), randomUUID());
     private final TrainingProgramProposalFactory trainingProgramProposalFactory;
+    private TrainingProgramProposalStatus status;
 
     private TrainingProgramProposal trainingProgramProposal;
 
@@ -37,6 +40,15 @@ public class GivenTrainingProgramProposal {
         trainingProgramProposalId = event.trainingProgramProposalId();
 
         trainingProgramProposal = new TrainingProgramProposal(event);
+        status = PROPOSED;
+
+        return this;
+    }
+
+    public GivenTrainingProgramProposal released() {
+        proposed();
+        trainingProgramProposal.released();
+        status = RELEASED;
 
         return this;
     }
@@ -53,7 +65,8 @@ public class GivenTrainingProgramProposal {
                 description,
                 agenda,
                 plan,
-                categoriesIds
+                categoriesIds,
+                status
         );
     }
 }

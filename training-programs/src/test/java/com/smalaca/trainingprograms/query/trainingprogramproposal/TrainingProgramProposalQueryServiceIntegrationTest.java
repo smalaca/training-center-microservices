@@ -57,19 +57,36 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
     }
 
     @Test
+    void shouldFindReleasedTrainingProgramProposalViewById() {
+        TrainingProgramProposalTestDto dto = existingReleasedTrainingProgramProposal();
+
+        Optional<TrainingProgramProposalView> actual = queryService.findById(dto.trainingProgramProposalId());
+
+        assertThat(actual)
+                .isPresent()
+                .satisfies(view -> assertThatTrainingProgramProposalHasSameDataAs(view.get(), dto));
+    }
+
+    @Test
     void shouldFindAllTrainingProgramProposals() {
         TrainingProgramProposalTestDto dtoOne = existingTrainingProgramProposal();
         TrainingProgramProposalTestDto dtoTwo = existingTrainingProgramProposal();
+        TrainingProgramProposalTestDto dtoThree = existingReleasedTrainingProgramProposal();
 
         Iterable<TrainingProgramProposalView> actual = queryService.findAll();
 
-        assertThat(actual).hasSize(2)
+        assertThat(actual).hasSize(3)
                 .anySatisfy(view -> assertThatTrainingProgramProposalHasSameDataAs(view, dtoOne))
-                .anySatisfy(view -> assertThatTrainingProgramProposalHasSameDataAs(view, dtoTwo));
+                .anySatisfy(view -> assertThatTrainingProgramProposalHasSameDataAs(view, dtoTwo))
+                .anySatisfy(view -> assertThatTrainingProgramProposalHasSameDataAs(view, dtoThree));
     }
 
     private TrainingProgramProposalTestDto existingTrainingProgramProposal() {
         return transaction.execute(transactionStatus -> given.trainingProgramProposal().proposed().getDto());
+    }
+
+    private TrainingProgramProposalTestDto existingReleasedTrainingProgramProposal() {
+        return transaction.execute(transactionStatus -> given.trainingProgramProposal().released().getDto());
     }
 
     private void assertThatTrainingProgramProposalHasSameDataAs(TrainingProgramProposalView actual, TrainingProgramProposalTestDto expected) {
@@ -80,6 +97,7 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
-                .hasCategoriesIds(expected.categoriesIds());
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasStatus(expected.status());
     }
 }
