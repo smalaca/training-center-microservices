@@ -4,5 +4,5 @@ import com.smalaca.domaindrivendesign.ValueObject;
 
 @ValueObject
 public enum TrainingProgramProposalStatus {
-    PROPOSED
+    PROPOSED, RELEASED
 }

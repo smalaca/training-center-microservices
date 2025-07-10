@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
@@ -63,7 +65,7 @@ public class TrainingProgramProposal {
         plan = event.plan();
         authorId = event.authorId();
         categoriesIds = new ArrayList<>(event.categoriesIds());
-        status = TrainingProgramProposalStatus.PROPOSED;
+        status = PROPOSED;
     }
 
     private TrainingProgramProposal() {}
@@ -81,5 +83,9 @@ public class TrainingProgramProposal {
                 authorId,
                 new ArrayList<>(categoriesIds)
         );
+    }
+
+    public void released() {
+        status = RELEASED;
     }
 }

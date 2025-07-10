@@ -69,7 +69,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
         service.create(event);
 
-        thenTrainingProgramProposalSaved(event)
+        thenTrainingProgramProposalSaved()
                 .isProposed()
                 .hasTrainingProgramProposalId(event.trainingProgramProposalId())
                 .hasName(event.name())
@@ -78,13 +78,6 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasPlan(event.plan())
                 .hasAuthorId(event.authorId())
                 .hasCategoriesIds(event.categoriesIds());
-    }
-
-    private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved(TrainingProgramProposedEvent event) {
-        ArgumentCaptor<TrainingProgramProposal> captor = ArgumentCaptor.forClass(TrainingProgramProposal.class);
-        then(repository).should().save(captor.capture());
-
-        return assertThatTrainingProgramProposal(captor.getValue());
     }
 
     private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
@@ -128,6 +121,44 @@ class TrainingProgramProposalApplicationServiceTest {
         thenPublishedTrainingProgramReleasedEvent().hasTrainingProgramId(actual);
     }
 
+    private TrainingProgramReleasedEventAssertion thenPublishedTrainingProgramReleasedEvent() {
+        ArgumentCaptor<TrainingProgramReleasedEvent> captor = ArgumentCaptor.forClass(TrainingProgramReleasedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        TrainingProgramReleasedEvent releasedEvent = captor.getValue();
+
+        return assertThatTrainingProgramReleasedEvent(releasedEvent);
+    }
+
+    @Test
+    void shouldMarkTrainingProgramProposalAsReleased() {
+        TrainingProgramProposedEvent event = givenExistingTrainingProgramProposed();
+
+        service.apply(asTrainingProgramReleasedEvent(event));
+
+        thenTrainingProgramProposalSaved()
+                .hasTrainingProgramProposalId(event.trainingProgramProposalId())
+                .hasName(event.name())
+                .hasDescription(event.description())
+                .hasAgenda(event.agenda())
+                .hasPlan(event.plan())
+                .hasAuthorId(event.authorId())
+                .hasCategoriesIds(event.categoriesIds())
+                .isReleased();
+    }
+
+    private TrainingProgramReleasedEvent asTrainingProgramReleasedEvent(TrainingProgramProposedEvent proposedEvent) {
+        return TrainingProgramReleasedEvent.create(
+                proposedEvent.trainingProgramProposalId(),
+                UUID.randomUUID(),
+                proposedEvent.name(),
+                proposedEvent.description(),
+                proposedEvent.agenda(),
+                proposedEvent.plan(),
+                proposedEvent.authorId(),
+                proposedEvent.categoriesIds()
+        );
+    }
+
     private TrainingProgramProposedEvent givenExistingTrainingProgramProposed() {
         TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
@@ -136,11 +167,10 @@ class TrainingProgramProposalApplicationServiceTest {
         return event;
     }
 
-    private TrainingProgramReleasedEventAssertion thenPublishedTrainingProgramReleasedEvent() {
-        ArgumentCaptor<TrainingProgramReleasedEvent> captor = ArgumentCaptor.forClass(TrainingProgramReleasedEvent.class);
-        then(eventRegistry).should().publish(captor.capture());
-        TrainingProgramReleasedEvent releasedEvent = captor.getValue();
+    private TrainingProgramProposalAssertion thenTrainingProgramProposalSaved() {
+        ArgumentCaptor<TrainingProgramProposal> captor = ArgumentCaptor.forClass(TrainingProgramProposal.class);
+        then(repository).should().save(captor.capture());
 
-        return assertThatTrainingProgramReleasedEvent(releasedEvent);
+        return assertThatTrainingProgramProposal(captor.getValue());
     }
 }
