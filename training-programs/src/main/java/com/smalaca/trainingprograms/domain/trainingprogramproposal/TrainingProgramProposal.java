@@ -59,7 +59,7 @@ public class TrainingProgramProposal {
         categoriesIds = new ArrayList<>(event.categoriesIds());
     }
 
-    protected TrainingProgramProposal() {}
+    private TrainingProgramProposal() {}
 
     public TrainingProgramReleasedEvent release() {
         UUID trainingProgramId = UUID.randomUUID();
