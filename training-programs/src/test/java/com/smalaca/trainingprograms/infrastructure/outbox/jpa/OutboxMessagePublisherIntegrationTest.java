@@ -6,6 +6,7 @@ import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogramproposal.TrainingProgramProposedEventPublisher;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -64,15 +65,21 @@ class OutboxMessagePublisherIntegrationTest {
         TrainingProgramProposedEvent eventOne = randomTrainingProgramProposedEvent();
         TrainingProgramProposedEvent eventTwo = randomTrainingProgramProposedEvent();
         TrainingProgramProposedEvent eventThree = randomTrainingProgramProposedEvent();
+        TrainingProgramReleasedEvent eventFour = randomTrainingProgramReleasedEvent();
+        TrainingProgramReleasedEvent eventFive = randomTrainingProgramReleasedEvent();
         notPublished(eventOne);
         published(randomTrainingProgramProposedEvent());
         published(randomTrainingProgramProposedEvent());
         notPublished(eventTwo);
         notPublished(eventThree);
+        notPublished(eventFour);
+        published(randomTrainingProgramReleasedEvent());
+        notPublished(eventFive);
 
         await()
                 .untilAsserted(() -> {
                     assertThat(listener.trainingProgramProposedEvents).contains(eventOne, eventTwo, eventThree);
+                    assertThat(listener.trainingProgramReleasedEvents).contains(eventFour, eventFive);
                 });
     }
 
@@ -83,11 +90,14 @@ class OutboxMessagePublisherIntegrationTest {
         published(randomTrainingProgramProposedEvent());
         notPublished(randomTrainingProgramProposedEvent());
         notPublished(randomTrainingProgramProposedEvent());
+        notPublished(randomTrainingProgramReleasedEvent());
+        published(randomTrainingProgramReleasedEvent());
+        notPublished(randomTrainingProgramReleasedEvent());
 
         await()
                 .untilAsserted(() -> {
                     assertThat(repository.findAll())
-                            .hasSize(5)
+                            .hasSize(8)
                             .allSatisfy(actual -> assertThat(actual.isPublished()).isTrue());
                 });
     }
@@ -106,11 +116,32 @@ class OutboxMessagePublisherIntegrationTest {
         return TrainingProgramProposedEvent.create(UUID.randomUUID(), command);
     }
 
+    private TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
+        return TrainingProgramReleasedEvent.create(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                FAKER.book().title(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                FAKER.lorem().paragraph(),
+                UUID.randomUUID(),
+                List.of(UUID.randomUUID(), UUID.randomUUID())
+        );
+    }
+
     private void published(TrainingProgramProposedEvent event) {
         published(event.eventId(), event);
     }
 
     private void notPublished(TrainingProgramProposedEvent event) {
+        notPublished(event.eventId(), event);
+    }
+
+    private void published(TrainingProgramReleasedEvent event) {
+        published(event.eventId(), event);
+    }
+
+    private void notPublished(TrainingProgramReleasedEvent event) {
         notPublished(event.eventId(), event);
     }
 
