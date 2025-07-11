@@ -28,12 +28,11 @@ public class TrainingProgram {
     @Column(name = "TRAINING_PROGRAM_PROPOSAL_ID")
     private UUID trainingProgramProposalId;
 
+    @Column(name = "AUTHOR_ID")
+    private UUID authorId;
+
     @Column(name = "NAME")
     private String name;
-
-    @Lob
-    @Column(name = "DESCRIPTION")
-    private String description;
 
     @Lob
     @Column(name = "AGENDA")
@@ -43,8 +42,9 @@ public class TrainingProgram {
     @Column(name = "PLAN")
     private String plan;
 
-    @Column(name = "AUTHOR_ID")
-    private UUID authorId;
+    @Lob
+    @Column(name = "DESCRIPTION")
+    private String description;
 
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "TRAINING_PROGRAM_CATEGORIES", joinColumns = @JoinColumn(name = "TRAINING_PROGRAM_ID"))
