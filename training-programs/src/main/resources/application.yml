@@ -15,6 +15,9 @@ kafka:
   bootstrap-servers: localhost:9092
   group-id: training-programs
   topics:
+    reviews:
+      events:
+        proposal-approved: reviews-proposal-approved-event-topic
     trainingprogram:
       events:
         training-program-proposed: training-programs-training-program-proposed-event-topic
