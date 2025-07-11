@@ -1,5 +1,6 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventlistener.kafka;
 
+import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.schemaregistry.reviews.events.ProposalApprovedEvent;
 import com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposalApplicationService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,6 +14,7 @@ public class ProposalApprovedEventKafkaListener {
         this.trainingProgramProposalApplicationService = trainingProgramProposalApplicationService;
     }
 
+    @DrivenAdapter
     @KafkaListener(
             topics = "${kafka.topics.reviews.events.proposal-approved}",
             groupId = "${kafka.group-id}",
