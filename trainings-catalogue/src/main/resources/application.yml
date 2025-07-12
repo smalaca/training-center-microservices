@@ -5,3 +5,11 @@ spring:
   jackson:
     serialization:
       indent_output: true
+
+kafka:
+  bootstrap-servers: localhost:9092
+  group-id: trainings-catalogue
+  topics:
+    trainingprogram:
+      events:
+        training-program-released: training-programs-training-program-released-event-topic
