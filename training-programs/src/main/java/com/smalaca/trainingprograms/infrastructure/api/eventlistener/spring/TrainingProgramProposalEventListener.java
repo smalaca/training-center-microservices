@@ -1,6 +1,6 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventlistener.spring;
 
-import com.smalaca.architecture.portsandadapters.DrivenAdapter;
+import com.smalaca.architecture.portsandadapters.DrivingAdapter;
 import com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposalApplicationService;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import org.springframework.context.event.EventListener;
@@ -15,7 +15,7 @@ public class TrainingProgramProposalEventListener {
     }
 
     @EventListener
-    @DrivenAdapter
+    @DrivingAdapter
     public void listen(TrainingProgramProposedEvent event) {
         trainingProgramProposalApplicationService.create(event);
     }
