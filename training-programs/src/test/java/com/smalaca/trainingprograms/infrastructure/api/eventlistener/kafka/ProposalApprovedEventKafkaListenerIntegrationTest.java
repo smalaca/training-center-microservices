@@ -9,6 +9,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.infrastructure.repository.jpa.trainingprogram.SpringTrainingProgramCrudRepository;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogram.TrainingProgramAssertion.assertThatTrainingProgram;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +53,9 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
     @Autowired
     private TrainingProgramProposalRepository repository;
 
+    @Autowired
+    private SpringTrainingProgramCrudRepository trainingProgramRepository;
+
     @BeforeEach
     void init() {
         kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
@@ -60,9 +65,8 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
     @Test
     void shouldPublishTrainingProgramReleasedEventWhenProposalApprovedEventReceived() {
         UUID trainingProgramProposalId = givenExistingTrainingProgramProposal();
-        ProposalApprovedEvent event = new ProposalApprovedEvent(EventId.newEventId(), trainingProgramProposalId, randomUUID());
 
-        kafkaTemplate.send("proposal-approved-event-topic", event);
+        kafkaTemplate.send("proposal-approved-event-topic", proposalApprovedEvent(trainingProgramProposalId));
 
         await().untilAsserted(() -> {
             Optional<TrainingProgramReleasedEvent> found = consumer.trainingProgramReleasedEventFor(trainingProgramProposalId);
@@ -74,12 +78,41 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
         });
     }
 
+    @Test
+    void shouldCreateTrainingProgramWhenProposalApprovedEventReceived() {
+        TrainingProgramProposedEvent event = trainingProgramProposedEvent();
+        givenExistingTrainingProgramProposalFor(event);
+
+        kafkaTemplate.send("proposal-approved-event-topic", proposalApprovedEvent(event.trainingProgramProposalId()));
+
+        await().untilAsserted(() -> {
+            assertThat(trainingProgramRepository.findAll())
+                    .anySatisfy(actual -> assertThatTrainingProgram(actual)
+                            .hasTrainingProgramIdNotNull()
+                            .hasTrainingProgramProposalId(event.trainingProgramProposalId())
+                            .hasName(event.name())
+                            .hasDescription(event.description())
+                            .hasAgenda(event.agenda())
+                            .hasPlan(event.plan())
+                            .hasAuthorId(event.authorId())
+                            .hasCategoriesIds(event.categoriesIds()));
+
+        });
+    }
+
+    private ProposalApprovedEvent proposalApprovedEvent(UUID trainingProgramProposalId) {
+        return new ProposalApprovedEvent(EventId.newEventId(), trainingProgramProposalId, randomUUID());
+    }
+
     private UUID givenExistingTrainingProgramProposal() {
-        TrainingProgramProposedEvent event = TrainingProgramProposedEvent.create(randomUUID(), createTrainingProgramProposalCommand());
-        TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
-        repository.save(trainingProgramProposal);
+        TrainingProgramProposedEvent event = trainingProgramProposedEvent();
+        givenExistingTrainingProgramProposalFor(event);
 
         return event.trainingProgramProposalId();
+    }
+
+    private TrainingProgramProposedEvent trainingProgramProposedEvent() {
+        return TrainingProgramProposedEvent.create(randomUUID(), createTrainingProgramProposalCommand());
     }
 
     private CreateTrainingProgramProposalCommand createTrainingProgramProposalCommand() {
@@ -87,5 +120,10 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
                 new CommandId(randomUUID(), randomUUID(), randomUUID(), now()),
                 randomUUID(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
                 List.of(randomUUID(), randomUUID()));
+    }
+
+    private void givenExistingTrainingProgramProposalFor(TrainingProgramProposedEvent event) {
+        TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
+        repository.save(trainingProgramProposal);
     }
 }

@@ -6,8 +6,10 @@ import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.trainingprograms.domain.trainingprogram.TrainingProgram;
 import com.smalaca.trainingprograms.domain.trainingprogram.TrainingProgramRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Service
 @ApplicationLayer
 public class TrainingProgramApplicationService {
     private final TrainingProgramRepository repository;

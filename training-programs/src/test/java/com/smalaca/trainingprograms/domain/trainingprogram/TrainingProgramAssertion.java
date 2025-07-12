@@ -16,6 +16,11 @@ public class TrainingProgramAssertion {
         return new TrainingProgramAssertion(actual);
     }
 
+    public TrainingProgramAssertion hasTrainingProgramIdNotNull() {
+        assertThat(actual).extracting("trainingProgramId").isNotNull();
+        return this;
+    }
+
     public TrainingProgramAssertion hasTrainingProgramId(UUID expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainingProgramId", expected);
         return this;
