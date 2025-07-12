@@ -1,8 +1,9 @@
-package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogramproposal;
+package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram;
 
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
+import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,16 +24,19 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
-@Import(TrainingProgramProposedTestKafkaListener.class)
-class TrainingProgramProposedEventPublisherIntegrationTest {
-
-    private final Faker faker = new Faker();
+@TestPropertySource(properties = {
+        "kafka.topics.trainingprogram.events.training-program-proposed=training-program-proposed-event-topic",
+        "kafka.topics.trainingprogram.events.training-program-released=training-program-released-event-topic"
+})
+@Import(TrainingProgramTestKafkaListener.class)
+class TrainingProgramEventPublisherIntegrationTest {
+    private static final Faker FAKER = new Faker();
 
     @Autowired
-    private TrainingProgramProposedEventPublisher publisher;
+    private TrainingProgramEventPublisher publisher;
 
     @Autowired
-    private TrainingProgramProposedTestKafkaListener consumer;
+    private TrainingProgramTestKafkaListener listener;
 
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
@@ -49,7 +54,20 @@ class TrainingProgramProposedEventPublisherIntegrationTest {
         publisher.consume(event);
 
         await().untilAsserted(() -> {
-            Optional<com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposedEvent> actual = consumer.trainingProgramProposedEventFor(event.trainingProgramProposalId());
+            Optional<com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposedEvent> actual = listener.trainingProgramProposedEventFor(event.trainingProgramProposalId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), event);
+        });
+    }
+
+    @Test
+    void shouldPublishTrainingProgramReleasedEvent() {
+        TrainingProgramReleasedEvent event = randomTrainingProgramReleasedEvent();
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent> actual = listener.trainingProgramReleasedEventFor(event.trainingProgramProposalId());
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), event);
         });
@@ -58,10 +76,10 @@ class TrainingProgramProposedEventPublisherIntegrationTest {
     private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
         UUID trainingProgramProposalId = UUID.randomUUID();
         UUID authorId = UUID.randomUUID();
-        String name = faker.company().name();
-        String description = faker.lorem().paragraph();
-        String agenda = faker.lorem().paragraph();
-        String plan = faker.lorem().paragraph();
+        String name = FAKER.company().name();
+        String description = FAKER.lorem().paragraph();
+        String agenda = FAKER.lorem().paragraph();
+        String plan = FAKER.lorem().paragraph();
         List<UUID> categoriesIds = List.of(UUID.randomUUID(), UUID.randomUUID());
         
         EventId eventId = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
@@ -70,9 +88,37 @@ class TrainingProgramProposedEventPublisherIntegrationTest {
                 eventId, trainingProgramProposalId, name, description, agenda, plan, authorId, categoriesIds);
     }
 
+    private TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
+        UUID trainingProgramProposalId = UUID.randomUUID();
+        UUID trainingProgramId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        String name = FAKER.company().name();
+        String description = FAKER.lorem().paragraph();
+        String agenda = FAKER.lorem().paragraph();
+        String plan = FAKER.lorem().paragraph();
+        List<UUID> categoriesIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+        
+        EventId eventId = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        
+        return new TrainingProgramReleasedEvent(
+                eventId, trainingProgramProposalId, trainingProgramId, name, description, agenda, plan, authorId, categoriesIds);
+    }
+
     private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposedEvent actual, TrainingProgramProposedEvent expected) {
         assertThatContainsSameData(actual.eventId(), expected.eventId());
         assertThat(actual.trainingProgramProposalId()).isEqualTo(expected.trainingProgramProposalId());
+        assertThat(actual.name()).isEqualTo(expected.name());
+        assertThat(actual.description()).isEqualTo(expected.description());
+        assertThat(actual.agenda()).isEqualTo(expected.agenda());
+        assertThat(actual.plan()).isEqualTo(expected.plan());
+        assertThat(actual.authorId()).isEqualTo(expected.authorId());
+        assertThat(actual.categoriesIds()).isEqualTo(expected.categoriesIds());
+    }
+
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent actual, TrainingProgramReleasedEvent expected) {
+        assertThatContainsSameData(actual.eventId(), expected.eventId());
+        assertThat(actual.trainingProgramProposalId()).isEqualTo(expected.trainingProgramProposalId());
+        assertThat(actual.trainingProgramId()).isEqualTo(expected.trainingProgramId());
         assertThat(actual.name()).isEqualTo(expected.name());
         assertThat(actual.description()).isEqualTo(expected.description());
         assertThat(actual.agenda()).isEqualTo(expected.agenda());

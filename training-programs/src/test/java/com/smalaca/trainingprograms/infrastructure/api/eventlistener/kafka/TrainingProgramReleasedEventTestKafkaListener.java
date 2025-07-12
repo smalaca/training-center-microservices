@@ -1,20 +1,21 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent;
+import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
-class TrainingProgramReleasedEventTestConsumer {
+class TrainingProgramReleasedEventTestKafkaListener {
     private final Map<UUID, TrainingProgramReleasedEvent> trainingProgramReleasedEvents = new HashMap<>();
 
-    @EventListener
-    void consume(TrainingProgramReleasedEvent event) {
+    @KafkaListener(
+            topics = "${kafka.topics.trainingprogram.events.training-program-released}",
+            groupId = "test-training-programs-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(TrainingProgramReleasedEvent event) {
         trainingProgramReleasedEvents.put(event.trainingProgramProposalId(), event);
     }
 

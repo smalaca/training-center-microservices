@@ -21,3 +21,4 @@ kafka:
     trainingprogram:
       events:
         training-program-proposed: training-programs-training-program-proposed-event-topic
+        training-program-released: training-programs-training-program-released-event-topic
