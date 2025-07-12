@@ -2,19 +2,18 @@ package com.smalaca.trainingprograms.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.EventId;
 import com.smalaca.schemaregistry.reviews.events.ProposalApprovedEvent;
-import com.smalaca.trainingprograms.TrainingProgramsApplication;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.infrastructure.repository.jpa.trainingprogram.SpringTrainingProgramCrudRepository;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -32,12 +31,12 @@ import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(classes = TrainingProgramsApplication.class)
+@SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.reviews.events.proposal-approved=proposal-approved-event-topic"
 })
-@Import(TrainingProgramReleasedEventTestConsumer.class)
+@Import(TrainingProgramReleasedEventTestKafkaListener.class)
 class ProposalApprovedEventKafkaListenerIntegrationTest {
     private static final Faker FAKER = new Faker();
 
@@ -48,7 +47,7 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
-    private TrainingProgramReleasedEventTestConsumer consumer;
+    private TrainingProgramReleasedEventTestKafkaListener consumer;
 
     @Autowired
     private TrainingProgramProposalRepository repository;

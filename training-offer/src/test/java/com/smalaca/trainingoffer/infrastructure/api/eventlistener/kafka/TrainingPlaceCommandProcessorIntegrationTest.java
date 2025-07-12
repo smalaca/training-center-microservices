@@ -4,10 +4,10 @@ import com.smalaca.schemaregistry.metadata.CommandId;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,7 +24,7 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(classes = com.smalaca.trainingoffer.TrainingOfferApplication.class)
+@SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.command.book-training-place=" + TrainingPlaceCommandProcessorIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,

@@ -4,12 +4,12 @@ import com.smalaca.schemaregistry.metadata.CommandId;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -27,7 +27,7 @@ import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-@SpringBootTest(classes = com.smalaca.trainingoffer.TrainingOfferApplication.class)
+@SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.command.confirm-training-price=" + TrainingPriceCommandProcessorIntegrationTest.CONFIRM_TRAINING_PRICE_COMMAND_TOPIC,
