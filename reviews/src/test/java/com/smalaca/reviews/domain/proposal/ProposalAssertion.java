@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProposalAssertion {
@@ -49,7 +50,19 @@ public class ProposalAssertion {
     }
 
     public ProposalAssertion isRegistered() {
-        assertThat(actual).hasFieldOrPropertyWithValue("status", REGISTERED);
+        return hasStatus(REGISTERED);
+    }
+
+    public ProposalAssertion isApproved() {
+        return hasStatus(APPROVED);
+    }
+
+    public ProposalAssertion isRejected() {
+        return hasStatus(REJECTED);
+    }
+
+    private ProposalAssertion hasStatus(ProposalStatus expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("status", expected);
         return this;
     }
 
@@ -60,11 +73,6 @@ public class ProposalAssertion {
 
     public ProposalAssertion hasReviewedAtNull() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
-        return this;
-    }
-
-    public ProposalAssertion isApproved() {
-        assertThat(actual).hasFieldOrPropertyWithValue("status", APPROVED);
         return this;
     }
 

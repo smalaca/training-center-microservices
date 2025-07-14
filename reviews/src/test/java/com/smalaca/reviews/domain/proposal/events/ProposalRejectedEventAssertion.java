@@ -5,28 +5,28 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProposalApprovedEventAssertion {
-    private final ProposalApprovedEvent actual;
+public class ProposalRejectedEventAssertion {
+    private final ProposalRejectedEvent actual;
 
-    private ProposalApprovedEventAssertion(ProposalApprovedEvent actual) {
+    private ProposalRejectedEventAssertion(ProposalRejectedEvent actual) {
         this.actual = actual;
     }
 
-    public static ProposalApprovedEventAssertion assertThatProposalApprovedEvent(ProposalApprovedEvent actual) {
-        return new ProposalApprovedEventAssertion(actual);
+    public static ProposalRejectedEventAssertion assertThatProposalRejectedEvent(ProposalRejectedEvent actual) {
+        return new ProposalRejectedEventAssertion(actual);
     }
 
-    public ProposalApprovedEventAssertion hasProposalId(UUID expected) {
+    public ProposalRejectedEventAssertion hasProposalId(UUID expected) {
         assertThat(actual.proposalId()).isEqualTo(expected);
         return this;
     }
 
-    public ProposalApprovedEventAssertion hasReviewerId(UUID expected) {
+    public ProposalRejectedEventAssertion hasReviewerId(UUID expected) {
         assertThat(actual.reviewerId()).isEqualTo(expected);
         return this;
     }
 
-    public ProposalApprovedEventAssertion hasEventIdWith(UUID expectedCorrelationId, LocalDateTime expectedCreationDateTime) {
+    public ProposalRejectedEventAssertion hasEventIdWith(UUID expectedCorrelationId, LocalDateTime expectedCreationDateTime) {
         assertThat(actual.eventId().eventId()).isInstanceOf(UUID.class);
         assertThat(actual.eventId().traceId()).isInstanceOf(UUID.class);
         assertThat(actual.eventId().correlationId()).isEqualTo(expectedCorrelationId);

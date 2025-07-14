@@ -4,6 +4,7 @@ import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +14,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @AggregateRoot
@@ -64,11 +66,43 @@ public class Proposal {
         return proposal;
     }
 
-    public ProposalApprovedEvent approve(UUID approverId, Clock clock) {
-        this.reviewedById = approverId;
+    public Optional<ProposalApprovedEvent> approve(UUID reviewerId, Clock clock) {
+        if (isRejected()) {
+            throw new UnsupportedProposalTransitionException(proposalId, status);
+        }
+
+        if (isApproved()) {
+            return Optional.empty();
+        }
+
+        this.reviewedById = reviewerId;
         this.reviewedAt = clock.now();
         this.status = ProposalStatus.APPROVED;
 
-        return ProposalApprovedEvent.create(proposalId, reviewedById, correlationId, reviewedAt);
+        return Optional.of(ProposalApprovedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
+    }
+
+    public Optional<ProposalRejectedEvent> reject(UUID reviewerId, Clock clock) {
+        if (isApproved()) {
+            throw new UnsupportedProposalTransitionException(proposalId, status);
+        }
+
+        if (isRejected()) {
+            return Optional.empty();
+        }
+
+        this.reviewedById = reviewerId;
+        this.reviewedAt = clock.now();
+        this.status = ProposalStatus.REJECTED;
+
+        return Optional.of(ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
+    }
+
+    private boolean isRejected() {
+        return status == ProposalStatus.REJECTED;
+    }
+
+    private boolean isApproved() {
+        return status == ProposalStatus.APPROVED;
     }
 }
