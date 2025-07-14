@@ -1,0 +1,64 @@
+package com.smalaca.reviews.domain.proposal;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class ProposalAssertion {
+    private final Proposal actual;
+
+    private ProposalAssertion(Proposal actual) {
+        this.actual = actual;
+    }
+
+    public static ProposalAssertion assertThatProposal(Proposal actual) {
+        return new ProposalAssertion(actual);
+    }
+
+    public ProposalAssertion hasProposalId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("proposalId", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasAuthorId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("authorId", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasTitle(String expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("title", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasContent(String expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("content", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasCorrelationId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("correlationId", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasRegisteredAt(LocalDateTime expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("registeredAt", expected);
+        return this;
+    }
+
+    public ProposalAssertion isRegistered() {
+        assertThat(actual).hasFieldOrPropertyWithValue("status", REGISTERED);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedByIdNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedById", null);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedAtNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
+        return this;
+    }
+}
