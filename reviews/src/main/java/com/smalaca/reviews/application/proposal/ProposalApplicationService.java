@@ -4,9 +4,11 @@ import com.smalaca.architecture.cqrs.CommandOperation;
 import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.reviews.domain.clock.Clock;
+import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
+import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -15,10 +17,12 @@ import java.util.UUID;
 public class ProposalApplicationService {
     private final ProposalRepository repository;
     private final Clock clock;
+    private final EventRegistry eventRegistry;
 
-    ProposalApplicationService(ProposalRepository repository, Clock clock) {
+    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
         this.repository = repository;
         this.clock = clock;
+        this.eventRegistry = eventRegistry;
     }
 
     @Transactional
@@ -36,8 +40,9 @@ public class ProposalApplicationService {
     public void approve(UUID proposalId, UUID approverId) {
         Proposal proposal = repository.findById(proposalId);
 
-        proposal.approve(approverId, clock);
+        ProposalApprovedEvent event = proposal.approve(approverId, clock);
 
+        eventRegistry.publish(event);
         repository.save(proposal);
     }
 }
