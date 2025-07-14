@@ -12,6 +12,7 @@ import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationLayer
@@ -41,9 +42,9 @@ public class ProposalApplicationService {
     public void approve(UUID proposalId, UUID reviewerId) {
         Proposal proposal = repository.findById(proposalId);
 
-        ProposalApprovedEvent event = proposal.approve(reviewerId, clock);
+        Optional<ProposalApprovedEvent> event = proposal.approve(reviewerId, clock);
 
-        eventRegistry.publish(event);
+        event.ifPresent(eventRegistry::publish);
         repository.save(proposal);
     }
 
@@ -53,9 +54,9 @@ public class ProposalApplicationService {
     public void reject(UUID proposalId, UUID reviewerId) {
         Proposal proposal = repository.findById(proposalId);
 
-        ProposalRejectedEvent event = proposal.reject(reviewerId, clock);
+        Optional<ProposalRejectedEvent> event = proposal.reject(reviewerId, clock);
 
-        eventRegistry.publish(event);
+        event.ifPresent(eventRegistry::publish);
         repository.save(proposal);
     }
 }
