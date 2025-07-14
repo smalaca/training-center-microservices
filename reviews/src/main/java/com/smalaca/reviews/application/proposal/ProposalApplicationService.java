@@ -9,6 +9,7 @@ import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -41,6 +42,18 @@ public class ProposalApplicationService {
         Proposal proposal = repository.findById(proposalId);
 
         ProposalApprovedEvent event = proposal.approve(reviewerId, clock);
+
+        eventRegistry.publish(event);
+        repository.save(proposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void reject(UUID proposalId, UUID reviewerId) {
+        Proposal proposal = repository.findById(proposalId);
+
+        ProposalRejectedEvent event = proposal.reject(reviewerId, clock);
 
         eventRegistry.publish(event);
         repository.save(proposal);

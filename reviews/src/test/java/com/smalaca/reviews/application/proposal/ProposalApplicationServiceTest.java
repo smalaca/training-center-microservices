@@ -9,6 +9,8 @@ import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion;
+import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
 import static com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion.assertThatProposalApprovedEvent;
+import static com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion.assertThatProposalRejectedEvent;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.mockito.BDDMockito.given;
@@ -90,6 +93,37 @@ class ProposalApplicationServiceTest {
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatProposalApprovedEvent(captor.getValue());
+    }
+
+    @Test
+    void shouldRejectProposal() {
+        givenExistingProposal();
+
+        service.reject(PROPOSAL_ID, REVIEWER_ID);
+
+        thenProposalSaved()
+                .isRejected()
+                .hasReviewedBy(REVIEWER_ID)
+                .hasReviewedAt(NOW);
+    }
+
+    @Test
+    void shouldPublishProposalRejectedEventWhenProposalIsRejected() {
+        givenExistingProposal();
+
+        service.reject(PROPOSAL_ID, REVIEWER_ID);
+
+        thenPublishedProposalRejectedEvent()
+                .hasEventIdWith(CORRELATION_ID, NOW)
+                .hasProposalId(PROPOSAL_ID)
+                .hasReviewerId(REVIEWER_ID);
+    }
+
+    private ProposalRejectedEventAssertion thenPublishedProposalRejectedEvent() {
+        ArgumentCaptor<ProposalRejectedEvent> captor = ArgumentCaptor.forClass(ProposalRejectedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+
+        return assertThatProposalRejectedEvent(captor.getValue());
     }
 
     private void givenExistingProposal() {

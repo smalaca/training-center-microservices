@@ -4,6 +4,7 @@ import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -70,5 +71,13 @@ public class Proposal {
         this.status = ProposalStatus.APPROVED;
 
         return ProposalApprovedEvent.create(proposalId, reviewedById, correlationId, reviewedAt);
+    }
+
+    public ProposalRejectedEvent reject(UUID reviewerId, Clock clock) {
+        this.reviewedById = reviewerId;
+        this.reviewedAt = clock.now();
+        this.status = ProposalStatus.REJECTED;
+
+        return ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt);
     }
 }
