@@ -13,12 +13,12 @@ class ProposalApprovedEventTest {
     void shouldCreateProposalApprovedEvent() {
         EventId eventId = EventId.newEventId();
         UUID proposalId = UUID.randomUUID();
-        UUID approverId = UUID.randomUUID();
+        UUID reviewerId = UUID.randomUUID();
 
-        ProposalApprovedEvent actual = new ProposalApprovedEvent(eventId, proposalId, approverId);
+        ProposalApprovedEvent actual = new ProposalApprovedEvent(eventId, proposalId, reviewerId);
 
         assertThat(actual.eventId()).isEqualTo(eventId);
         assertThat(actual.proposalId()).isEqualTo(proposalId);
-        assertThat(actual.approverId()).isEqualTo(approverId);
+        assertThat(actual.reviewerId()).isEqualTo(reviewerId);
     }
 }

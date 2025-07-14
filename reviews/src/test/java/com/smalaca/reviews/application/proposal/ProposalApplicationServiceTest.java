@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 
 class ProposalApplicationServiceTest {
     private static final UUID PROPOSAL_ID = randomUUID();
-    private static final UUID APPROVER_ID = randomUUID();
+    private static final UUID REVIEWER_ID = randomUUID();
     private static final UUID CORRELATION_ID = randomUUID();
     private static final LocalDateTime NOW = now();
     private static final LocalDateTime REGISTRATION_TIME = now().minusSeconds(10);
@@ -65,11 +65,11 @@ class ProposalApplicationServiceTest {
     void shouldApproveProposal() {
         givenExistingProposal();
 
-        service.approve(PROPOSAL_ID, APPROVER_ID);
+        service.approve(PROPOSAL_ID, REVIEWER_ID);
 
         thenProposalSaved()
                 .isApproved()
-                .hasReviewedBy(APPROVER_ID)
+                .hasReviewedBy(REVIEWER_ID)
                 .hasReviewedAt(NOW);
     }
 
@@ -77,12 +77,12 @@ class ProposalApplicationServiceTest {
     void shouldPublishProposalApprovedEventWhenProposalIsApproved() {
         givenExistingProposal();
 
-        service.approve(PROPOSAL_ID, APPROVER_ID);
+        service.approve(PROPOSAL_ID, REVIEWER_ID);
 
         thenPublishedProposalApprovedEvent()
                 .hasEventIdWith(CORRELATION_ID, NOW)
                 .hasProposalId(PROPOSAL_ID)
-                .hasApproverId(APPROVER_ID);
+                .hasReviewerId(REVIEWER_ID);
     }
 
     private ProposalApprovedEventAssertion thenPublishedProposalApprovedEvent() {

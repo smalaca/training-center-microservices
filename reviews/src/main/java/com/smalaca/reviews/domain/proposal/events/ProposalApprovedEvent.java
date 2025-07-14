@@ -9,9 +9,9 @@ import java.util.UUID;
 import static com.smalaca.reviews.domain.eventid.EventId.newEventId;
 
 @DomainEvent
-public record ProposalApprovedEvent(EventId eventId, UUID proposalId, UUID approverId) {
-    public static ProposalApprovedEvent create(UUID proposalId, UUID approverId, UUID correlationId, LocalDateTime reviewedAt) {
+public record ProposalApprovedEvent(EventId eventId, UUID proposalId, UUID reviewerId) {
+    public static ProposalApprovedEvent create(UUID proposalId, UUID reviewerId, UUID correlationId, LocalDateTime reviewedAt) {
         EventId eventId = newEventId(correlationId, reviewedAt);
-        return new ProposalApprovedEvent(eventId, proposalId, approverId);
+        return new ProposalApprovedEvent(eventId, proposalId, reviewerId);
     }
 }

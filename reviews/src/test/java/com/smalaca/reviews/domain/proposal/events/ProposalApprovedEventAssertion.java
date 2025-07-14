@@ -21,8 +21,8 @@ public class ProposalApprovedEventAssertion {
         return this;
     }
 
-    public ProposalApprovedEventAssertion hasApproverId(UUID expected) {
-        assertThat(actual.approverId()).isEqualTo(expected);
+    public ProposalApprovedEventAssertion hasReviewerId(UUID expected) {
+        assertThat(actual.reviewerId()).isEqualTo(expected);
         return this;
     }
 

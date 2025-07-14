@@ -37,10 +37,10 @@ public class ProposalApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void approve(UUID proposalId, UUID approverId) {
+    public void approve(UUID proposalId, UUID reviewerId) {
         Proposal proposal = repository.findById(proposalId);
 
-        ProposalApprovedEvent event = proposal.approve(approverId, clock);
+        ProposalApprovedEvent event = proposal.approve(reviewerId, clock);
 
         eventRegistry.publish(event);
         repository.save(proposal);

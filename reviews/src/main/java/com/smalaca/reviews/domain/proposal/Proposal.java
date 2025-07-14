@@ -64,8 +64,8 @@ public class Proposal {
         return proposal;
     }
 
-    public ProposalApprovedEvent approve(UUID approverId, Clock clock) {
-        this.reviewedById = approverId;
+    public ProposalApprovedEvent approve(UUID reviewerId, Clock clock) {
+        this.reviewedById = reviewerId;
         this.reviewedAt = clock.now();
         this.status = ProposalStatus.APPROVED;
 
