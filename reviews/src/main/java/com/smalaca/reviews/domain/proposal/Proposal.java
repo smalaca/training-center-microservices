@@ -1,7 +1,9 @@
 package com.smalaca.reviews.domain.proposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
+import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,6 +49,8 @@ public class Proposal {
     @Column(name = "STATUS")
     private ProposalStatus status;
 
+    private Proposal() {}
+
     public static Proposal register(RegisterProposalCommand command) {
         Proposal proposal = new Proposal();
         proposal.proposalId = command.proposalId();
@@ -60,5 +64,11 @@ public class Proposal {
         return proposal;
     }
 
-    private Proposal() {}
+    public ProposalApprovedEvent approve(UUID approverId, Clock clock) {
+        this.reviewedById = approverId;
+        this.reviewedAt = clock.now();
+        this.status = ProposalStatus.APPROVED;
+
+        return ProposalApprovedEvent.create(proposalId, reviewedById, correlationId, reviewedAt);
+    }
 }
