@@ -1,6 +1,7 @@
 package com.smalaca.reviews.domain.proposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -60,5 +61,11 @@ public class Proposal {
         return proposal;
     }
 
-    private Proposal() {}
+    protected Proposal() {}
+
+    public void approve(UUID approverId, Clock clock) {
+        this.reviewedById = approverId;
+        this.reviewedAt = clock.now();
+        this.status = ProposalStatus.APPROVED;
+    }
 }

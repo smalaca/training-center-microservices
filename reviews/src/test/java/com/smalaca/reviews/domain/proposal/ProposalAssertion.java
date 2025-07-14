@@ -3,6 +3,7 @@ package com.smalaca.reviews.domain.proposal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +60,21 @@ public class ProposalAssertion {
 
     public ProposalAssertion hasReviewedAtNull() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
+        return this;
+    }
+
+    public ProposalAssertion isApproved() {
+        assertThat(actual).hasFieldOrPropertyWithValue("status", APPROVED);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedBy(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedById", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedAt(LocalDateTime expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", expected);
         return this;
     }
 }
