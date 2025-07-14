@@ -28,10 +28,15 @@ class ProposalApplicationServiceTest {
         service.register(command);
 
         thenProposalSaved()
+                .isRegistered()
                 .hasProposalId(command.proposalId())
                 .hasAuthorId(command.authorId())
                 .hasTitle(command.title())
-                .hasContent(command.content());
+                .hasContent(command.content())
+                .hasCorrelationId(command.commandId().correlationId())
+                .hasRegisteredAt(command.commandId().creationDateTime())
+                .hasReviewedByIdNull()
+                .hasReviewedAtNull();
     }
 
     private RegisterProposalCommand randomRegisterProposalCommand() {

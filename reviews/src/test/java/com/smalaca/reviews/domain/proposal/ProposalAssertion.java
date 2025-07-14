@@ -1,7 +1,9 @@
 package com.smalaca.reviews.domain.proposal;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProposalAssertion {
@@ -32,6 +34,31 @@ public class ProposalAssertion {
 
     public ProposalAssertion hasContent(String expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("content", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasCorrelationId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("correlationId", expected);
+        return this;
+    }
+
+    public ProposalAssertion hasRegisteredAt(LocalDateTime expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("registeredAt", expected);
+        return this;
+    }
+
+    public ProposalAssertion isRegistered() {
+        assertThat(actual).hasFieldOrPropertyWithValue("status", REGISTERED);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedByIdNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedById", null);
+        return this;
+    }
+
+    public ProposalAssertion hasReviewedAtNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
         return this;
     }
 }

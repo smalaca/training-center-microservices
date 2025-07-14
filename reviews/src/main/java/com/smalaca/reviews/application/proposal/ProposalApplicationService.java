@@ -20,7 +20,7 @@ public class ProposalApplicationService {
     @CommandOperation
     @DrivingPort
     public void register(RegisterProposalCommand command) {
-        Proposal proposal = new Proposal(command);
+        Proposal proposal = Proposal.register(command);
 
         repository.save(proposal);
     }
