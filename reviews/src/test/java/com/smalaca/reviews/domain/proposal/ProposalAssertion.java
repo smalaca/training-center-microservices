@@ -45,7 +45,10 @@ public class ProposalAssertion {
     }
 
     public ProposalAssertion hasRegisteredAt(LocalDateTime expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("registeredAt", expected);
+        assertThat(actual).extracting("registeredAt").satisfies(registeredAt -> {
+            assertThat((LocalDateTime) registeredAt).isEqualToIgnoringNanos(expected);
+        });
+
         return this;
     }
 
@@ -82,7 +85,10 @@ public class ProposalAssertion {
     }
 
     public ProposalAssertion hasReviewedAt(LocalDateTime expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", expected);
+        assertThat(actual).extracting("reviewedAt").satisfies(registeredAt -> {
+            assertThat((LocalDateTime) registeredAt).isEqualToIgnoringNanos(expected);
+        });
+
         return this;
     }
 }
