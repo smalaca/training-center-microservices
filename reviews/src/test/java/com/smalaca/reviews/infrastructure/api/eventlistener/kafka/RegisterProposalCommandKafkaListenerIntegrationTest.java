@@ -1,10 +1,10 @@
 package com.smalaca.reviews.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.reviews.domain.commandid.CommandId;
 import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
-import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.infrastructure.repository.jpa.proposal.ProposalDoesNotExistException;
+import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.assertj.core.api.Assertions;
@@ -19,7 +19,6 @@ import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
-import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.awaitility.Awaitility.await;
 
@@ -80,7 +79,7 @@ class RegisterProposalCommandKafkaListenerIntegrationTest {
 
     private RegisterProposalCommand randomRegisterProposalCommand() {
         return new RegisterProposalCommand(
-                new CommandId(randomUUID(), randomUUID(), randomUUID(), now()),
+                CommandId.newCommandId(),
                 randomUUID(),
                 randomUUID(),
                 FAKER.book().title(),
