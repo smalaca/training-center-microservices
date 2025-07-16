@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @DrivenAdapter
-class DummyEventRegistry implements EventRegistry {
+class KafkaEventRegistry implements EventRegistry {
     @Override
     public void publish(ProposalApprovedEvent event) {
 

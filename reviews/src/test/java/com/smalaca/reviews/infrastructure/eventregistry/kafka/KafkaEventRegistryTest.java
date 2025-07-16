@@ -10,9 +10,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-class DummyEventRegistryTest {
+class KafkaEventRegistryTest {
 
-    private final DummyEventRegistry eventRegistry = new DummyEventRegistry();
+    private final KafkaEventRegistry eventRegistry = new KafkaEventRegistry();
 
     @Test
     void shouldNotThrowExceptionWhenPublishingProposalApprovedEvent() {
