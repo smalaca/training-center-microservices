@@ -13,6 +13,7 @@ kafka:
     reviews:
       events:
         proposal-approved: reviews-proposal-approved-event-topic
+        proposal-rejected: reviews-proposal-rejected-event-topic
       commands:
         register-proposal: reviews-register-proposal-command-topic
     trainingprogram:
