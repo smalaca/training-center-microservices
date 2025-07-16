@@ -74,6 +74,11 @@ public class ProposalAssertion {
         return this;
     }
 
+    public ProposalAssertion hasReviewedAtNotNull() {
+        assertThat(actual).extracting("reviewedAt").isNotNull();
+        return this;
+    }
+
     public ProposalAssertion hasReviewedAtNull() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
         return this;
