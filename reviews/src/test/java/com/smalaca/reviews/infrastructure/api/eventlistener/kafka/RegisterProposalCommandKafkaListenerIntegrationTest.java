@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
@@ -27,7 +26,6 @@ import static org.awaitility.Awaitility.await;
 @TestPropertySource(properties = {
         "kafka.topics.reviews.commands.register-proposal=register-proposal-command-topic"
 })
-@Import(KafkaTemplateTestFactory.class)
 class RegisterProposalCommandKafkaListenerIntegrationTest {
     private static final Faker FAKER = new Faker();
 
