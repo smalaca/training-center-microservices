@@ -3,6 +3,7 @@ package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
 import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
@@ -87,5 +89,13 @@ public class TrainingProgramProposal {
 
     public void released() {
         status = RELEASED;
+    }
+
+    public TrainingProgramRejectedEvent reject(UUID reviewerId) {
+        return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
+    }
+
+    public void rejected() {
+        status = REJECTED;
     }
 }

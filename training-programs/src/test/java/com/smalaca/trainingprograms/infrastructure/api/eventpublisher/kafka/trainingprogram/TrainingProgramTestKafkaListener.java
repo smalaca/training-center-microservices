@@ -2,6 +2,7 @@ package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.tra
 
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 class TrainingProgramTestKafkaListener {
     private final Map<UUID, TrainingProgramReleasedEvent> trainingProgramReleasedEvents = new HashMap<>();
+    private final Map<UUID, TrainingProgramRejectedEvent> trainingProgramRejectedEvents = new HashMap<>();
     private final Map<UUID, RegisterProposalCommand> registerProposalCommands = new HashMap<>();
 
     @KafkaListener(
@@ -35,5 +37,17 @@ class TrainingProgramTestKafkaListener {
 
     Optional<RegisterProposalCommand> registerProposalCommandFor(UUID proposalId) {
         return Optional.ofNullable(registerProposalCommands.get(proposalId));
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topics.trainingprogram.events.training-program-rejected}",
+            groupId = "test-training-programs-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(TrainingProgramRejectedEvent event) {
+        trainingProgramRejectedEvents.put(event.trainingProgramProposalId(), event);
+    }
+
+    Optional<TrainingProgramRejectedEvent> trainingProgramRejectedEventFor(UUID trainingProgramProposalId) {
+        return Optional.ofNullable(trainingProgramRejectedEvents.get(trainingProgramProposalId));
     }
 }

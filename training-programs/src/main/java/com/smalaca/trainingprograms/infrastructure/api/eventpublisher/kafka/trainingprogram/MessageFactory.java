@@ -6,6 +6,7 @@ import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +61,13 @@ class MessageFactory {
                 event.plan(),
                 event.authorId(),
                 event.categoriesIds());
+    }
+
+    com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent asExternalTrainingProgramRejectedEvent(TrainingProgramRejectedEvent event) {
+        return new com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent(
+                asExternalEventId(event.eventId()),
+                event.trainingProgramProposalId(),
+                event.reviewerId());
     }
 
     private com.smalaca.schemaregistry.metadata.EventId asExternalEventId(EventId eventId) {

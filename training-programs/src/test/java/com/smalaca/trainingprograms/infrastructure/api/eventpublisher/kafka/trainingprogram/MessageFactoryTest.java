@@ -6,6 +6,7 @@ import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramReleasedEventAssertion.assertThatExternalTrainingProgramReleasedEvent;
+import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramRejectedEventAssertion.assertThatExternalTrainingProgramRejectedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.RegisterProposalCommandAssertion.assertThatRegisterProposalCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +28,7 @@ class MessageFactoryTest {
     private static final UUID TRAINING_PROGRAM_PROPOSAL_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID AUTHOR_ID = UUID.randomUUID();
+    private static final UUID REVIEWER_ID = UUID.randomUUID();
     private static final UUID TRAINING_CATEGORY_ONE = UUID.randomUUID();
     private static final UUID TRAINING_CATEGORY_TWO = UUID.randomUUID();
     private static final List<UUID> TRAINING_CATEGORIES = List.of(TRAINING_CATEGORY_ONE, TRAINING_CATEGORY_TWO);
@@ -97,5 +100,21 @@ class MessageFactoryTest {
         return new TrainingProgramReleasedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, TRAINING_PROGRAM_ID, TRAINING_NAME, TRAINING_DESCRIPTION,
                 TRAINING_AGENDA, TRAINING_PLAN, AUTHOR_ID, TRAINING_CATEGORIES);
+    }
+
+    @Test
+    void shouldConvertTrainingProgramRejectedEventToExternalTrainingProgramRejectedEvent() {
+        TrainingProgramRejectedEvent event = trainingProgramRejectedEvent();
+
+        com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent actual = messageFactory.asExternalTrainingProgramRejectedEvent(event);
+
+        assertThatExternalTrainingProgramRejectedEvent(actual)
+                .hasTrainingProgramProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
+                .hasReviewerId(REVIEWER_ID)
+                .hasEventIdWithSameDataAs(EVENT_ID);
+    }
+
+    private TrainingProgramRejectedEvent trainingProgramRejectedEvent() {
+        return new TrainingProgramRejectedEvent(EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
     }
 }

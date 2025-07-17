@@ -8,6 +8,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramReleasedEventAssertion.assertThatTrainingProgramReleasedEvent;
+import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramRejectedEventAssertion.assertThatTrainingProgramRejectedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
 import static org.mockito.BDDMockito.given;
@@ -32,7 +34,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
     @Test
     void shouldPublishTrainingProgramProposalCreatedEvent() {
-        CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
+        CreateTrainingProgramProposalCommand command = createTrainingProgramProposalCommand();
 
         service.propose(command);
 
@@ -49,7 +51,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
     @Test
     void shouldReturnTrainingProgramProposalId() {
-        CreateTrainingProgramProposalCommand command = randomCreateTrainingProgramProposalCommand();
+        CreateTrainingProgramProposalCommand command = createTrainingProgramProposalCommand();
 
         UUID actual = service.propose(command);
 
@@ -65,7 +67,7 @@ class TrainingProgramProposalApplicationServiceTest {
 
     @Test
     void shouldCreateTrainingProgramProposalFromEvent() {
-        TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
+        TrainingProgramProposedEvent event = trainingProgramProposedEvent();
 
         service.create(event);
 
@@ -80,11 +82,11 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(event.categoriesIds());
     }
 
-    private TrainingProgramProposedEvent randomTrainingProgramProposedEvent() {
-        return TrainingProgramProposedEvent.create(randomId(), randomCreateTrainingProgramProposalCommand());
+    private TrainingProgramProposedEvent trainingProgramProposedEvent() {
+        return TrainingProgramProposedEvent.create(randomId(), createTrainingProgramProposalCommand());
     }
 
-    private CreateTrainingProgramProposalCommand randomCreateTrainingProgramProposalCommand() {
+    private CreateTrainingProgramProposalCommand createTrainingProgramProposalCommand() {
         CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
         return new CreateTrainingProgramProposalCommand(
                 commandId, randomId(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
@@ -112,21 +114,32 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(expected.categoriesIds());
     }
 
-    @Test
-    void shouldReturnTrainingProgramIdWhenTrainingProgramReleased() {
-        TrainingProgramProposedEvent expected = givenExistingTrainingProgramProposed();
-
-        UUID actual = service.release(expected.trainingProgramProposalId());
-
-        thenPublishedTrainingProgramReleasedEvent().hasTrainingProgramId(actual);
-    }
-
     private TrainingProgramReleasedEventAssertion thenPublishedTrainingProgramReleasedEvent() {
         ArgumentCaptor<TrainingProgramReleasedEvent> captor = ArgumentCaptor.forClass(TrainingProgramReleasedEvent.class);
         then(eventRegistry).should().publish(captor.capture());
         TrainingProgramReleasedEvent releasedEvent = captor.getValue();
 
         return assertThatTrainingProgramReleasedEvent(releasedEvent);
+    }
+    
+    @Test
+    void shouldPublishTrainingProgramRejectedEvent() {
+        TrainingProgramProposedEvent expected = givenExistingTrainingProgramProposed();
+        UUID reviewerId = UUID.randomUUID();
+
+        service.reject(expected.trainingProgramProposalId(), reviewerId);
+
+        thenPublishedTrainingProgramRejectedEvent()
+                .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
+                .hasReviewerId(reviewerId);
+    }
+    
+    private TrainingProgramRejectedEventAssertion thenPublishedTrainingProgramRejectedEvent() {
+        ArgumentCaptor<TrainingProgramRejectedEvent> captor = ArgumentCaptor.forClass(TrainingProgramRejectedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        TrainingProgramRejectedEvent rejectedEvent = captor.getValue();
+
+        return assertThatTrainingProgramRejectedEvent(rejectedEvent);
     }
 
     @Test
@@ -145,22 +158,46 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(event.categoriesIds())
                 .isReleased();
     }
+    
+    @Test
+    void shouldMarkTrainingProgramProposalAsRejected() {
+        TrainingProgramProposedEvent event = givenExistingTrainingProgramProposed();
 
-    private TrainingProgramReleasedEvent asTrainingProgramReleasedEvent(TrainingProgramProposedEvent proposedEvent) {
+        service.apply(asTrainingProgramRejectedEvent(event));
+
+        thenTrainingProgramProposalSaved()
+                .hasTrainingProgramProposalId(event.trainingProgramProposalId())
+                .hasName(event.name())
+                .hasDescription(event.description())
+                .hasAgenda(event.agenda())
+                .hasPlan(event.plan())
+                .hasAuthorId(event.authorId())
+                .hasCategoriesIds(event.categoriesIds())
+                .isRejected();
+    }
+
+    private TrainingProgramReleasedEvent asTrainingProgramReleasedEvent(TrainingProgramProposedEvent event) {
         return TrainingProgramReleasedEvent.create(
-                proposedEvent.trainingProgramProposalId(),
+                event.trainingProgramProposalId(),
                 UUID.randomUUID(),
-                proposedEvent.name(),
-                proposedEvent.description(),
-                proposedEvent.agenda(),
-                proposedEvent.plan(),
-                proposedEvent.authorId(),
-                proposedEvent.categoriesIds()
+                event.name(),
+                event.description(),
+                event.agenda(),
+                event.plan(),
+                event.authorId(),
+                event.categoriesIds()
+        );
+    }
+    
+    private TrainingProgramRejectedEvent asTrainingProgramRejectedEvent(TrainingProgramProposedEvent event) {
+        return TrainingProgramRejectedEvent.create(
+                event.trainingProgramProposalId(),
+                UUID.randomUUID()
         );
     }
 
     private TrainingProgramProposedEvent givenExistingTrainingProgramProposed() {
-        TrainingProgramProposedEvent event = randomTrainingProgramProposedEvent();
+        TrainingProgramProposedEvent event = trainingProgramProposedEvent();
         TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
         given(repository.findById(event.trainingProgramProposalId())).willReturn(trainingProgramProposal);
 
