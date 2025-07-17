@@ -16,6 +16,3 @@ kafka:
         proposal-rejected: reviews-proposal-rejected-event-topic
       commands:
         register-proposal: reviews-register-proposal-command-topic
-    trainingprogram:
-      events:
-        training-program-proposed: training-programs-training-program-proposed-event-topic
