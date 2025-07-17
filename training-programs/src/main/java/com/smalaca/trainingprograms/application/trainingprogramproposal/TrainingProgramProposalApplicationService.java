@@ -66,7 +66,7 @@ public class TrainingProgramProposalApplicationService {
     public void apply(TrainingProgramReleasedEvent event) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
 
-        trainingProgramProposal.released();
+        trainingProgramProposal.released(event.reviewerId());
 
         repository.save(trainingProgramProposal);
     }
@@ -88,7 +88,7 @@ public class TrainingProgramProposalApplicationService {
     public void apply(TrainingProgramRejectedEvent event) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
 
-        trainingProgramProposal.rejected();
+        trainingProgramProposal.rejected(event.reviewerId());
 
         repository.save(trainingProgramProposal);
     }

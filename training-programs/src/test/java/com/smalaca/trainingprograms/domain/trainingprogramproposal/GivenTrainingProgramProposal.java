@@ -28,6 +28,7 @@ public class GivenTrainingProgramProposal {
     private TrainingProgramProposalStatus status;
 
     private TrainingProgramProposal trainingProgramProposal;
+    private UUID reviewerId;
 
     GivenTrainingProgramProposal(TrainingProgramProposalFactory trainingProgramProposalFactory) {
         this.trainingProgramProposalFactory = trainingProgramProposalFactory;
@@ -48,18 +49,25 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal released() {
         proposed();
-        trainingProgramProposal.released();
+        trainingProgramProposal.released(getReviewerId());
         status = RELEASED;
 
         return this;
     }
-    
+
     public GivenTrainingProgramProposal rejected() {
         proposed();
-        trainingProgramProposal.rejected();
+        trainingProgramProposal.rejected(getReviewerId());
         status = REJECTED;
 
         return this;
+    }
+
+    private UUID getReviewerId() {
+        if (reviewerId == null) {
+            reviewerId = UUID.randomUUID();
+        }
+        return reviewerId;
     }
 
     public TrainingProgramProposal getTrainingProgramProposal() {
@@ -70,7 +78,7 @@ public class GivenTrainingProgramProposal {
         return new TrainingProgramProposalTestDto(
                 trainingProgramProposalId,
                 authorId,
-                null,
+                reviewerId,
                 name,
                 description,
                 agenda,

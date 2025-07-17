@@ -91,7 +91,8 @@ public class TrainingProgramProposal {
         );
     }
 
-    public void released() {
+    public void released(UUID reviewerId) {
+        this.reviewerId = reviewerId;
         status = RELEASED;
     }
 
@@ -99,7 +100,8 @@ public class TrainingProgramProposal {
         return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
     }
 
-    public void rejected() {
+    public void rejected(UUID reviewerId) {
+        this.reviewerId = reviewerId;
         status = REJECTED;
     }
 }
