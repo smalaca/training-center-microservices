@@ -49,6 +49,9 @@ public class TrainingProgramProposal {
 
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
+    
+    @Column(name = "REVIEWER_ID")
+    private UUID reviewerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
@@ -72,7 +75,7 @@ public class TrainingProgramProposal {
 
     private TrainingProgramProposal() {}
 
-    public TrainingProgramReleasedEvent release() {
+    public TrainingProgramReleasedEvent release(UUID reviewerId) {
         UUID trainingProgramId = UUID.randomUUID();
 
         return TrainingProgramReleasedEvent.create(
@@ -83,11 +86,13 @@ public class TrainingProgramProposal {
                 agenda,
                 plan,
                 authorId,
+                reviewerId,
                 new ArrayList<>(categoriesIds)
         );
     }
 
-    public void released() {
+    public void released(UUID reviewerId) {
+        this.reviewerId = reviewerId;
         status = RELEASED;
     }
 
@@ -95,7 +100,8 @@ public class TrainingProgramProposal {
         return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
     }
 
-    public void rejected() {
+    public void rejected(UUID reviewerId) {
+        this.reviewerId = reviewerId;
         status = REJECTED;
     }
 }

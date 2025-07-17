@@ -70,7 +70,7 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
     @Test
     void shouldFindAllTrainingProgramProposals() {
         TrainingProgramProposalTestDto dtoOne = existingTrainingProgramProposal();
-        TrainingProgramProposalTestDto dtoTwo = existingTrainingProgramProposal();
+        TrainingProgramProposalTestDto dtoTwo = existingRejectedTrainingProgramProposal();
         TrainingProgramProposalTestDto dtoThree = existingReleasedTrainingProgramProposal();
 
         Iterable<TrainingProgramProposalView> actual = queryService.findAll();
@@ -89,6 +89,10 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
         return transaction.execute(transactionStatus -> given.trainingProgramProposal().released().getDto());
     }
 
+    private TrainingProgramProposalTestDto existingRejectedTrainingProgramProposal() {
+        return transaction.execute(transactionStatus -> given.trainingProgramProposal().rejected().getDto());
+    }
+
     private void assertThatTrainingProgramProposalHasSameDataAs(TrainingProgramProposalView actual, TrainingProgramProposalTestDto expected) {
         assertThatTrainingProgramProposal(actual)
                 .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
@@ -98,6 +102,7 @@ class TrainingProgramProposalQueryServiceIntegrationTest {
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
                 .hasCategoriesIds(expected.categoriesIds())
+                .hasReviewerId(expected.reviewerId())
                 .hasStatus(expected.status());
     }
 }

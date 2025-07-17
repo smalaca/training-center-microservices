@@ -5,6 +5,6 @@ import java.util.UUID;
 
 public record RestTrainingProgramProposalTestDto(
         UUID trainingProgramProposalId, UUID authorId, String name, 
-        String description, String agenda, String plan, 
+        String description, String agenda, String plan, UUID reviewerId,
         List<UUID> categoriesIds, String status) {
 }

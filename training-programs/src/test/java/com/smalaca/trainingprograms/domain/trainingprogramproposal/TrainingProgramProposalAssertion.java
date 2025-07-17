@@ -49,6 +49,16 @@ public class TrainingProgramProposalAssertion {
         return this;
     }
 
+    public TrainingProgramProposalAssertion hasReviewerId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewerId", expected);
+        return this;
+    }
+
+    public TrainingProgramProposalAssertion hasReviewerIdNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewerId", null);
+        return this;
+    }
+
     public TrainingProgramProposalAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual)
                 .extracting("categoriesIds")
@@ -64,7 +74,7 @@ public class TrainingProgramProposalAssertion {
     public TrainingProgramProposalAssertion isReleased() {
         return hasStatus(RELEASED);
     }
-    
+
     public TrainingProgramProposalAssertion isRejected() {
         return hasStatus(REJECTED);
     }

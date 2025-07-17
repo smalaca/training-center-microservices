@@ -60,6 +60,7 @@ class MessageFactory {
                 event.agenda(),
                 event.plan(),
                 event.authorId(),
+                event.reviewerId(),
                 event.categoriesIds());
     }
 

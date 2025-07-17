@@ -47,6 +47,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
+                .hasReviewerIdNull()
                 .hasCategoriesIds(expected.categoriesIds())
                 .isProposed();
     }
@@ -74,6 +75,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
+                .hasReviewerIdNull()
                 .hasCategoriesIds(expected.categoriesIds())
                 .hasStatus(expected.status());
     }
@@ -91,6 +93,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
+                .hasReviewerId(expected.reviewerId())
                 .hasCategoriesIds(expected.categoriesIds())
                 .isReleased();
     }
@@ -108,6 +111,7 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
+                .hasReviewerId(expected.reviewerId())
                 .hasCategoriesIds(expected.categoriesIds())
                 .isRejected();
     }

@@ -58,6 +58,7 @@ class JpaTrainingProgramRepositoryIntegrationTest {
                 FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(),
                 randomUUID(),
+                randomUUID(),
                 List.of(randomUUID(), randomUUID())
         );
     }

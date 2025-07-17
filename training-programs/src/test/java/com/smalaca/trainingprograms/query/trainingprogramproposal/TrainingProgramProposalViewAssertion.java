@@ -57,4 +57,9 @@ class TrainingProgramProposalViewAssertion {
         assertThat(actual.getStatus()).isEqualTo(expected.name());
         return this;
     }
+
+    TrainingProgramProposalViewAssertion hasReviewerId(UUID expected) {
+        assertThat(actual.getReviewerId()).isEqualTo(expected);
+        return this;
+    }
 }
