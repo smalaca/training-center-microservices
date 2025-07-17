@@ -7,6 +7,7 @@ import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.infrastructure.api.eventlistener.spring.TrainingProgramProposalEventListener;
 import com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.TrainingProgramEventPublisher;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +43,10 @@ class OutboxMessagePublisherIntegrationTest {
     private TransactionTemplate transactionTemplate;
 
     @MockBean
-    private TrainingProgramEventPublisher publisher;
+    private TrainingProgramEventPublisher trainingProgramEventPublisher;
+
+    @MockBean
+    private TrainingProgramProposalEventListener trainingProgramProposalEventListener;
 
     private OutboxMessageMapper factory;
 

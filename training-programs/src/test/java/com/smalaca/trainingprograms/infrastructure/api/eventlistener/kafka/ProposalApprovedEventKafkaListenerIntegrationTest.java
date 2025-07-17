@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogram.TrainingProgramAssertion.assertThatTrainingProgram;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,6 +97,18 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
                             .hasAuthorId(event.authorId())
                             .hasCategoriesIds(event.categoriesIds()));
 
+        });
+    }
+    
+    @Test
+    void shouldMarkTrainingProgramProposalAsReleasedWhenProposalApprovedEventReceived() {
+        UUID trainingProgramProposalId = givenExistingTrainingProgramProposal();
+
+        kafkaTemplate.send("proposal-approved-event-topic", proposalApprovedEvent(trainingProgramProposalId));
+
+        await().untilAsserted(() -> {
+            TrainingProgramProposal proposal = repository.findById(trainingProgramProposalId);
+            assertThatTrainingProgramProposal(proposal).isReleased();
         });
     }
 
