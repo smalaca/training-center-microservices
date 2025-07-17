@@ -5,6 +5,7 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramReleasedEventAssertion.assertThatExternalTrainingProgramReleasedEvent;
+import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramRejectedEventAssertion.assertThatExternalTrainingProgramRejectedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.RegisterProposalCommandAssertion.assertThatRegisterProposalCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -29,7 +31,8 @@ import static org.awaitility.Awaitility.await;
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.reviews.commands.register-proposal=reviews-register-proposal-command-topic",
-        "kafka.topics.trainingprogram.events.training-program-released=training-program-released-event-topic"
+        "kafka.topics.trainingprogram.events.training-program-released=training-program-released-event-topic",
+        "kafka.topics.trainingprogram.events.training-program-rejected=training-program-rejected-event-topic"
 })
 @Import(TrainingProgramTestKafkaListener.class)
 class TrainingProgramEventPublisherIntegrationTest {
@@ -37,6 +40,7 @@ class TrainingProgramEventPublisherIntegrationTest {
     private static final UUID TRAINING_PROGRAM_PROPOSAL_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID AUTHOR_ID = UUID.randomUUID();
+    private static final UUID REVIEWER_ID = UUID.randomUUID();
     private static final UUID TRAINING_CATEGORY_ONE = UUID.randomUUID();
     private static final UUID TRAINING_CATEGORY_TWO = UUID.randomUUID();
     private static final List<UUID> TRAINING_CATEGORIES = List.of(TRAINING_CATEGORY_ONE, TRAINING_CATEGORY_TWO);
@@ -108,6 +112,21 @@ class TrainingProgramEventPublisherIntegrationTest {
         });
     }
 
+    @Test
+    void shouldPublishTrainingProgramRejectedEvent() {
+        publisher.consume(trainingProgramRejectedEvent());
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent> actual = listener.trainingProgramRejectedEventFor(TRAINING_PROGRAM_PROPOSAL_ID);
+            assertThat(actual).isPresent();
+
+            assertThatExternalTrainingProgramRejectedEvent(actual.get())
+                    .hasTrainingProgramProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
+                    .hasReviewerId(REVIEWER_ID)
+                    .hasEventIdWithSameDataAs(EVENT_ID);
+        });
+    }
+
     private TrainingProgramProposedEvent trainingProgramProposedEvent() {
         return new TrainingProgramProposedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, TRAINING_NAME, TRAINING_DESCRIPTION,
@@ -118,5 +137,10 @@ class TrainingProgramEventPublisherIntegrationTest {
         return new TrainingProgramReleasedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, TRAINING_PROGRAM_ID, TRAINING_NAME, TRAINING_DESCRIPTION, 
                 TRAINING_AGENDA, TRAINING_PLAN, AUTHOR_ID, TRAINING_CATEGORIES);
+    }
+
+    private TrainingProgramRejectedEvent trainingProgramRejectedEvent() {
+        return new TrainingProgramRejectedEvent(
+                EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
     }
 }
