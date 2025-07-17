@@ -1,6 +1,6 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;

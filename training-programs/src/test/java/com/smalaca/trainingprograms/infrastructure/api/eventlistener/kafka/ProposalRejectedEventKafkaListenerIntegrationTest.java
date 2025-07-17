@@ -2,13 +2,13 @@ package com.smalaca.trainingprograms.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.EventId;
 import com.smalaca.schemaregistry.reviews.events.ProposalRejectedEvent;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
