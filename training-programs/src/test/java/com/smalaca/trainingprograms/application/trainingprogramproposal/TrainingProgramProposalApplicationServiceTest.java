@@ -79,6 +79,7 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasAgenda(event.agenda())
                 .hasPlan(event.plan())
                 .hasAuthorId(event.authorId())
+                .hasReviewerIdNull()
                 .hasCategoriesIds(event.categoriesIds());
     }
 

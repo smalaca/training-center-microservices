@@ -54,7 +54,7 @@ public class TrainingProgramProposalAssertion {
         return this;
     }
 
-    public TrainingProgramProposalAssertion hasNullReviewerId() {
+    public TrainingProgramProposalAssertion hasReviewerIdNull() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewerId", null);
         return this;
     }
