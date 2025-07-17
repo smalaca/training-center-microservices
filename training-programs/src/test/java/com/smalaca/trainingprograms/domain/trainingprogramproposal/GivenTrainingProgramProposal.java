@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static java.util.UUID.randomUUID;
 
@@ -49,6 +50,14 @@ public class GivenTrainingProgramProposal {
         proposed();
         trainingProgramProposal.released();
         status = RELEASED;
+
+        return this;
+    }
+    
+    public GivenTrainingProgramProposal rejected() {
+        proposed();
+        trainingProgramProposal.rejected();
+        status = REJECTED;
 
         return this;
     }

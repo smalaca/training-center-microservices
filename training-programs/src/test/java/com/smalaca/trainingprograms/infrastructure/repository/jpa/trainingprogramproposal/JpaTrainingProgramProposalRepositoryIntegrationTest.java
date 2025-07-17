@@ -94,6 +94,23 @@ class JpaTrainingProgramProposalRepositoryIntegrationTest {
                 .hasCategoriesIds(expected.categoriesIds())
                 .isReleased();
     }
+    
+    @Test
+    void shouldFindRejectedTrainingProgramProposalById() {
+        TrainingProgramProposalTestDto expected = givenExisting(given.trainingProgramProposal().rejected());
+
+        TrainingProgramProposal actual = repository.findById(expected.trainingProgramProposalId());
+
+        assertThatTrainingProgramProposal(actual)
+                .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
+                .hasName(expected.name())
+                .hasDescription(expected.description())
+                .hasAgenda(expected.agenda())
+                .hasPlan(expected.plan())
+                .hasAuthorId(expected.authorId())
+                .hasCategoriesIds(expected.categoriesIds())
+                .isRejected();
+    }
 
     private TrainingProgramProposalTestDto givenExisting(GivenTrainingProgramProposal trainingProgramProposal) {
         TrainingProgramProposalTestDto expected = trainingProgramProposal.getDto();
