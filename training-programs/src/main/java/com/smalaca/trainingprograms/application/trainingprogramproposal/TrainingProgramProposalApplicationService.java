@@ -52,13 +52,12 @@ public class TrainingProgramProposalApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public UUID release(UUID trainingProgramProposalId) {
+    public void release(UUID trainingProgramProposalId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
 
         TrainingProgramReleasedEvent event = trainingProgramProposal.release();
 
         eventRegistry.publish(event);
-        return event.trainingProgramId();
     }
 
     @Transactional
