@@ -52,10 +52,10 @@ public class TrainingProgramProposalApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void release(UUID trainingProgramProposalId) {
+    public void release(UUID trainingProgramProposalId, UUID reviewerId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
 
-        TrainingProgramReleasedEvent event = trainingProgramProposal.release();
+        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId);
 
         eventRegistry.publish(event);
     }

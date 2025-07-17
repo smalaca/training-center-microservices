@@ -58,8 +58,8 @@ public class TrainingProgramReleasedEventAssertion {
         return this;
     }
     
-    public TrainingProgramReleasedEventAssertion hasReviewerNull() {
-        assertThat(actual.reviewerId()).isNull();
+    public TrainingProgramReleasedEventAssertion hasReviewerId(UUID reviewerId) {
+        assertThat(actual.reviewerId()).isEqualTo(reviewerId);
         return this;
     }
 

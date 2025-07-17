@@ -75,7 +75,7 @@ public class TrainingProgramProposal {
 
     private TrainingProgramProposal() {}
 
-    public TrainingProgramReleasedEvent release() {
+    public TrainingProgramReleasedEvent release(UUID reviewerId) {
         UUID trainingProgramId = UUID.randomUUID();
 
         return TrainingProgramReleasedEvent.create(

@@ -21,7 +21,7 @@ public class ProposalEventKafkaListener {
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void listen(ProposalApprovedEvent event) {
-        trainingProgramProposalApplicationService.release(event.proposalId());
+        trainingProgramProposalApplicationService.release(event.proposalId(), event.reviewerId());
     }
 
     @DrivenAdapter
