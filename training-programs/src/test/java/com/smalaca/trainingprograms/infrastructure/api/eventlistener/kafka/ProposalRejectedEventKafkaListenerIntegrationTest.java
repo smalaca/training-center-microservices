@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,6 +69,18 @@ class ProposalRejectedEventKafkaListenerIntegrationTest {
 
             TrainingProgramRejectedEvent actual = found.get();
             assertThat(actual.trainingProgramProposalId()).isEqualTo(trainingProgramProposalId);
+        });
+    }
+    
+    @Test
+    void shouldMarkTrainingProgramProposalAsRejectedWhenProposalRejectedEventReceived() {
+        UUID trainingProgramProposalId = givenExistingTrainingProgramProposal();
+
+        kafkaTemplate.send("proposal-rejected-event-topic", proposalRejectedEvent(trainingProgramProposalId));
+
+        await().untilAsserted(() -> {
+            TrainingProgramProposal proposal = repository.findById(trainingProgramProposalId);
+            assertThatTrainingProgramProposal(proposal).isRejected();
         });
     }
 
