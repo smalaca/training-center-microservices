@@ -6,6 +6,7 @@ import java.util.UUID;
 public class TrainingProgramProposalTestDto {
     private final UUID trainingProgramProposalId;
     private final UUID authorId;
+    private final UUID reviewerId;
     private final String name;
     private final String description;
     private final String agenda;
@@ -14,11 +15,12 @@ public class TrainingProgramProposalTestDto {
     private final TrainingProgramProposalStatus status;
 
     public TrainingProgramProposalTestDto(
-            UUID trainingProgramProposalId, UUID authorId, String name,
+            UUID trainingProgramProposalId, UUID authorId, UUID reviewerId, String name,
             String description, String agenda, String plan,
             List<UUID> categoriesIds, TrainingProgramProposalStatus status) {
         this.trainingProgramProposalId = trainingProgramProposalId;
         this.authorId = authorId;
+        this.reviewerId = reviewerId;
         this.name = name;
         this.description = description;
         this.agenda = agenda;
@@ -33,6 +35,10 @@ public class TrainingProgramProposalTestDto {
 
     public UUID authorId() {
         return authorId;
+    }
+    
+    public UUID reviewerId() {
+        return reviewerId;
     }
 
     public String name() {

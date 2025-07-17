@@ -48,6 +48,11 @@ public class TrainingProgramProposalAssertion {
         assertThat(actual).hasFieldOrPropertyWithValue("authorId", expected);
         return this;
     }
+    
+    public TrainingProgramProposalAssertion hasNullReviewerId() {
+        assertThat(actual).hasFieldOrPropertyWithValue("reviewerId", null);
+        return this;
+    }
 
     public TrainingProgramProposalAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual)

@@ -49,6 +49,9 @@ public class TrainingProgramProposal {
 
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
+    
+    @Column(name = "REVIEWER_ID")
+    private UUID reviewerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")

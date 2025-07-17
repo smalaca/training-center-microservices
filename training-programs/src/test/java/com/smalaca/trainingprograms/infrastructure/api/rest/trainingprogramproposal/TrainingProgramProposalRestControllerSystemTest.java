@@ -85,6 +85,7 @@ class TrainingProgramProposalRestControllerSystemTest {
         return new TrainingProgramProposalTestDto(
                 trainingProgramProposalId,
                 command.authorId(),
+                null,
                 command.name(),
                 command.description(),
                 command.agenda(),

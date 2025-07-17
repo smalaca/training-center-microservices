@@ -70,6 +70,7 @@ public class GivenTrainingProgramProposal {
         return new TrainingProgramProposalTestDto(
                 trainingProgramProposalId,
                 authorId,
+                null,
                 name,
                 description,
                 agenda,
