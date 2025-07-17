@@ -24,3 +24,4 @@ kafka:
     trainingprogram:
       events:
         training-program-released: training-programs-training-program-released-event-topic
+        training-program-rejected: training-programs-training-program-rejected-event-topic

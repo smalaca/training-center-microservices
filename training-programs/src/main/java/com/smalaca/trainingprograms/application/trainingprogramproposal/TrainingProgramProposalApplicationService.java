@@ -10,6 +10,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,28 @@ public class TrainingProgramProposalApplicationService {
         TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
 
         trainingProgramProposal.released();
+
+        repository.save(trainingProgramProposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void reject(UUID trainingProgramProposalId, UUID reviewerId) {
+        TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
+
+        TrainingProgramRejectedEvent event = trainingProgramProposal.reject(reviewerId);
+
+        eventRegistry.publish(event);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void apply(TrainingProgramRejectedEvent event) {
+        TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
+
+        trainingProgramProposal.rejected();
 
         repository.save(trainingProgramProposal);
     }
