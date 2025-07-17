@@ -63,18 +63,18 @@ class MessageFactory {
                 event.categoriesIds());
     }
 
+    com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent asExternalTrainingProgramRejectedEvent(TrainingProgramRejectedEvent event) {
+        return new com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent(
+                asExternalEventId(event.eventId()),
+                event.trainingProgramProposalId(),
+                event.reviewerId());
+    }
+
     private com.smalaca.schemaregistry.metadata.EventId asExternalEventId(EventId eventId) {
         return new com.smalaca.schemaregistry.metadata.EventId(
                 eventId.eventId(),
                 eventId.traceId(),
                 eventId.correlationId(),
                 eventId.creationDateTime());
-    }
-
-    com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent asExternalTrainingProgramRejectedEvent(TrainingProgramRejectedEvent event) {
-        return new com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent(
-                asExternalEventId(event.eventId()),
-                event.trainingProgramProposalId(),
-                event.reviewerId());
     }
 }
