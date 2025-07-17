@@ -111,6 +111,7 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasAgenda(expected.agenda())
                 .hasPlan(expected.plan())
                 .hasAuthorId(expected.authorId())
+                .hasReviewerNull()
                 .hasCategoriesIds(expected.categoriesIds());
     }
 
@@ -185,6 +186,7 @@ class TrainingProgramProposalApplicationServiceTest {
                 event.agenda(),
                 event.plan(),
                 event.authorId(),
+                UUID.randomUUID(),
                 event.categoriesIds()
         );
     }

@@ -53,6 +53,11 @@ class ExternalTrainingProgramReleasedEventAssertion {
         assertThat(actual.authorId()).isEqualTo(expected);
         return this;
     }
+    
+    ExternalTrainingProgramReleasedEventAssertion hasReviewerId(UUID expected) {
+        assertThat(actual.reviewerId()).isEqualTo(expected);
+        return this;
+    }
 
     ExternalTrainingProgramReleasedEventAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual.categoriesIds()).isEqualTo(expected);

@@ -57,6 +57,11 @@ public class TrainingProgramReleasedEventAssertion {
         assertThat(actual.authorId()).isEqualTo(expected);
         return this;
     }
+    
+    public TrainingProgramReleasedEventAssertion hasReviewerNull() {
+        assertThat(actual.reviewerId()).isNull();
+        return this;
+    }
 
     public TrainingProgramReleasedEventAssertion hasCategoriesIds(List<UUID> expected) {
         assertThat(actual.categoriesIds()).isEqualTo(expected);

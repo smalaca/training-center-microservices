@@ -92,6 +92,7 @@ class MessageFactoryTest {
                 .hasAgenda(TRAINING_AGENDA)
                 .hasPlan(TRAINING_PLAN)
                 .hasAuthorId(AUTHOR_ID)
+                .hasReviewerId(REVIEWER_ID)
                 .hasCategoriesIds(TRAINING_CATEGORIES)
                 .hasEventIdWithSameDataAs(EVENT_ID);
     }
@@ -99,7 +100,7 @@ class MessageFactoryTest {
     private TrainingProgramReleasedEvent trainingProgramReleasedEvent() {
         return new TrainingProgramReleasedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, TRAINING_PROGRAM_ID, TRAINING_NAME, TRAINING_DESCRIPTION,
-                TRAINING_AGENDA, TRAINING_PLAN, AUTHOR_ID, TRAINING_CATEGORIES);
+                TRAINING_AGENDA, TRAINING_PLAN, AUTHOR_ID, REVIEWER_ID, TRAINING_CATEGORIES);
     }
 
     @Test

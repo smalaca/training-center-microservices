@@ -93,6 +93,7 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(),
                 randomId(),
+                randomId(),
                 List.of(randomId(), randomId())
         );
     }

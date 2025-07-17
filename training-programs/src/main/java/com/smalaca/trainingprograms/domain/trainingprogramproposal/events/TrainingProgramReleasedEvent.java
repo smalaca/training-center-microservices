@@ -9,14 +9,14 @@ import java.util.UUID;
 @DomainEvent
 public record TrainingProgramReleasedEvent(
         EventId eventId, UUID trainingProgramProposalId, UUID trainingProgramId, String name, String description, 
-        String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
+        String agenda, String plan, UUID authorId, UUID reviewerId, List<UUID> categoriesIds) {
 
     public static TrainingProgramReleasedEvent create(
             UUID trainingProgramProposalId, UUID trainingProgramId, String name, String description, 
-            String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
+            String agenda, String plan, UUID authorId, UUID reviewerId, List<UUID> categoriesIds) {
         return new TrainingProgramReleasedEvent(
                 EventId.newEventId(), trainingProgramProposalId, trainingProgramId, name, description, agenda,
-                plan, authorId, categoriesIds
+                plan, authorId, reviewerId, categoriesIds
         );
     }
 }

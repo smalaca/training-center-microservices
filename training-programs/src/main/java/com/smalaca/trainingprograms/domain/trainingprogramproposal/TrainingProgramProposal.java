@@ -86,6 +86,7 @@ public class TrainingProgramProposal {
                 agenda,
                 plan,
                 authorId,
+                reviewerId,
                 new ArrayList<>(categoriesIds)
         );
     }

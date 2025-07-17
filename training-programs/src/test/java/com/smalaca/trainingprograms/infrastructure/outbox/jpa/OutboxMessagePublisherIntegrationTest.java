@@ -129,6 +129,7 @@ class OutboxMessagePublisherIntegrationTest {
                 FAKER.lorem().paragraph(),
                 FAKER.lorem().paragraph(),
                 UUID.randomUUID(),
+                UUID.randomUUID(),
                 List.of(UUID.randomUUID(), UUID.randomUUID())
         );
     }
