@@ -30,6 +30,7 @@ import static org.awaitility.Awaitility.await;
 @Import(TrainingProgramTestClient.class)
 class TrainingProgramProposalRestControllerSystemTest {
     private static final Faker FAKER = new Faker();
+    private static final UUID NO_REVIEWER_ID_FOR_PROPOSED = null;
 
     @Autowired
     private TrainingProgramProposalRepository repository;
@@ -85,7 +86,7 @@ class TrainingProgramProposalRestControllerSystemTest {
         return new TrainingProgramProposalTestDto(
                 trainingProgramProposalId,
                 command.authorId(),
-                null,
+                NO_REVIEWER_ID_FOR_PROPOSED,
                 command.name(),
                 command.description(),
                 command.agenda(),
@@ -102,10 +103,6 @@ class TrainingProgramProposalRestControllerSystemTest {
         assertThatTrainingProgramProposalResponse(actual).notFound();
     }
 
-    private UUID randomId() {
-        return UUID.randomUUID();
-    }
-
     @Test
     void shouldFindExistingTrainingProgramProposal() {
         TrainingProgramProposalTestDto dto = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().proposed().getDto());
@@ -120,8 +117,8 @@ class TrainingProgramProposalRestControllerSystemTest {
     @Test
     void shouldFindAllTrainingProgramProposals() {
         TrainingProgramProposalTestDto dtoOne = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().proposed().getDto());
-        TrainingProgramProposalTestDto dtoTwo = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().proposed().getDto());
-        TrainingProgramProposalTestDto dtoThree = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().proposed().getDto());
+        TrainingProgramProposalTestDto dtoTwo = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().released().getDto());
+        TrainingProgramProposalTestDto dtoThree = transactionTemplate.execute(transactionStatus -> given.trainingProgramProposal().rejected().getDto());
 
         RestTrainingProgramProposalTestResponse actual = client.trainingProgramProposals().findAll();
 
@@ -131,5 +128,9 @@ class TrainingProgramProposalRestControllerSystemTest {
                 .containsTrainingProgramProposal(dtoOne)
                 .containsTrainingProgramProposal(dtoTwo)
                 .containsTrainingProgramProposal(dtoThree);
+    }
+
+    private UUID randomId() {
+        return UUID.randomUUID();
     }
 }

@@ -44,6 +44,9 @@ public class TrainingProgramProposalView {
     @Column(name = "PLAN")
     private String plan;
 
+    @Column(name = "REVIEWER_ID")
+    private UUID reviewerId;
+
     @ElementCollection(fetch = EAGER)
     @CollectionTable(name = "TRAINING_PROGRAM_PROPOSAL_CATEGORIES", joinColumns = @JoinColumn(name = "TRAINING_PROGRAM_PROPOSAL_ID"))
     @Column(name = "CATEGORY_ID")
