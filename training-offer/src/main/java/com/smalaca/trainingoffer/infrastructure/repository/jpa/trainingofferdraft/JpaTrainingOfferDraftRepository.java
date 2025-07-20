@@ -23,7 +23,7 @@ public class JpaTrainingOfferDraftRepository implements TrainingOfferDraftReposi
     }
 
     @Override
-    public void save(TrainingOfferDraft trainingOfferDraft) {
-        repository.save(trainingOfferDraft);
+    public UUID save(TrainingOfferDraft trainingOfferDraft) {
+        return repository.save(trainingOfferDraft).trainingOfferDraftId();
     }
 }

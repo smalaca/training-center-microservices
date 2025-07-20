@@ -4,7 +4,9 @@ import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAlreadyPublishedException;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftFactory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import static com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferD
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion.assertThatTrainingOfferPublishedEvent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -39,7 +42,8 @@ class TrainingOfferDraftApplicationServiceTest {
 
     private final TrainingOfferDraftRepository repository = mock(TrainingOfferDraftRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationService(repository, eventRegistry);
+    private final TrainingOfferDraftFactory factory = new TrainingOfferDraftFactory();
+    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationService(repository, eventRegistry, factory);
 
     @Test
     void shouldMarkTrainingOfferDraftAsPublished() {
@@ -79,6 +83,32 @@ class TrainingOfferDraftApplicationServiceTest {
         TrainingOfferDraftAlreadyPublishedException actual = assertThrows(TrainingOfferDraftAlreadyPublishedException.class, () -> service.publish(TRAINING_OFFER_DRAFT_ID));
 
         assertThat(actual).hasMessage("Training offer draft: " + TRAINING_OFFER_DRAFT_ID + " already published.");
+    }
+    
+    @Test
+    void shouldReturnTrainingOfferDraftIdWhenCreated() {
+        CreateTrainingOfferDraftCommand command = createTrainingOfferDraftCommand();
+        given(repository.save(any())).willReturn(TRAINING_OFFER_DRAFT_ID);
+
+        UUID actual = service.create(command);
+
+        assertThat(actual).isEqualTo(TRAINING_OFFER_DRAFT_ID);
+    }
+    
+    @Test
+    void shouldCreateTrainingOfferDraftWithCorrectParameters() {
+        CreateTrainingOfferDraftCommand command = createTrainingOfferDraftCommand();
+
+        service.create(command);
+
+        thenTrainingOfferDraftSaved()
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPrice(com.smalaca.trainingoffer.domain.price.Price.of(PRICE_AMOUNT, CURRENCY))
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasTrainingSessionPeriod(new com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME))
+                .isNotPublished();
     }
 
     private TrainingOfferDraft trainingOfferDraft() {
@@ -121,5 +151,20 @@ class TrainingOfferDraftApplicationServiceTest {
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatTrainingOfferPublishedEvent(captor.getValue());
+    }
+    
+    private CreateTrainingOfferDraftCommand createTrainingOfferDraftCommand() {
+        return new CreateTrainingOfferDraftCommand(
+                TRAINING_PROGRAM_ID,
+                TRAINER_ID,
+                PRICE_AMOUNT,
+                CURRENCY,
+                MINIMUM_PARTICIPANTS,
+                MAXIMUM_PARTICIPANTS,
+                START_DATE,
+                END_DATE,
+                START_TIME,
+                END_TIME
+        );
     }
 }
