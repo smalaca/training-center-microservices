@@ -7,6 +7,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.UUID;
 
 public class RestTrainingOfferDraftTestResponse {
     private final MockHttpServletResponse response;
@@ -33,6 +34,14 @@ public class RestTrainingOfferDraftTestResponse {
     RestTrainingOfferDraftTestDto asTrainingOfferDraft() {
         try {
             return objectMapper.readValue(asString(), RestTrainingOfferDraftTestDto.class);
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    public UUID asTrainingOfferDraftId() {
+        try {
+            return objectMapper.readValue(asString(), UUID.class);
         } catch (JsonProcessingException exception) {
             throw new RuntimeException(exception);
         }
