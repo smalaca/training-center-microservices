@@ -94,7 +94,7 @@ public class TrainingOfferDraft {
     }
 
     @Factory
-    public static class Builder {
+    static class Builder {
         private UUID trainingProgramId;
         private UUID trainerId;
         private Price price;
@@ -102,37 +102,37 @@ public class TrainingOfferDraft {
         private int maximumParticipants;
         private TrainingSessionPeriod trainingSessionPeriod;
 
-        public Builder withTrainingProgramId(UUID trainingProgramId) {
+        Builder withTrainingProgramId(UUID trainingProgramId) {
             this.trainingProgramId = trainingProgramId;
             return this;
         }
 
-        public Builder withTrainerId(UUID trainerId) {
+        Builder withTrainerId(UUID trainerId) {
             this.trainerId = trainerId;
             return this;
         }
 
-        public Builder withPrice(BigDecimal amount, String currency) {
+        Builder withPrice(BigDecimal amount, String currency) {
             this.price = Price.of(amount, currency);
             return this;
         }
 
-        public Builder withMinimumParticipants(int minimumParticipants) {
+        Builder withMinimumParticipants(int minimumParticipants) {
             this.minimumParticipants = minimumParticipants;
             return this;
         }
 
-        public Builder withMaximumParticipants(int maximumParticipants) {
+        Builder withMaximumParticipants(int maximumParticipants) {
             this.maximumParticipants = maximumParticipants;
             return this;
         }
 
-        public Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
             this.trainingSessionPeriod = new TrainingSessionPeriod(startDate, endDate, startTime, endTime);
             return this;
         }
 
-        public TrainingOfferDraft build() {
+        TrainingOfferDraft build() {
             return new TrainingOfferDraft(this);
         }
     }

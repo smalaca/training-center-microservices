@@ -3,7 +3,8 @@ package com.smalaca.trainingoffer.domain.trainingofferdraft;
 class GivenTrainingOfferDraftWithRepository extends GivenTrainingOfferDraft {
     private final TrainingOfferDraftRepository repository;
 
-    GivenTrainingOfferDraftWithRepository(TrainingOfferDraftRepository repository) {
+    GivenTrainingOfferDraftWithRepository(TrainingOfferDraftFactory factory, TrainingOfferDraftRepository repository) {
+        super(factory);
         this.repository = repository;
     }
 
