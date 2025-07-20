@@ -77,7 +77,7 @@ public class RestTrainingOfferDraftTestResponseAssertion {
     }
 
     private void isSameAsTrainingOfferDraft(RestTrainingOfferDraftTestDto actual, TrainingOfferDraftTestDto expected, boolean published) {
-        assertThat(actual.trainingOfferDraftId()).isEqualTo(expected.trainingOfferDraftId());
+        assertThat(actual.trainingOfferDraftId()).isEqualTo(expected.getTrainingOfferDraftId());
         assertThat(actual.trainingProgramId()).isEqualTo(expected.getTrainingProgramId());
         assertThat(actual.trainerId()).isEqualTo(expected.getTrainerId());
         assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getPrice().amount());

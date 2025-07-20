@@ -1,12 +1,17 @@
 package com.smalaca.trainingoffer.application.trainingofferdraft;
 
 import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.GivenTrainingOfferDraft;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.GivenTrainingOfferDraftFactory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAlreadyPublishedException;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftTestDto;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion;
+import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -20,6 +25,7 @@ import static com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferD
 import static com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion.assertThatTrainingOfferPublishedEvent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
@@ -37,13 +43,15 @@ class TrainingOfferDraftApplicationServiceTest {
     private static final LocalTime START_TIME = LocalTime.of(9, 0);
     private static final LocalTime END_TIME = LocalTime.of(17, 0);
 
+    private final GivenTrainingOfferDraftFactory given = GivenTrainingOfferDraftFactory.create();
+
     private final TrainingOfferDraftRepository repository = mock(TrainingOfferDraftRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationService(repository, eventRegistry);
+    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationServiceFactory().trainingOfferDraftApplicationService(repository, eventRegistry);
 
     @Test
     void shouldMarkTrainingOfferDraftAsPublished() {
-        givenExisting(trainingOfferDraft());
+        givenExisting(given.trainingOfferDraft().initiated());
 
         service.publish(TRAINING_OFFER_DRAFT_ID);
 
@@ -52,58 +60,72 @@ class TrainingOfferDraftApplicationServiceTest {
 
     @Test
     void shouldPublishTrainingOfferPublishedEventWhenTrainingOfferDraftIsPublished() {
-        givenExisting(trainingOfferDraft());
+        TrainingOfferDraftTestDto expected = givenExisting(given.trainingOfferDraft().initiated());
 
         service.publish(TRAINING_OFFER_DRAFT_ID);
 
         thenTrainingOfferPublishedEventPublished()
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
-                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
-                .hasTrainerId(TRAINER_ID)
-                .hasPriceAmount(PRICE_AMOUNT)
-                .hasPriceCurrency(CURRENCY)
-                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
-                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                .hasStartDate(START_DATE)
-                .hasEndDate(END_DATE)
-                .hasStartTime(START_TIME)
-                .hasEndTime(END_TIME);
+                .hasTrainingProgramId(expected.getTrainingProgramId())
+                .hasTrainerId(expected.getTrainerId())
+                .hasPriceAmount(expected.getPrice().amount())
+                .hasPriceCurrency(expected.getPrice().currencyCode())
+                .hasMinimumParticipants(expected.getMinimumParticipants())
+                .hasMaximumParticipants(expected.getMaximumParticipants())
+                .hasStartDate(expected.getTrainingSessionPeriod().startDate())
+                .hasEndDate(expected.getTrainingSessionPeriod().endDate())
+                .hasStartTime(expected.getTrainingSessionPeriod().startTime())
+                .hasEndTime(expected.getTrainingSessionPeriod().endTime());
     }
 
     @Test
     void shouldThrowExceptionWhenTrainingOfferDraftAlreadyPublished() {
-        TrainingOfferDraft trainingOfferDraft = trainingOfferDraft();
-        trainingOfferDraft.publish();
-        givenExisting(trainingOfferDraft);
+        givenExisting(given.trainingOfferDraft().published());
 
         TrainingOfferDraftAlreadyPublishedException actual = assertThrows(TrainingOfferDraftAlreadyPublishedException.class, () -> service.publish(TRAINING_OFFER_DRAFT_ID));
 
         assertThat(actual).hasMessage("Training offer draft: " + TRAINING_OFFER_DRAFT_ID + " already published.");
     }
+    
+    @Test
+    void shouldReturnTrainingOfferDraftIdWhenCreated() {
+        CreateTrainingOfferDraftCommand command = createTrainingOfferDraftCommand();
+        given(repository.save(any())).willReturn(TRAINING_OFFER_DRAFT_ID);
 
-    private TrainingOfferDraft trainingOfferDraft() {
-        TrainingOfferDraft trainingOfferDraft = new TrainingOfferDraft.Builder()
-                .withTrainingProgramId(TRAINING_PROGRAM_ID)
-                .withTrainerId(TRAINER_ID)
-                .withPrice(PRICE_AMOUNT, CURRENCY)
-                .withMinimumParticipants(MINIMUM_PARTICIPANTS)
-                .withMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                .withTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)
-                .build();
+        UUID actual = service.create(command);
 
-        return assignTrainingOfferDraftIdTo(trainingOfferDraft);
+        assertThat(actual).isEqualTo(TRAINING_OFFER_DRAFT_ID);
+    }
+    
+    @Test
+    void shouldCreateTrainingOfferDraftWithCorrectParameters() {
+        CreateTrainingOfferDraftCommand command = createTrainingOfferDraftCommand();
+
+        service.create(command);
+
+        thenTrainingOfferDraftSaved()
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPrice(com.smalaca.trainingoffer.domain.price.Price.of(PRICE_AMOUNT, CURRENCY))
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasTrainingSessionPeriod(new TrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME))
+                .isNotPublished();
     }
 
-    private void givenExisting(TrainingOfferDraft draft) {
-        given(repository.findById(TRAINING_OFFER_DRAFT_ID)).willReturn(draft);
+    private TrainingOfferDraftTestDto givenExisting(GivenTrainingOfferDraft given) {
+        TrainingOfferDraft trainingOfferDraft = given.getTrainingOfferDraft();
+        assignTrainingOfferDraftIdTo(trainingOfferDraft);
+        given(repository.findById(TRAINING_OFFER_DRAFT_ID)).willReturn(trainingOfferDraft);
+
+        return given.getDto();
     }
 
-    private TrainingOfferDraft assignTrainingOfferDraftIdTo(TrainingOfferDraft trainingOfferDraft) {
+    private void assignTrainingOfferDraftIdTo(TrainingOfferDraft trainingOfferDraft) {
         try {
             Field offerIdField = trainingOfferDraft.getClass().getDeclaredField("trainingOfferDraftId");
             offerIdField.setAccessible(true);
             offerIdField.set(trainingOfferDraft, TRAINING_OFFER_DRAFT_ID);
-            return trainingOfferDraft;
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -121,5 +143,19 @@ class TrainingOfferDraftApplicationServiceTest {
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatTrainingOfferPublishedEvent(captor.getValue());
+    }
+    
+    private CreateTrainingOfferDraftCommand createTrainingOfferDraftCommand() {
+        return new CreateTrainingOfferDraftCommand(
+                TRAINING_PROGRAM_ID,
+                TRAINER_ID,
+                PRICE_AMOUNT,
+                CURRENCY,
+                MINIMUM_PARTICIPANTS,
+                MAXIMUM_PARTICIPANTS,
+                START_DATE,
+                END_DATE,
+                START_TIME,
+                END_TIME);
     }
 }

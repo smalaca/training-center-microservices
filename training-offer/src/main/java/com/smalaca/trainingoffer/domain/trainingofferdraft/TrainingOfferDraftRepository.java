@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface TrainingOfferDraftRepository {
     TrainingOfferDraft findById(UUID trainingOfferDraftId);
 
-    void save(TrainingOfferDraft trainingOfferDraft);
+    UUID save(TrainingOfferDraft trainingOfferDraft);
 }

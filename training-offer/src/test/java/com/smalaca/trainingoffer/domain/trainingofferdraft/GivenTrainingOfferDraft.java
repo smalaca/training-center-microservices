@@ -1,5 +1,6 @@
 package com.smalaca.trainingoffer.domain.trainingofferdraft;
 
+import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import net.datafaker.Faker;
 
 import java.math.BigDecimal;
@@ -22,20 +23,19 @@ public class GivenTrainingOfferDraft {
     private final LocalDate endDate = LocalDate.now().plusDays(FAKER.number().numberBetween(1L, 5L));
     private final LocalTime startTime = LocalTime.of(9, 0);
     private final LocalTime endTime = LocalTime.of(17, 0);
+    private final TrainingOfferDraftFactory factory;
 
     private TrainingOfferDraft trainingOfferDraft;
 
-    GivenTrainingOfferDraft() {}
+    GivenTrainingOfferDraft(TrainingOfferDraftFactory factory) {
+        this.factory = factory;
+    }
 
     public GivenTrainingOfferDraft initiated() {
-        trainingOfferDraft = new TrainingOfferDraft.Builder()
-                .withTrainingProgramId(trainingProgramId)
-                .withTrainerId(trainerId)
-                .withPrice(priceAmount, priceCurrency)
-                .withMinimumParticipants(minimumParticipants)
-                .withMaximumParticipants(maximumParticipants)
-                .withTrainingSessionPeriod(startDate, endDate, startTime, endTime)
-                .build();
+        CreateTrainingOfferDraftCommand command = new CreateTrainingOfferDraftCommand(
+                trainingProgramId, trainerId, priceAmount, priceCurrency, minimumParticipants, maximumParticipants,
+                startDate, endDate, startTime, endTime);
+        trainingOfferDraft = factory.create(command);
 
         return this;
     }

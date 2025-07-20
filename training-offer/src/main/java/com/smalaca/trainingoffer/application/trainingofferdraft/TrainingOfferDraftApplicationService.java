@@ -5,22 +5,36 @@ import com.smalaca.architecture.portsandadapters.DrivingPort;
 import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftFactory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
+import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @ApplicationLayer
-@Service
 public class TrainingOfferDraftApplicationService {
     private final TrainingOfferDraftRepository repository;
     private final EventRegistry eventRegistry;
+    private final TrainingOfferDraftFactory factory;
 
-    TrainingOfferDraftApplicationService(TrainingOfferDraftRepository repository, EventRegistry eventRegistry) {
+    TrainingOfferDraftApplicationService(
+            TrainingOfferDraftRepository repository, 
+            EventRegistry eventRegistry,
+            TrainingOfferDraftFactory factory) {
         this.repository = repository;
         this.eventRegistry = eventRegistry;
+        this.factory = factory;
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public UUID create(CreateTrainingOfferDraftCommand command) {
+        TrainingOfferDraft draft = factory.create(command);
+        
+        return repository.save(draft);
     }
 
     @Transactional
