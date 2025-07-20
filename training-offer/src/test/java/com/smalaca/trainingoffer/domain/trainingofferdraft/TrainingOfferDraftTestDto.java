@@ -55,7 +55,7 @@ public class TrainingOfferDraftTestDto {
         return trainingSessionPeriod;
     }
 
-    static class Builder {
+    public static class Builder {
         private UUID trainingOfferDraftId;
         private UUID trainingProgramId;
         private UUID trainerId;
@@ -64,42 +64,42 @@ public class TrainingOfferDraftTestDto {
         private int maximumParticipants;
         private TrainingSessionPeriod trainingSessionPeriod;
 
-        Builder withTrainingOfferDraftId(UUID trainingOfferDraftId) {
+        public Builder withTrainingOfferDraftId(UUID trainingOfferDraftId) {
             this.trainingOfferDraftId = trainingOfferDraftId;
             return this;
         }
 
-        Builder withTrainingProgramId(UUID trainingProgramId) {
+        public Builder withTrainingProgramId(UUID trainingProgramId) {
             this.trainingProgramId = trainingProgramId;
             return this;
         }
 
-        Builder withTrainerId(UUID trainerId) {
+        public Builder withTrainerId(UUID trainerId) {
             this.trainerId = trainerId;
             return this;
         }
 
-        Builder withPrice(BigDecimal amount, String currency) {
+        public Builder withPrice(BigDecimal amount, String currency) {
             this.price = Price.of(amount, currency);
             return this;
         }
 
-        Builder withMinimumParticipants(int minimumParticipants) {
+        public Builder withMinimumParticipants(int minimumParticipants) {
             this.minimumParticipants = minimumParticipants;
             return this;
         }
 
-        Builder withMaximumParticipants(int maximumParticipants) {
+        public Builder withMaximumParticipants(int maximumParticipants) {
             this.maximumParticipants = maximumParticipants;
             return this;
         }
 
-        Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        public Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
             this.trainingSessionPeriod = new TrainingSessionPeriod(startDate, endDate, startTime, endTime);
             return this;
         }
 
-        TrainingOfferDraftTestDto build() {
+        public TrainingOfferDraftTestDto build() {
             return new TrainingOfferDraftTestDto(this);
         }
     }
