@@ -2,10 +2,8 @@ package com.smalaca.trainingoffer.domain.trainingofferdraft;
 
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
-import org.springframework.stereotype.Component;
 
 @Factory
-@Component
 public class TrainingOfferDraftFactory {
     public TrainingOfferDraft create(CreateTrainingOfferDraftCommand command) {
         return new TrainingOfferDraft.Builder()

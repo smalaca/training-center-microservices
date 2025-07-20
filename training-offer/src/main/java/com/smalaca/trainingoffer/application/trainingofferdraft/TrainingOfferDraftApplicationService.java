@@ -9,13 +9,11 @@ import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftFac
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @ApplicationLayer
-@Service
 public class TrainingOfferDraftApplicationService {
     private final TrainingOfferDraftRepository repository;
     private final EventRegistry eventRegistry;

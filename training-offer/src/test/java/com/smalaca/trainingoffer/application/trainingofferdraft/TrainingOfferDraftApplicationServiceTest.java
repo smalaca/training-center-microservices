@@ -4,7 +4,6 @@ import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraft;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAlreadyPublishedException;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftAssertion;
-import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftFactory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
@@ -42,8 +41,7 @@ class TrainingOfferDraftApplicationServiceTest {
 
     private final TrainingOfferDraftRepository repository = mock(TrainingOfferDraftRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final TrainingOfferDraftFactory factory = new TrainingOfferDraftFactory();
-    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationService(repository, eventRegistry, factory);
+    private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationServiceFactory().trainingOfferDraftApplicationService(repository, eventRegistry);
 
     @Test
     void shouldMarkTrainingOfferDraftAsPublished() {
