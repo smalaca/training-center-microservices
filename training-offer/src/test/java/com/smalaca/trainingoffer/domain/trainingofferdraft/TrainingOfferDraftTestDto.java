@@ -27,7 +27,7 @@ public class TrainingOfferDraftTestDto {
         this.trainingSessionPeriod = builder.trainingSessionPeriod;
     }
 
-    public UUID trainingOfferDraftId() {
+    public UUID getTrainingOfferDraftId() {
         return trainingOfferDraftId;
     }
 

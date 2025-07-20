@@ -63,7 +63,7 @@ class JpaTrainingOfferDraftRepositoryIntegrationTest {
     }
 
     private TrainingOfferDraftAssertion thenSavedTrainingOfferDraftHasDataEqualTo(TrainingOfferDraftTestDto expected) {
-        TrainingOfferDraft saved = repository.findById(expected.trainingOfferDraftId());
+        TrainingOfferDraft saved = repository.findById(expected.getTrainingOfferDraftId());
 
         return assertThatTrainingOfferDraft(saved)
                 .hasTrainingOfferDraftId(saved.trainingOfferDraftId())

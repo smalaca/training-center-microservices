@@ -50,17 +50,17 @@ class TrainingOfferDraftRestControllerSystemTest {
     void shouldPublishTrainingOfferDraft() {
         TrainingOfferDraftTestDto dto = given.trainingOfferDraft().initiated().getDto();
 
-        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.trainingOfferDraftId());
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.getTrainingOfferDraftId());
 
         assertThatTrainingOfferDraftResponse(actual).isOk();
-        assertThatTrainingOfferDraftResponse(client.trainingOfferDrafts().findById(dto.trainingOfferDraftId()))
+        assertThatTrainingOfferDraftResponse(client.trainingOfferDrafts().findById(dto.getTrainingOfferDraftId()))
                 .isOk()
                 .hasPublishedTrainingOfferDraft(dto);
     }
 
     @Test
     void shouldReturnConflictWhenPublishingAlreadyPublishedTrainingOfferDraft() {
-        UUID trainingOfferDraftId = given.trainingOfferDraft().published().getDto().trainingOfferDraftId();
+        UUID trainingOfferDraftId = given.trainingOfferDraft().published().getDto().getTrainingOfferDraftId();
 
         RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(trainingOfferDraftId);
 
@@ -80,7 +80,7 @@ class TrainingOfferDraftRestControllerSystemTest {
     void shouldFindExistingTrainingOfferDraft() {
         TrainingOfferDraftTestDto dto = given.trainingOfferDraft().initiated().getDto();
 
-        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().findById(dto.trainingOfferDraftId());
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().findById(dto.getTrainingOfferDraftId());
 
         assertThatTrainingOfferDraftResponse(actual)
                 .isOk()

@@ -59,7 +59,7 @@ class TrainingOfferDraftQueryServiceIntegrationTest {
     void shouldFindTrainingOfferDraftViewById() {
         TrainingOfferDraftTestDto dto = transaction.execute(status -> given.trainingOfferDraft().initiated().getDto());
 
-        Optional<TrainingOfferDraftView> actual = queryService.findById(dto.trainingOfferDraftId());
+        Optional<TrainingOfferDraftView> actual = queryService.findById(dto.getTrainingOfferDraftId());
 
         assertThat(actual)
                 .isPresent()
@@ -80,7 +80,7 @@ class TrainingOfferDraftQueryServiceIntegrationTest {
 
     private TrainingOfferDraftViewAssertion assertThatTrainingOfferDraftHasDataEqualTo(TrainingOfferDraftView actual, TrainingOfferDraftTestDto expected) {
         return assertThatTrainingOfferDraft(actual)
-                .hasTrainingOfferDraftId(expected.trainingOfferDraftId())
+                .hasTrainingOfferDraftId(expected.getTrainingOfferDraftId())
                 .hasTrainingProgramId(expected.getTrainingProgramId())
                 .hasTrainerId(expected.getTrainerId())
                 .hasPriceAmount(expected.getPrice().amount())
