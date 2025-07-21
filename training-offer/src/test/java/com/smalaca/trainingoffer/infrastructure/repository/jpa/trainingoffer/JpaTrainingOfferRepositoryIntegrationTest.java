@@ -50,7 +50,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
 
-        Iterable<TrainingOffer> found = crudRepository.findAll();
+        Iterable<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> crudRepository.findAll());
         assertThat(found)
                 .hasSize(1)
                 .anySatisfy(actual -> assertThatTrainingOffer(actual)
