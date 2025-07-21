@@ -5,13 +5,17 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
 @Repository
 @DrivenAdapter
-public class DummyTrainingOfferRepository implements TrainingOfferRepository {
+public class JpaTrainingOfferRepository implements TrainingOfferRepository {
+    private final SpringTrainingOfferCrudRepository repository;
+
+    JpaTrainingOfferRepository(SpringTrainingOfferCrudRepository repository) {
+        this.repository = repository;
+    }
+
     @Override
-    public UUID save(TrainingOffer trainingOffer) {
-        return null;
+    public void save(TrainingOffer trainingOffer) {
+        repository.save(trainingOffer);
     }
 }

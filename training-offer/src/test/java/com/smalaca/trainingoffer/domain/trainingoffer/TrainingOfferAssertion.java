@@ -21,8 +21,8 @@ public class TrainingOfferAssertion {
         return new TrainingOfferAssertion(actual);
     }
 
-    public TrainingOfferAssertion hasTrainingOfferIdNull() {
-        assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferId", null);
+    public TrainingOfferAssertion hasTrainingOfferIdNotNull() {
+        assertThat(actual).extracting("trainingOfferId").isNotNull();
         return this;
     }
 

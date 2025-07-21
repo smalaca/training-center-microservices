@@ -39,7 +39,6 @@ class TrainingOfferApplicationServiceTest {
         service.create(event);
 
         thenTrainingOfferSaved()
-                .hasTrainingOfferIdNull()
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
                 .hasTrainerId(TRAINER_ID)
