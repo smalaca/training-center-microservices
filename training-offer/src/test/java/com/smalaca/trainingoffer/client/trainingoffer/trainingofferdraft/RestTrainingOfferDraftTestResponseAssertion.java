@@ -90,9 +90,4 @@ public class RestTrainingOfferDraftTestResponseAssertion {
         assertThat(actual.endTime()).isEqualTo(expected.getEndTime());
         assertThat(actual.published()).isEqualTo(published);
     }
-
-    public RestTrainingOfferDraftTestResponseAssertion withMessage(String expected) {
-        assertThat(actual.asString()).isEqualTo(expected);
-        return this;
-    }
 }

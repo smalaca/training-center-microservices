@@ -10,16 +10,17 @@ import java.util.UUID;
 
 @DomainEvent
 public record TrainingOfferPublishedEvent(
-        EventId eventId, UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId,
+        EventId eventId, UUID trainingOfferId, UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId,
         BigDecimal priceAmount, String priceCurrencyCode, int minimumParticipants, int maximumParticipants,
         LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
     public static TrainingOfferPublishedEvent create(
-            UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId,
+            UUID trainingOfferId, UUID trainingOfferDraftId, UUID trainingProgramId, UUID trainerId,
             BigDecimal priceAmount, String priceCurrencyCode, int minimumParticipants, int maximumParticipants,
             LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
         return new TrainingOfferPublishedEvent(
-                EventId.newEventId(), trainingOfferDraftId, trainingProgramId, trainerId, priceAmount, priceCurrencyCode,
-            minimumParticipants, maximumParticipants, startDate, endDate, startTime, endTime
+                EventId.newEventId(), trainingOfferId, trainingOfferDraftId, trainingProgramId, trainerId,
+                priceAmount, priceCurrencyCode, minimumParticipants, maximumParticipants,
+                startDate, endDate, startTime, endTime
         );
     }
 }

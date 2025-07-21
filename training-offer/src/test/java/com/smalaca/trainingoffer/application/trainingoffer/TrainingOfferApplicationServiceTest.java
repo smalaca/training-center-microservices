@@ -17,6 +17,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class TrainingOfferApplicationServiceTest {
+    private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
@@ -39,6 +40,7 @@ class TrainingOfferApplicationServiceTest {
         service.create(event);
 
         thenTrainingOfferSaved()
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
                 .hasTrainerId(TRAINER_ID)
@@ -50,7 +52,7 @@ class TrainingOfferApplicationServiceTest {
 
     private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
         return TrainingOfferPublishedEvent.create(
-                TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
+                TRAINING_OFFER_ID, TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
                 MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
     }
 

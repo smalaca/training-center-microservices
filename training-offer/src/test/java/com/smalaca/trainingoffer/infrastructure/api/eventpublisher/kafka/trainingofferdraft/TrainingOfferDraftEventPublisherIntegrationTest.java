@@ -55,7 +55,7 @@ class TrainingOfferDraftEventPublisherIntegrationTest {
 
     private TrainingOfferPublishedEvent randomTrainingOfferPublishedEvent() {
         return TrainingOfferPublishedEvent.create(
-                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
                 BigDecimal.valueOf(100.00), "USD", 5, 20,
                 LocalDate.of(2023, 10, 15), LocalDate.of(2023, 10, 20),
                 LocalTime.of(9, 0), LocalTime.of(17, 0));
@@ -63,6 +63,7 @@ class TrainingOfferDraftEventPublisherIntegrationTest {
 
     private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent actual, TrainingOfferPublishedEvent expected) {
         assertThatContainsSameData(actual.eventId(), expected.eventId());
+        assertThat(actual.trainingOfferId()).isEqualTo(expected.trainingOfferId());
         assertThat(actual.trainingOfferDraftId()).isEqualTo(expected.trainingOfferDraftId());
         assertThat(actual.trainingProgramId()).isEqualTo(expected.trainingProgramId());
         assertThat(actual.trainerId()).isEqualTo(expected.trainerId());

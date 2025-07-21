@@ -27,6 +27,7 @@ public class TrainingOfferDraftEventPublisher {
     private com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent asExternalTrainingOfferPublishedEvent(TrainingOfferPublishedEvent event) {
         return new com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent(
                 asExternalEventId(event.eventId()),
+                event.trainingOfferId(),
                 event.trainingOfferDraftId(),
                 event.trainingProgramId(),
                 event.trainerId(),

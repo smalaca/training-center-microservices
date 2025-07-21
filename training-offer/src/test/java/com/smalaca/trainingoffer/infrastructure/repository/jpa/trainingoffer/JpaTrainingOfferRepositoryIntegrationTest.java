@@ -13,6 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryTest
 @Import(JpaTrainingOfferRepository.class)
 class JpaTrainingOfferRepositoryIntegrationTest {
+    private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
@@ -50,23 +52,22 @@ class JpaTrainingOfferRepositoryIntegrationTest {
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
 
-        Iterable<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> crudRepository.findAll());
-        assertThat(found)
-                .hasSize(1)
-                .anySatisfy(actual -> assertThatTrainingOffer(actual)
-                        .hasTrainingOfferIdNotNull()
-                        .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
-                        .hasTrainingProgramId(TRAINING_PROGRAM_ID)
-                        .hasTrainerId(TRAINER_ID)
-                        .hasPrice(PRICE_AMOUNT, CURRENCY)
-                        .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
-                        .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                        .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME));
+        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> crudRepository.findById(TRAINING_OFFER_ID));
+        assertThat(found).isPresent();
+        assertThatTrainingOffer(found.get())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
+                .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPrice(PRICE_AMOUNT, CURRENCY)
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
     }
 
     private TrainingOffer createTrainingOffer() {
         TrainingOfferPublishedEvent event = TrainingOfferPublishedEvent.create(
-                TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
+                TRAINING_OFFER_ID, TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
                 MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
         return factory.create(event);
     }

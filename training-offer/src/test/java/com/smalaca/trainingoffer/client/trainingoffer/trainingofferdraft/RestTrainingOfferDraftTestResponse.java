@@ -40,6 +40,14 @@ public class RestTrainingOfferDraftTestResponse {
     }
 
     public UUID asTrainingOfferDraftId() {
+        return asId();
+    }
+
+    public UUID asTrainingOfferId() {
+        return asId();
+    }
+
+    private UUID asId() {
         try {
             return objectMapper.readValue(asString(), UUID.class);
         } catch (JsonProcessingException exception) {
@@ -47,7 +55,7 @@ public class RestTrainingOfferDraftTestResponse {
         }
     }
 
-    String asString() {
+    private String asString() {
         try {
             return response.getContentAsString();
         } catch (UnsupportedEncodingException exception) {

@@ -44,12 +44,12 @@ public class TrainingOfferDraftRestController {
 
     @PutMapping("publish/{trainingOfferDraftId}")
     @DrivingAdapter
-    public ResponseEntity<String> publish(@PathVariable UUID trainingOfferDraftId) {
+    public ResponseEntity<UUID> publish(@PathVariable UUID trainingOfferDraftId) {
         try {
-            trainingOfferDraftApplicationService.publish(trainingOfferDraftId);
-            return ResponseEntity.ok().build();
+            UUID trainingOfferId = trainingOfferDraftApplicationService.publish(trainingOfferDraftId);
+            return ResponseEntity.ok(trainingOfferId);
         } catch (TrainingOfferDraftAlreadyPublishedException exception) {
-            return ResponseEntity.status(CONFLICT).body(exception.getMessage());
+            return ResponseEntity.status(CONFLICT).build();
         }
     }
 
