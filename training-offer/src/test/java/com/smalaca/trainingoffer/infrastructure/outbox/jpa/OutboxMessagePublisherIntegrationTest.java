@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.eventid.EventId;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
+import com.smalaca.trainingoffer.infrastructure.api.eventlistener.spring.TrainingOfferDraftListener;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,10 @@ class OutboxMessagePublisherIntegrationTest {
     private TransactionTemplate transactionTemplate;
 
     @MockBean
-    private TrainingOfferDraftEventPublisher publisher;
+    private TrainingOfferDraftEventPublisher trainingOfferDraftEventPublisher;
+
+    @MockBean
+    private TrainingOfferDraftListener trainingOfferDraftListener;
 
     private OutboxMessageMapper factory;
 

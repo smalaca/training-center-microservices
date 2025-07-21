@@ -72,8 +72,6 @@ public class TrainingOfferDraft {
             throw new TrainingOfferDraftAlreadyPublishedException(trainingOfferDraftId);
         }
 
-        this.published = true;
-
         return TrainingOfferPublishedEvent.create(
             trainingOfferDraftId, 
             trainingProgramId, 
@@ -87,6 +85,10 @@ public class TrainingOfferDraft {
             trainingSessionPeriod.startTime(), 
             trainingSessionPeriod.endTime()
         );
+    }
+    
+    public void published() {
+        published = true;
     }
 
     public UUID trainingOfferDraftId() {

@@ -42,7 +42,7 @@ public class GivenTrainingOfferDraft {
 
     public GivenTrainingOfferDraft published() {
         initiated();
-        trainingOfferDraft.publish();
+        trainingOfferDraft.published();
         return this;
     }
 
