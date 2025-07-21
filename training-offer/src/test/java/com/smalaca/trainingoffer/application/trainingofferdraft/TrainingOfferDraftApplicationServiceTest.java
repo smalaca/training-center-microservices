@@ -11,7 +11,6 @@ import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftTes
 import com.smalaca.trainingoffer.domain.trainingofferdraft.commands.CreateTrainingOfferDraftCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEventAssertion;
-import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -74,14 +73,14 @@ class TrainingOfferDraftApplicationServiceTest {
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(expected.getTrainingProgramId())
                 .hasTrainerId(expected.getTrainerId())
-                .hasPriceAmount(expected.getPrice().amount())
-                .hasPriceCurrency(expected.getPrice().currencyCode())
+                .hasPriceAmount(expected.getPriceAmount())
+                .hasPriceCurrency(expected.getPriceCurrency())
                 .hasMinimumParticipants(expected.getMinimumParticipants())
                 .hasMaximumParticipants(expected.getMaximumParticipants())
-                .hasStartDate(expected.getTrainingSessionPeriod().startDate())
-                .hasEndDate(expected.getTrainingSessionPeriod().endDate())
-                .hasStartTime(expected.getTrainingSessionPeriod().startTime())
-                .hasEndTime(expected.getTrainingSessionPeriod().endTime());
+                .hasStartDate(expected.getStartDate())
+                .hasEndDate(expected.getEndDate())
+                .hasStartTime(expected.getStartTime())
+                .hasEndTime(expected.getEndTime());
     }
 
     @Test
@@ -112,10 +111,10 @@ class TrainingOfferDraftApplicationServiceTest {
         thenTrainingOfferDraftSaved()
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
                 .hasTrainerId(TRAINER_ID)
-                .hasPrice(com.smalaca.trainingoffer.domain.price.Price.of(PRICE_AMOUNT, CURRENCY))
+                .hasPrice(PRICE_AMOUNT, CURRENCY)
                 .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                .hasTrainingSessionPeriod(new TrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME))
+                .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME)
                 .isNotPublished();
     }
 

@@ -83,13 +83,13 @@ class TrainingOfferDraftQueryServiceIntegrationTest {
                 .hasTrainingOfferDraftId(expected.getTrainingOfferDraftId())
                 .hasTrainingProgramId(expected.getTrainingProgramId())
                 .hasTrainerId(expected.getTrainerId())
-                .hasPriceAmount(expected.getPrice().amount())
-                .hasPriceCurrency(expected.getPrice().currencyCode())
+                .hasPriceAmount(expected.getPriceAmount())
+                .hasPriceCurrency(expected.getPriceCurrency())
                 .hasMinimumParticipants(expected.getMinimumParticipants())
                 .hasMaximumParticipants(expected.getMaximumParticipants())
-                .hasStartDate(expected.getTrainingSessionPeriod().startDate())
-                .hasEndDate(expected.getTrainingSessionPeriod().endDate())
-                .hasStartTime(expected.getTrainingSessionPeriod().startTime())
-                .hasEndTime(expected.getTrainingSessionPeriod().endTime());
+                .hasStartDate(expected.getStartDate())
+                .hasEndDate(expected.getEndDate())
+                .hasStartTime(expected.getStartTime())
+                .hasEndTime(expected.getEndTime());
     }
 }

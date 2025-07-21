@@ -80,14 +80,14 @@ public class RestTrainingOfferDraftTestResponseAssertion {
         assertThat(actual.trainingOfferDraftId()).isEqualTo(expected.getTrainingOfferDraftId());
         assertThat(actual.trainingProgramId()).isEqualTo(expected.getTrainingProgramId());
         assertThat(actual.trainerId()).isEqualTo(expected.getTrainerId());
-        assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getPrice().amount());
-        assertThat(actual.priceCurrency()).isEqualTo(expected.getPrice().currencyCode());
+        assertThat(actual.priceAmount()).usingComparator(BigDecimal::compareTo).isEqualTo(expected.getPriceAmount());
+        assertThat(actual.priceCurrency()).isEqualTo(expected.getPriceCurrency());
         assertThat(actual.minimumParticipants()).isEqualTo(expected.getMinimumParticipants());
         assertThat(actual.maximumParticipants()).isEqualTo(expected.getMaximumParticipants());
-        assertThat(actual.startDate()).isEqualTo(expected.getTrainingSessionPeriod().startDate());
-        assertThat(actual.endDate()).isEqualTo(expected.getTrainingSessionPeriod().endDate());
-        assertThat(actual.startTime()).isEqualTo(expected.getTrainingSessionPeriod().startTime());
-        assertThat(actual.endTime()).isEqualTo(expected.getTrainingSessionPeriod().endTime());
+        assertThat(actual.startDate()).isEqualTo(expected.getStartDate());
+        assertThat(actual.endDate()).isEqualTo(expected.getEndDate());
+        assertThat(actual.startTime()).isEqualTo(expected.getStartTime());
+        assertThat(actual.endTime()).isEqualTo(expected.getEndTime());
         assertThat(actual.published()).isEqualTo(published);
     }
 

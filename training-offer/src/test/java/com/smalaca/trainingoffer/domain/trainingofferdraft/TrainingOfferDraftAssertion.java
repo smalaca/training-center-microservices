@@ -3,6 +3,9 @@ package com.smalaca.trainingoffer.domain.trainingofferdraft;
 import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,8 +36,10 @@ public class TrainingOfferDraftAssertion {
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasPrice(Price expected) {
+    public TrainingOfferDraftAssertion hasPrice(BigDecimal expectedPriceAmount, String expectedPriceCurrency) {
+        Price expected = Price.of(expectedPriceAmount, expectedPriceCurrency);
         assertThat(actual).hasFieldOrPropertyWithValue("price", expected);
+
         return this;
     }
 
@@ -48,8 +53,11 @@ public class TrainingOfferDraftAssertion {
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasTrainingSessionPeriod(TrainingSessionPeriod expected) {
+    public TrainingOfferDraftAssertion hasTrainingSessionPeriod(
+            LocalDate expectedStartDate, LocalDate expectedEndDate, LocalTime expectedStartTime, LocalTime expectedEndTime) {
+        TrainingSessionPeriod expected = new TrainingSessionPeriod(expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime);
         assertThat(actual).hasFieldOrPropertyWithValue("trainingSessionPeriod", expected);
+
         return this;
     }
 
