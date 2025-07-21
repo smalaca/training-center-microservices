@@ -40,12 +40,13 @@ public class TrainingOfferDraftApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void publish(UUID trainingOfferDraftId) {
+    public UUID publish(UUID trainingOfferDraftId) {
         TrainingOfferDraft draft = repository.findById(trainingOfferDraftId);
 
         TrainingOfferPublishedEvent event = draft.publish();
 
         eventRegistry.publish(event);
+        return event.trainingOfferId();
     }
     
     @Transactional

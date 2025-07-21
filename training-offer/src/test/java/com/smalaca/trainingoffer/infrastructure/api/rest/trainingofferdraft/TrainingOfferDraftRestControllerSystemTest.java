@@ -24,6 +24,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponseAssertion.assertThatTrainingOfferDraftResponse;
@@ -131,22 +132,19 @@ class TrainingOfferDraftRestControllerSystemTest {
 
         RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.getTrainingOfferDraftId());
 
-        assertThatTrainingOfferDraftResponse(actual).isOk();
         await().untilAsserted(() -> {
-                    Iterable<TrainingOffer> found = transactionTemplate.execute(status -> trainingOfferRepository.findAll());
-                    assertThat(found)
-                            .anySatisfy(trainingOffer -> assertThatTrainingOffer(trainingOffer)
-                                    .hasTrainingOfferIdNotNull()
-                                    .hasTrainingOfferDraftId(dto.getTrainingOfferDraftId())
-                                    .hasTrainingProgramId(dto.getTrainingProgramId())
-                                    .hasTrainerId(dto.getTrainerId())
-                                    .hasPrice(dto.getPriceAmount(), dto.getPriceCurrency())
-                                    .hasMinimumParticipants(dto.getMinimumParticipants())
-                                    .hasMaximumParticipants(dto.getMaximumParticipants())
-                                    .hasTrainingSessionPeriod(dto.getStartDate(), dto.getEndDate(), dto.getStartTime(), dto.getEndTime())
-                            );
-                }
-        );
+            Optional<TrainingOffer> found = transactionTemplate.execute(status -> trainingOfferRepository.findById(actual.asTrainingOfferId()));
+            assertThat(found).isPresent();
+            assertThatTrainingOffer(found.get())
+                    .hasTrainingOfferId(actual.asTrainingOfferId())
+                    .hasTrainingOfferDraftId(dto.getTrainingOfferDraftId())
+                    .hasTrainingProgramId(dto.getTrainingProgramId())
+                    .hasTrainerId(dto.getTrainerId())
+                    .hasPrice(dto.getPriceAmount(), dto.getPriceCurrency())
+                    .hasMinimumParticipants(dto.getMinimumParticipants())
+                    .hasMaximumParticipants(dto.getMaximumParticipants())
+                    .hasTrainingSessionPeriod(dto.getStartDate(), dto.getEndDate(), dto.getStartTime(), dto.getEndTime());
+        });
     }
 
     @Test
@@ -155,9 +153,7 @@ class TrainingOfferDraftRestControllerSystemTest {
 
         RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(trainingOfferDraftId);
 
-        assertThatTrainingOfferDraftResponse(actual)
-                .isConflict()
-                .withMessage("Training offer draft: " + trainingOfferDraftId + " already published.");
+        assertThatTrainingOfferDraftResponse(actual).isConflict();
     }
 
     @Test

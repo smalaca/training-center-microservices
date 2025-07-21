@@ -2,6 +2,9 @@ package com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingoffer;
 
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 
+import java.util.Optional;
+import java.util.UUID;
+
 public class SpringTrainingOfferCrudTestRepository {
     private final SpringTrainingOfferCrudRepository repository;
 
@@ -9,8 +12,8 @@ public class SpringTrainingOfferCrudTestRepository {
         this.repository = repository;
     }
 
-    public Iterable<TrainingOffer> findAll() {
-        return repository.findAll();
+    public Optional<TrainingOffer> findById(UUID trainingOfferId) {
+        return repository.findById(trainingOfferId);
     }
 
     public void deleteAll() {

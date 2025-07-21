@@ -18,6 +18,11 @@ public class TrainingOfferPublishedEventAssertion {
         return new TrainingOfferPublishedEventAssertion(actual);
     }
 
+    public TrainingOfferPublishedEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
+        return this;
+    }
+
     public TrainingOfferPublishedEventAssertion hasTrainingOfferDraftId(UUID expected) {
         assertThat(actual.trainingOfferDraftId()).isEqualTo(expected);
         return this;

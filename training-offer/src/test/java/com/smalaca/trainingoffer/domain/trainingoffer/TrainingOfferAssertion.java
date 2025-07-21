@@ -21,8 +21,8 @@ public class TrainingOfferAssertion {
         return new TrainingOfferAssertion(actual);
     }
 
-    public TrainingOfferAssertion hasTrainingOfferIdNotNull() {
-        assertThat(actual).extracting("trainingOfferId").isNotNull();
+    public TrainingOfferAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual).extracting("trainingOfferId").isEqualTo(expected);
         return this;
     }
 

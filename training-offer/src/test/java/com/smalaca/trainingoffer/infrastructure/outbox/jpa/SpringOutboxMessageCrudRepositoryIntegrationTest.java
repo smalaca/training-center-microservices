@@ -57,7 +57,7 @@ class SpringOutboxMessageCrudRepositoryIntegrationTest {
 
     private TrainingOfferPublishedEvent randomTrainingOfferPublishedEvent() {
         return TrainingOfferPublishedEvent.create(
-                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
                 BigDecimal.valueOf(100.00), "USD", 5, 20,
                 LocalDate.of(2023, 10, 15), LocalDate.of(2023, 10, 20),
                 LocalTime.of(9, 0), LocalTime.of(17, 0));

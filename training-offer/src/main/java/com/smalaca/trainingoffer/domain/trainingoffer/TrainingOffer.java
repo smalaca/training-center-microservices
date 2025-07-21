@@ -4,12 +4,10 @@ import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -20,7 +18,6 @@ import java.util.UUID;
 @Table(name = "TRAINING_OFFERS")
 public class TrainingOffer {
     @Id
-    @GeneratedValue
     @Column(name = "TRAINING_OFFER_ID")
     private UUID trainingOfferId;
 
@@ -54,6 +51,7 @@ public class TrainingOffer {
     private TrainingOffer() {}
 
     private TrainingOffer(Builder builder) {
+        this.trainingOfferId = builder.trainingOfferId;
         this.trainingOfferDraftId = builder.trainingOfferDraftId;
         this.trainerId = builder.trainerId;
         this.trainingProgramId = builder.trainingProgramId;
@@ -65,6 +63,7 @@ public class TrainingOffer {
 
     @Factory
     static class Builder {
+        private UUID trainingOfferId;
         private UUID trainingOfferDraftId;
         private UUID trainerId;
         private UUID trainingProgramId;
@@ -72,6 +71,11 @@ public class TrainingOffer {
         private Price price;
         private int minimumParticipants;
         private int maximumParticipants;
+
+        Builder withTrainingOfferId(UUID trainingOfferId) {
+            this.trainingOfferId = trainingOfferId;
+            return this;
+        }
 
         Builder withTrainingOfferDraftId(UUID trainingOfferDraftId) {
             this.trainingOfferDraftId = trainingOfferDraftId;

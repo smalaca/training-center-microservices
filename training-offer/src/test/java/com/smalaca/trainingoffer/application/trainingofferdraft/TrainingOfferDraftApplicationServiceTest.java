@@ -30,6 +30,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class TrainingOfferDraftApplicationServiceTest {
+    private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
@@ -59,7 +60,7 @@ class TrainingOfferDraftApplicationServiceTest {
 
     private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
         return TrainingOfferPublishedEvent.create(
-                TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
+                TRAINING_OFFER_ID, TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
                 MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
     }
 
@@ -81,6 +82,15 @@ class TrainingOfferDraftApplicationServiceTest {
                 .hasEndDate(expected.getEndDate())
                 .hasStartTime(expected.getStartTime())
                 .hasEndTime(expected.getEndTime());
+    }
+
+    @Test
+    void shouldPublishTrainingOfferPublishedWithTrainingOfferId() {
+        givenExisting(given.trainingOfferDraft().initiated());
+
+        UUID actual = service.publish(TRAINING_OFFER_DRAFT_ID);
+
+        thenTrainingOfferPublishedEventPublished().hasTrainingOfferId(actual);
     }
 
     @Test

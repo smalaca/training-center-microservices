@@ -9,6 +9,7 @@ import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPer
 public class TrainingOfferFactory {
     public TrainingOffer create(TrainingOfferPublishedEvent event) {
         return new TrainingOffer.Builder()
+                .withTrainingOfferId(event.trainingOfferId())
                 .withTrainingOfferDraftId(event.trainingOfferDraftId())
                 .withTrainingProgramId(event.trainingProgramId())
                 .withTrainerId(event.trainerId())

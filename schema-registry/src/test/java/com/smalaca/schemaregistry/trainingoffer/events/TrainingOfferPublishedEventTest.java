@@ -17,6 +17,7 @@ class TrainingOfferPublishedEventTest {
     @Test
     void shouldCreateTrainingOfferPublishedEvent() {
         EventId eventId = EventId.newEventId();
+        UUID trainingOfferId = UUID.randomUUID();
         UUID trainingOfferDraftId = UUID.randomUUID();
         UUID trainingProgramId = UUID.randomUUID();
         UUID trainerId = UUID.randomUUID();
@@ -30,11 +31,12 @@ class TrainingOfferPublishedEventTest {
         LocalTime endTime = LocalTime.of(17, 0);
 
         TrainingOfferPublishedEvent actual = new TrainingOfferPublishedEvent(
-                eventId, trainingOfferDraftId, trainingProgramId, trainerId,
+                eventId, trainingOfferId, trainingOfferDraftId, trainingProgramId, trainerId,
                 priceAmount, priceCurrencyCode, minimumParticipants, maximumParticipants,
                 startDate, endDate, startTime, endTime);
 
         assertThat(actual.eventId()).isEqualTo(eventId);
+        assertThat(actual.trainingOfferId()).isEqualTo(trainingOfferId);
         assertThat(actual.trainingOfferDraftId()).isEqualTo(trainingOfferDraftId);
         assertThat(actual.trainingProgramId()).isEqualTo(trainingProgramId);
         assertThat(actual.trainerId()).isEqualTo(trainerId);

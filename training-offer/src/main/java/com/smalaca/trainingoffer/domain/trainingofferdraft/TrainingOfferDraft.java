@@ -62,7 +62,8 @@ public class TrainingOfferDraft {
         this.published = false;
     }
 
-    private TrainingOfferDraft() {}
+    private TrainingOfferDraft() {
+    }
 
     public TrainingOfferPublishedEvent publish() {
         if (published) {
@@ -70,20 +71,25 @@ public class TrainingOfferDraft {
         }
 
         return TrainingOfferPublishedEvent.create(
-            trainingOfferDraftId, 
-            trainingProgramId, 
-            trainerId, 
-            price.amount(),
-            price.currencyCode(),
-            minimumParticipants, 
-            maximumParticipants, 
-            trainingSessionPeriod.startDate(), 
-            trainingSessionPeriod.endDate(), 
-            trainingSessionPeriod.startTime(), 
-            trainingSessionPeriod.endTime()
+                trainingOfferId(),
+                trainingOfferDraftId,
+                trainingProgramId,
+                trainerId,
+                price.amount(),
+                price.currencyCode(),
+                minimumParticipants,
+                maximumParticipants,
+                trainingSessionPeriod.startDate(),
+                trainingSessionPeriod.endDate(),
+                trainingSessionPeriod.startTime(),
+                trainingSessionPeriod.endTime()
         );
     }
-    
+
+    private UUID trainingOfferId() {
+        return UUID.randomUUID();
+    }
+
     public void published() {
         published = true;
     }
