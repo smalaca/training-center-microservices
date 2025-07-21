@@ -1,11 +1,9 @@
 package com.smalaca.trainingoffer.application.trainingoffer;
 
-import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
-import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -45,10 +43,10 @@ class TrainingOfferApplicationServiceTest {
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
                 .hasTrainerId(TRAINER_ID)
-                .hasPrice(Price.of(PRICE_AMOUNT, CURRENCY))
+                .hasPrice(PRICE_AMOUNT, CURRENCY)
                 .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
-                .hasTrainingSessionPeriod(new TrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME));
+                .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
     }
 
     private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
