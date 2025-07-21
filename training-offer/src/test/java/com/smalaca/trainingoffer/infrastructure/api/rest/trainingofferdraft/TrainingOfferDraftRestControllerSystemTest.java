@@ -5,14 +5,19 @@ import com.smalaca.trainingoffer.client.trainingoffer.TrainingOfferTestClient;
 import com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.CreateTrainingOfferDraftTestCommand;
 import com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponse;
 import com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponseAssertion;
+import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.GivenTrainingOfferDraftFactory;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.TrainingOfferDraftTestDto;
+import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
+import com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingoffer.JpaTrainingOfferRepository;
+import com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingoffer.SpringTrainingOfferCrudTestRepository;
 import com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingofferdraft.SpringTrainingOfferDraftCrudRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -22,10 +27,12 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponseAssertion.assertThatTrainingOfferDraftResponse;
+import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @SystemTest
-@Import(TrainingOfferTestClient.class)
+@Import({TrainingOfferTestClient.class, JpaTrainingOfferRepository.class, SpringTrainingOfferCrudTestRepository.class})
 class TrainingOfferDraftRestControllerSystemTest {
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
@@ -39,10 +46,13 @@ class TrainingOfferDraftRestControllerSystemTest {
     private static final LocalTime END_TIME = LocalTime.of(17, 0);
 
     @Autowired
-    private TrainingOfferDraftRepository repository;
+    private TrainingOfferDraftRepository trainingOfferDraftRepository;
 
     @Autowired
     private SpringTrainingOfferDraftCrudRepository springTrainingOfferDraftCrudRepository;
+
+    @Autowired
+    private SpringTrainingOfferCrudTestRepository trainingOfferRepository;
 
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -50,16 +60,20 @@ class TrainingOfferDraftRestControllerSystemTest {
     @Autowired
     private TrainingOfferTestClient client;
 
+    @MockBean
+    private TrainingOfferDraftEventPublisher trainingOfferDraftEventPublisher;
+
     private GivenTrainingOfferDraftFactory given;
 
     @BeforeEach
     void givenTrainingOfferDraftFactory() {
-        given = GivenTrainingOfferDraftFactory.create(repository);
+        given = GivenTrainingOfferDraftFactory.create(trainingOfferDraftRepository);
     }
 
     @AfterEach
     void deleteTrainingOfferDrafts() {
         transactionTemplate.executeWithoutResult(transactionStatus -> springTrainingOfferDraftCrudRepository.deleteAll());
+        transactionTemplate.executeWithoutResult(transactionStatus -> trainingOfferRepository.deleteAll());
     }
 
     @Test
@@ -109,6 +123,30 @@ class TrainingOfferDraftRestControllerSystemTest {
                     .isOk()
                     .hasPublishedTrainingOfferDraft(dto);
         });
+    }
+
+    @Test
+    void shouldCreateTrainingOfferWhenTrainingOfferDraftIsPublished() {
+        TrainingOfferDraftTestDto dto = given.trainingOfferDraft().initiated().getDto();
+
+        RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.getTrainingOfferDraftId());
+
+        assertThatTrainingOfferDraftResponse(actual).isOk();
+        await().untilAsserted(() -> {
+                    Iterable<TrainingOffer> found = transactionTemplate.execute(status -> trainingOfferRepository.findAll());
+                    assertThat(found)
+                            .anySatisfy(trainingOffer -> assertThatTrainingOffer(trainingOffer)
+                                    .hasTrainingOfferIdNotNull()
+                                    .hasTrainingOfferDraftId(dto.getTrainingOfferDraftId())
+                                    .hasTrainingProgramId(dto.getTrainingProgramId())
+                                    .hasTrainerId(dto.getTrainerId())
+                                    .hasPrice(dto.getPriceAmount(), dto.getPriceCurrency())
+                                    .hasMinimumParticipants(dto.getMinimumParticipants())
+                                    .hasMaximumParticipants(dto.getMaximumParticipants())
+                                    .hasTrainingSessionPeriod(dto.getStartDate(), dto.getEndDate(), dto.getStartTime(), dto.getEndTime())
+                            );
+                }
+        );
     }
 
     @Test
