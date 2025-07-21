@@ -27,11 +27,18 @@ public class TrainingOffer {
     @Column(name = "TRAINING_OFFER_DRAFT_ID")
     private UUID trainingOfferDraftId;
 
+    @Column(name = "TRAINER_ID")
+    private UUID trainerId;
+
     @Column(name = "TRAINING_PROGRAM_ID")
     private UUID trainingProgramId;
 
-    @Column(name = "TRAINER_ID")
-    private UUID trainerId;
+    @Embedded
+    @AttributeOverride(name = "startDate", column = @Column(name = "START_DATE"))
+    @AttributeOverride(name = "endDate", column = @Column(name = "END_DATE"))
+    @AttributeOverride(name = "startTime", column = @Column(name = "START_TIME"))
+    @AttributeOverride(name = "endTime", column = @Column(name = "END_TIME"))
+    private TrainingSessionPeriod trainingSessionPeriod;
 
     @Embedded
     @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT"))
@@ -44,37 +51,35 @@ public class TrainingOffer {
     @Column(name = "MAXIMUM_PARTICIPANTS")
     private int maximumParticipants;
 
-    @Embedded
-    @AttributeOverride(name = "startDate", column = @Column(name = "START_DATE"))
-    @AttributeOverride(name = "endDate", column = @Column(name = "END_DATE"))
-    @AttributeOverride(name = "startTime", column = @Column(name = "START_TIME"))
-    @AttributeOverride(name = "endTime", column = @Column(name = "END_TIME"))
-    private TrainingSessionPeriod trainingSessionPeriod;
-
     private TrainingOffer() {}
 
     private TrainingOffer(Builder builder) {
         this.trainingOfferDraftId = builder.trainingOfferDraftId;
-        this.trainingProgramId = builder.trainingProgramId;
         this.trainerId = builder.trainerId;
+        this.trainingProgramId = builder.trainingProgramId;
+        this.trainingSessionPeriod = builder.trainingSessionPeriod;
         this.price = builder.price;
         this.minimumParticipants = builder.minimumParticipants;
         this.maximumParticipants = builder.maximumParticipants;
-        this.trainingSessionPeriod = builder.trainingSessionPeriod;
     }
 
     @Factory
     static class Builder {
         private UUID trainingOfferDraftId;
-        private UUID trainingProgramId;
         private UUID trainerId;
+        private UUID trainingProgramId;
+        private TrainingSessionPeriod trainingSessionPeriod;
         private Price price;
         private int minimumParticipants;
         private int maximumParticipants;
-        private TrainingSessionPeriod trainingSessionPeriod;
 
         Builder withTrainingOfferDraftId(UUID trainingOfferDraftId) {
             this.trainingOfferDraftId = trainingOfferDraftId;
+            return this;
+        }
+
+        Builder withTrainerId(UUID trainerId) {
+            this.trainerId = trainerId;
             return this;
         }
 
@@ -83,8 +88,8 @@ public class TrainingOffer {
             return this;
         }
 
-        Builder withTrainerId(UUID trainerId) {
-            this.trainerId = trainerId;
+        Builder withTrainingSessionPeriod(TrainingSessionPeriod trainingSessionPeriod) {
+            this.trainingSessionPeriod = trainingSessionPeriod;
             return this;
         }
 
@@ -100,11 +105,6 @@ public class TrainingOffer {
 
         Builder withMaximumParticipants(int maximumParticipants) {
             this.maximumParticipants = maximumParticipants;
-            return this;
-        }
-
-        Builder withTrainingSessionPeriod(TrainingSessionPeriod trainingSessionPeriod) {
-            this.trainingSessionPeriod = trainingSessionPeriod;
             return this;
         }
 
