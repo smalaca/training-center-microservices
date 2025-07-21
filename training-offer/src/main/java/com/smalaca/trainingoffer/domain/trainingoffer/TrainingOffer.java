@@ -62,10 +62,6 @@ public class TrainingOffer {
         this.minimumParticipants = builder.minimumParticipants;
         this.maximumParticipants = builder.maximumParticipants;
     }
-    
-    public UUID trainingOfferId() {
-        return trainingOfferId;
-    }
 
     @Factory
     static class Builder {
