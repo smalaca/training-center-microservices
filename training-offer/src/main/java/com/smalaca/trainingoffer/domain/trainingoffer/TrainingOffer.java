@@ -98,13 +98,13 @@ public class TrainingOffer {
             return this;
         }
 
-        Builder withMinimumParticipants(int minimumParticipants) {
-            this.minimumParticipants = minimumParticipants;
+        Builder withMaximumParticipants(int maximumParticipants) {
+            this.maximumParticipants = maximumParticipants;
             return this;
         }
 
-        Builder withMaximumParticipants(int maximumParticipants) {
-            this.maximumParticipants = maximumParticipants;
+        Builder withMinimumParticipants(int minimumParticipants) {
+            this.minimumParticipants = minimumParticipants;
             return this;
         }
 
