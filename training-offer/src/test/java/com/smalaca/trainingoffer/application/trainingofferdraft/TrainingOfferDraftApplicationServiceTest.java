@@ -50,12 +50,18 @@ class TrainingOfferDraftApplicationServiceTest {
     private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationServiceFactory().trainingOfferDraftApplicationService(repository, eventRegistry);
 
     @Test
-    void shouldMarkTrainingOfferDraftAsPublished() {
+    void shouldMarkTrainingOfferDraftAsPublishedWhenEventIsReceived() {
         givenExisting(given.trainingOfferDraft().initiated());
 
-        service.publish(TRAINING_OFFER_DRAFT_ID);
+        service.published(trainingOfferPublishedEvent());
 
         thenTrainingOfferDraftSaved().isPublished();
+    }
+
+    private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
+        return TrainingOfferPublishedEvent.create(
+                TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
+                MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
     }
 
     @Test
@@ -147,15 +153,7 @@ class TrainingOfferDraftApplicationServiceTest {
     
     private CreateTrainingOfferDraftCommand createTrainingOfferDraftCommand() {
         return new CreateTrainingOfferDraftCommand(
-                TRAINING_PROGRAM_ID,
-                TRAINER_ID,
-                PRICE_AMOUNT,
-                CURRENCY,
-                MINIMUM_PARTICIPANTS,
-                MAXIMUM_PARTICIPANTS,
-                START_DATE,
-                END_DATE,
-                START_TIME,
-                END_TIME);
+                TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
+                MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
     }
 }

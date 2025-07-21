@@ -22,6 +22,7 @@ import java.time.LocalTime;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.client.trainingoffer.trainingofferdraft.RestTrainingOfferDraftTestResponseAssertion.assertThatTrainingOfferDraftResponse;
+import static org.awaitility.Awaitility.await;
 
 @SystemTest
 @Import(TrainingOfferTestClient.class)
@@ -102,9 +103,12 @@ class TrainingOfferDraftRestControllerSystemTest {
         RestTrainingOfferDraftTestResponse actual = client.trainingOfferDrafts().publish(dto.getTrainingOfferDraftId());
 
         assertThatTrainingOfferDraftResponse(actual).isOk();
-        assertThatTrainingOfferDraftResponse(client.trainingOfferDrafts().findById(dto.getTrainingOfferDraftId()))
-                .isOk()
-                .hasPublishedTrainingOfferDraft(dto);
+
+        await().untilAsserted(() -> {
+            assertThatTrainingOfferDraftResponse(client.trainingOfferDrafts().findById(dto.getTrainingOfferDraftId()))
+                    .isOk()
+                    .hasPublishedTrainingOfferDraft(dto);
+        });
     }
 
     @Test
