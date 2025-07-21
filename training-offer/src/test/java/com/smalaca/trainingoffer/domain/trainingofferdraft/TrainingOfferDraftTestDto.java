@@ -1,68 +1,52 @@
 package com.smalaca.trainingoffer.domain.trainingofferdraft;
 
-import com.smalaca.trainingoffer.domain.price.Price;
-import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
+@Getter
 public class TrainingOfferDraftTestDto {
     private final UUID trainingOfferDraftId;
     private final UUID trainingProgramId;
     private final UUID trainerId;
-    private final Price price;
+    private final BigDecimal priceAmount;
+    private final String priceCurrency;
     private final int minimumParticipants;
     private final int maximumParticipants;
-    private final TrainingSessionPeriod trainingSessionPeriod;
+    private final LocalDate startDate;
+    private final LocalTime startTime;
+    private final LocalDate endDate;
+    private final LocalTime endTime;
 
     private TrainingOfferDraftTestDto(Builder builder) {
         this.trainingOfferDraftId = builder.trainingOfferDraftId;
         this.trainingProgramId = builder.trainingProgramId;
         this.trainerId = builder.trainerId;
-        this.price = builder.price;
+        this.priceAmount = builder.priceAmount;
+        this.priceCurrency = builder.priceCurrency;
         this.minimumParticipants = builder.minimumParticipants;
         this.maximumParticipants = builder.maximumParticipants;
-        this.trainingSessionPeriod = builder.trainingSessionPeriod;
-    }
-
-    public UUID getTrainingOfferDraftId() {
-        return trainingOfferDraftId;
-    }
-
-    public UUID getTrainingProgramId() {
-        return trainingProgramId;
-    }
-
-    public UUID getTrainerId() {
-        return trainerId;
-    }
-
-    public Price getPrice() {
-        return price;
-    }
-
-    public int getMinimumParticipants() {
-        return minimumParticipants;
-    }
-
-    public int getMaximumParticipants() {
-        return maximumParticipants;
-    }
-
-    public TrainingSessionPeriod getTrainingSessionPeriod() {
-        return trainingSessionPeriod;
+        this.startDate = builder.startDate;
+        this.startTime = builder.startTime;
+        this.endDate = builder.endDate;
+        this.endTime = builder.endTime;
     }
 
     public static class Builder {
         private UUID trainingOfferDraftId;
         private UUID trainingProgramId;
         private UUID trainerId;
-        private Price price;
+        private BigDecimal priceAmount;
+        private String priceCurrency;
         private int minimumParticipants;
         private int maximumParticipants;
-        private TrainingSessionPeriod trainingSessionPeriod;
+        private LocalDate startDate;
+        private LocalTime startTime;
+        private LocalDate endDate;
+        private LocalTime endTime;
 
         public Builder withTrainingOfferDraftId(UUID trainingOfferDraftId) {
             this.trainingOfferDraftId = trainingOfferDraftId;
@@ -79,8 +63,9 @@ public class TrainingOfferDraftTestDto {
             return this;
         }
 
-        public Builder withPrice(BigDecimal amount, String currency) {
-            this.price = Price.of(amount, currency);
+        public Builder withPrice(BigDecimal priceAmount, String priceCurrency) {
+            this.priceAmount = priceAmount;
+            this.priceCurrency = priceCurrency;
             return this;
         }
 
@@ -95,7 +80,10 @@ public class TrainingOfferDraftTestDto {
         }
 
         public Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-            this.trainingSessionPeriod = new TrainingSessionPeriod(startDate, endDate, startTime, endTime);
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.startTime = startTime;
+            this.endTime = endTime;
             return this;
         }
 

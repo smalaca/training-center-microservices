@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.domain.trainingofferdraft;
+package com.smalaca.trainingoffer.domain.trainingoffer;
 
 import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
@@ -10,64 +10,59 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TrainingOfferDraftAssertion {
-    private final TrainingOfferDraft actual;
+public class TrainingOfferAssertion {
+    private final TrainingOffer actual;
 
-    private TrainingOfferDraftAssertion(TrainingOfferDraft actual) {
+    private TrainingOfferAssertion(TrainingOffer actual) {
         this.actual = actual;
     }
 
-    public static TrainingOfferDraftAssertion assertThatTrainingOfferDraft(TrainingOfferDraft actual) {
-        return new TrainingOfferDraftAssertion(actual);
+    public static TrainingOfferAssertion assertThatTrainingOffer(TrainingOffer actual) {
+        return new TrainingOfferAssertion(actual);
     }
 
-    public TrainingOfferDraftAssertion hasTrainingOfferDraftId(UUID expected) {
+    public TrainingOfferAssertion hasTrainingOfferIdNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferId", null);
+        return this;
+    }
+
+    public TrainingOfferAssertion hasTrainingOfferDraftId(UUID expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferDraftId", expected);
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasTrainingProgramId(UUID expected) {
+    public TrainingOfferAssertion hasTrainingProgramId(UUID expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainingProgramId", expected);
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasTrainerId(UUID expected) {
+    public TrainingOfferAssertion hasTrainerId(UUID expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("trainerId", expected);
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasPrice(BigDecimal expectedPriceAmount, String expectedPriceCurrency) {
+    public TrainingOfferAssertion hasPrice(BigDecimal expectedPriceAmount, String expectedPriceCurrency) {
         Price expected = Price.of(expectedPriceAmount, expectedPriceCurrency);
         assertThat(actual).hasFieldOrPropertyWithValue("price", expected);
 
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasMinimumParticipants(int expected) {
+    public TrainingOfferAssertion hasMinimumParticipants(int expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("minimumParticipants", expected);
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasMaximumParticipants(int expected) {
+    public TrainingOfferAssertion hasMaximumParticipants(int expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("maximumParticipants", expected);
         return this;
     }
 
-    public TrainingOfferDraftAssertion hasTrainingSessionPeriod(
+    public TrainingOfferAssertion hasTrainingSessionPeriod(
             LocalDate expectedStartDate, LocalDate expectedEndDate, LocalTime expectedStartTime, LocalTime expectedEndTime) {
         TrainingSessionPeriod expected = new TrainingSessionPeriod(expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime);
         assertThat(actual).hasFieldOrPropertyWithValue("trainingSessionPeriod", expected);
 
-        return this;
-    }
-
-    public TrainingOfferDraftAssertion isPublished() {
-        assertThat(actual).hasFieldOrPropertyWithValue("published", true);
-        return this;
-    }
-
-    public TrainingOfferDraftAssertion isNotPublished() {
-        assertThat(actual).hasFieldOrPropertyWithValue("published", false);
         return this;
     }
 }

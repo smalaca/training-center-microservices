@@ -69,10 +69,9 @@ class JpaTrainingOfferDraftRepositoryIntegrationTest {
                 .hasTrainingOfferDraftId(saved.trainingOfferDraftId())
                 .hasTrainingProgramId(expected.getTrainingProgramId())
                 .hasTrainerId(expected.getTrainerId())
-                .hasPrice(expected.getPrice())
+                .hasPrice(expected.getPriceAmount(), expected.getPriceCurrency())
                 .hasMinimumParticipants(expected.getMinimumParticipants())
                 .hasMaximumParticipants(expected.getMaximumParticipants())
-                .hasTrainingSessionPeriod(expected.getTrainingSessionPeriod());
+                .hasTrainingSessionPeriod(expected.getStartDate(), expected.getEndDate(), expected.getStartTime(), expected.getEndTime());
     }
-
 }

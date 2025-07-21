@@ -14,9 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.UUID;
 
 @AggregateRoot
@@ -114,8 +111,8 @@ public class TrainingOfferDraft {
             return this;
         }
 
-        Builder withPrice(BigDecimal amount, String currency) {
-            this.price = Price.of(amount, currency);
+        Builder withPrice(Price price) {
+            this.price = price;
             return this;
         }
 
@@ -129,8 +126,8 @@ public class TrainingOfferDraft {
             return this;
         }
 
-        Builder withTrainingSessionPeriod(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
-            this.trainingSessionPeriod = new TrainingSessionPeriod(startDate, endDate, startTime, endTime);
+        Builder withTrainingSessionPeriod(TrainingSessionPeriod trainingSessionPeriod) {
+            this.trainingSessionPeriod = trainingSessionPeriod;
             return this;
         }
 
