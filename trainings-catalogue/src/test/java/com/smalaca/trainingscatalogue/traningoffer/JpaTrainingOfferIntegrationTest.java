@@ -3,6 +3,7 @@ package com.smalaca.trainingscatalogue.traningoffer;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent;
 import com.smalaca.test.type.RepositoryTest;
 import net.datafaker.Faker;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -26,6 +27,11 @@ class JpaTrainingOfferIntegrationTest {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @AfterEach
+    void deleteAll() {
+        repository.deleteAll();
+    }
 
     @Test
     void shouldFindNoTrainingOfferIfItDoesNotExist() {
