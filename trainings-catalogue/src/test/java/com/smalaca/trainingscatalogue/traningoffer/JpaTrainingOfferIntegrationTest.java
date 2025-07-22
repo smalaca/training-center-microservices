@@ -2,6 +2,7 @@ package com.smalaca.trainingscatalogue.traningoffer;
 
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent;
 import com.smalaca.test.type.RepositoryTest;
+import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -9,7 +10,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
 class JpaTrainingOfferIntegrationTest {
+    private static final Faker FAKER = new Faker();
 
     @Autowired
     private JpaTrainingOfferRepository repository;
@@ -27,78 +28,51 @@ class JpaTrainingOfferIntegrationTest {
     private TransactionTemplate transactionTemplate;
 
     @Test
-    void shouldSaveTrainingOffer() {
+    void shouldFindNoTrainingOfferIfItDoesNotExist() {
+        Optional<TrainingOffer> actual = transactionTemplate.execute(transactionStatus -> repository.findById(randomId()));
+
+        assertThat(actual).isEmpty();
+    }
+
+    @Test
+    void shouldFindCreatedTrainingOffer() {
         TrainingOffer trainingOffer = trainingOffer();
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
 
         Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findById(trainingOffer.getTrainingOfferId()));
-        assertThat(found).isPresent();
-        assertThatTrainingOffer(found.get())
-                .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
-                .hasTrainingOfferDraftId(trainingOffer.getTrainingOfferDraftId())
-                .hasTrainingProgramId(trainingOffer.getTrainingProgramId())
-                .hasTrainerId(trainingOffer.getTrainerId())
-                .hasPriceAmount(trainingOffer.getPriceAmount())
-                .hasPriceCurrency(trainingOffer.getPriceCurrency())
-                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
-                .hasStartDate(trainingOffer.getStartDate())
-                .hasStartTime(trainingOffer.getStartTime())
-                .hasEndDate(trainingOffer.getEndDate())
-                .hasEndTime(trainingOffer.getEndTime());
-    }
-
-    @Test
-    void shouldFindTrainingOfferById() {
-        TrainingOffer trainingOffer = existingTrainingOffer();
-
-        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findById(trainingOffer.getTrainingOfferId()));
-
-        assertThatTrainingOffer(found.get())
-                .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
-                .hasTrainingOfferDraftId(trainingOffer.getTrainingOfferDraftId())
-                .hasTrainingProgramId(trainingOffer.getTrainingProgramId())
-                .hasTrainerId(trainingOffer.getTrainerId())
-                .hasPriceAmount(trainingOffer.getPriceAmount())
-                .hasPriceCurrency(trainingOffer.getPriceCurrency())
-                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
-                .hasStartDate(trainingOffer.getStartDate())
-                .hasStartTime(trainingOffer.getStartTime())
-                .hasEndDate(trainingOffer.getEndDate())
-                .hasEndTime(trainingOffer.getEndTime());
-    }
-
-    @Test
-    void shouldFindNoTrainingOfferIfItDoesNotExist() {
-        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findById(randomId()));
-
-        assertThat(found).isEmpty();
+        assertThatTrainingOfferHasSameDataAs(found.get(), trainingOffer);
     }
 
     @Test
     void shouldFindAllTrainingOffers() {
-        TrainingOffer trainingOffer = existingTrainingOffer();
+        TrainingOffer trainingOfferOne = existingTrainingOffer();
+        TrainingOffer trainingOfferTwo = existingTrainingOffer();
+        TrainingOffer trainingOfferThree = existingTrainingOffer();
 
         Iterable<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findAll());
 
-        List<TrainingOffer> trainingOffers = new java.util.ArrayList<>();
-        found.forEach(trainingOffers::add);
-        assertThat(trainingOffers).hasSize(1);
-        assertThatTrainingOffer(trainingOffers.get(0))
-                .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
-                .hasTrainingOfferDraftId(trainingOffer.getTrainingOfferDraftId())
-                .hasTrainingProgramId(trainingOffer.getTrainingProgramId())
-                .hasTrainerId(trainingOffer.getTrainerId())
-                .hasPriceAmount(trainingOffer.getPriceAmount())
-                .hasPriceCurrency(trainingOffer.getPriceCurrency())
-                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
-                .hasStartDate(trainingOffer.getStartDate())
-                .hasStartTime(trainingOffer.getStartTime())
-                .hasEndDate(trainingOffer.getEndDate())
-                .hasEndTime(trainingOffer.getEndTime());
+        assertThat(found)
+                .hasSize(3)
+                .anySatisfy(trainingOffer -> assertThatTrainingOfferHasSameDataAs(trainingOffer, trainingOfferOne))
+                .anySatisfy(trainingOffer -> assertThatTrainingOfferHasSameDataAs(trainingOffer, trainingOfferTwo))
+                .anySatisfy(trainingOffer -> assertThatTrainingOfferHasSameDataAs(trainingOffer, trainingOfferThree));
+    }
+
+    private void assertThatTrainingOfferHasSameDataAs(TrainingOffer actual, TrainingOffer trainingOfferOne) {
+        assertThatTrainingOffer(actual)
+                .hasTrainingOfferId(trainingOfferOne.getTrainingOfferId())
+                .hasTrainingOfferDraftId(trainingOfferOne.getTrainingOfferDraftId())
+                .hasTrainingProgramId(trainingOfferOne.getTrainingProgramId())
+                .hasTrainerId(trainingOfferOne.getTrainerId())
+                .hasPriceAmount(trainingOfferOne.getPriceAmount())
+                .hasPriceCurrency(trainingOfferOne.getPriceCurrency())
+                .hasMinimumParticipants(trainingOfferOne.getMinimumParticipants())
+                .hasMaximumParticipants(trainingOfferOne.getMaximumParticipants())
+                .hasStartDate(trainingOfferOne.getStartDate())
+                .hasStartTime(trainingOfferOne.getStartTime())
+                .hasEndDate(trainingOfferOne.getEndDate())
+                .hasEndTime(trainingOfferOne.getEndTime());
     }
 
     private TrainingOffer existingTrainingOffer() {
@@ -109,12 +83,44 @@ class JpaTrainingOfferIntegrationTest {
     }
 
     private TrainingOffer trainingOffer() {
+        int minimumParticipants = randomMinimumParticipants();
+        LocalDate startDate = randomStartDate();
+
         TrainingOfferPublishedEvent event = new TrainingOfferPublishedEvent(
                 newEventId(), randomId(), randomId(), randomId(), randomId(),
-                BigDecimal.valueOf(1000), "USD", 5, 20,
-                LocalDate.of(2023, 10, 1), LocalDate.of(2023, 10, 5), LocalTime.of(9, 0), LocalTime.of(17, 0));
+                randomPriceAmount(), FAKER.currency().code(),
+                minimumParticipants, randomMaximumParticipants(minimumParticipants),
+                startDate, randomEndDate(startDate), randomStartTime(), randomEndTime());
 
         return new TrainingOffer(event);
+    }
+
+    private LocalTime randomEndTime() {
+        return LocalTime.of(FAKER.number().numberBetween(14, 20), 0);
+    }
+
+    private LocalTime randomStartTime() {
+        return LocalTime.of(FAKER.number().numberBetween(8, 12), 0);
+    }
+
+    private LocalDate randomEndDate(LocalDate startDate) {
+        return startDate.plusDays(FAKER.number().numberBetween(1, 14));
+    }
+
+    private LocalDate randomStartDate() {
+        return LocalDate.now().plusDays(FAKER.number().numberBetween(1, 90));
+    }
+
+    private int randomMaximumParticipants(int minimumParticipants) {
+        return FAKER.number().numberBetween(minimumParticipants + 5, minimumParticipants + 30);
+    }
+
+    private int randomMinimumParticipants() {
+        return FAKER.number().numberBetween(3, 10);
+    }
+
+    private BigDecimal randomPriceAmount() {
+        return BigDecimal.valueOf(FAKER.number().numberBetween(100L, 10000L));
     }
 
     private UUID randomId() {
