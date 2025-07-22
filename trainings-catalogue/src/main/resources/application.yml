@@ -10,6 +10,9 @@ kafka:
   bootstrap-servers: localhost:9092
   group-id: trainings-catalogue
   topics:
+    trainingoffer:
+      events:
+        training-offer-published: training-offer-training-offer-published-event-topic
     trainingprogram:
       events:
         training-program-released: training-programs-training-program-released-event-topic
