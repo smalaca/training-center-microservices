@@ -20,7 +20,7 @@ import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummaryAs
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
-class JpaTrainingOfferIntegrationTest {
+class JpaTrainingOfferRepositoryIntegrationTest {
     @Autowired
     private JpaTrainingOfferRepository repository;
 
