@@ -81,6 +81,24 @@ class TrainingCatalogueRestControllerSystemTest {
                 .containsTrainingProgramSummaryFor(trainingProgramTwo)
                 .containsTrainingProgramSummaryFor(trainingProgramThree);
     }
+    
+    @Test
+    void shouldFindProgramByIdWhenProgramExists() {
+        TrainingProgram trainingProgram = existingTrainingProgram();
+        
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingProgramById(trainingProgram.getTrainingProgramId());
+        
+        assertThatTrainingCatalogueResponse(actual)
+                .isOk()
+                .hasTrainingProgram(trainingProgram);
+    }
+    
+    @Test
+    void shouldNotFindProgramByIdWhenProgramDoesNotExist() {
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingProgramById(UUID.randomUUID());
+        
+        assertThatTrainingCatalogueResponse(actual).notFound();
+    }
 
     private TrainingOffer existingTrainingOffer() {
         TrainingOffer trainingOffer = randomTrainingOffer();

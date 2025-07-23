@@ -5,6 +5,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 
+import java.util.UUID;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 public class TrainingCatalogueEndpoints {
@@ -23,6 +25,10 @@ public class TrainingCatalogueEndpoints {
     
     public RestTrainingCatalogueTestResponse findAllTrainingProgramSummaries() {
         return performSafe(get("/trainingprograms"));
+    }
+    
+    public RestTrainingCatalogueTestResponse findTrainingProgramById(UUID trainingProgramId) {
+        return performSafe(get("/trainingprograms/" + trainingProgramId));
     }
 
     private RestTrainingCatalogueTestResponse performSafe(RequestBuilder request) {
