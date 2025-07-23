@@ -3,11 +3,10 @@ package com.smalaca.trainingscatalogue.api.rest;
 import com.smalaca.test.type.SystemTest;
 import com.smalaca.trainingscatalogue.client.trainingcatalogue.RestTrainingCatalogueTestResponse;
 import com.smalaca.trainingscatalogue.client.trainingcatalogue.TrainingCatalogueTestClient;
-import com.smalaca.trainingscatalogue.traningoffer.JpaTrainingOfferRepository;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOffer;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummary;
 import com.smalaca.trainingscatalogue.trainingprogram.JpaTrainingProgramRepository;
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgram;
+import com.smalaca.trainingscatalogue.traningoffer.JpaTrainingOfferRepository;
+import com.smalaca.trainingscatalogue.traningoffer.TrainingOffer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.client.trainingcatalogue.RestTrainingCatalogueTestResponseAssertion.assertThatTrainingCatalogueResponse;
+import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
-import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
 
 @SystemTest
 @Import(TrainingCatalogueTestClient.class)
@@ -65,6 +64,22 @@ class TrainingCatalogueRestControllerSystemTest {
                 .containsTrainingOfferSummaryFor(trainingOfferThree, trainingProgramThree)
                 .containsTrainingOfferSummaryFor(trainingOfferFour)
                 .containsTrainingOfferSummaryFor(trainingOfferFive);
+    }
+    
+    @Test
+    void shouldFindAllTrainingProgramSummaries() {
+        TrainingProgram trainingProgramOne = existingTrainingProgram();
+        TrainingProgram trainingProgramTwo = existingTrainingProgram();
+        TrainingProgram trainingProgramThree = existingTrainingProgram();
+
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findAllTrainingProgramSummaries();
+
+        assertThatTrainingCatalogueResponse(actual)
+                .isOk()
+                .hasTrainingProgramSummaries(3)
+                .containsTrainingProgramSummaryFor(trainingProgramOne)
+                .containsTrainingProgramSummaryFor(trainingProgramTwo)
+                .containsTrainingProgramSummaryFor(trainingProgramThree);
     }
 
     private TrainingOffer existingTrainingOffer() {

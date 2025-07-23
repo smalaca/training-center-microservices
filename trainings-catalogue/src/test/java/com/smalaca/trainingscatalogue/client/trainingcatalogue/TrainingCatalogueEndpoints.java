@@ -18,7 +18,11 @@ public class TrainingCatalogueEndpoints {
     }
 
     public RestTrainingCatalogueTestResponse findAllTrainingOfferSummaries() {
-        return performSafe(get("/trainingcatalogue"));
+        return performSafe(get("/trainingoffers"));
+    }
+    
+    public RestTrainingCatalogueTestResponse findAllTrainingProgramSummaries() {
+        return performSafe(get("/trainingprograms"));
     }
 
     private RestTrainingCatalogueTestResponse performSafe(RequestBuilder request) {
