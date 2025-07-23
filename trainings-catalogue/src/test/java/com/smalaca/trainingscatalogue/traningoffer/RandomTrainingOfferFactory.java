@@ -14,11 +14,15 @@ public class RandomTrainingOfferFactory {
     private static final Faker FAKER = new Faker();
 
     public static TrainingOffer randomTrainingOffer() {
+        return randomTrainingOfferForProgram(randomId());
+    }
+
+    public static TrainingOffer randomTrainingOfferForProgram(UUID trainingProgramId) {
         int minimumParticipants = randomMinimumParticipants();
         LocalDate startDate = randomStartDate();
 
         TrainingOfferPublishedEvent event = new TrainingOfferPublishedEvent(
-                newEventId(), randomId(), randomId(), randomId(), randomId(),
+                newEventId(), randomId(), randomId(), trainingProgramId, randomId(),
                 randomPriceAmount(), FAKER.currency().code(),
                 minimumParticipants, randomMaximumParticipants(minimumParticipants),
                 startDate, randomEndDate(startDate), randomStartTime(), randomEndTime());

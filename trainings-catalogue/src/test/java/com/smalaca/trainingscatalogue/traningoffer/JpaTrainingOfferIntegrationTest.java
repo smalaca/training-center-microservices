@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
+import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
 import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferAssertion.assertThatTrainingOffer;
 import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummaryAssertion.assertThatTrainingOfferSummary;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -128,42 +129,10 @@ class JpaTrainingOfferIntegrationTest {
     }
     
     private TrainingOffer existingTrainingOfferWithProgram(UUID trainingProgramId) {
-        // Create a completely new training offer with the specified training program ID
-        UUID trainingOfferId = UUID.randomUUID();
-        UUID trainingOfferDraftId = UUID.randomUUID();
-        UUID trainerId = UUID.randomUUID();
-        
-        // Use the RandomTrainingOfferFactory to get random values for other fields
-        TrainingOffer randomOffer = randomTrainingOffer();
-        
-        // Create a new TrainingOfferPublishedEvent with the specified trainingProgramId
-        // Note: The order of parameters in the constructor is important!
-        // EventId, trainingOfferId, trainingOfferDraftId, trainingProgramId, trainerId, ...
-        com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent event = 
-            new com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent(
-                com.smalaca.schemaregistry.metadata.EventId.newEventId(),
-                trainingOfferId,
-                trainingOfferDraftId,
-                trainingProgramId, // 4th parameter is trainingProgramId
-                trainerId, // 5th parameter is trainerId
-                randomOffer.getPriceAmount(),
-                randomOffer.getPriceCurrency(),
-                randomOffer.getMinimumParticipants(),
-                randomOffer.getMaximumParticipants(),
-                randomOffer.getStartDate(),
-                randomOffer.getEndDate(),
-                randomOffer.getStartTime(),
-                randomOffer.getEndTime()
-            );
-        
-        TrainingOffer trainingOfferWithProgram = new TrainingOffer(event);
-        
-        // Verify that the training program ID is correctly set
-        assertThat(trainingOfferWithProgram.getTrainingProgramId()).isEqualTo(trainingProgramId);
-        
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOfferWithProgram));
-        
-        return trainingOfferWithProgram;
+        TrainingOffer trainingOffer = randomTrainingOfferForProgram(trainingProgramId);
+        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
+
+        return trainingOffer;
     }
     
     private TrainingProgram existingTrainingProgram() {
