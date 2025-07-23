@@ -83,7 +83,7 @@ class TrainingCatalogueRestControllerSystemTest {
     }
     
     @Test
-    void shouldFindProgramByIdWhenProgramExists() {
+    void shouldFindTrainingProgramByIdWhenTrainingProgramExists() {
         TrainingProgram trainingProgram = existingTrainingProgram();
         
         RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingProgramById(trainingProgram.getTrainingProgramId());
@@ -94,8 +94,38 @@ class TrainingCatalogueRestControllerSystemTest {
     }
     
     @Test
-    void shouldNotFindProgramByIdWhenProgramDoesNotExist() {
+    void shouldNotFindTrainingProgramByIdWhenTrainingProgramDoesNotExist() {
         RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingProgramById(UUID.randomUUID());
+        
+        assertThatTrainingCatalogueResponse(actual).notFound();
+    }
+    
+    @Test
+    void shouldFindTrainingOfferByIdWithTrainingProgram() {
+        TrainingProgram trainingProgram = existingTrainingProgram();
+        TrainingOffer trainingOffer = existingTrainingOfferWithProgram(trainingProgram.getTrainingProgramId());
+        
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingOfferById(trainingOffer.getTrainingOfferId());
+        
+        assertThatTrainingCatalogueResponse(actual)
+                .isOk()
+                .hasTrainingOfferDetailWithTrainingProgram(trainingOffer, trainingProgram);
+    }
+    
+    @Test
+    void shouldFindTrainingOfferByIdWithoutTrainingProgram() {
+        TrainingOffer trainingOffer = existingTrainingOffer();
+        
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingOfferById(trainingOffer.getTrainingOfferId());
+        
+        assertThatTrainingCatalogueResponse(actual)
+                .isOk()
+                .hasTrainingOfferDetailWithoutTrainingProgram(trainingOffer);
+    }
+    
+    @Test
+    void shouldNotFindTrainingOfferByIdWhenTrainingOfferDoesNotExist() {
+        RestTrainingCatalogueTestResponse actual = client.trainingCatalogue().findTrainingOfferById(UUID.randomUUID());
         
         assertThatTrainingCatalogueResponse(actual).notFound();
     }

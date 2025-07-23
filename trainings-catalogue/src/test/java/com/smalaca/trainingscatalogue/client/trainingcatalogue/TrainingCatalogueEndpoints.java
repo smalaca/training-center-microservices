@@ -22,11 +22,15 @@ public class TrainingCatalogueEndpoints {
     public RestTrainingCatalogueTestResponse findAllTrainingOfferSummaries() {
         return performSafe(get("/trainingoffers"));
     }
-    
+
+    public RestTrainingCatalogueTestResponse findTrainingOfferById(UUID trainingOfferId) {
+        return performSafe(get("/trainingoffers/" + trainingOfferId));
+    }
+
     public RestTrainingCatalogueTestResponse findAllTrainingProgramSummaries() {
         return performSafe(get("/trainingprograms"));
     }
-    
+
     public RestTrainingCatalogueTestResponse findTrainingProgramById(UUID trainingProgramId) {
         return performSafe(get("/trainingprograms/" + trainingProgramId));
     }
