@@ -12,9 +12,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
 import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferAssertion.assertThatTrainingOffer;
-import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
+import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummaryAssertion.assertThatTrainingOfferSummary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
@@ -80,27 +81,27 @@ class JpaTrainingOfferIntegrationTest {
 
         assertThat(actual)
                 .hasSize(3)
-                .anySatisfy(summary -> {
-                    assertThat(summary.getTrainingOfferId()).isEqualTo(trainingOfferOne.getTrainingOfferId());
-                    assertThat(summary.getTrainerId()).isEqualTo(trainingOfferOne.getTrainerId());
-                    assertThat(summary.getTrainingProgramName()).isEqualTo(trainingProgramOne.getName());
-                    assertThat(summary.getStartDate()).isEqualTo(trainingOfferOne.getStartDate());
-                    assertThat(summary.getEndDate()).isEqualTo(trainingOfferOne.getEndDate());
-                })
-                .anySatisfy(summary -> {
-                    assertThat(summary.getTrainingOfferId()).isEqualTo(trainingOfferTwo.getTrainingOfferId());
-                    assertThat(summary.getTrainerId()).isEqualTo(trainingOfferTwo.getTrainerId());
-                    assertThat(summary.getTrainingProgramName()).isEqualTo(trainingProgramTwo.getName());
-                    assertThat(summary.getStartDate()).isEqualTo(trainingOfferTwo.getStartDate());
-                    assertThat(summary.getEndDate()).isEqualTo(trainingOfferTwo.getEndDate());
-                })
-                .anySatisfy(summary -> {
-                    assertThat(summary.getTrainingOfferId()).isEqualTo(trainingOfferThree.getTrainingOfferId());
-                    assertThat(summary.getTrainerId()).isEqualTo(trainingOfferThree.getTrainerId());
-                    assertThat(summary.getTrainingProgramName()).isEqualTo("NO NAME");
-                    assertThat(summary.getStartDate()).isEqualTo(trainingOfferThree.getStartDate());
-                    assertThat(summary.getEndDate()).isEqualTo(trainingOfferThree.getEndDate());
-                });
+                .anySatisfy(summary -> assertThatTrainingOfferSummary(summary)
+                    .hasTrainingOfferId(trainingOfferOne.getTrainingOfferId())
+                    .hasTrainerId(trainingOfferOne.getTrainerId())
+                    .hasTrainingProgramName(trainingProgramOne.getName())
+                    .hasStartDate(trainingOfferOne.getStartDate())
+                    .hasEndDate(trainingOfferOne.getEndDate())
+                )
+                .anySatisfy(summary -> assertThatTrainingOfferSummary(summary)
+                    .hasTrainingOfferId(trainingOfferTwo.getTrainingOfferId())
+                    .hasTrainerId(trainingOfferTwo.getTrainerId())
+                    .hasTrainingProgramName(trainingProgramTwo.getName())
+                    .hasStartDate(trainingOfferTwo.getStartDate())
+                    .hasEndDate(trainingOfferTwo.getEndDate())
+                )
+                .anySatisfy(summary -> assertThatTrainingOfferSummary(summary)
+                    .hasTrainingOfferId(trainingOfferThree.getTrainingOfferId())
+                    .hasTrainerId(trainingOfferThree.getTrainerId())
+                    .hasNoTrainingProgramName()
+                    .hasStartDate(trainingOfferThree.getStartDate())
+                    .hasEndDate(trainingOfferThree.getEndDate())
+                );
     }
 
     private void assertThatTrainingOfferHasSameDataAs(TrainingOffer actual, TrainingOffer trainingOfferOne) {
