@@ -12,6 +12,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class RestTrainingCatalogueTestResponseAssertion {
     private final RestTrainingCatalogueTestResponse actual;
     private List<RestTrainingOfferSummaryTestDto> trainingOfferSummaries;
+    private List<RestTrainingProgramSummaryTestDto> trainingProgramSummaries;
 
     private RestTrainingCatalogueTestResponseAssertion(RestTrainingCatalogueTestResponse actual) {
         this.actual = actual;
@@ -34,6 +35,11 @@ public class RestTrainingCatalogueTestResponseAssertion {
         assertThat(getTrainingOfferSummaries()).hasSize(expected);
         return this;
     }
+    
+    public RestTrainingCatalogueTestResponseAssertion hasTrainingProgramSummaries(int expected) {
+        assertThat(getTrainingProgramSummaries()).hasSize(expected);
+        return this;
+    }
 
     public RestTrainingCatalogueTestResponseAssertion containsTrainingOfferSummaryFor(TrainingOffer expected) {
         return containsTrainingOfferSummaryFor(expected, "NO NAME");
@@ -52,6 +58,12 @@ public class RestTrainingCatalogueTestResponseAssertion {
 
         return this;
     }
+    
+    public RestTrainingCatalogueTestResponseAssertion containsTrainingProgramSummaryFor(TrainingProgram expected) {
+        assertThat(getTrainingProgramSummaries()).anySatisfy(summary -> isSameAsTrainingProgramSummary(summary, expected));
+
+        return this;
+    }
 
     private List<RestTrainingOfferSummaryTestDto> getTrainingOfferSummaries() {
         if (trainingOfferSummaries == null) {
@@ -60,11 +72,25 @@ public class RestTrainingCatalogueTestResponseAssertion {
 
         return trainingOfferSummaries;
     }
+    
+    private List<RestTrainingProgramSummaryTestDto> getTrainingProgramSummaries() {
+        if (trainingProgramSummaries == null) {
+            trainingProgramSummaries = actual.asTrainingProgramSummaries();
+        }
+
+        return trainingProgramSummaries;
+    }
 
     private void isSameAsTrainingOfferSummary(RestTrainingOfferSummaryTestDto actual, TrainingOffer expected) {
         assertThat(actual.trainingOfferId()).isEqualTo(expected.getTrainingOfferId());
         assertThat(actual.trainerId()).isEqualTo(expected.getTrainerId());
         assertThat(actual.startDate()).isEqualTo(expected.getStartDate());
         assertThat(actual.endDate()).isEqualTo(expected.getEndDate());
+    }
+    
+    private void isSameAsTrainingProgramSummary(RestTrainingProgramSummaryTestDto actual, TrainingProgram expected) {
+        assertThat(actual.trainingProgramId()).isEqualTo(expected.getTrainingProgramId());
+        assertThat(actual.authorId()).isEqualTo(expected.getAuthorId());
+        assertThat(actual.name()).isEqualTo(expected.getName());
     }
 }

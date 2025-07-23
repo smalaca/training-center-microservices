@@ -29,6 +29,15 @@ public class RestTrainingCatalogueTestResponse {
             throw new RuntimeException(exception);
         }
     }
+    
+    List<RestTrainingProgramSummaryTestDto> asTrainingProgramSummaries() {
+        try {
+            RestTrainingProgramSummaryTestDto[] trainingProgramSummaries = objectMapper.readValue(asString(), RestTrainingProgramSummaryTestDto[].class);
+            return Lists.newArrayList(trainingProgramSummaries);
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
 
     private String asString() {
         try {

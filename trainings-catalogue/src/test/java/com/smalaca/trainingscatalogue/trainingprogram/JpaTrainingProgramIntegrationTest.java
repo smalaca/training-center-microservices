@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
 import static com.smalaca.trainingscatalogue.trainingprogram.TrainingProgramAssertion.assertThatTrainingProgram;
+import static com.smalaca.trainingscatalogue.trainingprogram.TrainingProgramSummaryAssertion.assertThatTrainingProgramSummary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
@@ -58,6 +60,28 @@ class JpaTrainingProgramIntegrationTest {
                 .anySatisfy(trainingProgram -> assertThatTrainingProgramHasSameDataAs(trainingProgram, trainingProgramOne))
                 .anySatisfy(trainingProgram -> assertThatTrainingProgramHasSameDataAs(trainingProgram, trainingProgramTwo))
                 .anySatisfy(trainingProgram -> assertThatTrainingProgramHasSameDataAs(trainingProgram, trainingProgramThree));
+    }
+    
+    @Test
+    void shouldFindAllTrainingProgramSummaries() {
+        TrainingProgram trainingProgramOne = existingTrainingProgram();
+        TrainingProgram trainingProgramTwo = existingTrainingProgram();
+        TrainingProgram trainingProgramThree = existingTrainingProgram();
+
+        List<TrainingProgramSummary> actual = transactionTemplate.execute(transactionStatus -> repository.findAllTrainingProgramSummaries());
+
+        assertThat(actual)
+                .hasSize(3)
+                .anySatisfy(summary -> assertThatTrainingProgramSummaryHasSameDataAs(summary, trainingProgramOne))
+                .anySatisfy(summary -> assertThatTrainingProgramSummaryHasSameDataAs(summary, trainingProgramTwo))
+                .anySatisfy(summary -> assertThatTrainingProgramSummaryHasSameDataAs(summary, trainingProgramThree));
+    }
+
+    private void assertThatTrainingProgramSummaryHasSameDataAs(TrainingProgramSummary summary, TrainingProgram trainingProgramThree) {
+        assertThatTrainingProgramSummary(summary)
+                .hasTrainingProgramId(trainingProgramThree.getTrainingProgramId())
+                .hasAuthorId(trainingProgramThree.getAuthorId())
+                .hasName(trainingProgramThree.getName());
     }
 
     private void assertThatTrainingProgramHasSameDataAs(TrainingProgram actual, TrainingProgram expected) {
