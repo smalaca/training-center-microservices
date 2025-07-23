@@ -46,6 +46,14 @@ public class RestTrainingCatalogueTestResponse {
             throw new RuntimeException(exception);
         }
     }
+    
+    RestTrainingOfferDetailTestDto asTrainingOfferDetail() {
+        try {
+            return objectMapper.readValue(asString(), RestTrainingOfferDetailTestDto.class);
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
 
     private String asString() {
         try {

@@ -113,4 +113,42 @@ public class RestTrainingCatalogueTestResponseAssertion {
         
         return this;
     }
+    
+    public RestTrainingCatalogueTestResponseAssertion hasTrainingOfferDetailWithTrainingProgram(TrainingOffer expectedOffer, TrainingProgram expectedProgram) {
+        RestTrainingOfferDetailTestDto detail = actual.asTrainingOfferDetail();
+
+        hasTrainingOfferDetailSameAs(expectedOffer, detail);
+        assertThat(detail.name()).isEqualTo(expectedProgram.getName());
+        assertThat(detail.agenda()).isEqualTo(expectedProgram.getAgenda());
+        assertThat(detail.plan()).isEqualTo(expectedProgram.getPlan());
+        assertThat(detail.description()).isEqualTo(expectedProgram.getDescription());
+        
+        return this;
+    }
+    
+    public RestTrainingCatalogueTestResponseAssertion hasTrainingOfferDetailWithoutTrainingProgram(TrainingOffer expected) {
+        RestTrainingOfferDetailTestDto detail = actual.asTrainingOfferDetail();
+
+        hasTrainingOfferDetailSameAs(expected, detail);
+        assertThat(detail.name()).isNull();
+        assertThat(detail.agenda()).isNull();
+        assertThat(detail.plan()).isNull();
+        assertThat(detail.description()).isNull();
+        
+        return this;
+    }
+
+    private void hasTrainingOfferDetailSameAs(TrainingOffer expectedOffer, RestTrainingOfferDetailTestDto detail) {
+        assertThat(detail.trainingOfferId()).isEqualTo(expectedOffer.getTrainingOfferId());
+        assertThat(detail.trainerId()).isEqualTo(expectedOffer.getTrainerId());
+        assertThat(detail.trainingProgramId()).isEqualTo(expectedOffer.getTrainingProgramId());
+        assertThat(detail.startDate()).isEqualTo(expectedOffer.getStartDate());
+        assertThat(detail.endDate()).isEqualTo(expectedOffer.getEndDate());
+        assertThat(detail.startTime()).isEqualTo(expectedOffer.getStartTime());
+        assertThat(detail.endTime()).isEqualTo(expectedOffer.getEndTime());
+        assertThat(detail.priceAmount()).isEqualByComparingTo(expectedOffer.getPriceAmount());
+        assertThat(detail.priceCurrency()).isEqualTo(expectedOffer.getPriceCurrency());
+        assertThat(detail.minimumParticipants()).isEqualTo(expectedOffer.getMinimumParticipants());
+        assertThat(detail.maximumParticipants()).isEqualTo(expectedOffer.getMaximumParticipants());
+    }
 }

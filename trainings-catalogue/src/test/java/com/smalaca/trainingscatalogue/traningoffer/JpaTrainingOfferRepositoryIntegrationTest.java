@@ -16,11 +16,12 @@ import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgr
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
 import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
 import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferAssertion.assertThatTrainingOffer;
+import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferDetailAssertion.assertThatTrainingOfferDetail;
 import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummaryAssertion.assertThatTrainingOfferSummary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
-class JpaTrainingOfferIntegrationTest {
+class JpaTrainingOfferRepositoryIntegrationTest {
     @Autowired
     private JpaTrainingOfferRepository repository;
 
@@ -103,6 +104,64 @@ class JpaTrainingOfferIntegrationTest {
                     .hasStartDate(trainingOfferThree.getStartDate())
                     .hasEndDate(trainingOfferThree.getEndDate())
                 );
+    }
+    
+    @Test
+    void shouldFindTrainingOfferByIdWithTrainingProgram() {
+        TrainingProgram trainingProgram = existingTrainingProgram();
+        TrainingOffer trainingOffer = existingTrainingOfferWithProgram(trainingProgram.getTrainingProgramId());
+
+        Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
+                transactionStatus -> repository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
+
+        assertThatTrainingOfferDetail(actual.get())
+                .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
+                .hasTrainerId(trainingOffer.getTrainerId())
+                .hasTrainingProgramId(trainingOffer.getTrainingProgramId())
+                .hasStartDate(trainingOffer.getStartDate())
+                .hasEndDate(trainingOffer.getEndDate())
+                .hasStartTime(trainingOffer.getStartTime())
+                .hasEndTime(trainingOffer.getEndTime())
+                .hasPriceAmount(trainingOffer.getPriceAmount())
+                .hasPriceCurrency(trainingOffer.getPriceCurrency())
+                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
+                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
+                .hasName(trainingProgram.getName())
+                .hasAgenda(trainingProgram.getAgenda())
+                .hasPlan(trainingProgram.getPlan())
+                .hasDescription(trainingProgram.getDescription());
+    }
+    
+    @Test
+    void shouldFindTrainingOfferByIdWithoutTrainingProgram() {
+        TrainingOffer trainingOffer = existingTrainingOffer();
+
+        Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
+                transactionStatus -> repository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
+
+        assertThatTrainingOfferDetail(actual.get())
+                .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
+                .hasTrainerId(trainingOffer.getTrainerId())
+                .hasTrainingProgramId(trainingOffer.getTrainingProgramId())
+                .hasStartDate(trainingOffer.getStartDate())
+                .hasEndDate(trainingOffer.getEndDate())
+                .hasStartTime(trainingOffer.getStartTime())
+                .hasEndTime(trainingOffer.getEndTime())
+                .hasPriceAmount(trainingOffer.getPriceAmount())
+                .hasPriceCurrency(trainingOffer.getPriceCurrency())
+                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
+                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
+                .hasNoTrainingProgram();
+    }
+    
+    @Test
+    void shouldNotFindTrainingOfferByIdWhenTrainingOfferDoesNotExist() {
+        UUID nonExistentTrainingOfferId = UUID.randomUUID();
+
+        Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
+                transactionStatus -> repository.findTrainingOfferDetailById(nonExistentTrainingOfferId));
+
+        assertThat(actual).isEmpty();
     }
 
     private void assertThatTrainingOfferHasSameDataAs(TrainingOffer actual, TrainingOffer trainingOfferOne) {

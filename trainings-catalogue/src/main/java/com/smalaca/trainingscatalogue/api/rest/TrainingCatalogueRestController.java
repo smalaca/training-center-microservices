@@ -1,6 +1,7 @@
 package com.smalaca.trainingscatalogue.api.rest;
 
 import com.smalaca.trainingscatalogue.traningoffer.JpaTrainingOfferRepository;
+import com.smalaca.trainingscatalogue.traningoffer.TrainingOfferDetail;
 import com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummary;
 import com.smalaca.trainingscatalogue.trainingprogram.JpaTrainingProgramRepository;
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgram;
@@ -34,16 +35,25 @@ public class TrainingCatalogueRestController {
     public List<TrainingOfferSummary> findAllTrainingOfferSummaries() {
         return trainingOfferRepository.findAllTrainingOfferSummaries();
     }
-    
+
+    @GetMapping("trainingoffers/{trainingOfferId}")
+    public ResponseEntity<TrainingOfferDetail> findTrainingOfferById(@PathVariable UUID trainingOfferId) {
+        Optional<TrainingOfferDetail> found = trainingOfferRepository.findTrainingOfferDetailById(trainingOfferId);
+
+        return found
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("trainingprograms")
     public List<TrainingProgramSummary> findAllTrainingProgramSummaries() {
         return trainingProgramRepository.findAllTrainingProgramSummaries();
     }
-    
+
     @GetMapping("trainingprograms/{trainingProgramId}")
-    public ResponseEntity<TrainingProgram> findProgramById(@PathVariable UUID trainingProgramId) {
+    public ResponseEntity<TrainingProgram> findTrainingProgramById(@PathVariable UUID trainingProgramId) {
         Optional<TrainingProgram> found = trainingProgramRepository.findById(trainingProgramId);
-        
+
         return found
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
