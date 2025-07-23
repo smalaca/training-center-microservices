@@ -41,7 +41,7 @@ class JpaTrainingProgramIntegrationTest {
 
     @Test
     void shouldFindCreatedTrainingProgram() {
-        TrainingProgram trainingProgram = trainingProgram();
+        TrainingProgram trainingProgram = randomTrainingProgram();
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgram));
 
@@ -78,13 +78,13 @@ class JpaTrainingProgramIntegrationTest {
     }
 
     private TrainingProgram existingTrainingProgram() {
-        TrainingProgram trainingProgram = trainingProgram();
+        TrainingProgram trainingProgram = randomTrainingProgram();
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgram));
         
         return trainingProgram;
     }
 
-    private TrainingProgram trainingProgram() {
+    private TrainingProgram randomTrainingProgram() {
         TrainingProgramReleasedEvent event = new TrainingProgramReleasedEvent(
                 newEventId(), randomId(), randomId(), randomName(), randomDescription(),
                 randomAgenda(), randomPlan(), randomId(), randomId(), randomCategoriesIds());
