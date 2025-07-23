@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 public class RestTrainingCatalogueTestResponseAssertion {
@@ -24,6 +25,10 @@ public class RestTrainingCatalogueTestResponseAssertion {
 
     public RestTrainingCatalogueTestResponseAssertion isOk() {
         return hasStatus(OK);
+    }
+    
+    public RestTrainingCatalogueTestResponseAssertion notFound() {
+        return hasStatus(NOT_FOUND);
     }
 
     private RestTrainingCatalogueTestResponseAssertion hasStatus(HttpStatus expected) {
@@ -92,5 +97,20 @@ public class RestTrainingCatalogueTestResponseAssertion {
         assertThat(actual.trainingProgramId()).isEqualTo(expected.getTrainingProgramId());
         assertThat(actual.authorId()).isEqualTo(expected.getAuthorId());
         assertThat(actual.name()).isEqualTo(expected.getName());
+    }
+    
+    public RestTrainingCatalogueTestResponseAssertion hasTrainingProgram(TrainingProgram expected) {
+        RestTrainingProgramTestDto program = actual.asTrainingProgram();
+        assertThat(program.trainingProgramId()).isEqualTo(expected.getTrainingProgramId());
+        assertThat(program.trainingProgramProposalId()).isEqualTo(expected.getTrainingProgramProposalId());
+        assertThat(program.authorId()).isEqualTo(expected.getAuthorId());
+        assertThat(program.reviewerId()).isEqualTo(expected.getReviewerId());
+        assertThat(program.name()).isEqualTo(expected.getName());
+        assertThat(program.agenda()).isEqualTo(expected.getAgenda());
+        assertThat(program.plan()).isEqualTo(expected.getPlan());
+        assertThat(program.description()).isEqualTo(expected.getDescription());
+        assertThat(program.categoriesIds()).containsExactlyInAnyOrderElementsOf(expected.getCategoriesIds());
+        
+        return this;
     }
 }

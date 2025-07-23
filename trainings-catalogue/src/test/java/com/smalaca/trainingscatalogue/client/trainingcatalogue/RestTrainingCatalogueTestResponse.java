@@ -38,6 +38,14 @@ public class RestTrainingCatalogueTestResponse {
             throw new RuntimeException(exception);
         }
     }
+    
+    RestTrainingProgramTestDto asTrainingProgram() {
+        try {
+            return objectMapper.readValue(asString(), RestTrainingProgramTestDto.class);
+        } catch (JsonProcessingException exception) {
+            throw new RuntimeException(exception);
+        }
+    }
 
     private String asString() {
         try {
