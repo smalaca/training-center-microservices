@@ -5,11 +5,14 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingscatalogue.trainingoffer.JpaTrainingOfferRepository;
 import com.smalaca.trainingscatalogue.trainingoffer.TrainingOffer;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
@@ -35,7 +38,16 @@ class TrainingOfferKafkaListenerIntegrationTest {
     @Autowired
     private JpaTrainingOfferRepository trainingOfferRepository;
 
+    @Autowired
+    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
     private final List<UUID> ids = new ArrayList<>();
+
+    @BeforeEach
+    void init() {
+        kafkaListenerEndpointRegistry.getAllListenerContainers().forEach(
+                listenerContainer -> ContainerTestUtils.waitForAssignment(listenerContainer, 1));
+    }
 
     @AfterEach
     void deleteAll() {
