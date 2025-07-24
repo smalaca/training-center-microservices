@@ -14,20 +14,26 @@ public class RandomTrainingOfferFactory {
     private static final Faker FAKER = new Faker();
 
     public static TrainingOffer randomTrainingOffer() {
-        return randomTrainingOfferForProgram(randomId());
+        return new TrainingOffer(randomTrainingOfferPublishedEvent());
+    }
+
+    public static TrainingOfferPublishedEvent randomTrainingOfferPublishedEvent() {
+        return randomTrainingOfferPublishedEvent(randomId());
     }
 
     public static TrainingOffer randomTrainingOfferForProgram(UUID trainingProgramId) {
+        return new TrainingOffer(randomTrainingOfferPublishedEvent(trainingProgramId));
+    }
+
+    private static TrainingOfferPublishedEvent randomTrainingOfferPublishedEvent(UUID trainingProgramId) {
         int minimumParticipants = randomMinimumParticipants();
         LocalDate startDate = randomStartDate();
 
-        TrainingOfferPublishedEvent event = new TrainingOfferPublishedEvent(
+        return new TrainingOfferPublishedEvent(
                 newEventId(), randomId(), randomId(), trainingProgramId, randomId(),
                 randomPriceAmount(), FAKER.currency().code(),
                 minimumParticipants, randomMaximumParticipants(minimumParticipants),
                 startDate, randomEndDate(startDate), randomStartTime(), randomEndTime());
-
-        return new TrainingOffer(event);
     }
 
     private static LocalTime randomEndTime() {
