@@ -1,4 +1,4 @@
-package com.smalaca.trainingscatalogue.traningoffer;
+package com.smalaca.trainingscatalogue.trainingoffer;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

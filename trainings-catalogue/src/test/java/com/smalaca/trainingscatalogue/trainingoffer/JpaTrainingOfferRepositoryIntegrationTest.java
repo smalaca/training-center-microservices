@@ -1,4 +1,4 @@
-package com.smalaca.trainingscatalogue.traningoffer;
+package com.smalaca.trainingscatalogue.trainingoffer;
 
 import com.smalaca.test.type.RepositoryTest;
 import com.smalaca.trainingscatalogue.trainingprogram.JpaTrainingProgramRepository;
@@ -13,11 +13,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
-import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
-import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
-import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferAssertion.assertThatTrainingOffer;
-import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferDetailAssertion.assertThatTrainingOfferDetail;
-import static com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummaryAssertion.assertThatTrainingOfferSummary;
+import static com.smalaca.trainingscatalogue.trainingoffer.RandomTrainingOfferFactory.randomTrainingOffer;
+import static com.smalaca.trainingscatalogue.trainingoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
+import static com.smalaca.trainingscatalogue.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
+import static com.smalaca.trainingscatalogue.trainingoffer.TrainingOfferDetailAssertion.assertThatTrainingOfferDetail;
+import static com.smalaca.trainingscatalogue.trainingoffer.TrainingOfferSummaryAssertion.assertThatTrainingOfferSummary;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest

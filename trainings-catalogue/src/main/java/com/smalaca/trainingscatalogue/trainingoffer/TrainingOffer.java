@@ -1,4 +1,4 @@
-package com.smalaca.trainingscatalogue.traningoffer;
+package com.smalaca.trainingscatalogue.trainingoffer;
 
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferPublishedEvent;
 import jakarta.persistence.Column;
