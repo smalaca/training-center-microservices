@@ -12,6 +12,46 @@ Accepted
 
 Implement an Event-Driven Architecture (EDA) for communication between services and components.
 
+```mermaid
+flowchart TB
+    subgraph "Event-Driven Architecture"
+        EB[Event Broker / Kafka]
+        
+        subgraph "Service A"
+            A_PUB[Event Publisher]
+            A_SUB[Event Subscriber]
+        end
+        
+        subgraph "Service B"
+            B_PUB[Event Publisher]
+            B_SUB[Event Subscriber]
+        end
+        
+        subgraph "Service C"
+            C_PUB[Event Publisher]
+            C_SUB[Event Subscriber]
+        end
+        
+        %% Publishing events
+        A_PUB -->|Publish Event| EB
+        B_PUB -->|Publish Event| EB
+        C_PUB -->|Publish Event| EB
+        
+        %% Consuming events
+        EB -->|Consume Event| A_SUB
+        EB -->|Consume Event| B_SUB
+        EB -->|Consume Event| C_SUB
+    end
+    
+    classDef broker fill:#f96,stroke:#333,stroke-width:2px
+    classDef publisher fill:#adf,stroke:#333,stroke-width:2px
+    classDef subscriber fill:#ad9,stroke:#333,stroke-width:2px
+    
+    class EB broker
+    class A_PUB,B_PUB,C_PUB publisher
+    class A_SUB,B_SUB,C_SUB subscriber
+```
+
 ## Context
 
 * Our application is built as a microservices architecture with multiple independent services.

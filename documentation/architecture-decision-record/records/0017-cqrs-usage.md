@@ -14,6 +14,44 @@ Implement a system-wide CQRS (Command Query Responsibility Segregation) pattern 
 - Training Program and Training Offer modules serve as the command part, handling business logic and data modifications
 - Training Catalogue module serves as the query part, focusing exclusively on data retrieval operations
 
+```mermaid
+flowchart TB
+    subgraph "Command Side"
+        TP[Training Program Module]
+        TO[Training Offer Module]
+        TP_DB[(Training Program DB)]
+        TO_DB[(Training Offer DB)]
+        TP --> TP_DB
+        TO --> TO_DB
+    end
+    
+    subgraph "Events"
+        EV[Event Bus / Kafka]
+    end
+    
+    subgraph "Query Side"
+        TC[Training Catalogue Module]
+        TC_DB[(Read Model DB)]
+        TC --> TC_DB
+    end
+    
+    TP --> EV
+    TO --> EV
+    EV --> TC
+    
+    Client1[Client] --> TP
+    Client2[Client] --> TO
+    Client3[Client] --> TC
+    
+    classDef command fill:#f96,stroke:#333,stroke-width:2px
+    classDef query fill:#9cf,stroke:#333,stroke-width:2px
+    classDef event fill:#fc9,stroke:#333,stroke-width:2px
+    
+    class TP,TO,TP_DB,TO_DB command
+    class TC,TC_DB query
+    class EV event
+```
+
 ## Context
 
 * Our system consists of multiple modules that need to work together to provide a cohesive training management platform.
