@@ -13,11 +13,13 @@ public class RandomTrainingProgramFactory {
     private static final Faker FAKER = new Faker();
 
     public static TrainingProgram randomTrainingProgram() {
-        TrainingProgramReleasedEvent event = new TrainingProgramReleasedEvent(
+        return new TrainingProgram(randomTrainingProgramReleasedEvent());
+    }
+
+    public static TrainingProgramReleasedEvent randomTrainingProgramReleasedEvent() {
+        return new TrainingProgramReleasedEvent(
                 newEventId(), randomId(), randomId(), randomName(), randomDescription(),
                 randomAgenda(), randomPlan(), randomId(), randomId(), randomCategoriesIds());
-
-        return new TrainingProgram(event);
     }
 
     private static List<UUID> randomCategoriesIds() {

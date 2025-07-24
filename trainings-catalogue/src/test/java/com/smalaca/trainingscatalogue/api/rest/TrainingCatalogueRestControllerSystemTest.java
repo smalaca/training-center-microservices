@@ -5,20 +5,22 @@ import com.smalaca.trainingscatalogue.client.trainingcatalogue.RestTrainingCatal
 import com.smalaca.trainingscatalogue.client.trainingcatalogue.TrainingCatalogueTestClient;
 import com.smalaca.trainingscatalogue.trainingprogram.JpaTrainingProgramRepository;
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgram;
-import com.smalaca.trainingscatalogue.traningoffer.JpaTrainingOfferRepository;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOffer;
+import com.smalaca.trainingscatalogue.trainingoffer.JpaTrainingOfferRepository;
+import com.smalaca.trainingscatalogue.trainingoffer.TrainingOffer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.client.trainingcatalogue.RestTrainingCatalogueTestResponseAssertion.assertThatTrainingCatalogueResponse;
 import static com.smalaca.trainingscatalogue.trainingprogram.RandomTrainingProgramFactory.randomTrainingProgram;
-import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOffer;
-import static com.smalaca.trainingscatalogue.traningoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
+import static com.smalaca.trainingscatalogue.trainingoffer.RandomTrainingOfferFactory.randomTrainingOffer;
+import static com.smalaca.trainingscatalogue.trainingoffer.RandomTrainingOfferFactory.randomTrainingOfferForProgram;
 
 @SystemTest
 @Import(TrainingCatalogueTestClient.class)
@@ -35,11 +37,14 @@ class TrainingCatalogueRestControllerSystemTest {
     @Autowired
     private TrainingCatalogueTestClient client;
 
+    private final List<UUID> trainingProgramsIds = new ArrayList<>();
+    private final List<UUID> trainingOffersIds = new ArrayList<>();
+
     @AfterEach
     void deleteAll() {
         transactionTemplate.executeWithoutResult(transactionStatus -> {
-            trainingOfferRepository.deleteAll();
-            trainingProgramRepository.deleteAll();
+            trainingOfferRepository.deleteAllById(trainingOffersIds);
+            trainingProgramRepository.deleteAllById(trainingProgramsIds);
         });
     }
 
@@ -131,21 +136,23 @@ class TrainingCatalogueRestControllerSystemTest {
     }
 
     private TrainingOffer existingTrainingOffer() {
-        TrainingOffer trainingOffer = randomTrainingOffer();
-        transactionTemplate.executeWithoutResult(transactionStatus -> trainingOfferRepository.save(trainingOffer));
-        
-        return trainingOffer;
+        return existing(randomTrainingOffer());
     }
     
     private TrainingOffer existingTrainingOfferWithProgram(UUID trainingProgramId) {
-        TrainingOffer trainingOffer = randomTrainingOfferForProgram(trainingProgramId);
+        return existing(randomTrainingOfferForProgram(trainingProgramId));
+    }
+
+    private TrainingOffer existing(TrainingOffer trainingOffer) {
         transactionTemplate.executeWithoutResult(transactionStatus -> trainingOfferRepository.save(trainingOffer));
+        trainingOffersIds.add(trainingOffer.getTrainingOfferId());
 
         return trainingOffer;
     }
-    
+
     private TrainingProgram existingTrainingProgram() {
         TrainingProgram trainingProgram = randomTrainingProgram();
+        trainingProgramsIds.add(trainingProgram.getTrainingProgramId());
         transactionTemplate.executeWithoutResult(transactionStatus -> trainingProgramRepository.save(trainingProgram));
         
         return trainingProgram;

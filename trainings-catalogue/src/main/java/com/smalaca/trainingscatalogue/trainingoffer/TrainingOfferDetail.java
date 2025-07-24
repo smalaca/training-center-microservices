@@ -1,4 +1,4 @@
-package com.smalaca.trainingscatalogue.traningoffer;
+package com.smalaca.trainingscatalogue.trainingoffer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

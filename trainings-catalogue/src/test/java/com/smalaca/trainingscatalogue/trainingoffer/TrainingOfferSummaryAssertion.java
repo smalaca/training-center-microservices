@@ -1,4 +1,4 @@
-package com.smalaca.trainingscatalogue.traningoffer;
+package com.smalaca.trainingscatalogue.trainingoffer;
 
 import java.time.LocalDate;
 import java.util.UUID;

@@ -1,7 +1,7 @@
 package com.smalaca.trainingscatalogue.client.trainingcatalogue;
 
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgram;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOffer;
+import com.smalaca.trainingscatalogue.trainingoffer.TrainingOffer;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;

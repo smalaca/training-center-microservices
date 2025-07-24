@@ -1,8 +1,8 @@
 package com.smalaca.trainingscatalogue.api.rest;
 
-import com.smalaca.trainingscatalogue.traningoffer.JpaTrainingOfferRepository;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOfferDetail;
-import com.smalaca.trainingscatalogue.traningoffer.TrainingOfferSummary;
+import com.smalaca.trainingscatalogue.trainingoffer.JpaTrainingOfferRepository;
+import com.smalaca.trainingscatalogue.trainingoffer.TrainingOfferDetail;
+import com.smalaca.trainingscatalogue.trainingoffer.TrainingOfferSummary;
 import com.smalaca.trainingscatalogue.trainingprogram.JpaTrainingProgramRepository;
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgram;
 import com.smalaca.trainingscatalogue.trainingprogram.TrainingProgramSummary;
