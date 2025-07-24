@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +24,11 @@ class JpaTrainingProgramRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private final List<UUID> ids = new ArrayList<>();
+
     @AfterEach
     void deleteAll() {
-        repository.deleteAll();
+        repository.deleteAllById(ids);
     }
 
     @Test
@@ -39,7 +42,7 @@ class JpaTrainingProgramRepositoryIntegrationTest {
 
     @Test
     void shouldFindCreatedTrainingProgram() {
-        TrainingProgram trainingProgram = randomTrainingProgram();
+        TrainingProgram trainingProgram = trainingProgram();
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgram));
 
@@ -98,9 +101,16 @@ class JpaTrainingProgramRepositoryIntegrationTest {
     }
 
     private TrainingProgram existingTrainingProgram() {
-        TrainingProgram trainingProgram = randomTrainingProgram();
+        TrainingProgram trainingProgram = trainingProgram();
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingProgram));
         
+        return trainingProgram;
+    }
+
+    private TrainingProgram trainingProgram() {
+        TrainingProgram trainingProgram = randomTrainingProgram();
+        ids.add(trainingProgram.getTrainingProgramId());
+
         return trainingProgram;
     }
 }

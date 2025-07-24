@@ -12,6 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingscatalogue.trainingoffer.RandomTrainingOfferFactory.randomTrainingOfferPublishedEvent;
@@ -33,14 +35,16 @@ class TrainingOfferKafkaListenerIntegrationTest {
     @Autowired
     private JpaTrainingOfferRepository trainingOfferRepository;
 
+    private final List<UUID> ids = new ArrayList<>();
+
     @AfterEach
     void deleteAll() {
-        trainingOfferRepository.deleteAll();
+        trainingOfferRepository.deleteAllById(ids);
     }
 
     @Test
     void shouldCreateNewTrainingOffer() {
-        TrainingOfferPublishedEvent event = randomTrainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent event = trainingOfferPublishedEvent();
 
         publish(event);
 
@@ -52,7 +56,7 @@ class TrainingOfferKafkaListenerIntegrationTest {
 
     @Test
     void shouldOverwriteExistingTrainingOffer() {
-        TrainingOfferPublishedEvent event = randomTrainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent event = trainingOfferPublishedEvent();
 
         publish(event);
         publish(event);
@@ -66,11 +70,11 @@ class TrainingOfferKafkaListenerIntegrationTest {
 
     @Test
     void shouldCreateTrainingOffers() {
-        TrainingOfferPublishedEvent trainingOfferPublishedEventOne = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent trainingOfferPublishedEventTwo = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent trainingOfferPublishedEventThree = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent trainingOfferPublishedEventFour = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent trainingOfferPublishedEventFive = randomTrainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventOne = trainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventTwo = trainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventThree = trainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventFour = trainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventFive = trainingOfferPublishedEvent();
 
         publish(trainingOfferPublishedEventOne);
         publish(trainingOfferPublishedEventTwo);
@@ -89,6 +93,13 @@ class TrainingOfferKafkaListenerIntegrationTest {
                     .anySatisfy(found -> assertThatTrainingOfferMatchesEvent(found, trainingOfferPublishedEventFour))
                     .anySatisfy(found -> assertThatTrainingOfferMatchesEvent(found, trainingOfferPublishedEventFive));
         });
+    }
+
+    private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
+        TrainingOfferPublishedEvent trainingOfferPublishedEvent = randomTrainingOfferPublishedEvent();
+        ids.add(trainingOfferPublishedEvent.trainingOfferId());
+
+        return trainingOfferPublishedEvent;
     }
 
     private void publish(TrainingOfferPublishedEvent trainingOfferPublishedEvent) {

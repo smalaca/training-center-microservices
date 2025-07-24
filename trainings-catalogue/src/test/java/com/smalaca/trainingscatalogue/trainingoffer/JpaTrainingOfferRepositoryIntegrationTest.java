@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RepositoryTest
 class JpaTrainingOfferRepositoryIntegrationTest {
     @Autowired
-    private JpaTrainingOfferRepository repository;
+    private JpaTrainingOfferRepository trainingOfferRepository;
 
     @Autowired
     private JpaTrainingProgramRepository trainingProgramRepository;
@@ -31,17 +32,20 @@ class JpaTrainingOfferRepositoryIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private final List<UUID> trainingProgramsIds = new ArrayList<>();
+    private final List<UUID> trainingOffersIds = new ArrayList<>();
+
     @AfterEach
     void deleteAll() {
-        repository.deleteAll();
-        trainingProgramRepository.deleteAll();
+        trainingOfferRepository.deleteAllById(trainingOffersIds);
+        trainingProgramRepository.deleteAllById(trainingProgramsIds);
     }
 
     @Test
     void shouldFindNoTrainingOfferIfItDoesNotExist() {
         UUID trainingOfferId = UUID.randomUUID();
 
-        Optional<TrainingOffer> actual = transactionTemplate.execute(transactionStatus -> repository.findById(trainingOfferId));
+        Optional<TrainingOffer> actual = transactionTemplate.execute(transactionStatus -> trainingOfferRepository.findById(trainingOfferId));
 
         assertThat(actual).isEmpty();
     }
@@ -49,10 +53,11 @@ class JpaTrainingOfferRepositoryIntegrationTest {
     @Test
     void shouldFindCreatedTrainingOffer() {
         TrainingOffer trainingOffer = randomTrainingOffer();
+        trainingOffersIds.add(trainingOffer.getTrainingOfferId());
 
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
+        transactionTemplate.executeWithoutResult(transactionStatus -> trainingOfferRepository.save(trainingOffer));
 
-        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findById(trainingOffer.getTrainingOfferId()));
+        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> trainingOfferRepository.findById(trainingOffer.getTrainingOfferId()));
         assertThatTrainingOfferHasSameDataAs(found.get(), trainingOffer);
     }
 
@@ -62,7 +67,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
         TrainingOffer trainingOfferTwo = existingTrainingOffer();
         TrainingOffer trainingOfferThree = existingTrainingOffer();
 
-        Iterable<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> repository.findAll());
+        Iterable<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> trainingOfferRepository.findAll());
 
         assertThat(found)
                 .hasSize(3)
@@ -79,7 +84,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
         TrainingOffer trainingOfferTwo = existingTrainingOfferWithProgram(trainingProgramTwo.getTrainingProgramId());
         TrainingOffer trainingOfferThree = existingTrainingOffer();
 
-        List<TrainingOfferSummary> actual = transactionTemplate.execute(transactionStatus -> repository.findAllTrainingOfferSummaries());
+        List<TrainingOfferSummary> actual = transactionTemplate.execute(transactionStatus -> trainingOfferRepository.findAllTrainingOfferSummaries());
 
         assertThat(actual)
                 .hasSize(3)
@@ -105,14 +110,14 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                     .hasEndDate(trainingOfferThree.getEndDate())
                 );
     }
-    
+
     @Test
     void shouldFindTrainingOfferByIdWithTrainingProgram() {
         TrainingProgram trainingProgram = existingTrainingProgram();
         TrainingOffer trainingOffer = existingTrainingOfferWithProgram(trainingProgram.getTrainingProgramId());
 
         Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
-                transactionStatus -> repository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
+                transactionStatus -> trainingOfferRepository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
 
         assertThatTrainingOfferDetail(actual.get())
                 .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
@@ -131,13 +136,13 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasPlan(trainingProgram.getPlan())
                 .hasDescription(trainingProgram.getDescription());
     }
-    
+
     @Test
     void shouldFindTrainingOfferByIdWithoutTrainingProgram() {
         TrainingOffer trainingOffer = existingTrainingOffer();
 
         Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
-                transactionStatus -> repository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
+                transactionStatus -> trainingOfferRepository.findTrainingOfferDetailById(trainingOffer.getTrainingOfferId()));
 
         assertThatTrainingOfferDetail(actual.get())
                 .hasTrainingOfferId(trainingOffer.getTrainingOfferId())
@@ -153,13 +158,13 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
                 .hasNoTrainingProgram();
     }
-    
+
     @Test
     void shouldNotFindTrainingOfferByIdWhenTrainingOfferDoesNotExist() {
         UUID nonExistentTrainingOfferId = UUID.randomUUID();
 
         Optional<TrainingOfferDetail> actual = transactionTemplate.execute(
-                transactionStatus -> repository.findTrainingOfferDetailById(nonExistentTrainingOfferId));
+                transactionStatus -> trainingOfferRepository.findTrainingOfferDetailById(nonExistentTrainingOfferId));
 
         assertThat(actual).isEmpty();
     }
@@ -181,23 +186,26 @@ class JpaTrainingOfferRepositoryIntegrationTest {
     }
 
     private TrainingOffer existingTrainingOffer() {
-        TrainingOffer trainingOffer = randomTrainingOffer();
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
-        
-        return trainingOffer;
+        return existing(randomTrainingOffer());
     }
-    
+
     private TrainingOffer existingTrainingOfferWithProgram(UUID trainingProgramId) {
-        TrainingOffer trainingOffer = randomTrainingOfferForProgram(trainingProgramId);
-        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
+        return existing(randomTrainingOfferForProgram(trainingProgramId));
+    }
+
+    private TrainingOffer existing(TrainingOffer trainingOffer) {
+        trainingOffersIds.add(trainingOffer.getTrainingOfferId());
+        transactionTemplate.executeWithoutResult(transactionStatus -> trainingOfferRepository.save(trainingOffer));
 
         return trainingOffer;
     }
-    
+
     private TrainingProgram existingTrainingProgram() {
         TrainingProgram trainingProgram = randomTrainingProgram();
+        trainingProgramsIds.add(trainingProgram.getTrainingProgramId());
+
         transactionTemplate.executeWithoutResult(transactionStatus -> trainingProgramRepository.save(trainingProgram));
-        
+
         return trainingProgram;
     }
 }
