@@ -12,6 +12,42 @@ Accepted
 
 Use a Microservices Architecture for the Training Center Application.
 
+```mermaid
+flowchart TB
+    subgraph "Training Center Application"
+        TP[Training Programs Service]
+        TO[Training Offer Service]
+        OT[Open Trainings Service]
+        REV[Reviews Service]
+        TC[Training Catalogue Service]
+        PAY[Payment Gateway]
+        PDM[Personal Data Management]
+        DM[Discount Management]
+    end
+    
+    %% Service connections
+    TP <--> TO
+    TO <--> OT
+    TP <--> REV
+    TO <--> REV
+    TP --> TC
+    TO --> TC
+    OT <--> PAY
+    OT <--> PDM
+    OT <--> DM
+    
+    %% External connections
+    Client[Client Applications] --> TC
+    Client --> OT
+    Client --> REV
+    
+    classDef service fill:#adf,stroke:#333,stroke-width:2px
+    classDef external fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class TP,TO,OT,REV,TC,PAY,PDM,DM service
+    class Client external
+```
+
 ## Context
 
 * We are developing a new application for our training center.

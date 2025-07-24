@@ -12,6 +12,55 @@ Accepted
 
 Use Port and Adapters Architecture with the usage of Tactical Domain-Driven Design (DDD) patterns.
 
+```mermaid
+flowchart TB
+    subgraph "Reviews Service"
+        subgraph "Domain Layer"
+            AGG[Aggregates]
+            VO[Value Objects]
+            DOM_SVC[Domain Services]
+            
+            AGG --- VO
+            AGG --- DOM_SVC
+        end
+        
+        subgraph "Application Layer"
+            APP_SVC[Application Services]
+            PORTS_OUT[Output Ports]
+            PORTS_IN[Input Ports]
+            
+            APP_SVC --> PORTS_OUT
+            PORTS_IN --> APP_SVC
+            APP_SVC --> AGG
+        end
+        
+        subgraph "Infrastructure Layer"
+            REST_ADPT[REST Adapter]
+            KAFKA_ADPT[Kafka Adapter]
+            REPO_ADPT[Repository Adapter]
+            DB[(Database)]
+            
+            REST_ADPT --> PORTS_IN
+            KAFKA_ADPT --> PORTS_IN
+            PORTS_OUT --> REPO_ADPT
+            REPO_ADPT --> DB
+        end
+    end
+    
+    Client[Client] --> REST_ADPT
+    Events[Event Bus / Kafka] --> KAFKA_ADPT
+    
+    classDef domain fill:#f9d,stroke:#333,stroke-width:2px
+    classDef application fill:#adf,stroke:#333,stroke-width:2px
+    classDef infrastructure fill:#ad9,stroke:#333,stroke-width:2px
+    classDef external fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class AGG,VO,DOM_SVC domain
+    class APP_SVC,PORTS_OUT,PORTS_IN application
+    class REST_ADPT,KAFKA_ADPT,REPO_ADPT,DB infrastructure
+    class Client,Events external
+```
+
 ## Context
 
 * We are developing a service responsible for managing reviews and proposals, including registration, approval, and rejection of proposals.

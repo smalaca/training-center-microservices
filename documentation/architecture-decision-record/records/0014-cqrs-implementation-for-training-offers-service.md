@@ -12,6 +12,49 @@ Accepted
 
 Implement CQRS (Command Query Responsibility Segregation) pattern within the Training Offers service using a shared database approach with code-level separation between commands and queries.
 
+```mermaid
+flowchart TB
+    subgraph "Training Offers Service"
+        subgraph "Command Side"
+            CMD_SVC[Command Services]
+            DOM_ENT[Domain Entities<br>TrainingOfferDraft]
+            CMD_REPO[Command Repositories]
+            
+            CMD_SVC --> DOM_ENT
+            CMD_SVC --> CMD_REPO
+            CMD_REPO --> DOM_ENT
+        end
+        
+        subgraph "Query Side"
+            QRY_SVC[Query Services]
+            VIEW_ENT[View Entities<br>TrainingOfferDraftView]
+            QRY_REPO[Query Repositories]
+            
+            QRY_SVC --> VIEW_ENT
+            QRY_SVC --> QRY_REPO
+            QRY_REPO --> VIEW_ENT
+        end
+        
+        DB[(Shared Database<br>TRAINING_OFFER_DRAFTS table)]
+        
+        CMD_REPO --> DB
+        QRY_REPO --> DB
+    end
+    
+    REST_API[REST API] --> CMD_SVC
+    REST_API --> QRY_SVC
+    
+    classDef command fill:#f96,stroke:#333,stroke-width:2px
+    classDef query fill:#9cf,stroke:#333,stroke-width:2px
+    classDef database fill:#ad9,stroke:#333,stroke-width:2px
+    classDef external fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class CMD_SVC,DOM_ENT,CMD_REPO command
+    class QRY_SVC,VIEW_ENT,QRY_REPO query
+    class DB database
+    class REST_API external
+```
+
 ## Context
 
 * The Training Offers service manages training offer drafts as core business entities with complex workflows involving creation, modification, and retrieval operations.

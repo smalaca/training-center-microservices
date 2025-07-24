@@ -12,6 +12,45 @@ Accepted
 
 Use Layered Architecture for the Training Catalogue module.
 
+```mermaid
+flowchart TB
+    subgraph "Training Catalogue Module"
+        subgraph "Presentation Layer"
+            REST[REST API Controller]
+            KAFKA[Kafka Listener]
+        end
+        
+        subgraph "Service Layer"
+            SVC[Service Components]
+        end
+        
+        subgraph "Data Access Layer"
+            REPO[Repositories]
+            DB[(Database)]
+        end
+        
+        %% Layer connections
+        REST --> SVC
+        KAFKA --> SVC
+        SVC --> REPO
+        REPO --> DB
+        
+        %% External connections
+        Client[Client] --> REST
+        Events[Event Bus / Kafka] --> KAFKA
+    end
+    
+    classDef presentation fill:#f9a,stroke:#333,stroke-width:2px
+    classDef service fill:#adf,stroke:#333,stroke-width:2px
+    classDef data fill:#ad9,stroke:#333,stroke-width:2px
+    classDef external fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class REST,KAFKA presentation
+    class SVC service
+    class REPO,DB data
+    class Client,Events external
+```
+
 ## Context
 
 * We are developing a module responsible for maintaining a catalog of training programs and training offers.

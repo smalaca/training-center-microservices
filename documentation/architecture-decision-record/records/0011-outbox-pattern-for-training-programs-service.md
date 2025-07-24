@@ -12,6 +12,49 @@ Accepted
 
 Implement the Outbox Pattern to ensure reliable event publishing in the Training Programs service.
 
+```mermaid
+flowchart TB
+    subgraph "Outbox Pattern"
+        subgraph "Training Programs Service"
+            BL[Business Logic]
+            DB[(Database)]
+            OB[(Outbox Table)]
+            OP[Outbox Processor]
+            
+            BL -->|1. Update Data| DB
+            BL -->|2. Store Event| OB
+            OP -->|3. Read Unpublished Events| OB
+            OP -->|5. Mark as Published| OB
+        end
+        
+        MB[Message Broker / Kafka]
+        CS[Consuming Services]
+        
+        OP -->|4. Publish Events| MB
+        MB -->|6. Consume Events| CS
+    end
+    
+    subgraph "Direct Publishing (Alternative)"
+        BL2[Business Logic]
+        DB2[(Database)]
+        MB2[Message Broker / Kafka]
+        
+        BL2 -->|1. Update Data| DB2
+        BL2 -->|2. Publish Event| MB2
+        BL2 -. "Risk of inconsistency if step 2 fails" .-> MB2
+    end
+    
+    classDef service fill:#adf,stroke:#333,stroke-width:2px
+    classDef database fill:#f96,stroke:#333,stroke-width:2px
+    classDef broker fill:#ad9,stroke:#333,stroke-width:2px
+    classDef alternative fill:#ddd,stroke:#333,stroke-width:1px
+    
+    class BL,OP service
+    class DB,OB database
+    class MB,CS broker
+    class BL2,DB2,MB2 alternative
+```
+
 ## Context
 
 * The Training Programs service uses an event-driven architecture where it communicates with other services through events.
