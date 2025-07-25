@@ -3,6 +3,10 @@ package com.smalaca.trainingoffer.domain.trainingoffer;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.price.Price;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -59,6 +63,16 @@ public class TrainingOffer {
         this.price = builder.price;
         this.minimumParticipants = builder.minimumParticipants;
         this.maximumParticipants = builder.maximumParticipants;
+    }
+    
+    public TrainingOfferEvent confirmPrice(ConfirmTrainingPriceCommand command) {
+        Price toConfirm = Price.of(command.priceAmount(), command.priceCurrencyCode());
+
+        if (price.equals(toConfirm)) {
+            return TrainingPriceNotChangedEvent.nextAfter(command);
+        } else {
+            return TrainingPriceChangedEvent.nextAfter(command);
+        }
     }
 
     @Factory
