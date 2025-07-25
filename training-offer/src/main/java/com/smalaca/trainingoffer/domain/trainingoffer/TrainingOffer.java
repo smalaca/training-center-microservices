@@ -71,7 +71,7 @@ public class TrainingOffer {
         if (price.equals(toConfirm)) {
             return TrainingPriceNotChangedEvent.nextAfter(command);
         } else {
-            return TrainingPriceChangedEvent.nextAfter(command);
+            return TrainingPriceChangedEvent.nextAfter(command, price);
         }
     }
 

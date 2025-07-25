@@ -93,7 +93,7 @@ class TrainingOfferApplicationServiceTest {
                 .isNextAfter(command.commandId())
                 .hasOfferId(TRAINING_OFFER_ID)
                 .hasTrainingId(TRAINING_PROGRAM_ID)
-                .hasPriceAmount(NEW_PRICE_AMOUNT)
+                .hasPriceAmount(PRICE_AMOUNT)
                 .hasPriceCurrencyCode(CURRENCY);
     }
 
@@ -109,7 +109,7 @@ class TrainingOfferApplicationServiceTest {
                 .hasOfferId(TRAINING_OFFER_ID)
                 .hasTrainingId(TRAINING_PROGRAM_ID)
                 .hasPriceAmount(PRICE_AMOUNT)
-                .hasPriceCurrencyCode(NEW_CURRENCY);
+                .hasPriceCurrencyCode(CURRENCY);
     }
 
     private TrainingPriceChangedEventAssertion thenTrainingPriceChangedEventPublished() {
