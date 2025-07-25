@@ -6,6 +6,7 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -13,11 +14,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RepositoryTest
 @Import(JpaTrainingOfferRepository.class)
@@ -39,22 +40,28 @@ class JpaTrainingOfferRepositoryIntegrationTest {
     private TrainingOfferRepository repository;
 
     @Autowired
-    private SpringTrainingOfferCrudRepository crudRepository;
-
-    @Autowired
     private TransactionTemplate transactionTemplate;
 
     private final TrainingOfferFactory factory = new TrainingOfferFactory();
 
     @Test
-    void shouldSaveTrainingOffer() {
+    void shouldFindNoTrainingOfferWhenDoesNotExist() {
+        UUID trainingOfferId = UUID.randomUUID();
+        Executable executable = () -> repository.findById(trainingOfferId);
+
+        RuntimeException actual = assertThrows(TrainingOfferDoesNotExistException.class, executable);
+
+        assertThat(actual).hasMessage("Training Offer with id " + trainingOfferId + " does not exist.");
+    }
+
+    @Test
+    void shouldFindCreatedTrainingOfferById() {
         TrainingOffer trainingOffer = createTrainingOffer();
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
 
-        Optional<TrainingOffer> found = transactionTemplate.execute(transactionStatus -> crudRepository.findById(TRAINING_OFFER_ID));
-        assertThat(found).isPresent();
-        assertThatTrainingOffer(found.get())
+        TrainingOffer found = transactionTemplate.execute(transactionStatus -> repository.findById(TRAINING_OFFER_ID));
+        assertThatTrainingOffer(found)
                 .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)

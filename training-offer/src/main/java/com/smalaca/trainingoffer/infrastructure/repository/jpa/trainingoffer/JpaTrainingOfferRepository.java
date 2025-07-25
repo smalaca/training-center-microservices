@@ -5,6 +5,8 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.UUID;
+
 @Repository
 @DrivenAdapter
 public class JpaTrainingOfferRepository implements TrainingOfferRepository {
@@ -12,6 +14,12 @@ public class JpaTrainingOfferRepository implements TrainingOfferRepository {
 
     JpaTrainingOfferRepository(SpringTrainingOfferCrudRepository repository) {
         this.repository = repository;
+    }
+    
+    @Override
+    public TrainingOffer findById(UUID trainingOfferId) {
+        return repository.findById(trainingOfferId)
+                .orElseThrow(() -> new TrainingOfferDoesNotExistException(trainingOfferId));
     }
 
     @Override
