@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,9 +27,9 @@ import static org.awaitility.Awaitility.await;
 @SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
-        "kafka.topics.command.book-training-place=" + TrainingPlaceCommandProcessorIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,
-        "kafka.topics.event.training-place-booked=" + TrainingPlaceCommandProcessorIntegrationTest.TRAINING_PLACE_BOOKED_EVENT_TOPIC,
-        "kafka.topics.event.no-available-training-places-left=" + TrainingPlaceCommandProcessorIntegrationTest.NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC
+        "kafka.topics.trainingoffer.commands.book-training-place=" + TrainingPlaceCommandProcessorIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,
+        "kafka.topics.trainingoffer.events.training-place-booked=" + TrainingPlaceCommandProcessorIntegrationTest.TRAINING_PLACE_BOOKED_EVENT_TOPIC,
+        "kafka.topics.trainingoffer.events.no-available-training-places-left=" + TrainingPlaceCommandProcessorIntegrationTest.NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC
 })
 @Import(TrainingOfferPivotalEventTestConsumer.class)
 class TrainingPlaceCommandProcessorIntegrationTest {

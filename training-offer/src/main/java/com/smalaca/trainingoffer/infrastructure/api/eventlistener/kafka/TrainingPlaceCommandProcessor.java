@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.google.common.collect.ImmutableSet;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -24,15 +24,15 @@ public class TrainingPlaceCommandProcessor {
 
     TrainingPlaceCommandProcessor(
             KafkaTemplate<String, Object> kafkaTemplate,
-            @Value("${kafka.topics.event.training-place-booked}") String trainingPlaceBookedTopic,
-            @Value("${kafka.topics.event.no-available-training-places-left}") String noAvailableTrainingPlacesLeftTopic) {
+            @Value("${kafka.topics.trainingoffer.events.training-place-booked}") String trainingPlaceBookedTopic,
+            @Value("${kafka.topics.trainingoffer.events.no-available-training-places-left}") String noAvailableTrainingPlacesLeftTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.trainingPlaceBookedTopic = trainingPlaceBookedTopic;
         this.noAvailableTrainingPlacesLeftTopic = noAvailableTrainingPlacesLeftTopic;
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.command.book-training-place}",
+            topics = "${kafka.topics.trainingoffer.commands.book-training-place}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void process(BookTrainingPlaceCommand command) {

@@ -1,6 +1,6 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.trainingoffer.application.trainingoffer.TrainingOfferApplicationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ public class TrainingOfferKafkaEventListener {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.command.confirm-training-price}",
+            topics = "${kafka.topics.trainingoffer.commands.confirm-training-price}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void process(ConfirmTrainingPriceCommand command) {

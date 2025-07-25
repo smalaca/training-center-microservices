@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
@@ -34,9 +34,9 @@ import static org.awaitility.Awaitility.await;
 @SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
-        "kafka.topics.command.confirm-training-price=" + TrainingOfferKafkaEventListenerIntegrationTest.CONFIRM_TRAINING_PRICE_COMMAND_TOPIC,
-        "kafka.topics.event.training-price-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_CHANGED_EVENT_TOPIC,
-        "kafka.topics.event.training-price-not-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_NOT_CHANGED_EVENT_TOPIC
+        "kafka.topics.trainingoffer.commands.confirm-training-price=" + TrainingOfferKafkaEventListenerIntegrationTest.CONFIRM_TRAINING_PRICE_COMMAND_TOPIC,
+        "kafka.topics.trainingoffer.events.training-price-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_CHANGED_EVENT_TOPIC,
+        "kafka.topics.trainingoffer.events.training-price-not-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_NOT_CHANGED_EVENT_TOPIC
 })
 @Import(TrainingOfferPivotalEventTestConsumer.class)
 class TrainingOfferKafkaEventListenerIntegrationTest {

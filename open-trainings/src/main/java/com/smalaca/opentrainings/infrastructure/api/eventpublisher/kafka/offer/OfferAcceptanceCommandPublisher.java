@@ -63,8 +63,8 @@ public class OfferAcceptanceCommandPublisher {
                 command.discountCode());
     }
 
-    private com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand asExternalConfirmTrainingPriceCommand(ConfirmTrainingPriceCommand command) {
-        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand(
+    private com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand asExternalConfirmTrainingPriceCommand(ConfirmTrainingPriceCommand command) {
+        return new com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.trainingId(),
@@ -72,8 +72,8 @@ public class OfferAcceptanceCommandPublisher {
                 command.priceCurrencyCode());
     }
 
-    private com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand asExternalBookTrainingPlaceCommand(BookTrainingPlaceCommand command) {
-        return new com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand(
+    private com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand asExternalBookTrainingPlaceCommand(BookTrainingPlaceCommand command) {
+        return new com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.participantId(),

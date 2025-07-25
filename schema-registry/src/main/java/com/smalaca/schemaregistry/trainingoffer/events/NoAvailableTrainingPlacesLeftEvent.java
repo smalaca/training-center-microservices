@@ -1,4 +1,4 @@
-package com.smalaca.schemaregistry.offeracceptancesaga.events;
+package com.smalaca.schemaregistry.trainingoffer.events;
 
 import com.smalaca.schemaregistry.metadata.EventId;
 

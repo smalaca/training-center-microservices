@@ -92,11 +92,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.training-price-changed}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent event) {
+    public void listen(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent event) {
         engine.accept(asTrainingPriceChangedEvent(event));
     }
 
-    private TrainingPriceChangedEvent asTrainingPriceChangedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent event) {
+    private TrainingPriceChangedEvent asTrainingPriceChangedEvent(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent event) {
         return new TrainingPriceChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
@@ -110,11 +110,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.training-price-not-changed}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent event) {
+    public void listen(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent event) {
         engine.accept(asTrainingPriceNotChangedEvent(event));
     }
 
-    private TrainingPriceNotChangedEvent asTrainingPriceNotChangedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent event) {
+    private TrainingPriceNotChangedEvent asTrainingPriceNotChangedEvent(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent event) {
         return new TrainingPriceNotChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
@@ -165,11 +165,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.training-place-booked}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent event) {
+    public void listen(com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent event) {
         engine.accept(asTrainingPlaceBookedEvent(event));
     }
 
-    private TrainingPlaceBookedEvent asTrainingPlaceBookedEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent event) {
+    private TrainingPlaceBookedEvent asTrainingPlaceBookedEvent(com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent event) {
         return new TrainingPlaceBookedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
@@ -182,11 +182,11 @@ public class OfferAcceptanceEventListener {
             topics = "${kafka.topics.offer-acceptance.events.no-available-training-places-left}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
-    public void listen(com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent event) {
+    public void listen(com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent event) {
         engine.accept(asNoAvailableTrainingPlacesLeftEvent(event));
     }
 
-    private NoAvailableTrainingPlacesLeftEvent asNoAvailableTrainingPlacesLeftEvent(com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent event) {
+    private NoAvailableTrainingPlacesLeftEvent asNoAvailableTrainingPlacesLeftEvent(com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent event) {
         return new NoAvailableTrainingPlacesLeftEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
