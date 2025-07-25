@@ -18,21 +18,21 @@ class TrainingPriceNotChangedEventAssertion {
         return new TrainingPriceNotChangedEventAssertion(actual);
     }
 
-    TrainingPriceNotChangedEventAssertion isNextAfter(CommandId commandId) {
-        assertThat(actual.eventId().eventId()).isNotEqualTo(commandId.commandId());
-        assertThat(actual.eventId().traceId()).isEqualTo(commandId.traceId());
-        assertThat(actual.eventId().correlationId()).isEqualTo(commandId.correlationId());
-        assertThat(actual.eventId().creationDateTime()).isAfterOrEqualTo(commandId.creationDateTime());
+    TrainingPriceNotChangedEventAssertion isNextAfter(CommandId expected) {
+        assertThat(actual.eventId().eventId()).isNotEqualTo(expected.commandId());
+        assertThat(actual.eventId().traceId()).isEqualTo(expected.traceId());
+        assertThat(actual.eventId().correlationId()).isEqualTo(expected.correlationId());
+        assertThat(actual.eventId().creationDateTime()).isAfterOrEqualTo(expected.creationDateTime());
         return this;
     }
 
-    TrainingPriceNotChangedEventAssertion hasOfferId(UUID offerId) {
-        assertThat(actual.offerId()).isEqualTo(offerId);
+    TrainingPriceNotChangedEventAssertion hasOfferId(UUID expected) {
+        assertThat(actual.offerId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPriceNotChangedEventAssertion hasTrainingId(UUID trainingId) {
-        assertThat(actual.trainingId()).isEqualTo(trainingId);
+    TrainingPriceNotChangedEventAssertion hasTrainingId(UUID expected) {
+        assertThat(actual.trainingId()).isEqualTo(expected);
         return this;
     }
 }

@@ -19,31 +19,30 @@ class TrainingPriceChangedEventAssertion {
         return new TrainingPriceChangedEventAssertion(actual);
     }
 
-    TrainingPriceChangedEventAssertion isNextAfter(CommandId commandId) {
-        assertThat(actual.eventId().eventId()).isNotEqualTo(commandId.commandId());
-        assertThat(actual.eventId().traceId()).isEqualTo(commandId.traceId());
-        assertThat(actual.eventId().correlationId()).isEqualTo(commandId.correlationId());
-        assertThat(actual.eventId().creationDateTime()).isAfterOrEqualTo(commandId.creationDateTime());
+    TrainingPriceChangedEventAssertion isNextAfter(CommandId expected) {
+        assertThat(actual.eventId().eventId()).isNotEqualTo(expected.commandId());
+        assertThat(actual.eventId().traceId()).isEqualTo(expected.traceId());
+        assertThat(actual.eventId().correlationId()).isEqualTo(expected.correlationId());
+        assertThat(actual.eventId().creationDateTime()).isAfterOrEqualTo(expected.creationDateTime());
         return this;
     }
 
-    TrainingPriceChangedEventAssertion hasOfferId(UUID offerId) {
-        assertThat(actual.offerId()).isEqualTo(offerId);
+    TrainingPriceChangedEventAssertion hasOfferId(UUID expected) {
+        assertThat(actual.offerId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPriceChangedEventAssertion hasTrainingId(UUID trainingId) {
-        assertThat(actual.trainingId()).isEqualTo(trainingId);
+    TrainingPriceChangedEventAssertion hasTrainingId(UUID expected) {
+        assertThat(actual.trainingId()).isEqualTo(expected);
         return this;
     }
 
-    TrainingPriceChangedEventAssertion hasPriceAmountDifferentThan(BigDecimal priceAmount) {
-        assertThat(actual.priceAmount()).isNotNull().isNotEqualTo(priceAmount);
+    TrainingPriceChangedEventAssertion hasPriceAmount(BigDecimal expected) {
+        assertThat(actual.priceAmount()).isEqualByComparingTo(expected);
         return this;
     }
-
-    TrainingPriceChangedEventAssertion hasPriceCurrencyCode(String priceCurrencyCode) {
-        assertThat(actual.priceCurrencyCode()).isEqualTo(priceCurrencyCode);
+    TrainingPriceChangedEventAssertion hasPriceCurrency(String expected) {
+        assertThat(actual.priceCurrencyCode()).isEqualTo(expected);
         return this;
     }
 }
