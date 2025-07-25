@@ -1,4 +1,4 @@
-package com.smalaca.schemaregistry.offeracceptancesaga.commands;
+package com.smalaca.schemaregistry.trainingoffer.commands;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
 

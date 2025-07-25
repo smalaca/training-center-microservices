@@ -1,7 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 
 import java.util.UUID;
 

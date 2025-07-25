@@ -1,7 +1,7 @@
 package com.smalaca.opentrainings.infrastructure.api.eventpublisher.kafka.offer;
 
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
+import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.RegisterPersonCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand;
 import com.smalaca.schemaregistry.offeracceptancesaga.commands.UseDiscountCodeCommand;

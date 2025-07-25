@@ -33,8 +33,8 @@ public class TrainingOfferEventPublisher {
         kafkaTemplate.send(trainingPriceNotChangedTopic, asExternalTrainingPriceNotChangedEvent(event));
     }
 
-    private com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent asExternalTrainingPriceChangedEvent(TrainingPriceChangedEvent event) {
-        return new com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent(
+    private com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent asExternalTrainingPriceChangedEvent(TrainingPriceChangedEvent event) {
+        return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.trainingId(),
@@ -42,8 +42,8 @@ public class TrainingOfferEventPublisher {
                 event.priceCurrencyCode());
     }
 
-    private com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent asExternalTrainingPriceNotChangedEvent(TrainingPriceNotChangedEvent event) {
-        return new com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent(
+    private com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent asExternalTrainingPriceNotChangedEvent(TrainingPriceNotChangedEvent event) {
+        return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.trainingId());

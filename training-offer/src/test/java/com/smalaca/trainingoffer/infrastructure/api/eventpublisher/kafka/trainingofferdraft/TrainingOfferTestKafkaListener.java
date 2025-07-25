@@ -1,7 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft;
 
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;

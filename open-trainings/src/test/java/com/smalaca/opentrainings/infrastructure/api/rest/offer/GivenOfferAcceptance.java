@@ -6,11 +6,11 @@ import com.smalaca.opentrainings.domain.offer.OfferTestDto;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.AlreadyRegisteredPersonFoundEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeAlreadyUsedEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.DiscountCodeUsedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.schemaregistry.offeracceptancesaga.events.PersonRegisteredEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 
 import java.math.BigDecimal;
 import java.util.UUID;

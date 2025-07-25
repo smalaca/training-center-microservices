@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.google.common.collect.ImmutableSet;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;

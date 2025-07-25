@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 
 import java.util.HashMap;

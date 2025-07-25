@@ -46,7 +46,7 @@ class TrainingOfferEventPublisherIntegrationTest {
         publisher.consume(event);
 
         await().untilAsserted(() -> {
-            Optional<com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent> actual = consumer.trainingPriceChangedEventFor(event.offerId());
+            Optional<com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent> actual = consumer.trainingPriceChangedEventFor(event.offerId());
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), event);
         });
@@ -59,7 +59,7 @@ class TrainingOfferEventPublisherIntegrationTest {
         publisher.consume(event);
 
         await().untilAsserted(() -> {
-            Optional<com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent> actual = consumer.trainingPriceNotChangedEventFor(event.offerId());
+            Optional<com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent> actual = consumer.trainingPriceNotChangedEventFor(event.offerId());
             assertThat(actual).isPresent();
             assertThatContainsSameData(actual.get(), event);
         });
@@ -77,7 +77,7 @@ class TrainingOfferEventPublisherIntegrationTest {
         return new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
     }
 
-    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent actual, TrainingPriceChangedEvent expected) {
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent actual, TrainingPriceChangedEvent expected) {
         assertThatContainsSameData(actual.eventId(), expected.eventId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
@@ -85,7 +85,7 @@ class TrainingOfferEventPublisherIntegrationTest {
         assertThat(actual.priceCurrencyCode()).isEqualTo(expected.priceCurrencyCode());
     }
 
-    private void assertThatContainsSameData(com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent actual, TrainingPriceNotChangedEvent expected) {
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent actual, TrainingPriceNotChangedEvent expected) {
         assertThatContainsSameData(actual.eventId(), expected.eventId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.trainingId()).isEqualTo(expected.trainingId());

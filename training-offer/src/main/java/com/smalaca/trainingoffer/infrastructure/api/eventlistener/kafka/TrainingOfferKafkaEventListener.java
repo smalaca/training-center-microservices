@@ -1,6 +1,6 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.trainingoffer.application.trainingoffer.TrainingOfferApplicationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;

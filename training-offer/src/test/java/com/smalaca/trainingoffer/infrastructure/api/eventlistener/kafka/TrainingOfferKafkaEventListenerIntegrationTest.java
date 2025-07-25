@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.ConfirmTrainingPriceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceChangedEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;

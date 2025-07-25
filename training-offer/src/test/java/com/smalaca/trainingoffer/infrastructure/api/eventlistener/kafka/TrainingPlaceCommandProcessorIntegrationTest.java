@@ -1,9 +1,9 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
-import com.smalaca.schemaregistry.offeracceptancesaga.commands.BookTrainingPlaceCommand;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.NoAvailableTrainingPlacesLeftEvent;
-import com.smalaca.schemaregistry.offeracceptancesaga.events.TrainingPlaceBookedEvent;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
