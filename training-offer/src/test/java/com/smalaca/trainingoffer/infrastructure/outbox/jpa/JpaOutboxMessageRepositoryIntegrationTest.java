@@ -1,6 +1,10 @@
 package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
 import com.smalaca.test.type.SpringBootIntegrationTest;
+import com.smalaca.trainingoffer.domain.eventid.EventId;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -43,12 +47,24 @@ class JpaOutboxMessageRepositoryIntegrationTest {
     @Test
     void shouldFindAllOutboxMessages() {
         TrainingOfferPublishedEvent trainingOfferPublishedEvent = publish(randomTrainingOfferPublishedEvent());
+        TrainingPriceChangedEvent trainingPriceChangedEvent = publishTrainingOfferEvent(randomTrainingPriceChangedEvent());
+        TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = publishTrainingOfferEvent(randomTrainingPriceNotChangedEvent());
 
         assertThat(springRepository.findAll())
+                .anySatisfy(actual -> assertTrainingPriceNotChangedEventSaved(actual, trainingPriceNotChangedEvent))
+                .anySatisfy(actual -> assertTrainingPriceChangedEventSaved(actual, trainingPriceChangedEvent))
                 .anySatisfy(actual -> assertTrainingOfferPublishedEventSaved(actual, trainingOfferPublishedEvent));
     }
 
     private <T extends TrainingOfferPublishedEvent> T publish(T event) {
+        return transactionTemplate.execute(transactionStatus -> {
+            repository.publish(event);
+            messagesIds.add(event.eventId().eventId());
+            return event;
+        });
+    }
+    
+    private <T extends TrainingOfferEvent> T publishTrainingOfferEvent(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
             messagesIds.add(event.eventId().eventId());
@@ -63,12 +79,44 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 LocalDate.of(2023, 10, 15), LocalDate.of(2023, 10, 20),
                 LocalTime.of(9, 0), LocalTime.of(17, 0));
     }
+    
+    private TrainingPriceChangedEvent randomTrainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(
+                EventId.newEventId(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.valueOf(150.00),
+                "EUR");
+    }
+    
+    private TrainingPriceNotChangedEvent randomTrainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(
+                EventId.newEventId(),
+                UUID.randomUUID(),
+                UUID.randomUUID());
+    }
 
     private void assertTrainingOfferPublishedEventSaved(OutboxMessage actual, TrainingOfferPublishedEvent expected) {
         assertThatOutboxMessage(actual)
                 .hasMessageId(expected.eventId().eventId())
                 .hasOccurredOn(expected.eventId().creationDateTime())
                 .hasMessageType("com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+    
+    private void assertTrainingPriceChangedEventSaved(OutboxMessage actual, TrainingPriceChangedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+    
+    private void assertTrainingPriceNotChangedEventSaved(OutboxMessage actual, TrainingPriceNotChangedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }

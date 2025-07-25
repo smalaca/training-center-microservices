@@ -2,6 +2,7 @@ package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 
 @DrivenAdapter
@@ -16,6 +17,11 @@ class JpaOutboxMessageRepository implements EventRegistry {
 
     @Override
     public void publish(TrainingOfferPublishedEvent event) {
+        repository.save(outboxMessageMapper.outboxMessage(event.eventId(), event));
+    }
+    
+    @Override
+    public void publish(TrainingOfferEvent event) {
         repository.save(outboxMessageMapper.outboxMessage(event.eventId(), event));
     }
 }

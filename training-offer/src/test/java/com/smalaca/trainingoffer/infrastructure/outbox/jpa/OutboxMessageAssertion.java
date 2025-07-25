@@ -1,5 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 
 import java.time.LocalDateTime;
@@ -43,6 +45,22 @@ class OutboxMessageAssertion {
                 .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode())
                 .contains("\"minimumParticipants\" : " + expected.minimumParticipants())
                 .contains("\"maximumParticipants\" : " + expected.maximumParticipants());
+        return this;
+    }
+    
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPriceChangedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
+                .contains("\"priceAmount\" : " + expected.priceAmount())
+                .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode());
+        return this;
+    }
+    
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPriceNotChangedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
         return this;
     }
 }
