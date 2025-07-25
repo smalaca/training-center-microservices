@@ -14,7 +14,7 @@ public class TrainingOfferKafkaEventListener {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.command.confirm-training-price}",
+            topics = "${kafka.topics.trainingoffer.commands.confirm-training-price}",
             groupId = "${kafka.group-id}",
             containerFactory = "listenerContainerFactory")
     public void process(ConfirmTrainingPriceCommand command) {

@@ -16,8 +16,8 @@ public class TrainingOfferEventPublisher {
 
     TrainingOfferEventPublisher(
             KafkaTemplate<String, Object> kafkaTemplate,
-            @Value("${kafka.topics.event.training-price-changed}") String trainingPriceChangedTopic,
-            @Value("${kafka.topics.event.training-price-not-changed}") String trainingPriceNotChangedTopic) {
+            @Value("${kafka.topics.trainingoffer.events.training-price-changed}") String trainingPriceChangedTopic,
+            @Value("${kafka.topics.trainingoffer.events.training-price-not-changed}") String trainingPriceNotChangedTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.trainingPriceChangedTopic = trainingPriceChangedTopic;
         this.trainingPriceNotChangedTopic = trainingPriceNotChangedTopic;

@@ -27,9 +27,9 @@ import static org.awaitility.Awaitility.await;
 @SpringBootIntegrationTest
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
-        "kafka.topics.command.book-training-place=" + TrainingPlaceCommandProcessorIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,
-        "kafka.topics.event.training-place-booked=" + TrainingPlaceCommandProcessorIntegrationTest.TRAINING_PLACE_BOOKED_EVENT_TOPIC,
-        "kafka.topics.event.no-available-training-places-left=" + TrainingPlaceCommandProcessorIntegrationTest.NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC
+        "kafka.topics.trainingoffer.commands.book-training-place=" + TrainingPlaceCommandProcessorIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,
+        "kafka.topics.trainingoffer.events.training-place-booked=" + TrainingPlaceCommandProcessorIntegrationTest.TRAINING_PLACE_BOOKED_EVENT_TOPIC,
+        "kafka.topics.trainingoffer.events.no-available-training-places-left=" + TrainingPlaceCommandProcessorIntegrationTest.NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC
 })
 @Import(TrainingOfferPivotalEventTestConsumer.class)
 class TrainingPlaceCommandProcessorIntegrationTest {

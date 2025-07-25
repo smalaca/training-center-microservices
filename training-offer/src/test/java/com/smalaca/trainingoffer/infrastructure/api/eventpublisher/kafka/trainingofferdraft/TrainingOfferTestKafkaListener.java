@@ -14,7 +14,7 @@ class TrainingOfferTestKafkaListener {
     private final Map<UUID, TrainingPriceNotChangedEvent> trainingPriceNotChangedEvents = new HashMap<>();
 
     @KafkaListener(
-            topics = "${kafka.topics.event.training-price-changed}",
+            topics = "${kafka.topics.trainingoffer.events.training-price-changed}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(TrainingPriceChangedEvent event) {
@@ -22,7 +22,7 @@ class TrainingOfferTestKafkaListener {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.event.training-price-not-changed}",
+            topics = "${kafka.topics.trainingoffer.events.training-price-not-changed}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(TrainingPriceNotChangedEvent event) {

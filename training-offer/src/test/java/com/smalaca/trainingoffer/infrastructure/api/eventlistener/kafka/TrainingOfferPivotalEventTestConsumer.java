@@ -18,7 +18,7 @@ class TrainingOfferPivotalEventTestConsumer {
     private final Map<UUID, NoAvailableTrainingPlacesLeftEvent> noAvailableTrainingPlacesLeftEvents = new HashMap<>();
 
     @KafkaListener(
-            topics = "${kafka.topics.event.training-price-changed}",
+            topics = "${kafka.topics.trainingoffer.events.training-price-changed}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(TrainingPriceChangedEvent event) {
@@ -26,7 +26,7 @@ class TrainingOfferPivotalEventTestConsumer {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.event.training-price-not-changed}",
+            topics = "${kafka.topics.trainingoffer.events.training-price-not-changed}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(TrainingPriceNotChangedEvent event) {
@@ -34,7 +34,7 @@ class TrainingOfferPivotalEventTestConsumer {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.event.training-place-booked}",
+            topics = "${kafka.topics.trainingoffer.events.training-place-booked}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(TrainingPlaceBookedEvent event) {
@@ -42,7 +42,7 @@ class TrainingOfferPivotalEventTestConsumer {
     }
 
     @KafkaListener(
-            topics = "${kafka.topics.event.no-available-training-places-left}",
+            topics = "${kafka.topics.trainingoffer.events.no-available-training-places-left}",
             groupId = "test-training-offer-group",
             containerFactory = "listenerContainerFactory")
     public void consume(NoAvailableTrainingPlacesLeftEvent event) {
