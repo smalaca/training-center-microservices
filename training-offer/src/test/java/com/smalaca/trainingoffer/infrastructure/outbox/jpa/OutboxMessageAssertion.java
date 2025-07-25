@@ -1,5 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
@@ -60,6 +62,22 @@ class OutboxMessageAssertion {
     OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPriceNotChangedEvent expected) {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+    
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
+                .contains("\"trainingId\" : \"" + expected.trainingId());
+        return this;
+    }
+    
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPlaceBookedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"offerId\" : \"" + expected.offerId())
+                .contains("\"participantId\" : \"" + expected.participantId())
                 .contains("\"trainingId\" : \"" + expected.trainingId());
         return this;
     }
