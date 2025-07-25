@@ -7,7 +7,7 @@ import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPr
 import java.util.UUID;
 
 @DomainEvent
-public record TrainingPriceNotChangedEvent(EventId eventId, UUID offerId, UUID trainingId) {
+public record TrainingPriceNotChangedEvent(EventId eventId, UUID offerId, UUID trainingId) implements TrainingOfferEvent {
 
     public static TrainingPriceNotChangedEvent nextAfter(ConfirmTrainingPriceCommand command) {
         return new TrainingPriceNotChangedEvent(command.commandId().nextEventId(), command.offerId(), command.trainingId());

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @DomainEvent
-public record TrainingPriceChangedEvent(EventId eventId, UUID offerId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode) {
+public record TrainingPriceChangedEvent(EventId eventId, UUID offerId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode) implements TrainingOfferEvent {
 
     public static TrainingPriceChangedEvent nextAfter(ConfirmTrainingPriceCommand command) {
         return new TrainingPriceChangedEvent(command.commandId().nextEventId(), command.offerId(), command.trainingId(), command.priceAmount(), command.priceCurrencyCode());
