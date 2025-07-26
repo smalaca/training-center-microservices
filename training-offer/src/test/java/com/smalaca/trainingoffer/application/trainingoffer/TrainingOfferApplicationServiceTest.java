@@ -149,9 +149,7 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
-
-        return new ConfirmTrainingPriceCommand(commandId, TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+        return new ConfirmTrainingPriceCommand(commandId(), TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
     }
     
     @Test
@@ -220,10 +218,13 @@ class TrainingOfferApplicationServiceTest {
     }
     
     private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
-        return new BookTrainingPlaceCommand(commandId, TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+        return new BookTrainingPlaceCommand(commandId(), TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
     }
-    
+
+    private CommandId commandId() {
+        return new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+    }
+
     private TrainingPlaceBookedEvent thenTrainingPlaceBookedEventPublished() {
         return thenTrainingOfferEventPublished(TrainingPlaceBookedEvent.class);
     }
