@@ -67,7 +67,7 @@ public class OfferAcceptanceCommandPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
-                command.trainingId(),
+                command.trainingOfferId(),
                 command.priceAmount(),
                 command.priceCurrencyCode());
     }

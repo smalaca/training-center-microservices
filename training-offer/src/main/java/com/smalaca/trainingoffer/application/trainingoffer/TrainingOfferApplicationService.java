@@ -38,7 +38,7 @@ public class TrainingOfferApplicationService {
     @CommandOperation
     @DrivingPort
     public void confirmPrice(ConfirmTrainingPriceCommand command) {
-        TrainingOffer trainingOffer = repository.findById(command.trainingId());
+        TrainingOffer trainingOffer = repository.findById(command.trainingOfferId());
         
         TrainingOfferEvent event = trainingOffer.confirmPrice(command);
         

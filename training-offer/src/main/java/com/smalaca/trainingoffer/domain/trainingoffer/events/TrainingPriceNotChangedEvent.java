@@ -10,6 +10,6 @@ import java.util.UUID;
 public record TrainingPriceNotChangedEvent(EventId eventId, UUID offerId, UUID trainingId) implements TrainingOfferEvent {
 
     public static TrainingPriceNotChangedEvent nextAfter(ConfirmTrainingPriceCommand command) {
-        return new TrainingPriceNotChangedEvent(command.commandId().nextEventId(), command.offerId(), command.trainingId());
+        return new TrainingPriceNotChangedEvent(command.commandId().nextEventId(), command.offerId(), command.trainingOfferId());
     }
 }

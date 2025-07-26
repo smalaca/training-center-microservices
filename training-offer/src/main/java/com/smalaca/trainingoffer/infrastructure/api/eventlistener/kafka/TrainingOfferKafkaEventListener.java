@@ -34,7 +34,7 @@ public class TrainingOfferKafkaEventListener {
         return new com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand(
                 toDomainCommandId(command.commandId()),
                 command.offerId(),
-                command.trainingId(),
+                command.trainingOfferId(),
                 command.priceAmount(),
                 command.priceCurrencyCode());
     }

@@ -609,7 +609,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThat(actual).isInstanceOf(ConfirmTrainingPriceCommand.class);
                     assertThatConfirmTrainingPriceCommand((ConfirmTrainingPriceCommand) actual)
                             .hasOfferId(OFFER_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .hasPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .isNextAfter(event.eventId());
                 });

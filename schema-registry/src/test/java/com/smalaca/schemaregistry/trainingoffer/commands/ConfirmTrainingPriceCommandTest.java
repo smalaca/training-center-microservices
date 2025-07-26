@@ -21,7 +21,7 @@ class ConfirmTrainingPriceCommandTest {
 
         assertThat(command.commandId()).isEqualTo(commandId);
         assertThat(command.offerId()).isEqualTo(offerId);
-        assertThat(command.trainingId()).isEqualTo(trainingId);
+        assertThat(command.trainingOfferId()).isEqualTo(trainingId);
         assertThat(command.priceAmount()).isEqualTo(priceAmount);
         assertThat(command.priceCurrencyCode()).isEqualTo(priceCurrencyCode);
     }

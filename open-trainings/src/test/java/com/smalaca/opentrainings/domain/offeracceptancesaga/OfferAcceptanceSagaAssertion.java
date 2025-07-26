@@ -138,12 +138,12 @@ public class OfferAcceptanceSagaAssertion {
     }
 
     public OfferAcceptanceSagaAssertion hasTrainingId(UUID expected) {
-        assertThat(actual).extracting("trainingId").isEqualTo(expected);
+        assertThat(actual).extracting("trainingOfferId").isEqualTo(expected);
         return this;
     }
 
     public OfferAcceptanceSagaAssertion hasNoTrainingId() {
-        assertThat(actual).extracting("trainingId").isNull();
+        assertThat(actual).extracting("trainingOfferId").isNull();
         return this;
     }
 
