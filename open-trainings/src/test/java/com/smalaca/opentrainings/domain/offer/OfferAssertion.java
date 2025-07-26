@@ -31,7 +31,7 @@ public class OfferAssertion {
     }
 
     public OfferAssertion hasTrainingId(UUID expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferId", expected);
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingId", expected);
         return this;
     }
 

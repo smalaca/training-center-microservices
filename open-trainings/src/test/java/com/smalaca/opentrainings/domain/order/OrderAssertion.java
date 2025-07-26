@@ -60,7 +60,7 @@ public class OrderAssertion {
     }
 
     public OrderAssertion hasTrainingId(UUID expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("trainingOfferId", expected);
+        assertThat(actual).hasFieldOrPropertyWithValue("trainingId", expected);
         return this;
     }
 

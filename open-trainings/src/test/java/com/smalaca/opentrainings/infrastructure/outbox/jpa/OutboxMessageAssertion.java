@@ -63,7 +63,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"participantId\" : \"" + expected.participantId());
         return this;
     }
@@ -72,7 +72,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"participantId\" : \"" + expected.participantId());
         return this;
     }
@@ -81,7 +81,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"orderId\" : \"" + expected.orderId())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"participantId\" : \"" + expected.participantId());
         return this;
     }
@@ -125,7 +125,7 @@ class OutboxMessageAssertion {
     OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(OfferAcceptedEvent expected) {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"participantId\" : \"" + expected.participantId())
                 .contains("\"trainingPriceAmount\" : " + expected.trainingPriceAmount())
                 .contains("\"trainingPriceCurrencyCode\" : \"" + expected.trainingPriceCurrencyCode())
@@ -222,7 +222,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"participantId\" : \"" + expected.participantId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"priceAmount\" : " + expected.priceAmount())
                 .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode())
                 .contains("\"discountCode\" : \"" + expected.discountCode());
@@ -234,7 +234,7 @@ class OutboxMessageAssertion {
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"discountCode\" : \"" + expected.discountCode())
                 .contains("\"participantId\" : \"" + expected.participantId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingId\" : \"" + expected.trainingId())
                 .contains("\"originalPrice\" : " + expected.originalPrice())
                 .contains("\"newPrice\" : " + expected.newPrice())
                 .contains("\"priceCurrency\" : \"" + expected.priceCurrency());
@@ -245,7 +245,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
             .contains("\"offerId\" : \"" + expected.offerId())
             .contains("\"participantId\" : \"" + expected.participantId())
-            .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+            .contains("\"trainingId\" : \"" + expected.trainingId())
             .contains("\"discountCode\" : \"" + expected.discountCode());
         return this;
     }
