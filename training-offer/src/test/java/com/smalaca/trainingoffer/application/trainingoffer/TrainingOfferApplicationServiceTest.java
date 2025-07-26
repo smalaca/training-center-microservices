@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
@@ -137,8 +138,11 @@ class TrainingOfferApplicationServiceTest {
         return assertThatTrainingPriceNotChangedEvent(thenTrainingOfferEventPublished(TrainingPriceNotChangedEvent.class));
     }
 
-    private void existingTrainingOffer() {
-        given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer());
+    private TrainingOffer existingTrainingOffer() {
+        TrainingOffer trainingOffer = trainingOffer();
+        given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer);
+
+        return trainingOffer;
     }
 
     private TrainingOffer trainingOffer() {
@@ -169,7 +173,7 @@ class TrainingOfferApplicationServiceTest {
     
     @Test
     void shouldPublishTrainingPlaceBookedEventWhenSomePlacesAlreadyBooked() {
-        TrainingOffer trainingOffer = trainingOfferWithSomeBookedPlaces();
+        TrainingOffer trainingOffer = existingTrainingOfferWithSomeBookedPlaces();
         given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer);
         BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
 
@@ -185,7 +189,7 @@ class TrainingOfferApplicationServiceTest {
     
     @Test
     void shouldPublishNoAvailableTrainingPlacesLeftEventWhenMaxPlacesAlreadyBooked() {
-        TrainingOffer trainingOffer = trainingOfferWithMaxBookedPlaces();
+        TrainingOffer trainingOffer = trainingOfferWithAllBookedPlaces();
         given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer);
         BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
 
@@ -199,21 +203,19 @@ class TrainingOfferApplicationServiceTest {
         assertThat(event.participantId()).isEqualTo(command.participantId());
     }
     
-    private TrainingOffer trainingOfferWithSomeBookedPlaces() {
-        TrainingOffer trainingOffer = trainingOffer();
-        // Book half of the maximum places
-        for (int i = 0; i < MAXIMUM_PARTICIPANTS / 2; i++) {
-            trainingOffer.book(bookTrainingPlaceCommand());
-        }
+    private TrainingOffer existingTrainingOfferWithSomeBookedPlaces() {
+        TrainingOffer trainingOffer = existingTrainingOffer();
+        trainingOffer.book(bookTrainingPlaceCommand());
+        trainingOffer.book(bookTrainingPlaceCommand());
+        trainingOffer.book(bookTrainingPlaceCommand());
+
         return trainingOffer;
     }
     
-    private TrainingOffer trainingOfferWithMaxBookedPlaces() {
+    private TrainingOffer trainingOfferWithAllBookedPlaces() {
         TrainingOffer trainingOffer = trainingOffer();
-        // Book all available places
-        for (int i = 0; i < MAXIMUM_PARTICIPANTS; i++) {
-            trainingOffer.book(bookTrainingPlaceCommand());
-        }
+        IntStream.range(0, MAXIMUM_PARTICIPANTS).forEach(i -> trainingOffer.book(bookTrainingPlaceCommand()));
+
         return trainingOffer;
     }
     
