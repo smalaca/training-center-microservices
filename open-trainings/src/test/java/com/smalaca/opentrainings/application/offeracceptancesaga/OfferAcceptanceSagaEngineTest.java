@@ -251,7 +251,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -283,7 +283,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -357,7 +357,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -389,7 +389,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -463,7 +463,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -495,7 +495,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -516,7 +516,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -548,7 +548,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -609,7 +609,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThat(actual).isInstanceOf(ConfirmTrainingPriceCommand.class);
                     assertThatConfirmTrainingPriceCommand((ConfirmTrainingPriceCommand) actual)
                             .hasOfferId(OFFER_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .hasPrice(TRAINING_PRICE_AMOUNT, TRAINING_PRICE_CURRENCY_CODE)
                             .isNextAfter(event.eventId());
                 });
@@ -690,7 +690,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -723,7 +723,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }
@@ -745,7 +745,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 })
                 .anySatisfy(actual -> {
@@ -778,7 +778,7 @@ class OfferAcceptanceSagaEngineTest {
                     assertThatBookTrainingPlaceCommand((BookTrainingPlaceCommand) actual)
                             .hasOfferId(OFFER_ID)
                             .hasParticipantId(PARTICIPANT_ID)
-                            .hasTrainingId(TRAINING_ID)
+                            .hasTrainingOfferId(TRAINING_ID)
                             .isNextAfter(event.eventId());
                 });
     }

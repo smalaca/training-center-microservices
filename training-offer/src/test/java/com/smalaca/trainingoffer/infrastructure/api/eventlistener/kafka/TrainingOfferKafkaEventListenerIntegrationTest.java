@@ -105,7 +105,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasPriceAmount(PRICE_AMOUNT)
                     .hasPriceCurrency(CURRENCY);
         });
@@ -125,7 +125,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasPriceAmount(PRICE_AMOUNT)
                     .hasPriceCurrency(CURRENCY);
         });
@@ -145,12 +145,12 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceNotChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId());
+                    .hasTrainingOfferId(command.trainingOfferId());
         });
     }
 
     private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
-        return new ConfirmTrainingPriceCommand(commandId(), TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+        return new ConfirmTrainingPriceCommand(commandId(), UUID.randomUUID(), TRAINING_OFFER_ID, amount, currency);
     }
 
     @Test
@@ -167,7 +167,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPlaceBookedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasParticipantId(command.participantId());
         });
     }
@@ -186,13 +186,13 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatNoAvailableTrainingPlacesLeftEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasParticipantId(command.participantId());
         });
     }
 
     private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
-        return new BookTrainingPlaceCommand(commandId(), TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+        return new BookTrainingPlaceCommand(commandId(), UUID.randomUUID(), UUID.randomUUID(), TRAINING_OFFER_ID);
     }
 
     private CommandId commandId() {
@@ -208,7 +208,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
     private com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand internalBookTrainingPlaceCommand() {
         com.smalaca.trainingoffer.domain.commandid.CommandId commandId = new com.smalaca.trainingoffer.domain.commandid.CommandId(
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), now());
-        return new com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand(commandId, TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+        return new com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand(commandId, UUID.randomUUID(), UUID.randomUUID(), TRAINING_OFFER_ID);
     }
 
     private void existingTrainingOffer() {

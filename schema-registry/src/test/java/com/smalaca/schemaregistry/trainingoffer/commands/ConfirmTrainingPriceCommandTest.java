@@ -13,15 +13,15 @@ class ConfirmTrainingPriceCommandTest {
     void shouldCreateConfirmTrainingPriceCommand() {
         CommandId commandId = CommandId.newCommandId();
         UUID offerId = UUID.randomUUID();
-        UUID trainingId = UUID.randomUUID();
+        UUID trainingOfferId = UUID.randomUUID();
         BigDecimal priceAmount = BigDecimal.valueOf(123.45);
         String priceCurrencyCode = "USD";
 
-        ConfirmTrainingPriceCommand command = new ConfirmTrainingPriceCommand(commandId, offerId, trainingId, priceAmount, priceCurrencyCode);
+        ConfirmTrainingPriceCommand command = new ConfirmTrainingPriceCommand(commandId, offerId, trainingOfferId, priceAmount, priceCurrencyCode);
 
         assertThat(command.commandId()).isEqualTo(commandId);
         assertThat(command.offerId()).isEqualTo(offerId);
-        assertThat(command.trainingId()).isEqualTo(trainingId);
+        assertThat(command.trainingOfferId()).isEqualTo(trainingOfferId);
         assertThat(command.priceAmount()).isEqualTo(priceAmount);
         assertThat(command.priceCurrencyCode()).isEqualTo(priceCurrencyCode);
     }

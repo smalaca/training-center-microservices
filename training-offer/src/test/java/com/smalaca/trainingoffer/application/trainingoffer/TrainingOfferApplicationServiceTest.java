@@ -100,8 +100,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenTrainingPriceChangedEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasPriceAmount(PRICE_AMOUNT)
                 .hasPriceCurrencyCode(CURRENCY);
     }
@@ -115,8 +115,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenTrainingPriceChangedEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasPriceAmount(PRICE_AMOUNT)
                 .hasPriceCurrencyCode(CURRENCY);
     }
@@ -134,8 +134,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenTrainingPriceNotChangedEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID);
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID);
     }
 
     private TrainingPriceNotChangedEventAssertion thenTrainingPriceNotChangedEventPublished() {
@@ -157,7 +157,7 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
-        return new ConfirmTrainingPriceCommand(commandId(), TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+        return new ConfirmTrainingPriceCommand(commandId(), UUID.randomUUID(), TRAINING_OFFER_ID, amount, currency);
     }
     
     @Test
@@ -169,8 +169,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenTrainingPlaceBookedEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasParticipantId(command.participantId());
     }
     
@@ -184,8 +184,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenTrainingPlaceBookedEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasParticipantId(command.participantId());
     }
     
@@ -198,8 +198,8 @@ class TrainingOfferApplicationServiceTest {
 
         thenNoAvailableTrainingPlacesLeftEventPublished()
                 .isNextAfter(command.commandId())
-                .hasOfferId(TRAINING_OFFER_ID)
-                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasOfferId(command.offerId())
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasParticipantId(command.participantId());
     }
     
@@ -256,7 +256,7 @@ class TrainingOfferApplicationServiceTest {
     }
     
     private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
-        return new BookTrainingPlaceCommand(commandId(), TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+        return new BookTrainingPlaceCommand(commandId(), UUID.randomUUID(), UUID.randomUUID(), TRAINING_OFFER_ID);
     }
 
     private CommandId commandId() {

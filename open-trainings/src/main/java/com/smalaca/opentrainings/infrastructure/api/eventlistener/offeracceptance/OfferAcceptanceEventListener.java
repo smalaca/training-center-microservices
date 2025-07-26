@@ -100,7 +100,7 @@ public class OfferAcceptanceEventListener {
         return new TrainingPriceChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId(),
+                event.trainingOfferId(),
                 event.priceAmount(),
                 event.priceCurrencyCode());
     }
@@ -118,7 +118,7 @@ public class OfferAcceptanceEventListener {
         return new TrainingPriceNotChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     @DrivenAdapter
@@ -174,7 +174,7 @@ public class OfferAcceptanceEventListener {
                 asEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     @DrivenAdapter
@@ -191,7 +191,7 @@ public class OfferAcceptanceEventListener {
                 asEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     @EventListener

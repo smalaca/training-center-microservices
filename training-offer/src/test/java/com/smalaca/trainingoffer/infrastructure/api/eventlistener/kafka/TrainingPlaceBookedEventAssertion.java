@@ -28,8 +28,8 @@ class TrainingPlaceBookedEventAssertion {
         return this;
     }
 
-    TrainingPlaceBookedEventAssertion hasTrainingId(UUID expected) {
-        assertThat(actual.trainingId()).isEqualTo(expected);
+    TrainingPlaceBookedEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 

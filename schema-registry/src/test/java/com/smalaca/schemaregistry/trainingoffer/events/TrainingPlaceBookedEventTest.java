@@ -13,13 +13,13 @@ class TrainingPlaceBookedEventTest {
         EventId eventId = EventId.newEventId();
         UUID offerId = UUID.randomUUID();
         UUID participantId = UUID.randomUUID();
-        UUID trainingId = UUID.randomUUID();
+        UUID trainingOfferId = UUID.randomUUID();
 
-        TrainingPlaceBookedEvent event = new TrainingPlaceBookedEvent(eventId, offerId, participantId, trainingId);
+        TrainingPlaceBookedEvent event = new TrainingPlaceBookedEvent(eventId, offerId, participantId, trainingOfferId);
 
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
         assertThat(event.participantId()).isEqualTo(participantId);
-        assertThat(event.trainingId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingOfferId);
     }
 }

@@ -32,8 +32,8 @@ class TrainingPriceChangedEventAssertion {
         return this;
     }
 
-    TrainingPriceChangedEventAssertion hasTrainingId(UUID expected) {
-        assertThat(actual.trainingId()).isEqualTo(expected);
+    TrainingPriceChangedEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 

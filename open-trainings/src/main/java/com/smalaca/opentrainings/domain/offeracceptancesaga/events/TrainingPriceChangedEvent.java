@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record TrainingPriceChangedEvent(EventId eventId, UUID offerId, UUID trainingId, BigDecimal priceAmount, String priceCurrencyCode) implements OfferAcceptanceSagaEvent {
+public record TrainingPriceChangedEvent(EventId eventId, UUID offerId, UUID trainingOfferId, BigDecimal priceAmount, String priceCurrencyCode) implements OfferAcceptanceSagaEvent {
     @Override
     public void accept(OfferAcceptanceSaga offerAcceptanceSaga, LocalDateTime consumedAt) {
         offerAcceptanceSaga.accept(this, () -> consumedAt);

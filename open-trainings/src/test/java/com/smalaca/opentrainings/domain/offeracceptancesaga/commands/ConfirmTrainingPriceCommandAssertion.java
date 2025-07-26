@@ -24,8 +24,8 @@ public class ConfirmTrainingPriceCommandAssertion {
         return this;
     }
 
-    public ConfirmTrainingPriceCommandAssertion hasTrainingId(UUID expected) {
-        assertThat(actual).extracting("trainingId").isEqualTo(expected);
+    public ConfirmTrainingPriceCommandAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual).extracting("trainingOfferId").isEqualTo(expected);
         return this;
     }
 

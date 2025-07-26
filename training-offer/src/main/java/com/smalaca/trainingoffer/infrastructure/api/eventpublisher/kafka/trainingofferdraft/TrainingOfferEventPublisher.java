@@ -55,7 +55,7 @@ public class TrainingOfferEventPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId(),
+                event.trainingOfferId(),
                 event.priceAmount(),
                 event.priceCurrencyCode());
     }
@@ -64,7 +64,7 @@ public class TrainingOfferEventPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
     
     private com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent asExternalTrainingPlaceBookedEvent(TrainingPlaceBookedEvent event) {
@@ -72,7 +72,7 @@ public class TrainingOfferEventPublisher {
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
     
     private com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent asExternalNoAvailableTrainingPlacesLeftEvent(NoAvailableTrainingPlacesLeftEvent event) {
@@ -80,7 +80,7 @@ public class TrainingOfferEventPublisher {
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     private com.smalaca.schemaregistry.metadata.EventId asExternalEventId(EventId eventId) {

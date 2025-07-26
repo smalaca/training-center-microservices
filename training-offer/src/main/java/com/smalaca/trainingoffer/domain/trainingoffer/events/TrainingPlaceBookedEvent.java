@@ -7,9 +7,9 @@ import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlace
 import java.util.UUID;
 
 @DomainEvent
-public record TrainingPlaceBookedEvent(EventId eventId, UUID offerId, UUID participantId, UUID trainingId) implements TrainingOfferEvent {
+public record TrainingPlaceBookedEvent(EventId eventId, UUID offerId, UUID participantId, UUID trainingOfferId) implements TrainingOfferEvent {
 
     public static TrainingPlaceBookedEvent nextAfter(BookTrainingPlaceCommand command) {
-        return new TrainingPlaceBookedEvent(command.commandId().nextEventId(), command.offerId(), command.participantId(), command.trainingId());
+        return new TrainingPlaceBookedEvent(command.commandId().nextEventId(), command.offerId(), command.participantId(), command.trainingOfferId());
     }
 }

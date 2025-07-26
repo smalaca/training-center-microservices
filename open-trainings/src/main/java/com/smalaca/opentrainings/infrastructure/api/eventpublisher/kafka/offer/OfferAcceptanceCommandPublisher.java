@@ -67,7 +67,7 @@ public class OfferAcceptanceCommandPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand(
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
-                command.trainingId(),
+                command.trainingOfferId(),
                 command.priceAmount(),
                 command.priceCurrencyCode());
     }
@@ -77,7 +77,7 @@ public class OfferAcceptanceCommandPublisher {
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.participantId(),
-                command.trainingId());
+                command.trainingOfferId());
     }
 
     private com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand asExternalReturnDiscountCodeCommand(ReturnDiscountCodeCommand command) {
