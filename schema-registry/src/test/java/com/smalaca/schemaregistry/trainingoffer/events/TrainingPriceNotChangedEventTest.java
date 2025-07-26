@@ -12,12 +12,12 @@ class TrainingPriceNotChangedEventTest {
     void shouldCreateTrainingPriceNotChangedEvent() {
         EventId eventId = EventId.newEventId();
         UUID offerId = UUID.randomUUID();
-        UUID trainingId = UUID.randomUUID();
+        UUID trainingOfferId = UUID.randomUUID();
 
-        TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(eventId, offerId, trainingId);
+        TrainingPriceNotChangedEvent event = new TrainingPriceNotChangedEvent(eventId, offerId, trainingOfferId);
 
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
-        assertThat(event.trainingOfferId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingOfferId);
     }
 }

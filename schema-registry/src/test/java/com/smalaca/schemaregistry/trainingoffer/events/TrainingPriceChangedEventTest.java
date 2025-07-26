@@ -13,15 +13,15 @@ class TrainingPriceChangedEventTest {
     void shouldCreateTrainingPriceChangedEvent() {
         EventId eventId = EventId.newEventId();
         UUID offerId = UUID.randomUUID();
-        UUID trainingId = UUID.randomUUID();
+        UUID trainingOfferId = UUID.randomUUID();
         BigDecimal priceAmount = BigDecimal.valueOf(123.45);
         String priceCurrencyCode = "USD";
 
-        TrainingPriceChangedEvent event = new TrainingPriceChangedEvent(eventId, offerId, trainingId, priceAmount, priceCurrencyCode);
+        TrainingPriceChangedEvent event = new TrainingPriceChangedEvent(eventId, offerId, trainingOfferId, priceAmount, priceCurrencyCode);
 
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
-        assertThat(event.trainingOfferId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingOfferId);
         assertThat(event.priceAmount()).isEqualTo(priceAmount);
         assertThat(event.priceCurrencyCode()).isEqualTo(priceCurrencyCode);
     }

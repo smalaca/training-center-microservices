@@ -13,13 +13,13 @@ class BookTrainingPlaceCommandTest {
         CommandId commandId = CommandId.newCommandId();
         UUID offerId = UUID.randomUUID();
         UUID participantId = UUID.randomUUID();
-        UUID trainingId = UUID.randomUUID();
+        UUID trainingOfferId = UUID.randomUUID();
 
-        BookTrainingPlaceCommand command = new BookTrainingPlaceCommand(commandId, offerId, participantId, trainingId);
+        BookTrainingPlaceCommand command = new BookTrainingPlaceCommand(commandId, offerId, participantId, trainingOfferId);
 
         assertThat(command.commandId()).isEqualTo(commandId);
         assertThat(command.offerId()).isEqualTo(offerId);
         assertThat(command.participantId()).isEqualTo(participantId);
-        assertThat(command.trainingOfferId()).isEqualTo(trainingId);
+        assertThat(command.trainingOfferId()).isEqualTo(trainingOfferId);
     }
 }
