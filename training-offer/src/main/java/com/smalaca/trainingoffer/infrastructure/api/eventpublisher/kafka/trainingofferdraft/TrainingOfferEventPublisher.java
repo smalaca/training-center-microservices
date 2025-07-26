@@ -55,7 +55,7 @@ public class TrainingOfferEventPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId(),
+                event.trainingOfferId(),
                 event.priceAmount(),
                 event.priceCurrencyCode());
     }

@@ -53,7 +53,7 @@ class OutboxMessageAssertion {
     OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingPriceChangedEvent expected) {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId())
+                .contains("\"trainingOfferId\" : \"" + expected.trainingOfferId())
                 .contains("\"priceAmount\" : " + expected.priceAmount())
                 .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode());
         return this;

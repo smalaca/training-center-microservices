@@ -100,7 +100,7 @@ public class OfferAcceptanceEventListener {
         return new TrainingPriceChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId(),
+                event.trainingOfferId(),
                 event.priceAmount(),
                 event.priceCurrencyCode());
     }

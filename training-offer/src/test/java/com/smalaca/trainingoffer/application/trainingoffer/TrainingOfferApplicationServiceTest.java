@@ -101,7 +101,7 @@ class TrainingOfferApplicationServiceTest {
         thenTrainingPriceChangedEventPublished()
                 .isNextAfter(command.commandId())
                 .hasOfferId(command.offerId())
-                .hasTrainingId(TRAINING_OFFER_ID)
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasPriceAmount(PRICE_AMOUNT)
                 .hasPriceCurrencyCode(CURRENCY);
     }
@@ -116,7 +116,7 @@ class TrainingOfferApplicationServiceTest {
         thenTrainingPriceChangedEventPublished()
                 .isNextAfter(command.commandId())
                 .hasOfferId(command.offerId())
-                .hasTrainingId(TRAINING_OFFER_ID)
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasPriceAmount(PRICE_AMOUNT)
                 .hasPriceCurrencyCode(CURRENCY);
     }

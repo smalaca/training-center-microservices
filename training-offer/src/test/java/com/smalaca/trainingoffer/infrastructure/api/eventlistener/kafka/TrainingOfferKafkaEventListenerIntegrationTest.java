@@ -105,7 +105,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingOfferId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasPriceAmount(PRICE_AMOUNT)
                     .hasPriceCurrency(CURRENCY);
         });
@@ -125,7 +125,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingOfferId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasPriceAmount(PRICE_AMOUNT)
                     .hasPriceCurrency(CURRENCY);
         });

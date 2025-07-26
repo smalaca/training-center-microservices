@@ -21,7 +21,7 @@ class TrainingPriceChangedEventTest {
 
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
-        assertThat(event.trainingId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingId);
         assertThat(event.priceAmount()).isEqualTo(priceAmount);
         assertThat(event.priceCurrencyCode()).isEqualTo(priceCurrencyCode);
     }
