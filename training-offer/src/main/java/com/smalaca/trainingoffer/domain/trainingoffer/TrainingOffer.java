@@ -46,23 +46,19 @@ public class TrainingOffer {
     @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
     private Price price;
 
-    @Column(name = "MINIMUM_PARTICIPANTS")
-    private int minimumParticipants;
+    @Embedded
+    private Participants participants;
 
-    @Column(name = "MAXIMUM_PARTICIPANTS")
-    private int maximumParticipants;
+    protected TrainingOffer() {}
 
-    private TrainingOffer() {}
-
-    private TrainingOffer(Builder builder) {
+    private TrainingOffer(Builder builder, Participants participants) {
         this.trainingOfferId = builder.trainingOfferId;
         this.trainingOfferDraftId = builder.trainingOfferDraftId;
         this.trainerId = builder.trainerId;
         this.trainingProgramId = builder.trainingProgramId;
         this.trainingSessionPeriod = builder.trainingSessionPeriod;
         this.price = builder.price;
-        this.minimumParticipants = builder.minimumParticipants;
-        this.maximumParticipants = builder.maximumParticipants;
+        this.participants = participants;
     }
     
     public TrainingOfferEvent confirmPrice(ConfirmTrainingPriceCommand command) {
@@ -127,7 +123,7 @@ public class TrainingOffer {
         }
 
         TrainingOffer build() {
-            return new TrainingOffer(this);
+            return new TrainingOffer(this, Participants.from(minimumParticipants, maximumParticipants));
         }
     }
 }

@@ -66,6 +66,7 @@ class TrainingOfferApplicationServiceTest {
                 .hasPrice(PRICE_AMOUNT, CURRENCY)
                 .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasNoParticipantsRegistered()
                 .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
     }
 

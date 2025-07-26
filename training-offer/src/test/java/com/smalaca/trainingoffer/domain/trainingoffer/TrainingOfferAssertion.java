@@ -6,6 +6,7 @@ import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPer
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,12 +50,17 @@ public class TrainingOfferAssertion {
     }
 
     public TrainingOfferAssertion hasMinimumParticipants(int expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("minimumParticipants", expected);
+        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("minimumParticipants", expected);
         return this;
     }
 
     public TrainingOfferAssertion hasMaximumParticipants(int expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("maximumParticipants", expected);
+        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("maximumParticipants", expected);
+        return this;
+    }
+
+    public TrainingOfferAssertion hasNoParticipantsRegistered() {
+        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("participantIds", new HashSet<>());
         return this;
     }
 

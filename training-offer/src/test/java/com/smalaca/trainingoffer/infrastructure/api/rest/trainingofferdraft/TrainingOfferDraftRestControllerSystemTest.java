@@ -143,6 +143,7 @@ class TrainingOfferDraftRestControllerSystemTest {
                     .hasPrice(dto.getPriceAmount(), dto.getPriceCurrency())
                     .hasMinimumParticipants(dto.getMinimumParticipants())
                     .hasMaximumParticipants(dto.getMaximumParticipants())
+                    .hasNoParticipantsRegistered()
                     .hasTrainingSessionPeriod(dto.getStartDate(), dto.getEndDate(), dto.getStartTime(), dto.getEndTime());
         });
     }
