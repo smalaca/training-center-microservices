@@ -61,19 +61,19 @@ public class TrainingOfferAssertion {
     }
 
     public TrainingOfferAssertion hasNoParticipantsRegistered() {
-        return hasParticipants(actual -> assertThat(actual).isEmpty());
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).isEmpty());
     }
 
     public TrainingOfferAssertion hasParticipantsRegistered(int expected) {
-        return hasParticipants(actual -> assertThat(actual).hasSize(expected));
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).hasSize(expected));
     }
 
     public TrainingOfferAssertion hasRegisteredParticipant(UUID expected) {
-        return hasParticipants(actual -> assertThat(actual).contains(expected));
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).contains(expected));
     }
 
     public TrainingOfferAssertion hasNoRegisteredParticipant(UUID expected) {
-        return hasParticipants(actual -> assertThat(actual).doesNotContain(expected));
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).doesNotContain(expected));
     }
 
     private TrainingOfferAssertion hasParticipants(Consumer<Set<UUID>> assertion) {
