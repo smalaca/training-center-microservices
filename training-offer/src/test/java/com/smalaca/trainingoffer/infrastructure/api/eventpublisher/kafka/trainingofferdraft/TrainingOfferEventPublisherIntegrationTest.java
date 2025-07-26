@@ -97,4 +97,52 @@ class TrainingOfferEventPublisherIntegrationTest {
         assertThat(actual.correlationId()).isEqualTo(expected.correlationId());
         assertThat(actual.creationDateTime()).isEqualTo(expected.creationDateTime());
     }
+    
+    @Test
+    void shouldPublishTrainingPlaceBookedEvent() {
+        com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent event = randomTrainingPlaceBookedEvent();
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent> actual = consumer.trainingPlaceBookedEventFor(event.offerId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), event);
+        });
+    }
+    
+    @Test
+    void shouldPublishNoAvailableTrainingPlacesLeftEvent() {
+        com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent event = randomNoAvailableTrainingPlacesLeftEvent();
+
+        publisher.consume(event);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent> actual = consumer.noAvailableTrainingPlacesLeftEventFor(event.offerId());
+            assertThat(actual).isPresent();
+            assertThatContainsSameData(actual.get(), event);
+        });
+    }
+    
+    private com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
+        return new com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent(randomEventId(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
+    
+    private com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {
+        return new com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent(randomEventId(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
+    
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent actual, com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent expected) {
+        assertThatContainsSameData(actual.eventId(), expected.eventId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.participantId()).isEqualTo(expected.participantId());
+        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
+    }
+    
+    private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent actual, com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThatContainsSameData(actual.eventId(), expected.eventId());
+        assertThat(actual.offerId()).isEqualTo(expected.offerId());
+        assertThat(actual.participantId()).isEqualTo(expected.participantId());
+        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
+    }
 }
