@@ -254,7 +254,7 @@ class OutboxMessageAssertion {
         assertThat(actual.getPayload())
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"participantId\" : \"" + expected.participantId())
-                .contains("\"trainingOfferId\" : \"" + expected.trainingId());
+                .contains("\"trainingOfferId\" : \"" + expected.trainingOfferId());
         return this;
     }
 

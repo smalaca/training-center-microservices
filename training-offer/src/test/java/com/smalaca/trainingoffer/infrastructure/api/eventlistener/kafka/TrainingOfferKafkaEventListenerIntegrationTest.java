@@ -167,7 +167,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPlaceBookedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingOfferId())
+                    .hasTrainingOfferId(command.trainingOfferId())
                     .hasParticipantId(command.participantId());
         });
     }

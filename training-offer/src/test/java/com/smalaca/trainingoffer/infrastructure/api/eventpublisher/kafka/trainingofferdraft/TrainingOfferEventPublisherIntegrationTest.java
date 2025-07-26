@@ -136,7 +136,7 @@ class TrainingOfferEventPublisherIntegrationTest {
         assertThatContainsSameData(actual.eventId(), expected.eventId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.participantId()).isEqualTo(expected.participantId());
-        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
+        assertThat(actual.trainingOfferId()).isEqualTo(expected.trainingOfferId());
     }
     
     private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent actual, com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent expected) {

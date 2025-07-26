@@ -72,7 +72,7 @@ public class TrainingOfferEventPublisher {
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
     
     private com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent asExternalNoAvailableTrainingPlacesLeftEvent(NoAvailableTrainingPlacesLeftEvent event) {
