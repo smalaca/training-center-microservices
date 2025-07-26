@@ -64,7 +64,7 @@ public class TrainingOfferEventPublisher {
         return new com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent(
                 asExternalEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
     
     private com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent asExternalTrainingPlaceBookedEvent(TrainingPlaceBookedEvent event) {

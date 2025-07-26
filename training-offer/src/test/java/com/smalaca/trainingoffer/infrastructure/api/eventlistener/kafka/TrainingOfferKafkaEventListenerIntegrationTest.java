@@ -145,7 +145,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPriceNotChangedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingOfferId());
+                    .hasTrainingOfferId(command.trainingOfferId());
         });
     }
 

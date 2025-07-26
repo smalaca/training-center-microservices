@@ -135,7 +135,7 @@ class TrainingOfferApplicationServiceTest {
         thenTrainingPriceNotChangedEventPublished()
                 .isNextAfter(command.commandId())
                 .hasOfferId(command.offerId())
-                .hasTrainingId(TRAINING_OFFER_ID);
+                .hasTrainingOfferId(TRAINING_OFFER_ID);
     }
 
     private TrainingPriceNotChangedEventAssertion thenTrainingPriceNotChangedEventPublished() {

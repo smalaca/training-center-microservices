@@ -118,7 +118,7 @@ public class OfferAcceptanceEventListener {
         return new TrainingPriceNotChangedEvent(
                 asEventId(event.eventId()),
                 event.offerId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     @DrivenAdapter

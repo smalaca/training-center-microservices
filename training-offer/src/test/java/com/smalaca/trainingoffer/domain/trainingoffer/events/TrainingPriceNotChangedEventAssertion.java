@@ -28,8 +28,8 @@ public class TrainingPriceNotChangedEventAssertion {
         return this;
     }
 
-    public TrainingPriceNotChangedEventAssertion hasTrainingId(UUID expected) {
-        assertThat(actual.trainingId()).isEqualTo(expected);
+    public TrainingPriceNotChangedEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 }

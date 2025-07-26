@@ -18,6 +18,6 @@ class TrainingPriceNotChangedEventTest {
 
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
-        assertThat(event.trainingId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingId);
     }
 }
