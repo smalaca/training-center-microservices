@@ -6,8 +6,9 @@ import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPer
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,7 +61,25 @@ public class TrainingOfferAssertion {
     }
 
     public TrainingOfferAssertion hasNoParticipantsRegistered() {
-        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("participantIds", new HashSet<>());
+        return hasParticipants(actual -> assertThat(actual).isEmpty());
+    }
+
+    public TrainingOfferAssertion hasParticipantsRegistered(int expected) {
+        return hasParticipants(actual -> assertThat(actual).hasSize(expected));
+    }
+
+    public TrainingOfferAssertion hasRegisteredParticipant(UUID expected) {
+        return hasParticipants(actual -> assertThat(actual).contains(expected));
+    }
+
+    public TrainingOfferAssertion hasNoRegisteredParticipant(UUID expected) {
+        return hasParticipants(actual -> assertThat(actual).doesNotContain(expected));
+    }
+
+    private TrainingOfferAssertion hasParticipants(Consumer<Set<UUID>> assertion) {
+        assertThat(actual).extracting("participants").extracting("participantIds").satisfies(participantIds -> {
+            assertion.accept((Set<UUID>) participantIds);
+        });
         return this;
     }
 

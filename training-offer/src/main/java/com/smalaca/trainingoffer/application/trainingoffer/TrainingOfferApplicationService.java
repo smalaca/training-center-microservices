@@ -53,6 +53,7 @@ public class TrainingOfferApplicationService {
         
         TrainingOfferEvent event = trainingOffer.book(command);
         
+        repository.save(trainingOffer);
         eventRegistry.publish(event);
     }
 }
