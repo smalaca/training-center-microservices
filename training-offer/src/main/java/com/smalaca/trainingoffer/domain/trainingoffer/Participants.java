@@ -38,4 +38,12 @@ class Participants {
     static Participants from(int minimumParticipants, int maximumParticipants) {
         return new Participants(minimumParticipants, maximumParticipants, new HashSet<>());
     }
+    
+    boolean hasAvailablePlaces() {
+        return participantIds.size() < maximumParticipants;
+    }
+    
+    void addParticipant(UUID participantId) {
+        participantIds.add(participantId);
+    }
 }

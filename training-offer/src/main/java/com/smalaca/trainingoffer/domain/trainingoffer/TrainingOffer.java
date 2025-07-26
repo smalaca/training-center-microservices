@@ -3,8 +3,11 @@ package com.smalaca.trainingoffer.domain.trainingoffer;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.price.Price;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPeriod;
@@ -68,6 +71,15 @@ public class TrainingOffer {
             return TrainingPriceNotChangedEvent.nextAfter(command);
         } else {
             return TrainingPriceChangedEvent.nextAfter(command, price);
+        }
+    }
+    
+    public TrainingOfferEvent book(BookTrainingPlaceCommand command) {
+        if (participants.hasAvailablePlaces()) {
+            participants.addParticipant(command.participantId());
+            return TrainingPlaceBookedEvent.nextAfter(command);
+        } else {
+            return NoAvailableTrainingPlacesLeftEvent.nextAfter(command);
         }
     }
 

@@ -7,6 +7,7 @@ import com.smalaca.trainingoffer.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
@@ -40,6 +41,17 @@ public class TrainingOfferApplicationService {
         TrainingOffer trainingOffer = repository.findById(command.offerId());
         
         TrainingOfferEvent event = trainingOffer.confirmPrice(command);
+        
+        eventRegistry.publish(event);
+    }
+    
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void book(BookTrainingPlaceCommand command) {
+        TrainingOffer trainingOffer = repository.findById(command.offerId());
+        
+        TrainingOfferEvent event = trainingOffer.book(command);
         
         eventRegistry.publish(event);
     }
