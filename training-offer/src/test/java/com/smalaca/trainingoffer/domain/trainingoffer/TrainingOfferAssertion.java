@@ -73,7 +73,9 @@ public class TrainingOfferAssertion {
     }
 
     public TrainingOfferAssertion hasNoRegisteredParticipant(UUID expected) {
-        return hasParticipants(actualParticipants -> assertThat(actualParticipants).doesNotContain(expected));
+        return hasParticipants(actualParticipants -> {
+            assertThat(actualParticipants).isNotEmpty().doesNotContain(expected);
+        });
     }
 
     private TrainingOfferAssertion hasParticipants(Consumer<Set<UUID>> assertion) {
