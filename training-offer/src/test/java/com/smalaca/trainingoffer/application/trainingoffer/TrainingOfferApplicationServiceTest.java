@@ -117,13 +117,7 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private TrainingPriceChangedEventAssertion thenTrainingPriceChangedEventPublished() {
-        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
-        then(eventRegistry).should().publish(eventCaptor.capture());
-        TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(TrainingPriceChangedEvent.class);
-
-        TrainingPriceChangedEvent event = (TrainingPriceChangedEvent) actual;
-        return assertThatTrainingPriceChangedEvent(event);
+        return assertThatTrainingPriceChangedEvent(thenTrainingOfferEventPublished(TrainingPriceChangedEvent.class));
     }
 
     @Test
@@ -140,12 +134,7 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private TrainingPriceNotChangedEventAssertion thenTrainingPriceNotChangedEventPublished() {
-        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
-        then(eventRegistry).should().publish(eventCaptor.capture());
-        TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(TrainingPriceNotChangedEvent.class);
-
-        return assertThatTrainingPriceNotChangedEvent((TrainingPriceNotChangedEvent) actual);
+        return assertThatTrainingPriceNotChangedEvent(thenTrainingOfferEventPublished(TrainingPriceNotChangedEvent.class));
     }
 
     private void existingTrainingOffer() {
@@ -236,20 +225,19 @@ class TrainingOfferApplicationServiceTest {
     }
     
     private TrainingPlaceBookedEvent thenTrainingPlaceBookedEventPublished() {
-        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
-        then(eventRegistry).should().publish(eventCaptor.capture());
-        TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(TrainingPlaceBookedEvent.class);
-
-        return (TrainingPlaceBookedEvent) actual;
+        return thenTrainingOfferEventPublished(TrainingPlaceBookedEvent.class);
     }
     
     private NoAvailableTrainingPlacesLeftEvent thenNoAvailableTrainingPlacesLeftEventPublished() {
+        return thenTrainingOfferEventPublished(NoAvailableTrainingPlacesLeftEvent.class);
+    }
+
+    private <T extends TrainingOfferEvent> T thenTrainingOfferEventPublished(Class<T> expectedEventType) {
         ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
         then(eventRegistry).should().publish(eventCaptor.capture());
         TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(NoAvailableTrainingPlacesLeftEvent.class);
+        assertThat(actual).isInstanceOf(expectedEventType);
 
-        return (NoAvailableTrainingPlacesLeftEvent) actual;
+        return expectedEventType.cast(actual);
     }
 }
