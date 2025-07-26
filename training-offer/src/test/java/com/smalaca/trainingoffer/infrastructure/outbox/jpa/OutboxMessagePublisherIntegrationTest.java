@@ -3,9 +3,15 @@ package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.eventid.EventId;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.infrastructure.api.eventlistener.spring.TrainingOfferDraftListener;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
+import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,6 +51,9 @@ class OutboxMessagePublisherIntegrationTest {
     @MockBean
     private TrainingOfferDraftListener trainingOfferDraftListener;
 
+    @MockBean
+    private TrainingOfferEventPublisher trainingOfferEventPublisher;
+
     private OutboxMessageMapper factory;
 
     private final List<UUID> messageIds = new ArrayList<>();
@@ -63,18 +72,31 @@ class OutboxMessagePublisherIntegrationTest {
 
     @Test
     void shouldPublishOnlyNotPublishedOutboxEvents() {
-        TrainingOfferPublishedEvent eventOne = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent eventTwo = randomTrainingOfferPublishedEvent();
-        TrainingOfferPublishedEvent eventThree = randomTrainingOfferPublishedEvent();
-        notPublished(eventOne);
+        TrainingOfferPublishedEvent trainingOfferPublishedEventOne = randomTrainingOfferPublishedEvent();
+        TrainingOfferPublishedEvent trainingOfferPublishedEventTwo = randomTrainingOfferPublishedEvent();
+        TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = randomTrainingPriceNotChangedEvent();
+        TrainingPriceChangedEvent trainingPriceChangedEvent = randomTrainingPriceChangedEvent();
+        NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = randomNoAvailableTrainingPlacesLeftEvent();
+        TrainingPlaceBookedEvent trainingPlaceBookedEvent = randomTrainingPlaceBookedEvent();
+        notPublished(trainingOfferPublishedEventOne);
         published(randomTrainingOfferPublishedEvent());
-        published(randomTrainingOfferPublishedEvent());
-        notPublished(eventTwo);
-        notPublished(eventThree);
+        notPublished(trainingOfferPublishedEventTwo);
+        notPublished(trainingPriceNotChangedEvent);
+        published(randomTrainingPriceNotChangedEvent());
+        notPublished(trainingPriceChangedEvent);
+        published(randomTrainingPriceChangedEvent());
+        published(randomNoAvailableTrainingPlacesLeftEvent());
+        notPublished(noAvailableTrainingPlacesLeftEvent);
+        notPublished(trainingPlaceBookedEvent);
+        published(randomTrainingPlaceBookedEvent());
 
         await()
                 .untilAsserted(() -> {
-                    assertThat(listener.trainingOfferPublishedEvents).contains(eventOne, eventTwo, eventThree);
+                    assertThat(listener.trainingOfferPublishedEvents).contains(trainingOfferPublishedEventOne, trainingOfferPublishedEventTwo);
+                    assertThat(listener.trainingPriceNotChangedEvents).contains(trainingPriceNotChangedEvent);
+                    assertThat(listener.trainingPriceChangedEvents).contains(trainingPriceChangedEvent);
+                    assertThat(listener.noAvailableTrainingPlacesLeftEvents).contains(noAvailableTrainingPlacesLeftEvent);
+                    assertThat(listener.trainingPlaceBookedEvents).contains(trainingPlaceBookedEvent);
                 });
     }
 
@@ -82,14 +104,19 @@ class OutboxMessagePublisherIntegrationTest {
     void shouldMarkOutboxEventsAsPublished() {
         notPublished(randomTrainingOfferPublishedEvent());
         published(randomTrainingOfferPublishedEvent());
-        published(randomTrainingOfferPublishedEvent());
-        notPublished(randomTrainingOfferPublishedEvent());
-        notPublished(randomTrainingOfferPublishedEvent());
+        notPublished(randomTrainingPriceNotChangedEvent());
+        published(randomTrainingPriceNotChangedEvent());
+        notPublished(randomTrainingPriceChangedEvent());
+        published(randomTrainingPriceChangedEvent());
+        notPublished(randomNoAvailableTrainingPlacesLeftEvent());
+        published(randomNoAvailableTrainingPlacesLeftEvent());
+        notPublished(randomTrainingPlaceBookedEvent());
+        published(randomTrainingPlaceBookedEvent());
 
         await()
                 .untilAsserted(() -> {
                     assertThat(repository.findAll())
-                            .hasSize(5)
+                            .hasSize(10)
                             .allSatisfy(actual -> assertThat(actual.isPublished()).isTrue());
                 });
     }
@@ -101,12 +128,36 @@ class OutboxMessagePublisherIntegrationTest {
                 LocalDate.of(2023, 10, 15), LocalDate.of(2023, 10, 20),
                 LocalTime.of(9, 0), LocalTime.of(17, 0));
     }
+    
+    private TrainingPriceNotChangedEvent randomTrainingPriceNotChangedEvent() {
+        return new TrainingPriceNotChangedEvent(EventId.newEventId(), UUID.randomUUID(), UUID.randomUUID());
+    }
+    
+    private TrainingPriceChangedEvent randomTrainingPriceChangedEvent() {
+        return new TrainingPriceChangedEvent(EventId.newEventId(), UUID.randomUUID(), UUID.randomUUID(), BigDecimal.valueOf(150.00), "EUR");
+    }
+    
+    private NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {
+        return new NoAvailableTrainingPlacesLeftEvent(EventId.newEventId(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
+    
+    private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
+        return new TrainingPlaceBookedEvent(EventId.newEventId(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
 
     private void published(TrainingOfferPublishedEvent event) {
         published(event.eventId(), event);
     }
 
     private void notPublished(TrainingOfferPublishedEvent event) {
+        notPublished(event.eventId(), event);
+    }
+    
+    private void published(TrainingOfferEvent event) {
+        published(event.eventId(), event);
+    }
+
+    private void notPublished(TrainingOfferEvent event) {
         notPublished(event.eventId(), event);
     }
 

@@ -2,7 +2,9 @@ package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.eventid.EventId;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
@@ -49,11 +51,15 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         TrainingOfferPublishedEvent trainingOfferPublishedEvent = publish(randomTrainingOfferPublishedEvent());
         TrainingPriceChangedEvent trainingPriceChangedEvent = publishTrainingOfferEvent(randomTrainingPriceChangedEvent());
         TrainingPriceNotChangedEvent trainingPriceNotChangedEvent = publishTrainingOfferEvent(randomTrainingPriceNotChangedEvent());
+        NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = publishTrainingOfferEvent(randomNoAvailableTrainingPlacesLeftEvent());
+        TrainingPlaceBookedEvent trainingPlaceBookedEvent = publishTrainingOfferEvent(randomTrainingPlaceBookedEvent());
 
         assertThat(springRepository.findAll())
                 .anySatisfy(actual -> assertTrainingPriceNotChangedEventSaved(actual, trainingPriceNotChangedEvent))
                 .anySatisfy(actual -> assertTrainingPriceChangedEventSaved(actual, trainingPriceChangedEvent))
-                .anySatisfy(actual -> assertTrainingOfferPublishedEventSaved(actual, trainingOfferPublishedEvent));
+                .anySatisfy(actual -> assertTrainingOfferPublishedEventSaved(actual, trainingOfferPublishedEvent))
+                .anySatisfy(actual -> assertNoAvailableTrainingPlacesLeftEventSaved(actual, noAvailableTrainingPlacesLeftEvent))
+                .anySatisfy(actual -> assertTrainingPlaceBookedEventSaved(actual, trainingPlaceBookedEvent));
     }
 
     private <T extends TrainingOfferPublishedEvent> T publish(T event) {
@@ -95,6 +101,22 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 UUID.randomUUID(),
                 UUID.randomUUID());
     }
+    
+    private NoAvailableTrainingPlacesLeftEvent randomNoAvailableTrainingPlacesLeftEvent() {
+        return new NoAvailableTrainingPlacesLeftEvent(
+                EventId.newEventId(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID());
+    }
+    
+    private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
+        return new TrainingPlaceBookedEvent(
+                EventId.newEventId(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID());
+    }
 
     private void assertTrainingOfferPublishedEventSaved(OutboxMessage actual, TrainingOfferPublishedEvent expected) {
         assertThatOutboxMessage(actual)
@@ -117,6 +139,22 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.eventId().eventId())
                 .hasOccurredOn(expected.eventId().creationDateTime())
                 .hasMessageType("com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+    
+    private void assertNoAvailableTrainingPlacesLeftEventSaved(OutboxMessage actual, NoAvailableTrainingPlacesLeftEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+    
+    private void assertTrainingPlaceBookedEventSaved(OutboxMessage actual, TrainingPlaceBookedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }

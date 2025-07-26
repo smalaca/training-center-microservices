@@ -6,8 +6,13 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -21,8 +26,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
+import static com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEventAssertion.assertThatNoAvailableTrainingPlacesLeftEvent;
+import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEventAssertion.assertThatTrainingPlaceBookedEvent;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEventAssertion.assertThatTrainingPriceNotChangedEvent;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,6 +74,7 @@ class TrainingOfferApplicationServiceTest {
                 .hasPrice(PRICE_AMOUNT, CURRENCY)
                 .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasNoParticipantsRegistered()
                 .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
     }
 
@@ -113,13 +122,7 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private TrainingPriceChangedEventAssertion thenTrainingPriceChangedEventPublished() {
-        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
-        then(eventRegistry).should().publish(eventCaptor.capture());
-        TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(TrainingPriceChangedEvent.class);
-
-        TrainingPriceChangedEvent event = (TrainingPriceChangedEvent) actual;
-        return assertThatTrainingPriceChangedEvent(event);
+        return assertThatTrainingPriceChangedEvent(thenTrainingOfferEventPublished(TrainingPriceChangedEvent.class));
     }
 
     @Test
@@ -136,16 +139,14 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private TrainingPriceNotChangedEventAssertion thenTrainingPriceNotChangedEventPublished() {
-        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
-        then(eventRegistry).should().publish(eventCaptor.capture());
-        TrainingOfferEvent actual = eventCaptor.getValue();
-        assertThat(actual).isInstanceOf(TrainingPriceNotChangedEvent.class);
-
-        return assertThatTrainingPriceNotChangedEvent((TrainingPriceNotChangedEvent) actual);
+        return assertThatTrainingPriceNotChangedEvent(thenTrainingOfferEventPublished(TrainingPriceNotChangedEvent.class));
     }
 
-    private void existingTrainingOffer() {
-        given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer());
+    private TrainingOffer existingTrainingOffer() {
+        TrainingOffer trainingOffer = trainingOffer();
+        given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer);
+
+        return trainingOffer;
     }
 
     private TrainingOffer trainingOffer() {
@@ -156,9 +157,126 @@ class TrainingOfferApplicationServiceTest {
     }
 
     private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        return new ConfirmTrainingPriceCommand(commandId(), TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+    }
+    
+    @Test
+    void shouldPublishTrainingPlaceBookedEventWhenNoPlacesBookedYet() {
+        existingTrainingOffer();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
 
-        return new ConfirmTrainingPriceCommand(commandId, TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+        service.book(command);
+
+        thenTrainingPlaceBookedEventPublished()
+                .isNextAfter(command.commandId())
+                .hasOfferId(TRAINING_OFFER_ID)
+                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasParticipantId(command.participantId());
+    }
+    
+    @Test
+    void shouldPublishTrainingPlaceBookedEventWhenSomePlacesAlreadyBooked() {
+        TrainingOffer trainingOffer = existingTrainingOfferWithSomeBookedPlaces();
+        given(repository.findById(TRAINING_OFFER_ID)).willReturn(trainingOffer);
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        service.book(command);
+
+        thenTrainingPlaceBookedEventPublished()
+                .isNextAfter(command.commandId())
+                .hasOfferId(TRAINING_OFFER_ID)
+                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasParticipantId(command.participantId());
+    }
+    
+    @Test
+    void shouldPublishNoAvailableTrainingPlacesLeftEventWhenMaxPlacesAlreadyBooked() {
+        existingTrainingOfferWithAllBookedPlaces();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        service.book(command);
+
+        thenNoAvailableTrainingPlacesLeftEventPublished()
+                .isNextAfter(command.commandId())
+                .hasOfferId(TRAINING_OFFER_ID)
+                .hasTrainingId(TRAINING_PROGRAM_ID)
+                .hasParticipantId(command.participantId());
+    }
+    
+    @Test
+    void shouldSaveTrainingOfferWhenNoPlacesBookedYet() {
+        existingTrainingOffer();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        service.book(command);
+
+        thenTrainingOfferSaved()
+                .hasParticipantsRegistered(1)
+                .hasRegisteredParticipant(command.participantId());
+    }
+    
+    @Test
+    void shouldSaveTrainingOfferWhenSomePlacesAlreadyBooked() {
+        existingTrainingOfferWithSomeBookedPlaces();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        service.book(command);
+
+        thenTrainingOfferSaved()
+                .hasParticipantsRegistered(4)
+                .hasRegisteredParticipant(command.participantId());
     }
 
+    @Test
+    void shouldSaveTrainingOfferWhenAllPlacesAlreadyBooked() {
+        existingTrainingOfferWithAllBookedPlaces();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        service.book(command);
+
+        thenTrainingOfferSaved()
+                .hasParticipantsRegistered(MAXIMUM_PARTICIPANTS)
+                .hasNoRegisteredParticipant(command.participantId());
+    }
+    
+    private TrainingOffer existingTrainingOfferWithSomeBookedPlaces() {
+        TrainingOffer trainingOffer = existingTrainingOffer();
+        trainingOffer.book(bookTrainingPlaceCommand());
+        trainingOffer.book(bookTrainingPlaceCommand());
+        trainingOffer.book(bookTrainingPlaceCommand());
+
+        return trainingOffer;
+    }
+    
+    private TrainingOffer existingTrainingOfferWithAllBookedPlaces() {
+        TrainingOffer trainingOffer = existingTrainingOffer();
+        IntStream.range(0, MAXIMUM_PARTICIPANTS).forEach(i -> trainingOffer.book(bookTrainingPlaceCommand()));
+
+        return trainingOffer;
+    }
+    
+    private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
+        return new BookTrainingPlaceCommand(commandId(), TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+    }
+
+    private CommandId commandId() {
+        return new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+    }
+
+    private TrainingPlaceBookedEventAssertion thenTrainingPlaceBookedEventPublished() {
+        return assertThatTrainingPlaceBookedEvent(thenTrainingOfferEventPublished(TrainingPlaceBookedEvent.class));
+    }
+    
+    private NoAvailableTrainingPlacesLeftEventAssertion thenNoAvailableTrainingPlacesLeftEventPublished() {
+        return assertThatNoAvailableTrainingPlacesLeftEvent(thenTrainingOfferEventPublished(NoAvailableTrainingPlacesLeftEvent.class));
+    }
+
+    private <T extends TrainingOfferEvent> T thenTrainingOfferEventPublished(Class<T> expectedEventType) {
+        ArgumentCaptor<TrainingOfferEvent> eventCaptor = ArgumentCaptor.forClass(TrainingOfferEvent.class);
+        then(eventRegistry).should().publish(eventCaptor.capture());
+        TrainingOfferEvent actual = eventCaptor.getValue();
+        assertThat(actual).isInstanceOf(expectedEventType);
+
+        return expectedEventType.cast(actual);
+    }
 }

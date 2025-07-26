@@ -6,7 +6,9 @@ import com.smalaca.trainingoffer.domain.trainingsessionperiod.TrainingSessionPer
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,12 +51,37 @@ public class TrainingOfferAssertion {
     }
 
     public TrainingOfferAssertion hasMinimumParticipants(int expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("minimumParticipants", expected);
+        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("minimumParticipants", expected);
         return this;
     }
 
     public TrainingOfferAssertion hasMaximumParticipants(int expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("maximumParticipants", expected);
+        assertThat(actual).extracting("participants").hasFieldOrPropertyWithValue("maximumParticipants", expected);
+        return this;
+    }
+
+    public TrainingOfferAssertion hasNoParticipantsRegistered() {
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).isEmpty());
+    }
+
+    public TrainingOfferAssertion hasParticipantsRegistered(int expected) {
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).hasSize(expected));
+    }
+
+    public TrainingOfferAssertion hasRegisteredParticipant(UUID expected) {
+        return hasParticipants(actualParticipants -> assertThat(actualParticipants).contains(expected));
+    }
+
+    public TrainingOfferAssertion hasNoRegisteredParticipant(UUID expected) {
+        return hasParticipants(actualParticipants -> {
+            assertThat(actualParticipants).isNotEmpty().doesNotContain(expected);
+        });
+    }
+
+    private TrainingOfferAssertion hasParticipants(Consumer<Set<UUID>> assertion) {
+        assertThat(actual).extracting("participants").extracting("participantIds").satisfies(participantIds -> {
+            assertion.accept((Set<UUID>) participantIds);
+        });
         return this;
     }
 

@@ -1,7 +1,10 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka;
 
 import com.smalaca.schemaregistry.metadata.CommandId;
+import com.smalaca.schemaregistry.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
@@ -24,7 +27,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.NoAvailableTrainingPlacesLeftEventAssertion.assertThatNoAvailableTrainingPlacesLeftEvent;
+import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPlaceBookedEventAssertion.assertThatTrainingPlaceBookedEvent;
 import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
 import static com.smalaca.trainingoffer.infrastructure.api.eventlistener.kafka.TrainingPriceNotChangedEventAssertion.assertThatTrainingPriceNotChangedEvent;
 import static java.time.LocalDateTime.now;
@@ -35,14 +41,20 @@ import static org.awaitility.Awaitility.await;
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.trainingoffer.commands.confirm-training-price=" + TrainingOfferKafkaEventListenerIntegrationTest.CONFIRM_TRAINING_PRICE_COMMAND_TOPIC,
+        "kafka.topics.trainingoffer.commands.book-training-place=" + TrainingOfferKafkaEventListenerIntegrationTest.BOOK_TRAINING_PLACE_COMMAND_TOPIC,
         "kafka.topics.trainingoffer.events.training-price-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_CHANGED_EVENT_TOPIC,
-        "kafka.topics.trainingoffer.events.training-price-not-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_NOT_CHANGED_EVENT_TOPIC
+        "kafka.topics.trainingoffer.events.training-price-not-changed=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PRICE_NOT_CHANGED_EVENT_TOPIC,
+        "kafka.topics.trainingoffer.events.training-place-booked=" + TrainingOfferKafkaEventListenerIntegrationTest.TRAINING_PLACE_BOOKED_EVENT_TOPIC,
+        "kafka.topics.trainingoffer.events.no-available-training-places-left=" + TrainingOfferKafkaEventListenerIntegrationTest.NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC
 })
 @Import(TrainingOfferPivotalEventTestConsumer.class)
 class TrainingOfferKafkaEventListenerIntegrationTest {
     protected static final String CONFIRM_TRAINING_PRICE_COMMAND_TOPIC = "confirm-training-price-command-topic";
+    protected static final String BOOK_TRAINING_PLACE_COMMAND_TOPIC = "book-training-place-command-topic";
     protected static final String TRAINING_PRICE_CHANGED_EVENT_TOPIC = "training-price-changed-event-topic";
     protected static final String TRAINING_PRICE_NOT_CHANGED_EVENT_TOPIC = "training-price-not-changed-event-topic";
+    protected static final String TRAINING_PLACE_BOOKED_EVENT_TOPIC = "training-place-booked-event-topic";
+    protected static final String NO_AVAILABLE_TRAINING_PLACES_LEFT_EVENT_TOPIC = "no-available-training-places-left-event-topic";
 
     private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
@@ -137,6 +149,68 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
         });
     }
 
+    private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
+        return new ConfirmTrainingPriceCommand(commandId(), TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
+    }
+
+    @Test
+    void shouldPublishTrainingPlaceBookedEventWhenPlacesAvailable() {
+        existingTrainingOffer();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        producerFactory.send(BOOK_TRAINING_PLACE_COMMAND_TOPIC, command);
+
+        await().untilAsserted(() -> {
+            Optional<TrainingPlaceBookedEvent> actual = consumer.trainingPlaceBookedEventFor(command.offerId());
+            assertThat(actual).isPresent();
+
+            assertThatTrainingPlaceBookedEvent(actual.get())
+                    .isNextAfter(command.commandId())
+                    .hasOfferId(command.offerId())
+                    .hasTrainingId(command.trainingId())
+                    .hasParticipantId(command.participantId());
+        });
+    }
+
+    @Test
+    void shouldPublishNoAvailableTrainingPlacesLeftEventWhenNoPlacesAvailable() {
+        existingTrainingOfferWithAllBookedPlaces();
+        BookTrainingPlaceCommand command = bookTrainingPlaceCommand();
+
+        producerFactory.send(BOOK_TRAINING_PLACE_COMMAND_TOPIC, command);
+
+        await().untilAsserted(() -> {
+            Optional<NoAvailableTrainingPlacesLeftEvent> actual = consumer.noAvailableTrainingPlacesLeftEventFor(command.offerId());
+            assertThat(actual).isPresent();
+
+            assertThatNoAvailableTrainingPlacesLeftEvent(actual.get())
+                    .isNextAfter(command.commandId())
+                    .hasOfferId(command.offerId())
+                    .hasTrainingId(command.trainingId())
+                    .hasParticipantId(command.participantId());
+        });
+    }
+
+    private BookTrainingPlaceCommand bookTrainingPlaceCommand() {
+        return new BookTrainingPlaceCommand(commandId(), TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+    }
+
+    private CommandId commandId() {
+        return new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), now());
+    }
+
+    private void existingTrainingOfferWithAllBookedPlaces() {
+        TrainingOffer trainingOffer = trainingOffer();
+        IntStream.range(0, MAXIMUM_PARTICIPANTS).forEach(i -> trainingOffer.book(internalBookTrainingPlaceCommand()));
+        repository.save(trainingOffer);
+    }
+
+    private com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand internalBookTrainingPlaceCommand() {
+        com.smalaca.trainingoffer.domain.commandid.CommandId commandId = new com.smalaca.trainingoffer.domain.commandid.CommandId(
+                UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), now());
+        return new com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand(commandId, TRAINING_OFFER_ID, UUID.randomUUID(), TRAINING_PROGRAM_ID);
+    }
+
     private void existingTrainingOffer() {
         repository.save(trainingOffer());
     }
@@ -147,11 +221,5 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
                 MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
 
         return factory.create(event);
-    }
-
-    private ConfirmTrainingPriceCommand confirmTrainingPriceCommand(BigDecimal amount, String currency) {
-        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), now());
-
-        return new ConfirmTrainingPriceCommand(commandId, TRAINING_OFFER_ID, TRAINING_PROGRAM_ID, amount, currency);
     }
 }
