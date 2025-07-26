@@ -52,7 +52,7 @@ public class TrainingOffer {
     @Embedded
     private Participants participants;
 
-    protected TrainingOffer() {}
+    private TrainingOffer() {}
 
     private TrainingOffer(Builder builder, Participants participants) {
         this.trainingOfferId = builder.trainingOfferId;
