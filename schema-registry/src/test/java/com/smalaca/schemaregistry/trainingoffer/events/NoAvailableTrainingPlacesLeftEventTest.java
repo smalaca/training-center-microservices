@@ -20,6 +20,6 @@ class NoAvailableTrainingPlacesLeftEventTest {
         assertThat(event.eventId()).isEqualTo(eventId);
         assertThat(event.offerId()).isEqualTo(offerId);
         assertThat(event.participantId()).isEqualTo(participantId);
-        assertThat(event.trainingId()).isEqualTo(trainingId);
+        assertThat(event.trainingOfferId()).isEqualTo(trainingId);
     }
 }

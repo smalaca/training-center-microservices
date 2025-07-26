@@ -191,7 +191,7 @@ public class OfferAcceptanceEventListener {
                 asEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     @EventListener

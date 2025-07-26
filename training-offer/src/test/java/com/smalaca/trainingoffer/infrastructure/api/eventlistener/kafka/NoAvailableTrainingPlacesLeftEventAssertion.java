@@ -28,8 +28,8 @@ class NoAvailableTrainingPlacesLeftEventAssertion {
         return this;
     }
 
-    NoAvailableTrainingPlacesLeftEventAssertion hasTrainingId(UUID expected) {
-        assertThat(actual.trainingId()).isEqualTo(expected);
+    NoAvailableTrainingPlacesLeftEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 

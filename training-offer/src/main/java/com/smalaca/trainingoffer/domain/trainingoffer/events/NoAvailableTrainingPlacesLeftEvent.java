@@ -7,7 +7,7 @@ import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlace
 import java.util.UUID;
 
 @DomainEvent
-public record NoAvailableTrainingPlacesLeftEvent(EventId eventId, UUID offerId, UUID participantId, UUID trainingId) implements TrainingOfferEvent {
+public record NoAvailableTrainingPlacesLeftEvent(EventId eventId, UUID offerId, UUID participantId, UUID trainingOfferId) implements TrainingOfferEvent {
 
     public static NoAvailableTrainingPlacesLeftEvent nextAfter(BookTrainingPlaceCommand command) {
         return new NoAvailableTrainingPlacesLeftEvent(command.commandId().nextEventId(), command.offerId(), command.participantId(), command.trainingOfferId());

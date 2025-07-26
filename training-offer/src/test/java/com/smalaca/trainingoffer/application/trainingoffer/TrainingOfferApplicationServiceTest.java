@@ -199,7 +199,7 @@ class TrainingOfferApplicationServiceTest {
         thenNoAvailableTrainingPlacesLeftEventPublished()
                 .isNextAfter(command.commandId())
                 .hasOfferId(command.offerId())
-                .hasTrainingId(TRAINING_OFFER_ID)
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasParticipantId(command.participantId());
     }
     

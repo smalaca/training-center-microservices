@@ -80,7 +80,7 @@ public class TrainingOfferEventPublisher {
                 asExternalEventId(event.eventId()),
                 event.offerId(),
                 event.participantId(),
-                event.trainingId());
+                event.trainingOfferId());
     }
 
     private com.smalaca.schemaregistry.metadata.EventId asExternalEventId(EventId eventId) {
