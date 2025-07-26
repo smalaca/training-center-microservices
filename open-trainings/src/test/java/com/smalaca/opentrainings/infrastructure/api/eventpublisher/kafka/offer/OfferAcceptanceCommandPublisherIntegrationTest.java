@@ -142,7 +142,7 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
         assertThatContainsSameData(actual.commandId(), expected.commandId());
         assertThat(actual.offerId()).isEqualTo(expected.offerId());
         assertThat(actual.participantId()).isEqualTo(expected.participantId());
-        assertThat(actual.trainingId()).isEqualTo(expected.trainingId());
+        assertThat(actual.trainingOfferId()).isEqualTo(expected.trainingOfferId());
     }
 
     private void assertThatContainsSameData(com.smalaca.schemaregistry.trainingoffer.commands.ConfirmTrainingPriceCommand actual, ConfirmTrainingPriceCommand expected) {

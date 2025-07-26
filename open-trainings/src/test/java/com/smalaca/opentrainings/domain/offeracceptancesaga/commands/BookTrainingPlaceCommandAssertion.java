@@ -23,8 +23,8 @@ public class BookTrainingPlaceCommandAssertion {
         return this;
     }
 
-    public BookTrainingPlaceCommandAssertion hasTrainingId(UUID expected) {
-        assertThat(actual.trainingId()).isEqualTo(expected);
+    public BookTrainingPlaceCommandAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 

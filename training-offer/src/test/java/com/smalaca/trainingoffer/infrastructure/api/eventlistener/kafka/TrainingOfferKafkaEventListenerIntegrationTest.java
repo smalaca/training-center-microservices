@@ -167,7 +167,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatTrainingPlaceBookedEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingId(command.trainingOfferId())
                     .hasParticipantId(command.participantId());
         });
     }
@@ -186,7 +186,7 @@ class TrainingOfferKafkaEventListenerIntegrationTest {
             assertThatNoAvailableTrainingPlacesLeftEvent(actual.get())
                     .isNextAfter(command.commandId())
                     .hasOfferId(command.offerId())
-                    .hasTrainingId(command.trainingId())
+                    .hasTrainingId(command.trainingOfferId())
                     .hasParticipantId(command.participantId());
         });
     }

@@ -49,7 +49,7 @@ public class TrainingOfferApplicationService {
     @CommandOperation
     @DrivingPort
     public void book(BookTrainingPlaceCommand command) {
-        TrainingOffer trainingOffer = repository.findById(command.trainingId());
+        TrainingOffer trainingOffer = repository.findById(command.trainingOfferId());
         
         TrainingOfferEvent event = trainingOffer.book(command);
         

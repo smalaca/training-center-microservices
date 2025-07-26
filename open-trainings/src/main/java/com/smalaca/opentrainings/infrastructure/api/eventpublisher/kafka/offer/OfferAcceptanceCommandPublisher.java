@@ -77,7 +77,7 @@ public class OfferAcceptanceCommandPublisher {
                 asExternalCommandId(command.commandId()),
                 command.offerId(),
                 command.participantId(),
-                command.trainingId());
+                command.trainingOfferId());
     }
 
     private com.smalaca.schemaregistry.offeracceptancesaga.commands.ReturnDiscountCodeCommand asExternalReturnDiscountCodeCommand(ReturnDiscountCodeCommand command) {

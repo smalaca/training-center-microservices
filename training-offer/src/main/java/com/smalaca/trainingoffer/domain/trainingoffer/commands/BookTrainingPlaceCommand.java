@@ -4,5 +4,5 @@ import com.smalaca.trainingoffer.domain.commandid.CommandId;
 
 import java.util.UUID;
 
-public record BookTrainingPlaceCommand(CommandId commandId, UUID offerId, UUID participantId, UUID trainingId) {
+public record BookTrainingPlaceCommand(CommandId commandId, UUID offerId, UUID participantId, UUID trainingOfferId) {
 }

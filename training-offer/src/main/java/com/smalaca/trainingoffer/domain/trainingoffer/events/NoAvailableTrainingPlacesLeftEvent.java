@@ -10,6 +10,6 @@ import java.util.UUID;
 public record NoAvailableTrainingPlacesLeftEvent(EventId eventId, UUID offerId, UUID participantId, UUID trainingId) implements TrainingOfferEvent {
 
     public static NoAvailableTrainingPlacesLeftEvent nextAfter(BookTrainingPlaceCommand command) {
-        return new NoAvailableTrainingPlacesLeftEvent(command.commandId().nextEventId(), command.offerId(), command.participantId(), command.trainingId());
+        return new NoAvailableTrainingPlacesLeftEvent(command.commandId().nextEventId(), command.offerId(), command.participantId(), command.trainingOfferId());
     }
 }

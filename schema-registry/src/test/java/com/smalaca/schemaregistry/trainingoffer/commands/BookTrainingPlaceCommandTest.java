@@ -20,6 +20,6 @@ class BookTrainingPlaceCommandTest {
         assertThat(command.commandId()).isEqualTo(commandId);
         assertThat(command.offerId()).isEqualTo(offerId);
         assertThat(command.participantId()).isEqualTo(participantId);
-        assertThat(command.trainingId()).isEqualTo(trainingId);
+        assertThat(command.trainingOfferId()).isEqualTo(trainingId);
     }
 }
