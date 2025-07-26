@@ -38,7 +38,7 @@ public class TrainingOfferApplicationService {
     @CommandOperation
     @DrivingPort
     public void confirmPrice(ConfirmTrainingPriceCommand command) {
-        TrainingOffer trainingOffer = repository.findById(command.offerId());
+        TrainingOffer trainingOffer = repository.findById(command.trainingId());
         
         TrainingOfferEvent event = trainingOffer.confirmPrice(command);
         
@@ -49,7 +49,7 @@ public class TrainingOfferApplicationService {
     @CommandOperation
     @DrivingPort
     public void book(BookTrainingPlaceCommand command) {
-        TrainingOffer trainingOffer = repository.findById(command.offerId());
+        TrainingOffer trainingOffer = repository.findById(command.trainingId());
         
         TrainingOfferEvent event = trainingOffer.book(command);
         
