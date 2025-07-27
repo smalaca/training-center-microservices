@@ -57,18 +57,8 @@ public class TrainingProgramProposalApplicationService {
 
         TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId);
 
-        eventRegistry.publish(event);
-    }
-
-    @Transactional
-    @CommandOperation
-    @DrivingPort
-    public void apply(TrainingProgramReleasedEvent event) {
-        TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
-
-        trainingProgramProposal.released(event.reviewerId());
-
         repository.save(trainingProgramProposal);
+        eventRegistry.publish(event);
     }
 
     @Transactional

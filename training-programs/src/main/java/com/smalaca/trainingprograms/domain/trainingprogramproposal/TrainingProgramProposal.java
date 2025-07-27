@@ -76,11 +76,12 @@ public class TrainingProgramProposal {
     private TrainingProgramProposal() {}
 
     public TrainingProgramReleasedEvent release(UUID reviewerId) {
-        UUID trainingProgramId = UUID.randomUUID();
+        this.reviewerId = reviewerId;
+        status = RELEASED;
 
         return TrainingProgramReleasedEvent.create(
                 trainingProgramProposalId,
-                trainingProgramId,
+                trainingProgramId(),
                 name,
                 description,
                 agenda,
@@ -91,9 +92,8 @@ public class TrainingProgramProposal {
         );
     }
 
-    public void released(UUID reviewerId) {
-        this.reviewerId = reviewerId;
-        status = RELEASED;
+    private UUID trainingProgramId() {
+        return UUID.randomUUID();
     }
 
     public TrainingProgramRejectedEvent reject(UUID reviewerId) {

@@ -49,7 +49,7 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal released() {
         proposed();
-        trainingProgramProposal.released(getReviewerId());
+        trainingProgramProposal.release(getReviewerId());
         status = RELEASED;
 
         return this;
