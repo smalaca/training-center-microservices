@@ -8,6 +8,6 @@ import java.util.UUID;
 public record RestTrainingOfferDetailTestDto(
         UUID trainingOfferId, UUID trainerId, UUID trainingProgramId,
         LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime,
-        BigDecimal priceAmount, String priceCurrency, int minimumParticipants, int maximumParticipants,
+        BigDecimal priceAmount, String priceCurrency, int availablePlaces,
         String name, String agenda, String plan, String description) {
 }

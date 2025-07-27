@@ -15,8 +15,7 @@ public interface TrainingOfferDetail {
     LocalTime getEndTime();
     BigDecimal getPriceAmount();
     String getPriceCurrency();
-    int getMinimumParticipants();
-    int getMaximumParticipants();
+    int getAvailablePlaces();
     String getName();
     String getAgenda();
     String getPlan();

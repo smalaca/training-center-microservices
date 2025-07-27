@@ -129,8 +129,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasEndTime(trainingOffer.getEndTime())
                 .hasPriceAmount(trainingOffer.getPriceAmount())
                 .hasPriceCurrency(trainingOffer.getPriceCurrency())
-                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
+                .hasAvailablePlaces(trainingOffer.getAvailablePlaces())
                 .hasName(trainingProgram.getName())
                 .hasAgenda(trainingProgram.getAgenda())
                 .hasPlan(trainingProgram.getPlan())
@@ -154,8 +153,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasEndTime(trainingOffer.getEndTime())
                 .hasPriceAmount(trainingOffer.getPriceAmount())
                 .hasPriceCurrency(trainingOffer.getPriceCurrency())
-                .hasMinimumParticipants(trainingOffer.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOffer.getMaximumParticipants())
+                .hasAvailablePlaces(trainingOffer.getAvailablePlaces())
                 .hasNoTrainingProgram();
     }
 
@@ -177,8 +175,7 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasTrainerId(trainingOfferOne.getTrainerId())
                 .hasPriceAmount(trainingOfferOne.getPriceAmount())
                 .hasPriceCurrency(trainingOfferOne.getPriceCurrency())
-                .hasMinimumParticipants(trainingOfferOne.getMinimumParticipants())
-                .hasMaximumParticipants(trainingOfferOne.getMaximumParticipants())
+                .hasAvailablePlaces(trainingOfferOne.getAvailablePlaces())
                 .hasStartDate(trainingOfferOne.getStartDate())
                 .hasStartTime(trainingOfferOne.getStartTime())
                 .hasEndDate(trainingOfferOne.getEndDate())

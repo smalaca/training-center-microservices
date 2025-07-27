@@ -148,7 +148,6 @@ public class RestTrainingCatalogueTestResponseAssertion {
         assertThat(detail.endTime()).isEqualTo(expectedOffer.getEndTime());
         assertThat(detail.priceAmount()).isEqualByComparingTo(expectedOffer.getPriceAmount());
         assertThat(detail.priceCurrency()).isEqualTo(expectedOffer.getPriceCurrency());
-        assertThat(detail.minimumParticipants()).isEqualTo(expectedOffer.getMinimumParticipants());
-        assertThat(detail.maximumParticipants()).isEqualTo(expectedOffer.getMaximumParticipants());
+        assertThat(detail.availablePlaces()).isEqualTo(expectedOffer.getAvailablePlaces());
     }
 }
