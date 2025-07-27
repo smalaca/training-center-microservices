@@ -4,17 +4,29 @@ import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
-import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
-@Service
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @DrivenAdapter
 public class TrainingOfferCatalogueRestClient implements TrainingOfferCatalogue {
+    private final RestClient client;
+
+    TrainingOfferCatalogueRestClient(RestClient client) {
+        this.client = client;
+    }
 
     @Override
     public TrainingDto detailsOf(UUID trainingId) {
-        return new TrainingDto(42, Price.of(BigDecimal.valueOf(100), "PLN"));
+        RestTrainingOfferDetailDto detail = client
+                .get()
+                .uri("/trainingoffers/{trainingOfferId}", trainingId)
+                .accept(APPLICATION_JSON)
+                .retrieve()
+                .body(RestTrainingOfferDetailDto.class);
+
+        return new TrainingDto(trainingId, detail.availablePlaces(), Price.of(detail.priceAmount(), detail.priceCurrency()));
     }
 }

@@ -72,7 +72,7 @@ public class GivenOffer {
     public GivenOffer initiated() {
         status = INITIATED;
         given(clock.now()).willReturn(creationDateTime);
-        given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(new TrainingDto(randomAvailability(), trainingPrice));
+        given(trainingOfferCatalogue.detailsOf(trainingId)).willReturn(new TrainingDto(trainingId, randomAvailability(), trainingPrice));
         offer = offerFactory.create(trainingId);
 
         return this;
