@@ -30,7 +30,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 
 class TrainingOfferDraftApplicationServiceTest {
-    private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
     private static final UUID TRAINING_OFFER_DRAFT_ID = UUID.randomUUID();
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID TRAINER_ID = UUID.randomUUID();
@@ -48,21 +47,6 @@ class TrainingOfferDraftApplicationServiceTest {
     private final TrainingOfferDraftRepository repository = mock(TrainingOfferDraftRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
     private final TrainingOfferDraftApplicationService service = new TrainingOfferDraftApplicationServiceFactory().trainingOfferDraftApplicationService(repository, eventRegistry);
-
-    @Test
-    void shouldMarkTrainingOfferDraftAsPublishedWhenEventIsReceived() {
-        givenExisting(given.trainingOfferDraft().initiated());
-
-        service.published(trainingOfferPublishedEvent());
-
-        thenTrainingOfferDraftSaved().isPublished();
-    }
-
-    private TrainingOfferPublishedEvent trainingOfferPublishedEvent() {
-        return TrainingOfferPublishedEvent.create(
-                TRAINING_OFFER_ID, TRAINING_OFFER_DRAFT_ID, TRAINING_PROGRAM_ID, TRAINER_ID, PRICE_AMOUNT, CURRENCY, MINIMUM_PARTICIPANTS,
-                MAXIMUM_PARTICIPANTS, START_DATE, END_DATE, START_TIME, END_TIME);
-    }
 
     @Test
     void shouldPublishTrainingOfferPublishedEventWhenTrainingOfferDraftIsPublished() {
@@ -101,7 +85,16 @@ class TrainingOfferDraftApplicationServiceTest {
 
         assertThat(actual).hasMessage("Training offer draft: " + TRAINING_OFFER_DRAFT_ID + " already published.");
     }
-    
+
+    @Test
+    void shouldMarkTrainingOfferDraftAsPublishedWhenEventIsReceived() {
+        givenExisting(given.trainingOfferDraft().initiated());
+
+        service.publish(TRAINING_OFFER_DRAFT_ID);
+
+        thenTrainingOfferDraftSaved().isPublished();
+    }
+
     @Test
     void shouldReturnTrainingOfferDraftIdWhenCreated() {
         CreateTrainingOfferDraftCommand command = createTrainingOfferDraftCommand();

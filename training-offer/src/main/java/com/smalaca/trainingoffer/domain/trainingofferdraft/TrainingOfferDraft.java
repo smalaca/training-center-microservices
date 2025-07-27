@@ -70,6 +70,8 @@ public class TrainingOfferDraft {
             throw new TrainingOfferDraftAlreadyPublishedException(trainingOfferDraftId);
         }
 
+        published = true;
+
         return TrainingOfferPublishedEvent.create(
                 trainingOfferId(),
                 trainingOfferDraftId,
@@ -88,10 +90,6 @@ public class TrainingOfferDraft {
 
     private UUID trainingOfferId() {
         return UUID.randomUUID();
-    }
-
-    public void published() {
-        published = true;
     }
 
     public UUID trainingOfferDraftId() {

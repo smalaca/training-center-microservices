@@ -46,17 +46,7 @@ public class TrainingOfferDraftApplicationService {
         TrainingOfferPublishedEvent event = draft.publish();
 
         eventRegistry.publish(event);
-        return event.trainingOfferId();
-    }
-    
-    @Transactional
-    @CommandOperation
-    @DrivingPort
-    public void published(TrainingOfferPublishedEvent event) {
-        TrainingOfferDraft draft = repository.findById(event.trainingOfferDraftId());
-        
-        draft.published();
-        
         repository.save(draft);
+        return event.trainingOfferId();
     }
 }

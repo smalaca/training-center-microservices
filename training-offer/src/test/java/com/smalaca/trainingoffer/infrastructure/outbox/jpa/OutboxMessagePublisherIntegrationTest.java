@@ -9,7 +9,6 @@ import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBooked
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
-import com.smalaca.trainingoffer.infrastructure.api.eventlistener.spring.TrainingOfferDraftListener;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferEventPublisher;
 import org.junit.jupiter.api.AfterEach;
@@ -47,9 +46,6 @@ class OutboxMessagePublisherIntegrationTest {
 
     @MockBean
     private TrainingOfferDraftEventPublisher trainingOfferDraftEventPublisher;
-
-    @MockBean
-    private TrainingOfferDraftListener trainingOfferDraftListener;
 
     @MockBean
     private TrainingOfferEventPublisher trainingOfferEventPublisher;
