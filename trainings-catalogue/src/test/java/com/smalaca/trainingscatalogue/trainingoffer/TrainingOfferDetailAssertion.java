@@ -63,13 +63,8 @@ class TrainingOfferDetailAssertion {
         return this;
     }
 
-    TrainingOfferDetailAssertion hasMinimumParticipants(int expected) {
-        assertThat(actual.getMinimumParticipants()).isEqualTo(expected);
-        return this;
-    }
-
-    TrainingOfferDetailAssertion hasMaximumParticipants(int expected) {
-        assertThat(actual.getMaximumParticipants()).isEqualTo(expected);
+    TrainingOfferDetailAssertion hasAvailablePlaces(int expected) {
+        assertThat(actual.getAvailablePlaces()).isEqualTo(expected);
         return this;
     }
 

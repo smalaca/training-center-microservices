@@ -47,11 +47,8 @@ public class TrainingOffer {
     @Column(name = "PRICE_CURRENCY")
     private String priceCurrency;
 
-    @Column(name = "MINIMUM_PARTICIPANTS")
-    private int minimumParticipants;
-
-    @Column(name = "MAXIMUM_PARTICIPANTS")
-    private int maximumParticipants;
+    @Column(name = "AVAILABLE_PLACES")
+    private int availablePlaces;
 
     private TrainingOffer() {}
 
@@ -66,7 +63,6 @@ public class TrainingOffer {
         this.endTime = event.endTime();
         this.priceAmount = event.priceAmount();
         this.priceCurrency = event.priceCurrencyCode();
-        this.minimumParticipants = event.minimumParticipants();
-        this.maximumParticipants = event.maximumParticipants();
+        this.availablePlaces = event.maximumParticipants();
     }
 }

@@ -28,8 +28,7 @@ public interface JpaTrainingOfferRepository extends CrudRepository<TrainingOffer
            "to.endTime as endTime, " +
            "to.priceAmount as priceAmount, " +
            "to.priceCurrency as priceCurrency, " +
-           "to.minimumParticipants as minimumParticipants, " +
-           "to.maximumParticipants as maximumParticipants, " +
+           "to.availablePlaces as availablePlaces, " +
            "tp.name as name, " +
            "tp.agenda as agenda, " +
            "tp.plan as plan, " +
