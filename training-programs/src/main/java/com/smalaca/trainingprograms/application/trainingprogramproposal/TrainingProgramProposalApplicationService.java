@@ -79,17 +79,7 @@ public class TrainingProgramProposalApplicationService {
 
         TrainingProgramRejectedEvent event = trainingProgramProposal.reject(reviewerId);
 
-        eventRegistry.publish(event);
-    }
-
-    @Transactional
-    @CommandOperation
-    @DrivingPort
-    public void apply(TrainingProgramRejectedEvent event) {
-        TrainingProgramProposal trainingProgramProposal = repository.findById(event.trainingProgramProposalId());
-
-        trainingProgramProposal.rejected(event.reviewerId());
-
         repository.save(trainingProgramProposal);
+        eventRegistry.publish(event);
     }
 }

@@ -142,6 +142,25 @@ class TrainingProgramProposalApplicationServiceTest {
     }
 
     @Test
+    void shouldMarkTrainingProgramProposalAsRejected() {
+        TrainingProgramProposedEvent expected = givenExistingTrainingProgramProposed();
+        UUID reviewerId = randomId();
+
+        service.reject(expected.trainingProgramProposalId(), reviewerId);
+
+        thenTrainingProgramProposalSaved()
+                .hasTrainingProgramProposalId(expected.trainingProgramProposalId())
+                .hasName(expected.name())
+                .hasDescription(expected.description())
+                .hasAgenda(expected.agenda())
+                .hasPlan(expected.plan())
+                .hasAuthorId(expected.authorId())
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasReviewerId(reviewerId)
+                .isRejected();
+    }
+
+    @Test
     void shouldMarkTrainingProgramProposalAsReleased() {
         TrainingProgramProposedEvent event = givenExistingTrainingProgramProposed();
 
@@ -156,23 +175,6 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasAuthorId(event.authorId())
                 .hasCategoriesIds(event.categoriesIds())
                 .isReleased();
-    }
-    
-    @Test
-    void shouldMarkTrainingProgramProposalAsRejected() {
-        TrainingProgramProposedEvent event = givenExistingTrainingProgramProposed();
-
-        service.apply(asTrainingProgramRejectedEvent(event));
-
-        thenTrainingProgramProposalSaved()
-                .hasTrainingProgramProposalId(event.trainingProgramProposalId())
-                .hasName(event.name())
-                .hasDescription(event.description())
-                .hasAgenda(event.agenda())
-                .hasPlan(event.plan())
-                .hasAuthorId(event.authorId())
-                .hasCategoriesIds(event.categoriesIds())
-                .isRejected();
     }
 
     private TrainingProgramReleasedEvent asTrainingProgramReleasedEvent(TrainingProgramProposedEvent event) {

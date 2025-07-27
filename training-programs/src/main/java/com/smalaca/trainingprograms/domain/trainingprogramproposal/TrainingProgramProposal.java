@@ -2,8 +2,8 @@ package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
-import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
@@ -97,11 +97,9 @@ public class TrainingProgramProposal {
     }
 
     public TrainingProgramRejectedEvent reject(UUID reviewerId) {
-        return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
-    }
-
-    public void rejected(UUID reviewerId) {
         this.reviewerId = reviewerId;
         status = REJECTED;
+
+        return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
     }
 }

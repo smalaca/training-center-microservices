@@ -57,7 +57,7 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal rejected() {
         proposed();
-        trainingProgramProposal.rejected(getReviewerId());
+        trainingProgramProposal.reject(getReviewerId());
         status = REJECTED;
 
         return this;
