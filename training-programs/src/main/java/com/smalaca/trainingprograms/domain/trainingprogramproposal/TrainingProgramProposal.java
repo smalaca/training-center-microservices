@@ -2,8 +2,8 @@ package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
-import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
@@ -76,11 +76,12 @@ public class TrainingProgramProposal {
     private TrainingProgramProposal() {}
 
     public TrainingProgramReleasedEvent release(UUID reviewerId) {
-        UUID trainingProgramId = UUID.randomUUID();
+        this.reviewerId = reviewerId;
+        status = RELEASED;
 
         return TrainingProgramReleasedEvent.create(
                 trainingProgramProposalId,
-                trainingProgramId,
+                trainingProgramId(),
                 name,
                 description,
                 agenda,
@@ -91,17 +92,14 @@ public class TrainingProgramProposal {
         );
     }
 
-    public void released(UUID reviewerId) {
-        this.reviewerId = reviewerId;
-        status = RELEASED;
+    private UUID trainingProgramId() {
+        return UUID.randomUUID();
     }
 
     public TrainingProgramRejectedEvent reject(UUID reviewerId) {
-        return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
-    }
-
-    public void rejected(UUID reviewerId) {
         this.reviewerId = reviewerId;
         status = REJECTED;
+
+        return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
     }
 }

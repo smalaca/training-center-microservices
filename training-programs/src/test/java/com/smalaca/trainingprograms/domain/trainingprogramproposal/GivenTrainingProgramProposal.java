@@ -49,7 +49,7 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal released() {
         proposed();
-        trainingProgramProposal.released(getReviewerId());
+        trainingProgramProposal.release(getReviewerId());
         status = RELEASED;
 
         return this;
@@ -57,7 +57,7 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal rejected() {
         proposed();
-        trainingProgramProposal.rejected(getReviewerId());
+        trainingProgramProposal.reject(getReviewerId());
         status = REJECTED;
 
         return this;
