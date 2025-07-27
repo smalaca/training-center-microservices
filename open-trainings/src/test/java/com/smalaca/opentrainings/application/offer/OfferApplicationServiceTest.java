@@ -81,7 +81,7 @@ class OfferApplicationServiceTest {
 
     @Test
     void shouldInterruptTrainingChoiceIfThereNoAvailablePlaces() {
-        givenTraining(new TrainingDto(NO_AVAILABLE_PLACES, TRAINING_PRICE));
+        givenTraining(new TrainingDto(TRAINING_ID, NO_AVAILABLE_PLACES, TRAINING_PRICE));
 
         NoAvailablePlacesException actual = assertThrows(NoAvailablePlacesException.class, () -> service.chooseTraining(TRAINING_ID));
 
@@ -322,7 +322,7 @@ class OfferApplicationServiceTest {
     private void givenAvailableTraining() {
         int availablePlaces = FAKER.number().numberBetween(1, 42);
 
-        givenTraining(new TrainingDto(availablePlaces, OfferApplicationServiceTest.TRAINING_PRICE));
+        givenTraining(new TrainingDto(TRAINING_ID, availablePlaces, OfferApplicationServiceTest.TRAINING_PRICE));
     }
 
     private void givenTraining(TrainingDto trainingDto) {

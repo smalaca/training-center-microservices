@@ -37,6 +37,7 @@ class TrainingOfferCatalogueRestClientIntegrationTest {
 
         TrainingDto trainingDto = trainingOfferCatalogue.detailsOf(TRAINING_ID);
 
+        assertThat(trainingDto.trainingId()).isEqualTo(TRAINING_ID);
         assertThat(trainingDto.availablePlaces()).isEqualTo(AVAILABLE_PLACES);
         assertThat(trainingDto.price()).isEqualTo(Price.of(PRICE_AMOUNT, PRICE_CURRENCY));
     }

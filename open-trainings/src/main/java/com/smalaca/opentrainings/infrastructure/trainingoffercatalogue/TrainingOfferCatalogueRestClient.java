@@ -27,6 +27,6 @@ public class TrainingOfferCatalogueRestClient implements TrainingOfferCatalogue 
                 .retrieve()
                 .body(RestTrainingOfferDetailDto.class);
 
-        return new TrainingDto(detail.availablePlaces(), Price.of(detail.priceAmount(), detail.priceCurrency()));
+        return new TrainingDto(trainingId, detail.availablePlaces(), Price.of(detail.priceAmount(), detail.priceCurrency()));
     }
 }

@@ -41,7 +41,7 @@ class TrainingRestControllerSystemTest {
 
     @BeforeEach
     void givenAvailableTraining() {
-        TrainingDto dto = new TrainingDto(AVAILABLE_PLACES, randomPrice());
+        TrainingDto dto = new TrainingDto(TRAINING_ID, AVAILABLE_PLACES, randomPrice());
         given(trainingOfferCatalogue.detailsOf(TRAINING_ID)).willReturn(dto);
     }
 
