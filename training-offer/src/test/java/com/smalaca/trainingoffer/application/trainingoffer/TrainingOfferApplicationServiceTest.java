@@ -326,7 +326,7 @@ class TrainingOfferApplicationServiceTest {
                 .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .isRescheduled();
     }
-    
+
     @Test
     void shouldSaveNewTrainingOfferAsPublished() {
         existingTrainingOffer();
