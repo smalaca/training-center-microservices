@@ -8,9 +8,12 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.RescheduleTrainingOfferCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEventAssertion;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
@@ -30,6 +33,7 @@ import java.util.stream.IntStream;
 
 import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferAssertion.assertThatTrainingOffer;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEventAssertion.assertThatNoAvailableTrainingPlacesLeftEvent;
+import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEventAssertion.assertThatTrainingOfferRescheduledEvent;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEventAssertion.assertThatTrainingPlaceBookedEvent;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEventAssertion.assertThatTrainingPriceChangedEvent;
 import static com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEventAssertion.assertThatTrainingPriceNotChangedEvent;
@@ -37,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 class TrainingOfferApplicationServiceTest {
     private static final UUID TRAINING_OFFER_ID = UUID.randomUUID();
@@ -51,8 +56,14 @@ class TrainingOfferApplicationServiceTest {
     private static final LocalDate END_DATE = LocalDate.of(2023, 10, 5);
     private static final LocalTime START_TIME = LocalTime.of(9, 0);
     private static final LocalTime END_TIME = LocalTime.of(17, 0);
+    private static final LocalDate NEW_START_DATE = LocalDate.of(2023, 11, 1);
+    private static final LocalDate NEW_END_DATE = LocalDate.of(2023, 11, 5);
+    private static final LocalTime NEW_START_TIME = LocalTime.of(10, 0);
+    private static final LocalTime NEW_END_TIME = LocalTime.of(18, 0);
     private static final BigDecimal NEW_PRICE_AMOUNT = BigDecimal.valueOf(1500);
     private static final String NEW_CURRENCY = "EUR";
+    private static final int NEW_TRAINING_OFFER = 1;
+    private static final int EXISTING_TRAINING_OFFER = 0;
 
     private final TrainingOfferRepository repository = mock(TrainingOfferRepository.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
@@ -278,5 +289,85 @@ class TrainingOfferApplicationServiceTest {
         assertThat(actual).isInstanceOf(expectedEventType);
 
         return expectedEventType.cast(actual);
+    }
+    
+    @Test
+    void shouldPublishTrainingOfferRescheduledEvent() {
+        existingTrainingOffer();
+        RescheduleTrainingOfferCommand command = rescheduleTrainingOfferCommand();
+
+        UUID actualTrainingOfferId = service.reschedule(command);
+
+        thenTrainingOfferRescheduledEventPublished()
+                .isNextAfter(command.commandId())
+                .hasTrainingOfferId(actualTrainingOfferId)
+                .hasRescheduledTrainingOfferId(TRAINING_OFFER_ID)
+                .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPriceAmount(PRICE_AMOUNT)
+                .hasPriceCurrencyCode(CURRENCY)
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasStartDate(NEW_START_DATE)
+                .hasEndDate(NEW_END_DATE)
+                .hasStartTime(NEW_START_TIME)
+                .hasEndTime(NEW_END_TIME);
+    }
+    
+    @Test
+    void shouldSaveExistingTrainingOfferAsRescheduled() {
+        existingTrainingOffer();
+        RescheduleTrainingOfferCommand command = rescheduleTrainingOfferCommand();
+        
+        service.reschedule(command);
+
+        thenRescheduledTrainingOfferWasSaved(EXISTING_TRAINING_OFFER)
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
+                .isRescheduled();
+    }
+
+    @Test
+    void shouldSaveNewTrainingOfferAsPublished() {
+        existingTrainingOffer();
+        RescheduleTrainingOfferCommand command = rescheduleTrainingOfferCommand();
+        
+        service.reschedule(command);
+
+        TrainingOfferRescheduledEvent event = thenTrainingOfferEventPublished(TrainingOfferRescheduledEvent.class);
+        thenRescheduledTrainingOfferWasSaved(NEW_TRAINING_OFFER)
+                .hasTrainingOfferId(event.trainingOfferId())
+                .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPrice(PRICE_AMOUNT, CURRENCY)
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasNoParticipantsRegistered()
+                .hasTrainingSessionPeriod(NEW_START_DATE, NEW_END_DATE, NEW_START_TIME, NEW_END_TIME)
+                .isPublished();
+    }
+
+    private TrainingOfferAssertion thenRescheduledTrainingOfferWasSaved(int index) {
+        ArgumentCaptor<TrainingOffer> captor = ArgumentCaptor.forClass(TrainingOffer.class);
+        then(repository).should(times(2)).save(captor.capture());
+        TrainingOffer newTrainingOffer = captor.getAllValues().get(index);
+
+        return assertThatTrainingOffer(newTrainingOffer);
+    }
+
+    private RescheduleTrainingOfferCommand rescheduleTrainingOfferCommand() {
+        return new RescheduleTrainingOfferCommand(
+                commandId(), 
+                TRAINING_OFFER_ID, 
+                NEW_START_DATE, 
+                NEW_END_DATE, 
+                NEW_START_TIME, 
+                NEW_END_TIME
+        );
+    }
+    
+    private TrainingOfferRescheduledEventAssertion thenTrainingOfferRescheduledEventPublished() {
+        return assertThatTrainingOfferRescheduledEvent(thenTrainingOfferEventPublished(TrainingOfferRescheduledEvent.class));
     }
 }

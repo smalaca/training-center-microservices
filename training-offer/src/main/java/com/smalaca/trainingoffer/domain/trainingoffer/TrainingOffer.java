@@ -5,8 +5,10 @@ import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.trainingoffer.domain.price.Price;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.RescheduleTrainingOfferCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -15,10 +17,14 @@ import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.util.UUID;
+
+import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferStatus.PUBLISHED;
 
 @AggregateRoot
 @Entity
@@ -51,16 +57,21 @@ public class TrainingOffer {
 
     @Embedded
     private Participants participants;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
+    private TrainingOfferStatus status;
 
     private TrainingOffer() {}
 
-    private TrainingOffer(Builder builder, Participants participants) {
+    private TrainingOffer(Builder builder, TrainingOfferStatus status, Participants participants) {
         this.trainingOfferId = builder.trainingOfferId;
         this.trainingOfferDraftId = builder.trainingOfferDraftId;
         this.trainerId = builder.trainerId;
         this.trainingProgramId = builder.trainingProgramId;
         this.trainingSessionPeriod = builder.trainingSessionPeriod;
         this.price = builder.price;
+        this.status = status;
         this.participants = participants;
     }
     
@@ -81,6 +92,25 @@ public class TrainingOffer {
         } else {
             return NoAvailableTrainingPlacesLeftEvent.nextAfter(command);
         }
+    }
+    
+    public TrainingOfferRescheduledEvent reschedule(RescheduleTrainingOfferCommand command) {
+        this.status = TrainingOfferStatus.RESCHEDULED;
+        
+        return TrainingOfferRescheduledEvent.nextAfter(
+            command, newTrainingOfferId(),
+            trainingOfferDraftId,
+            trainingProgramId, 
+            trainerId, 
+            price.amount(), 
+            price.currencyCode(), 
+            participants.minimumParticipants(), 
+            participants.maximumParticipants()
+        );
+    }
+
+    private UUID newTrainingOfferId() {
+        return UUID.randomUUID();
     }
 
     @Factory
@@ -135,7 +165,7 @@ public class TrainingOffer {
         }
 
         TrainingOffer build() {
-            return new TrainingOffer(this, Participants.from(minimumParticipants, maximumParticipants));
+            return new TrainingOffer(this, PUBLISHED, Participants.from(minimumParticipants, maximumParticipants));
         }
     }
 }
