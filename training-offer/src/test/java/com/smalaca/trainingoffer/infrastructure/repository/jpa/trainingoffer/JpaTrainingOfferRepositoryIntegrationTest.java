@@ -1,9 +1,11 @@
 package com.smalaca.trainingoffer.infrastructure.repository.jpa.trainingoffer;
 
 import com.smalaca.test.type.RepositoryTest;
+import com.smalaca.trainingoffer.domain.commandid.CommandId;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOffer;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.RescheduleTrainingOfferCommand;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -13,6 +15,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -55,13 +58,14 @@ class JpaTrainingOfferRepositoryIntegrationTest {
     }
 
     @Test
-    void shouldFindCreatedTrainingOfferById() {
+    void shouldFindPublishedTrainingOfferById() {
         TrainingOffer trainingOffer = createTrainingOffer();
 
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
 
         TrainingOffer found = transactionTemplate.execute(transactionStatus -> repository.findById(TRAINING_OFFER_ID));
         assertThatTrainingOffer(found)
+                .isPublished()
                 .hasTrainingOfferId(TRAINING_OFFER_ID)
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
@@ -71,6 +75,32 @@ class JpaTrainingOfferRepositoryIntegrationTest {
                 .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
                 .hasNoParticipantsRegistered()
                 .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
+    }
+
+    @Test
+    void shouldFindRescheduledTrainingOfferById() {
+        TrainingOffer trainingOffer = createTrainingOffer();
+        trainingOffer.reschedule(rescheduleTrainingOfferCommand());
+
+        transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(trainingOffer));
+
+        TrainingOffer found = transactionTemplate.execute(transactionStatus -> repository.findById(TRAINING_OFFER_ID));
+        assertThatTrainingOffer(found)
+                .isRescheduled()
+                .hasTrainingOfferId(TRAINING_OFFER_ID)
+                .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
+                .hasTrainingProgramId(TRAINING_PROGRAM_ID)
+                .hasTrainerId(TRAINER_ID)
+                .hasPrice(PRICE_AMOUNT, CURRENCY)
+                .hasMinimumParticipants(MINIMUM_PARTICIPANTS)
+                .hasMaximumParticipants(MAXIMUM_PARTICIPANTS)
+                .hasNoParticipantsRegistered()
+                .hasTrainingSessionPeriod(START_DATE, END_DATE, START_TIME, END_TIME);
+    }
+
+    private RescheduleTrainingOfferCommand rescheduleTrainingOfferCommand() {
+        CommandId commandId = new CommandId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
+        return new RescheduleTrainingOfferCommand(commandId, TRAINING_OFFER_ID, START_DATE.plusDays(1), END_DATE.plusDays(1), START_TIME, END_TIME);
     }
 
     private TrainingOffer createTrainingOffer() {
