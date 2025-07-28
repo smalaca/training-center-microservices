@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferStatus.PUBLISHED;
+import static com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferStatus.RESCHEDULED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrainingOfferAssertion {
@@ -90,6 +92,19 @@ public class TrainingOfferAssertion {
         TrainingSessionPeriod expected = new TrainingSessionPeriod(expectedStartDate, expectedEndDate, expectedStartTime, expectedEndTime);
         assertThat(actual).hasFieldOrPropertyWithValue("trainingSessionPeriod", expected);
 
+        return this;
+    }
+
+    public TrainingOfferAssertion  isPublished() {
+        return hasStatus(PUBLISHED);
+    }
+
+    public TrainingOfferAssertion isRescheduled() {
+        return hasStatus(RESCHEDULED);
+    }
+
+    private TrainingOfferAssertion hasStatus(TrainingOfferStatus expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("status", expected);
         return this;
     }
 }

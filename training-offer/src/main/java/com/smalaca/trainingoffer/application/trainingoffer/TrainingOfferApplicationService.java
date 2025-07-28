@@ -9,7 +9,9 @@ import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferFactory;
 import com.smalaca.trainingoffer.domain.trainingoffer.TrainingOfferRepository;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.BookTrainingPlaceCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.commands.ConfirmTrainingPriceCommand;
+import com.smalaca.trainingoffer.domain.trainingoffer.commands.RescheduleTrainingOfferCommand;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +56,20 @@ public class TrainingOfferApplicationService {
         TrainingOfferEvent event = trainingOffer.book(command);
         
         repository.save(trainingOffer);
+        eventRegistry.publish(event);
+    }
+    
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void reschedule(RescheduleTrainingOfferCommand command) {
+        TrainingOffer existingTrainingOffer = repository.findById(command.trainingOfferId());
+        
+        TrainingOfferRescheduledEvent event = existingTrainingOffer.reschedule(command);
+        TrainingOffer newTrainingOffer = factory.create(event);
+        
+        repository.save(existingTrainingOffer);
+        repository.save(newTrainingOffer);
         eventRegistry.publish(event);
     }
 }

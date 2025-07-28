@@ -46,4 +46,12 @@ class Participants {
     void addParticipant(UUID participantId) {
         participantIds.add(participantId);
     }
+    
+    int minimumParticipants() {
+        return minimumParticipants;
+    }
+    
+    int maximumParticipants() {
+        return maximumParticipants;
+    }
 }
