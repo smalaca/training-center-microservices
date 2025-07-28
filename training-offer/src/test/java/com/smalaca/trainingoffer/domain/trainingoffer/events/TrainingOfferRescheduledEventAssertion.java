@@ -26,8 +26,8 @@ public class TrainingOfferRescheduledEventAssertion {
         return this;
     }
 
-    public TrainingOfferRescheduledEventAssertion hasTrainingOfferId() {
-        assertThat(actual.trainingOfferId()).isNotNull();
+    public TrainingOfferRescheduledEventAssertion hasTrainingOfferId(UUID expected) {
+        assertThat(actual.trainingOfferId()).isEqualTo(expected);
         return this;
     }
 

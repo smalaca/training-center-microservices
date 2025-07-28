@@ -16,6 +16,8 @@ import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @ApplicationLayer
 public class TrainingOfferApplicationService {
     private final TrainingOfferRepository repository;
@@ -66,7 +68,7 @@ public class TrainingOfferApplicationService {
     @Transactional
     @CommandOperation
     @DrivingPort
-    public void reschedule(RescheduleTrainingOfferCommand command) {
+    public UUID reschedule(RescheduleTrainingOfferCommand command) {
         TrainingOffer existingTrainingOffer = repository.findById(command.trainingOfferId());
 
         RescheduledTrainingOffer rescheduledTrainingOffer = trainingOfferDomainService.reschedule(existingTrainingOffer, command);
@@ -74,5 +76,7 @@ public class TrainingOfferApplicationService {
         repository.save(existingTrainingOffer);
         repository.save(rescheduledTrainingOffer.trainingOffer());
         eventRegistry.publish(rescheduledTrainingOffer.event());
+
+        return rescheduledTrainingOffer.event().trainingOfferId();
     }
 }

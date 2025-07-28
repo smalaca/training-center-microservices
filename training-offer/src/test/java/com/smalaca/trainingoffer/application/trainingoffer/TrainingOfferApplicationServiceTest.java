@@ -295,12 +295,12 @@ class TrainingOfferApplicationServiceTest {
     void shouldPublishTrainingOfferRescheduledEvent() {
         existingTrainingOffer();
         RescheduleTrainingOfferCommand command = rescheduleTrainingOfferCommand();
-        
-        service.reschedule(command);
-        
+
+        UUID actualTrainingOfferId = service.reschedule(command);
+
         thenTrainingOfferRescheduledEventPublished()
                 .isNextAfter(command.commandId())
-                .hasTrainingOfferId()
+                .hasTrainingOfferId(actualTrainingOfferId)
                 .hasRescheduledTrainingOfferId(TRAINING_OFFER_ID)
                 .hasTrainingOfferDraftId(TRAINING_OFFER_DRAFT_ID)
                 .hasTrainingProgramId(TRAINING_PROGRAM_ID)
