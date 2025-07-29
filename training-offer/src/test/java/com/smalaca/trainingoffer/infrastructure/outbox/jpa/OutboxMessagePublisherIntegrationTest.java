@@ -5,12 +5,13 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingoffer.domain.eventid.EventId;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
-import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferEventPublisher;
+import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingoffer.TrainingOfferEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,6 +75,7 @@ class OutboxMessagePublisherIntegrationTest {
         TrainingPriceChangedEvent trainingPriceChangedEvent = randomTrainingPriceChangedEvent();
         NoAvailableTrainingPlacesLeftEvent noAvailableTrainingPlacesLeftEvent = randomNoAvailableTrainingPlacesLeftEvent();
         TrainingPlaceBookedEvent trainingPlaceBookedEvent = randomTrainingPlaceBookedEvent();
+        TrainingOfferRescheduledEvent trainingOfferRescheduledEvent = randomTrainingOfferRescheduledEvent();
         notPublished(trainingOfferPublishedEventOne);
         published(randomTrainingOfferPublishedEvent());
         notPublished(trainingOfferPublishedEventTwo);
@@ -85,6 +87,8 @@ class OutboxMessagePublisherIntegrationTest {
         notPublished(noAvailableTrainingPlacesLeftEvent);
         notPublished(trainingPlaceBookedEvent);
         published(randomTrainingPlaceBookedEvent());
+        notPublished(trainingOfferRescheduledEvent);
+        published(randomTrainingOfferRescheduledEvent());
 
         await()
                 .untilAsserted(() -> {
@@ -93,6 +97,7 @@ class OutboxMessagePublisherIntegrationTest {
                     assertThat(listener.trainingPriceChangedEvents).contains(trainingPriceChangedEvent);
                     assertThat(listener.noAvailableTrainingPlacesLeftEvents).contains(noAvailableTrainingPlacesLeftEvent);
                     assertThat(listener.trainingPlaceBookedEvents).contains(trainingPlaceBookedEvent);
+                    assertThat(listener.trainingOfferRescheduledEvents).contains(trainingOfferRescheduledEvent);
                 });
     }
 
@@ -108,11 +113,13 @@ class OutboxMessagePublisherIntegrationTest {
         published(randomNoAvailableTrainingPlacesLeftEvent());
         notPublished(randomTrainingPlaceBookedEvent());
         published(randomTrainingPlaceBookedEvent());
+        notPublished(randomTrainingOfferRescheduledEvent());
+        published(randomTrainingOfferRescheduledEvent());
 
         await()
                 .untilAsserted(() -> {
                     assertThat(repository.findAll())
-                            .hasSize(10)
+                            .hasSize(12)
                             .allSatisfy(actual -> assertThat(actual.isPublished()).isTrue());
                 });
     }
@@ -139,6 +146,24 @@ class OutboxMessagePublisherIntegrationTest {
     
     private TrainingPlaceBookedEvent randomTrainingPlaceBookedEvent() {
         return new TrainingPlaceBookedEvent(EventId.newEventId(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
+    }
+    
+    private TrainingOfferRescheduledEvent randomTrainingOfferRescheduledEvent() {
+        return new TrainingOfferRescheduledEvent(
+                EventId.newEventId(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                BigDecimal.valueOf(200.00),
+                "GBP",
+                3,
+                15,
+                LocalDate.of(2023, 11, 1),
+                LocalDate.of(2023, 11, 5),
+                LocalTime.of(10, 0),
+                LocalTime.of(16, 0),
+                UUID.randomUUID());
     }
 
     private void published(TrainingOfferPublishedEvent event) {

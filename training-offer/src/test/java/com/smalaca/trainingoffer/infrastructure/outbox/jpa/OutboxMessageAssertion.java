@@ -1,6 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -79,6 +80,24 @@ class OutboxMessageAssertion {
                 .contains("\"offerId\" : \"" + expected.offerId())
                 .contains("\"participantId\" : \"" + expected.participantId())
                 .contains("\"trainingOfferId\" : \"" + expected.trainingOfferId());
+        return this;
+    }
+    
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingOfferRescheduledEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"trainingOfferId\" : \"" + expected.trainingOfferId())
+                .contains("\"trainingOfferDraftId\" : \"" + expected.trainingOfferDraftId())
+                .contains("\"trainingProgramId\" : \"" + expected.trainingProgramId())
+                .contains("\"trainerId\" : \"" + expected.trainerId())
+                .contains("\"priceAmount\" : " + expected.priceAmount())
+                .contains("\"priceCurrencyCode\" : \"" + expected.priceCurrencyCode())
+                .contains("\"minimumParticipants\" : " + expected.minimumParticipants())
+                .contains("\"maximumParticipants\" : " + expected.maximumParticipants())
+                .contains("\"startDate\" : \"" + expected.startDate())
+                .contains("\"endDate\" : \"" + expected.endDate())
+                .contains("\"startTime\" : \"" + expected.startTime())
+                .contains("\"endTime\" : \"" + expected.endTime())
+                .contains("\"rescheduledTrainingOfferId\" : \"" + expected.rescheduledTrainingOfferId());
         return this;
     }
 }

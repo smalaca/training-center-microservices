@@ -21,6 +21,7 @@ kafka:
         book-training-place: training-offer-book-training-place-command-topic
       events:
         training-offer-published: training-offer-training-offer-published-event-topic
+        training-offer-rescheduled: training-offer-training-offer-rescheduled-event-topic
         training-price-changed: training-offer-training-price-changed-event-topic
         training-price-not-changed: training-offer-training-price-not-changed-event-topic
         training-place-booked: training-offer-training-place-booked-event-topic

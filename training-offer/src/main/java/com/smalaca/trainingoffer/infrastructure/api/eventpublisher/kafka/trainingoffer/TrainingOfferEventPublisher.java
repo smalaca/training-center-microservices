@@ -1,7 +1,8 @@
-package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft;
+package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingoffer;
 
 import com.smalaca.trainingoffer.domain.eventid.EventId;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -17,18 +18,21 @@ public class TrainingOfferEventPublisher {
     private final String trainingPriceNotChangedTopic;
     private final String trainingPlaceBookedTopic;
     private final String noAvailableTrainingPlacesLeftTopic;
+    private final String trainingOfferRescheduledTopic;
 
     TrainingOfferEventPublisher(
             KafkaTemplate<String, Object> kafkaTemplate,
             @Value("${kafka.topics.trainingoffer.events.training-price-changed}") String trainingPriceChangedTopic,
             @Value("${kafka.topics.trainingoffer.events.training-price-not-changed}") String trainingPriceNotChangedTopic,
             @Value("${kafka.topics.trainingoffer.events.training-place-booked}") String trainingPlaceBookedTopic,
-            @Value("${kafka.topics.trainingoffer.events.no-available-training-places-left}") String noAvailableTrainingPlacesLeftTopic) {
+            @Value("${kafka.topics.trainingoffer.events.no-available-training-places-left}") String noAvailableTrainingPlacesLeftTopic,
+            @Value("${kafka.topics.trainingoffer.events.training-offer-rescheduled}") String trainingOfferRescheduledTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.trainingPriceChangedTopic = trainingPriceChangedTopic;
         this.trainingPriceNotChangedTopic = trainingPriceNotChangedTopic;
         this.trainingPlaceBookedTopic = trainingPlaceBookedTopic;
         this.noAvailableTrainingPlacesLeftTopic = noAvailableTrainingPlacesLeftTopic;
+        this.trainingOfferRescheduledTopic = trainingOfferRescheduledTopic;
     }
 
     @EventListener
@@ -49,6 +53,11 @@ public class TrainingOfferEventPublisher {
     @EventListener
     public void consume(NoAvailableTrainingPlacesLeftEvent event) {
         kafkaTemplate.send(noAvailableTrainingPlacesLeftTopic, asExternalNoAvailableTrainingPlacesLeftEvent(event));
+    }
+    
+    @EventListener
+    public void consume(TrainingOfferRescheduledEvent event) {
+        kafkaTemplate.send(trainingOfferRescheduledTopic, asExternalTrainingOfferRescheduledEvent(event));
     }
 
     private com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent asExternalTrainingPriceChangedEvent(TrainingPriceChangedEvent event) {
@@ -81,6 +90,24 @@ public class TrainingOfferEventPublisher {
                 event.offerId(),
                 event.participantId(),
                 event.trainingOfferId());
+    }
+    
+    private com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferRescheduledEvent asExternalTrainingOfferRescheduledEvent(TrainingOfferRescheduledEvent event) {
+        return new com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferRescheduledEvent(
+                asExternalEventId(event.eventId()),
+                event.rescheduledTrainingOfferId(),
+                event.trainingOfferId(),
+                event.trainingOfferDraftId(),
+                event.trainingProgramId(),
+                event.trainerId(),
+                event.priceAmount(),
+                event.priceCurrencyCode(),
+                event.minimumParticipants(),
+                event.maximumParticipants(),
+                event.startDate(),
+                event.endDate(),
+                event.startTime(),
+                event.endTime());
     }
 
     private com.smalaca.schemaregistry.metadata.EventId asExternalEventId(EventId eventId) {

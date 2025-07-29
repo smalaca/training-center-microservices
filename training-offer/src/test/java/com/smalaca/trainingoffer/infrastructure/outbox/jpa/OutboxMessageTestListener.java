@@ -1,6 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.outbox.jpa;
 
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -18,6 +19,7 @@ class OutboxMessageTestListener {
     List<TrainingPriceChangedEvent> trainingPriceChangedEvents = new ArrayList<>();
     List<NoAvailableTrainingPlacesLeftEvent> noAvailableTrainingPlacesLeftEvents = new ArrayList<>();
     List<TrainingPlaceBookedEvent> trainingPlaceBookedEvents = new ArrayList<>();
+    List<TrainingOfferRescheduledEvent> trainingOfferRescheduledEvents = new ArrayList<>();
 
     @EventListener
     void listen(TrainingOfferPublishedEvent event) {
@@ -42,5 +44,10 @@ class OutboxMessageTestListener {
     @EventListener
     void listen(TrainingPlaceBookedEvent event) {
         trainingPlaceBookedEvents.add(event);
+    }
+    
+    @EventListener
+    void listen(TrainingOfferRescheduledEvent event) {
+        trainingOfferRescheduledEvents.add(event);
     }
 }
