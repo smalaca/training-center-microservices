@@ -166,6 +166,7 @@ A chronological series of blog posts documenting the project journey:
    3. [Event Storming Big Picture — How to enforce the Timeline?](https://letstalkaboutjava.blogspot.com/2025/07/event-storming-big-picture-how-to.html)
    4. [So… Which Event Goes First?](https://letstalkaboutjava.blogspot.com/2025/07/so-which-event-goes-first.html)
    5. [Big Challenges of Event Storming Big Picture](https://letstalkaboutjava.blogspot.com/2025/07/big-challenges-of-event-storming-big.html)
+   6. [After the Big Picture: Turning Insights into Action](https://letstalkaboutjava.blogspot.com/2025/07/after-big-picture-turning-insights-into.html)
 4. **Domain-Driven Design Introduction**
    1. Domain-Driven Design for dummies
 5. **Discovering Language Boundaries**
