@@ -1,6 +1,7 @@
 package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingoffer;
 
 import com.smalaca.schemaregistry.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
+import com.smalaca.schemaregistry.trainingoffer.events.TrainingOfferRescheduledEvent;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingPlaceBookedEvent;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceChangedEvent;
 import com.smalaca.schemaregistry.trainingoffer.events.TrainingPriceNotChangedEvent;
@@ -16,6 +17,7 @@ class TrainingOfferTestKafkaListener {
     private final Map<UUID, TrainingPriceNotChangedEvent> trainingPriceNotChangedEvents = new HashMap<>();
     private final Map<UUID, TrainingPlaceBookedEvent> trainingPlaceBookedEvents = new HashMap<>();
     private final Map<UUID, NoAvailableTrainingPlacesLeftEvent> noAvailableTrainingPlacesLeftEvents = new HashMap<>();
+    private final Map<UUID, TrainingOfferRescheduledEvent> trainingOfferRescheduledEvents = new HashMap<>();
 
     @KafkaListener(
             topics = "${kafka.topics.trainingoffer.events.training-price-changed}",
@@ -49,6 +51,14 @@ class TrainingOfferTestKafkaListener {
         noAvailableTrainingPlacesLeftEvents.put(event.offerId(), event);
     }
 
+    @KafkaListener(
+            topics = "${kafka.topics.trainingoffer.events.training-offer-rescheduled}",
+            groupId = "test-training-offer-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(TrainingOfferRescheduledEvent event) {
+        trainingOfferRescheduledEvents.put(event.trainingOfferId(), event);
+    }
+
     Optional<TrainingPriceChangedEvent> trainingPriceChangedEventFor(UUID offerId) {
         return Optional.ofNullable(trainingPriceChangedEvents.get(offerId));
     }
@@ -63,5 +73,9 @@ class TrainingOfferTestKafkaListener {
     
     Optional<NoAvailableTrainingPlacesLeftEvent> noAvailableTrainingPlacesLeftEventFor(UUID offerId) {
         return Optional.ofNullable(noAvailableTrainingPlacesLeftEvents.get(offerId));
+    }
+
+    Optional<TrainingOfferRescheduledEvent> trainingOfferRescheduledEventFor(UUID offerId) {
+        return Optional.ofNullable(trainingOfferRescheduledEvents.get(offerId));
     }
 }
