@@ -10,7 +10,7 @@ import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceChange
 import com.smalaca.trainingoffer.domain.trainingoffer.events.TrainingPriceNotChangedEvent;
 import com.smalaca.trainingoffer.domain.trainingofferdraft.events.TrainingOfferPublishedEvent;
 import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferDraftEventPublisher;
-import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft.TrainingOfferEventPublisher;
+import com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingoffer.TrainingOfferEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

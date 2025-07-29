@@ -1,4 +1,4 @@
-package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingofferdraft;
+package com.smalaca.trainingoffer.infrastructure.api.eventpublisher.kafka.trainingoffer;
 
 import com.smalaca.trainingoffer.domain.eventid.EventId;
 import com.smalaca.trainingoffer.domain.trainingoffer.events.NoAvailableTrainingPlacesLeftEvent;
