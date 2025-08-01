@@ -41,9 +41,7 @@ class TrainingProgramEventPublisherIntegrationTest {
     private static final UUID TRAINING_PROGRAM_ID = UUID.randomUUID();
     private static final UUID AUTHOR_ID = UUID.randomUUID();
     private static final UUID REVIEWER_ID = UUID.randomUUID();
-    private static final UUID TRAINING_CATEGORY_ONE = UUID.randomUUID();
-    private static final UUID TRAINING_CATEGORY_TWO = UUID.randomUUID();
-    private static final List<UUID> TRAINING_CATEGORIES = List.of(TRAINING_CATEGORY_ONE, TRAINING_CATEGORY_TWO);
+    private static final List<UUID> TRAINING_CATEGORIES = List.of(UUID.randomUUID(), UUID.randomUUID());
     private static final EventId EVENT_ID = new EventId(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), LocalDateTime.now());
     private static final String TRAINING_PLAN = FAKER.lorem().paragraph();
     private static final String TRAINING_AGENDA = FAKER.lorem().paragraph();
@@ -80,14 +78,14 @@ class TrainingProgramEventPublisherIntegrationTest {
                     .hasProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
                     .hasAuthorId(AUTHOR_ID)
                     .hasTitle(TRAINING_NAME)
+                    .hasCategoriesIds(TRAINING_CATEGORIES)
                     .hasContent(String.format("""
                         {
-                            "categoriesIds" : [ "%s", "%s" ],
                             "name" : "%s",
                             "description" : "%s",
                             "agenda" : "%s",
                             "plan" : "%s"
-                        }""", TRAINING_CATEGORY_ONE, TRAINING_CATEGORY_TWO, TRAINING_NAME, TRAINING_DESCRIPTION, TRAINING_AGENDA, TRAINING_PLAN));
+                        }""", TRAINING_NAME, TRAINING_DESCRIPTION, TRAINING_AGENDA, TRAINING_PLAN));
         });
     }
 

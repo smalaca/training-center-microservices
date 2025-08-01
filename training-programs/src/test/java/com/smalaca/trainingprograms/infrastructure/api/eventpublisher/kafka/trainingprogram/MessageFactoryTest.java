@@ -51,14 +51,14 @@ class MessageFactoryTest {
                 .hasProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
                 .hasAuthorId(AUTHOR_ID)
                 .hasTitle(TRAINING_NAME)
+                .hasCategoriesIds(TRAINING_CATEGORIES)
                 .hasContent(String.format("""
                         {
-                            "categoriesIds" : [ "%s", "%s" ],
                             "name" : "%s",
                             "description" : "%s",
                             "agenda" : "%s",
                             "plan" : "%s"
-                        }""", TRAINING_CATEGORY_ONE, TRAINING_CATEGORY_TWO, TRAINING_NAME, TRAINING_DESCRIPTION, TRAINING_AGENDA, TRAINING_PLAN));
+                        }""", TRAINING_NAME, TRAINING_DESCRIPTION, TRAINING_AGENDA, TRAINING_PLAN));
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import net.datafaker.Faker;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
@@ -30,7 +31,7 @@ public class GivenProposal {
 
     public GivenProposal registered() {
         CommandId commandId = new CommandId(randomUUID(), randomUUID(), correlationId, registeredAt);
-        RegisterProposalCommand command = new RegisterProposalCommand(commandId, proposalId, authorId, title, content);
+        RegisterProposalCommand command = new RegisterProposalCommand(commandId, proposalId, authorId, title, content, List.of(randomUUID(), randomUUID()));
         
         proposal = Proposal.register(command);
         status = REGISTERED;

@@ -24,7 +24,8 @@ class MessageFactory {
                 event.trainingProgramProposalId(),
                 event.authorId(),
                 event.name(),
-                createContent(event));
+                createContent(event),
+                event.categoriesIds());
     }
 
     private String createContent(TrainingProgramProposedEvent event) {
@@ -33,7 +34,6 @@ class MessageFactory {
         content.put("description", event.description());
         content.put("agenda", event.agenda());
         content.put("plan", event.plan());
-        content.put("categoriesIds", event.categoriesIds());
 
         try {
             return objectMapper.writeValueAsString(content);

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
@@ -219,7 +220,8 @@ class ProposalApplicationServiceTest {
                 PROPOSAL_ID,
                 randomUUID(),
                 FAKER.book().title(),
-                FAKER.lorem().paragraph()
+                FAKER.lorem().paragraph(),
+                List.of(randomUUID(), randomUUID())
         );
     }
 
