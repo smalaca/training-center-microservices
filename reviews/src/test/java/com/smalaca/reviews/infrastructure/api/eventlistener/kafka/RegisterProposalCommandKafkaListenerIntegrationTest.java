@@ -17,6 +17,8 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.List;
+
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
 import static java.util.UUID.randomUUID;
 import static org.awaitility.Awaitility.await;
@@ -81,7 +83,8 @@ class RegisterProposalCommandKafkaListenerIntegrationTest {
                 randomUUID(),
                 randomUUID(),
                 FAKER.book().title(),
-                FAKER.lorem().paragraph()
+                FAKER.lorem().paragraph(),
+                List.of(randomUUID(), randomUUID())
         );
     }
 }

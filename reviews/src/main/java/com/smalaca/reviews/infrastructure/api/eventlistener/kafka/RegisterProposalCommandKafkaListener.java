@@ -30,7 +30,8 @@ public class RegisterProposalCommandKafkaListener {
                 command.proposalId(),
                 command.authorId(),
                 command.title(),
-                command.content());
+                command.content(),
+                command.categoriesIds());
     }
 
     private CommandId asCommandId(com.smalaca.schemaregistry.metadata.CommandId commandId) {

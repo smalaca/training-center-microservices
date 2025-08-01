@@ -3,6 +3,7 @@ package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.tra
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +36,11 @@ class RegisterProposalCommandAssertion {
 
     RegisterProposalCommandAssertion hasContent(String expected) {
         assertThat(actual.content()).isEqualToIgnoringWhitespace(expected);
+        return this;
+    }
+
+    RegisterProposalCommandAssertion hasCategoriesIds(List<UUID> expected) {
+        assertThat(actual.categoriesIds()).isEqualTo(expected);
         return this;
     }
 
