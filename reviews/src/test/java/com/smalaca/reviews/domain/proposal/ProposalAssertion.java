@@ -99,7 +99,9 @@ public class ProposalAssertion {
     }
 
     public ProposalAssertion hasCategoriesIds(List<UUID> expected) {
-        assertThat(actual).hasFieldOrPropertyWithValue("categoriesIds", expected);
+        assertThat(actual).extracting("categoriesIds").satisfies(value -> {
+            assertThat((List<UUID>) value).containsExactlyInAnyOrderElementsOf(expected);
+        });
         return this;
     }
 

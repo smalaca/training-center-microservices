@@ -5,11 +5,14 @@ import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
@@ -17,6 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static jakarta.persistence.FetchType.EAGER;
 
 @AggregateRoot
 @Entity
@@ -52,7 +57,12 @@ public class Proposal {
     @Column(name = "STATUS")
     private ProposalStatus status;
 
-    @Column(name = "CATEGORIES_IDS")
+    @ElementCollection(fetch = EAGER)
+    @CollectionTable(
+        name = "PROPOSAL_CATEGORIES",
+        joinColumns = @JoinColumn(name = "PROPOSAL_ID")
+    )
+    @Column(name = "CATEGORY_ID")
     private List<UUID> categoriesIds;
 
     @Column(name = "ASSIGNED_REVIEWER_ID")
