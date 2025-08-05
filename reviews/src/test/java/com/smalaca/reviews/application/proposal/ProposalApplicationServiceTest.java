@@ -3,9 +3,12 @@ package com.smalaca.reviews.application.proposal;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.commandid.CommandId;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
+import com.smalaca.reviews.domain.proposal.GivenProposal;
+import com.smalaca.reviews.domain.proposal.GivenProposalFactory;
 import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalAssertion;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
+import com.smalaca.reviews.domain.proposal.ProposalTestDto;
 import com.smalaca.reviews.domain.proposal.UnsupportedProposalTransitionException;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
@@ -36,7 +39,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 
 class ProposalApplicationServiceTest {
-    private static final UUID PROPOSAL_ID = randomUUID();
     private static final UUID REVIEWER_ID = randomUUID();
     private static final UUID CORRELATION_ID = randomUUID();
     private static final LocalDateTime NOW = now();
@@ -46,7 +48,9 @@ class ProposalApplicationServiceTest {
     private final ProposalRepository repository = mock(ProposalRepository.class);
     private final Clock clock = mock(Clock.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final ProposalApplicationService service = new ProposalApplicationService(repository, clock, eventRegistry);
+    private final ProposalApplicationService service = new ProposalApplicationServiceFactory().proposalApplicationService(repository, clock, eventRegistry);
+
+    private final GivenProposalFactory given = GivenProposalFactory.create();
 
     @BeforeEach
     void initClock() {
@@ -75,9 +79,9 @@ class ProposalApplicationServiceTest {
 
     @Test
     void shouldApproveProposal() {
-        givenExistingProposal();
+        ProposalTestDto dto = givenExistingProposal();
 
-        service.approve(PROPOSAL_ID, REVIEWER_ID);
+        service.approve(dto.proposalId(), REVIEWER_ID);
 
         thenProposalSaved()
                 .isApproved()
@@ -87,40 +91,40 @@ class ProposalApplicationServiceTest {
 
     @Test
     void shouldPublishProposalApprovedEventWhenProposalIsApproved() {
-        givenExistingProposal();
+        ProposalTestDto dto = givenExistingProposal();
 
-        service.approve(PROPOSAL_ID, REVIEWER_ID);
+        service.approve(dto.proposalId(), REVIEWER_ID);
 
         thenPublishedProposalApprovedEvent()
-                .hasEventIdWith(CORRELATION_ID, NOW)
-                .hasProposalId(PROPOSAL_ID)
+                .hasEventIdWith(dto.correlationId(), NOW)
+                .hasProposalId(dto.proposalId())
                 .hasReviewerId(REVIEWER_ID);
     }
 
     @Test
     void shouldThrowExceptionWhenTryingToApproveRejectedProposal() {
-        givenExistingRejectedProposal();
-        Executable executable = () -> service.approve(PROPOSAL_ID, REVIEWER_ID);
+        ProposalTestDto dto = givenExistingRejectedProposal();
+        Executable executable = () -> service.approve(dto.proposalId(), REVIEWER_ID);
 
         UnsupportedProposalTransitionException actual = assertThrows(UnsupportedProposalTransitionException.class, executable);
 
-        assertThat(actual).hasMessage("Cannot transition proposal with id: " + PROPOSAL_ID + " from status: REJECTED");
+        assertThat(actual).hasMessage("Cannot transition proposal with id: " + dto.proposalId() + " from status: REJECTED");
     }
 
     @Test
     void shouldNotPublishEventWhenProposalWasAlreadyApproved() {
-        givenExistingApprovedProposal();
+        ProposalTestDto dto = givenExistingApprovedProposal();
 
-        service.approve(PROPOSAL_ID, REVIEWER_ID);
+        service.approve(dto.proposalId(), REVIEWER_ID);
 
         thenProposalApprovedEventNotPublished();
     }
 
     @Test
     void shouldNotPublishApprovalEventWhenProposalWasAlreadyRejected() {
-        givenExistingRejectedProposal();
+        ProposalTestDto dto = givenExistingRejectedProposal();
 
-        assertThrows(UnsupportedProposalTransitionException.class, () -> service.approve(PROPOSAL_ID, REVIEWER_ID));
+        assertThrows(UnsupportedProposalTransitionException.class, () -> service.approve(dto.proposalId(), REVIEWER_ID));
 
         thenProposalApprovedEventNotPublished();
     }
@@ -138,9 +142,9 @@ class ProposalApplicationServiceTest {
 
     @Test
     void shouldRejectProposal() {
-        givenExistingProposal();
+        ProposalTestDto dto = givenExistingProposal();
 
-        service.reject(PROPOSAL_ID, REVIEWER_ID);
+        service.reject(dto.proposalId(), REVIEWER_ID);
 
         thenProposalSaved()
                 .isRejected()
@@ -150,40 +154,40 @@ class ProposalApplicationServiceTest {
 
     @Test
     void shouldPublishProposalRejectedEventWhenProposalIsRejected() {
-        givenExistingProposal();
+        ProposalTestDto dto = givenExistingProposal();
 
-        service.reject(PROPOSAL_ID, REVIEWER_ID);
+        service.reject(dto.proposalId(), REVIEWER_ID);
 
         thenPublishedProposalRejectedEvent()
-                .hasEventIdWith(CORRELATION_ID, NOW)
-                .hasProposalId(PROPOSAL_ID)
+                .hasEventIdWith(dto.correlationId(), NOW)
+                .hasProposalId(dto.proposalId())
                 .hasReviewerId(REVIEWER_ID);
     }
 
     @Test
     void shouldThrowExceptionWhenTryingToRejectApprovedProposal() {
-        givenExistingApprovedProposal();
-        Executable executable = () -> service.reject(PROPOSAL_ID, REVIEWER_ID);
+        ProposalTestDto dto = givenExistingApprovedProposal();
+        Executable executable = () -> service.reject(dto.proposalId(), REVIEWER_ID);
 
         UnsupportedProposalTransitionException actual = assertThrows(UnsupportedProposalTransitionException.class, executable);
 
-        assertThat(actual).hasMessage("Cannot transition proposal with id: " + PROPOSAL_ID + " from status: APPROVED");
+        assertThat(actual).hasMessage("Cannot transition proposal with id: " + dto.proposalId() + " from status: APPROVED");
     }
 
     @Test
     void shouldNotPublishRejectionEventWhenProposalWasAlreadyRejected() {
-        givenExistingRejectedProposal();
+        ProposalTestDto dto = givenExistingRejectedProposal();
 
-        service.reject(PROPOSAL_ID, REVIEWER_ID);
+        service.reject(dto.proposalId(), REVIEWER_ID);
 
         thenProposalRejectedEventNotPublished();
     }
 
     @Test
     void shouldNotPublishEventWhenProposalWasAlreadyApprovedForRejection() {
-        givenExistingApprovedProposal();
+        ProposalTestDto dto = givenExistingApprovedProposal();
 
-        assertThrows(UnsupportedProposalTransitionException.class, () -> service.reject(PROPOSAL_ID, REVIEWER_ID));
+        assertThrows(UnsupportedProposalTransitionException.class, () -> service.reject(dto.proposalId(), REVIEWER_ID));
 
         thenProposalRejectedEventNotPublished();
     }
@@ -199,27 +203,30 @@ class ProposalApplicationServiceTest {
         return assertThatProposalRejectedEvent(captor.getValue());
     }
 
-    private void givenExistingProposal() {
-        Proposal proposal = Proposal.register(randomRegisterProposalCommand());
-        given(repository.findById(PROPOSAL_ID)).willReturn(proposal);
+    private ProposalTestDto givenExistingProposal() {
+        return givenExisting(given.proposal().registered());
     }
 
-    private void givenExistingApprovedProposal() {
-        Proposal proposal = Proposal.register(randomRegisterProposalCommand());
-        proposal.approve(REVIEWER_ID, clock);
-        given(repository.findById(PROPOSAL_ID)).willReturn(proposal);
+    private ProposalTestDto givenExistingApprovedProposal() {
+        return givenExisting(given.proposal().approved());
     }
 
-    private void givenExistingRejectedProposal() {
-        Proposal proposal = Proposal.register(randomRegisterProposalCommand());
-        proposal.reject(REVIEWER_ID, clock);
-        given(repository.findById(PROPOSAL_ID)).willReturn(proposal);
+    private ProposalTestDto givenExistingRejectedProposal() {
+        return givenExisting(given.proposal().rejected());
+    }
+
+    private ProposalTestDto givenExisting(GivenProposal givenProposal) {
+        Proposal proposal = givenProposal.getProposal();
+        ProposalTestDto dto = givenProposal.getDto();
+        given(repository.findById(dto.proposalId())).willReturn(proposal);
+
+        return dto;
     }
 
     private RegisterProposalCommand randomRegisterProposalCommand() {
         return new RegisterProposalCommand(
                 new CommandId(randomUUID(), randomUUID(), CORRELATION_ID, REGISTRATION_TIME),
-                PROPOSAL_ID,
+                randomUUID(),
                 randomUUID(),
                 FAKER.book().title(),
                 FAKER.lorem().paragraph(),

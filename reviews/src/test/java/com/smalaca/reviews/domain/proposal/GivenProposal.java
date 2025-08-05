@@ -16,6 +16,7 @@ import static java.util.UUID.randomUUID;
 
 public class GivenProposal {
     private static final Faker FAKER = new Faker();
+    private static final ProposalFactory FACTORY = new ProposalFactory();
 
     private final UUID proposalId = randomUUID();
     private final UUID authorId = randomUUID();
@@ -34,7 +35,7 @@ public class GivenProposal {
         CommandId commandId = new CommandId(randomUUID(), randomUUID(), correlationId, registeredAt);
         RegisterProposalCommand command = new RegisterProposalCommand(commandId, proposalId, authorId, title, content, categoriesIds);
         
-        proposal = Proposal.register(command);
+        proposal = FACTORY.create(command);
         status = REGISTERED;
 
         return this;
