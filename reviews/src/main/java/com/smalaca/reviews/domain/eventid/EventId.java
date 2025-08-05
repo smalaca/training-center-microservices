@@ -1,9 +1,17 @@
 package com.smalaca.reviews.domain.eventid;
 
+import com.smalaca.reviews.domain.commandid.CommandId;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static java.time.LocalDateTime.now;
+
 public record EventId(UUID eventId, UUID traceId, UUID correlationId, LocalDateTime creationDateTime) {
+    public static EventId nextAfter(CommandId commandId) {
+        return new EventId(id(), commandId.traceId(), commandId.correlationId(), now());
+    }
+
     public static EventId newEventId(UUID correlationId, LocalDateTime creationDateTime) {
         return new EventId(id(), id(), correlationId, creationDateTime);
     }
