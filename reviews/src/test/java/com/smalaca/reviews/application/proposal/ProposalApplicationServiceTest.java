@@ -67,6 +67,8 @@ class ProposalApplicationServiceTest {
                 .hasContent(command.content())
                 .hasCorrelationId(command.commandId().correlationId())
                 .hasRegisteredAt(command.commandId().creationDateTime())
+                .hasCategoriesIds(command.categoriesIds())
+                .hasAssignedReviewerIdNull()
                 .hasReviewedByIdNull()
                 .hasReviewedAtNull();
     }

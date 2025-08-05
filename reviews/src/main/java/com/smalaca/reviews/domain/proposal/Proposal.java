@@ -14,6 +14,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +52,12 @@ public class Proposal {
     @Column(name = "STATUS")
     private ProposalStatus status;
 
+    @Column(name = "CATEGORIES_IDS")
+    private List<UUID> categoriesIds;
+
+    @Column(name = "ASSIGNED_REVIEWER_ID")
+    private UUID assignedReviewerId;
+
     private Proposal() {}
 
     public static Proposal register(RegisterProposalCommand command) {
@@ -62,6 +69,8 @@ public class Proposal {
         proposal.correlationId = command.commandId().correlationId();
         proposal.registeredAt = command.commandId().creationDateTime();
         proposal.status = ProposalStatus.REGISTERED;
+        proposal.categoriesIds = command.categoriesIds();
+        proposal.assignedReviewerId = null;
 
         return proposal;
     }
