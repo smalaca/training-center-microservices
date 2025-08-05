@@ -61,6 +61,8 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasContent(expected.content())
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasAssignedReviewerIdNull()
                 .hasReviewedByIdNull()
                 .hasReviewedAtNull();
     }
@@ -78,6 +80,8 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasContent(expected.content())
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasAssignedReviewerIdNull()
                 .hasReviewedBy(expected.reviewedById())
                 .hasReviewedAt(expected.reviewedAt())
                 .isApproved();
@@ -96,6 +100,8 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasContent(expected.content())
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasAssignedReviewerIdNull()
                 .hasReviewedBy(expected.reviewedById())
                 .hasReviewedAt(expected.reviewedAt())
                 .isRejected();

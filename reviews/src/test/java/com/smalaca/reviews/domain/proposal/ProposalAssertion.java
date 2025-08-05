@@ -1,6 +1,7 @@
 package com.smalaca.reviews.domain.proposal;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
@@ -94,6 +95,18 @@ public class ProposalAssertion {
             assertThat((LocalDateTime) registeredAt).isEqualToIgnoringNanos(expected);
         });
 
+        return this;
+    }
+
+    public ProposalAssertion hasCategoriesIds(List<UUID> expected) {
+        assertThat(actual).extracting("categoriesIds").satisfies(value -> {
+            assertThat((List<UUID>) value).containsExactlyInAnyOrderElementsOf(expected);
+        });
+        return this;
+    }
+
+    public ProposalAssertion hasAssignedReviewerIdNull() {
+        assertThat(actual).hasFieldOrPropertyWithValue("assignedReviewerId", null);
         return this;
     }
 }

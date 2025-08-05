@@ -23,6 +23,7 @@ public class GivenProposal {
     private final String content = FAKER.lorem().paragraph();
     private final UUID correlationId = randomUUID();
     private final LocalDateTime registeredAt = LocalDateTime.now();
+    private final List<UUID> categoriesIds = List.of(randomUUID(), randomUUID());
     private UUID reviewedById;
     private LocalDateTime reviewedAt;
     private ProposalStatus status;
@@ -31,7 +32,7 @@ public class GivenProposal {
 
     public GivenProposal registered() {
         CommandId commandId = new CommandId(randomUUID(), randomUUID(), correlationId, registeredAt);
-        RegisterProposalCommand command = new RegisterProposalCommand(commandId, proposalId, authorId, title, content, List.of(randomUUID(), randomUUID()));
+        RegisterProposalCommand command = new RegisterProposalCommand(commandId, proposalId, authorId, title, content, categoriesIds);
         
         proposal = Proposal.register(command);
         status = REGISTERED;
@@ -75,7 +76,9 @@ public class GivenProposal {
                 registeredAt,
                 reviewedById,
                 reviewedAt,
-                status
+                status,
+                categoriesIds,
+                null
         );
     }
 }
