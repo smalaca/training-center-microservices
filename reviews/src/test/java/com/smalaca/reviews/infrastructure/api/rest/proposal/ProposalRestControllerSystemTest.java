@@ -1,8 +1,9 @@
 package com.smalaca.reviews.infrastructure.api.rest.proposal;
 
 import com.smalaca.reviews.client.reviews.ReviewsTestClient;
-import com.smalaca.reviews.client.reviews.proposal.RestProposalTestResponse;
 import com.smalaca.reviews.client.reviews.proposal.CompleteReviewTestCommand;
+import com.smalaca.reviews.client.reviews.proposal.RestProposalTestResponse;
+import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.GivenProposal;
 import com.smalaca.reviews.domain.proposal.GivenProposalFactory;
 import com.smalaca.reviews.domain.proposal.Proposal;
@@ -13,6 +14,7 @@ import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 
 import java.util.UUID;
@@ -33,6 +35,9 @@ class ProposalRestControllerSystemTest {
     private ReviewsTestClient client;
 
     private GivenProposalFactory given;
+
+    @MockBean
+    private EventRegistry eventRegistry;
 
     @BeforeEach
     void init() {
