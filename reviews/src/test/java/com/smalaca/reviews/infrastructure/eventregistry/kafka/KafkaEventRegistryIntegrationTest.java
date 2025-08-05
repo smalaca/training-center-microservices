@@ -1,5 +1,6 @@
 package com.smalaca.reviews.infrastructure.eventregistry.kafka;
 
+import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
@@ -39,7 +40,7 @@ class KafkaEventRegistryIntegrationTest {
     private static final LocalDateTime REVIEWED_AT = now();
 
     @Autowired
-    private KafkaEventRegistry eventRegistry;
+    private EventRegistry eventRegistry;
 
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
