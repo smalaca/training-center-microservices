@@ -69,6 +69,9 @@ public class Proposal {
     @Column(name = "ASSIGNED_REVIEWER_ID")
     private UUID assignedReviewerId;
 
+    @Column(name = "LAST_ASSIGNMENT_DATE_TIME")
+    private LocalDateTime lastAssignmentDateTime;
+
     private Proposal() {}
 
     @Factory
@@ -116,6 +119,14 @@ public class Proposal {
         this.status = ProposalStatus.REJECTED;
 
         return Optional.of(ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
+    }
+
+    public void assign(ProposalReviewAssignmentPolicy assignmentPolicy) {
+        Assignment assignment = assignmentPolicy.assign();
+        
+        status = assignment.status();
+        assignedReviewerId = assignment.reviewerId();
+        lastAssignmentDateTime = assignment.occurredAt();
     }
 
     private boolean isRejected() {

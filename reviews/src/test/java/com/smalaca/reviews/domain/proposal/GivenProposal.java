@@ -10,12 +10,15 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REJECTED;
 import static java.util.UUID.randomUUID;
 
 public class GivenProposal {
     private static final Faker FAKER = new Faker();
+    private static final LocalDateTime NOW = LocalDateTime.now();
+    private static final Clock CLOCK = () -> NOW;
 
     private final UUID proposalId = randomUUID();
     private final UUID authorId = randomUUID();
@@ -26,6 +29,7 @@ public class GivenProposal {
     private final List<UUID> categoriesIds = List.of(randomUUID(), randomUUID());
     private UUID reviewedById;
     private LocalDateTime reviewedAt;
+    private LocalDateTime lastAssignmentDateTime;
     private ProposalStatus status;
 
     private Proposal proposal;
@@ -42,10 +46,9 @@ public class GivenProposal {
 
     public GivenProposal approved() {
         registered();
-        Clock clock = LocalDateTime::now;
         reviewedById = randomUUID();
-        proposal.approve(reviewedById, clock);
-        reviewedAt = clock.now();
+        proposal.approve(reviewedById, CLOCK);
+        reviewedAt = NOW;
         status = APPROVED;
 
         return this;
@@ -53,11 +56,20 @@ public class GivenProposal {
 
     public GivenProposal rejected() {
         registered();
-        Clock clock = LocalDateTime::now;
         reviewedById = randomUUID();
-        proposal.reject(reviewedById, clock);
-        reviewedAt = clock.now();
+        proposal.reject(reviewedById, CLOCK);
+        reviewedAt = NOW;
         status = REJECTED;
+
+        return this;
+    }
+
+    public GivenProposal assigned() {
+        registered();
+        NoAssignmentPolicy assignmentPolicy = new NoAssignmentPolicy(CLOCK);
+        proposal.assign(assignmentPolicy);
+        lastAssignmentDateTime = NOW;
+        status = QUEUED;
 
         return this;
     }
@@ -78,7 +90,8 @@ public class GivenProposal {
                 reviewedAt,
                 status,
                 categoriesIds,
-                null
+                null,
+                lastAssignmentDateTime
         );
     }
 }

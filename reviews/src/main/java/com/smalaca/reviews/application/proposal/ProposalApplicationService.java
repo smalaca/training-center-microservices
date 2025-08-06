@@ -7,6 +7,7 @@ import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
+import com.smalaca.reviews.domain.proposal.ProposalReviewAssignmentPolicy;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
@@ -20,11 +21,13 @@ public class ProposalApplicationService {
     private final ProposalRepository repository;
     private final Clock clock;
     private final EventRegistry eventRegistry;
+    private final ProposalReviewAssignmentPolicy assignmentPolicy;
 
-    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
+    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry, ProposalReviewAssignmentPolicy assignmentPolicy) {
         this.repository = repository;
         this.clock = clock;
         this.eventRegistry = eventRegistry;
+        this.assignmentPolicy = assignmentPolicy;
     }
 
     @Transactional
@@ -57,6 +60,17 @@ public class ProposalApplicationService {
         Optional<ProposalRejectedEvent> event = proposal.reject(reviewerId, clock);
 
         event.ifPresent(eventRegistry::publish);
+        repository.save(proposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void assign(UUID proposalId) {
+        Proposal proposal = repository.findById(proposalId);
+
+        proposal.assign(assignmentPolicy);
+
         repository.save(proposal);
     }
 }
