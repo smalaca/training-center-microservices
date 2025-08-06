@@ -7,7 +7,7 @@ import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.Proposal;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
-import com.smalaca.reviews.domain.proposal.ProposalReviewAssignmentPolicy;
+import com.smalaca.reviews.domain.proposal.ReviewerAssignmentPolicy;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
@@ -21,9 +21,9 @@ public class ProposalApplicationService {
     private final ProposalRepository repository;
     private final Clock clock;
     private final EventRegistry eventRegistry;
-    private final ProposalReviewAssignmentPolicy assignmentPolicy;
+    private final ReviewerAssignmentPolicy assignmentPolicy;
 
-    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry, ProposalReviewAssignmentPolicy assignmentPolicy) {
+    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry, ReviewerAssignmentPolicy assignmentPolicy) {
         this.repository = repository;
         this.clock = clock;
         this.eventRegistry = eventRegistry;

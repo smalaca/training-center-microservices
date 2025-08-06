@@ -19,6 +19,7 @@ public class GivenProposal {
     private static final Faker FAKER = new Faker();
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final Clock CLOCK = () -> NOW;
+    private static final ReviewerAssignmentPolicy REVIEWER_ASSIGNMENT_POLICY = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(CLOCK);
 
     private final UUID proposalId = randomUUID();
     private final UUID authorId = randomUUID();
@@ -66,8 +67,7 @@ public class GivenProposal {
 
     public GivenProposal assigned() {
         registered();
-        NoAssignmentPolicy assignmentPolicy = new NoAssignmentPolicy(CLOCK);
-        proposal.assign(assignmentPolicy);
+        proposal.assign(REVIEWER_ASSIGNMENT_POLICY);
         lastAssignmentDateTime = NOW;
         status = QUEUED;
 

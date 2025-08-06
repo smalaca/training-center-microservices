@@ -121,7 +121,7 @@ public class Proposal {
         return Optional.of(ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
     }
 
-    public void assign(ProposalReviewAssignmentPolicy assignmentPolicy) {
+    public void assign(ReviewerAssignmentPolicy assignmentPolicy) {
         Assignment assignment = assignmentPolicy.assign();
         
         status = assignment.status();
