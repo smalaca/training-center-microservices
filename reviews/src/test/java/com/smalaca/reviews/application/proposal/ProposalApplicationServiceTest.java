@@ -141,6 +141,18 @@ class ProposalApplicationServiceTest {
     }
 
     @Test
+    void shouldAssignProposal() {
+        ProposalTestDto dto = givenExistingProposal();
+
+        service.assign(dto.proposalId());
+
+        thenProposalSaved()
+                .isQueued()
+                .hasAssignedReviewerIdNull()
+                .hasLastAssignmentDateTime(NOW);
+    }
+
+    @Test
     void shouldRejectProposal() {
         ProposalTestDto dto = givenExistingProposal();
 

@@ -5,6 +5,7 @@ import com.smalaca.domaindrivendesign.ValueObject;
 @ValueObject
 enum ProposalStatus {
     REGISTERED,
+    QUEUED,
     APPROVED,
     REJECTED
 }

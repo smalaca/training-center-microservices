@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +66,10 @@ public class ProposalAssertion {
         return hasStatus(REJECTED);
     }
 
+    public ProposalAssertion isQueued() {
+        return hasStatus(QUEUED);
+    }
+
     private ProposalAssertion hasStatus(ProposalStatus expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("status", expected);
         return this;
@@ -107,6 +112,14 @@ public class ProposalAssertion {
 
     public ProposalAssertion hasAssignedReviewerIdNull() {
         assertThat(actual).hasFieldOrPropertyWithValue("assignedReviewerId", null);
+        return this;
+    }
+
+    public ProposalAssertion hasLastAssignmentDateTime(LocalDateTime expected) {
+        assertThat(actual).extracting("lastAssignmentDateTime").satisfies(lastAssignmentDateTime -> {
+            assertThat((LocalDateTime) lastAssignmentDateTime).isEqualToIgnoringNanos(expected);
+        });
+
         return this;
     }
 }

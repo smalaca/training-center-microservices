@@ -6,8 +6,8 @@ import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.Proposal;
-import com.smalaca.reviews.domain.proposal.ProposalFactory;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
+import com.smalaca.reviews.domain.proposal.ReviewerAssignmentPolicy;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
@@ -18,23 +18,23 @@ import java.util.UUID;
 
 @ApplicationLayer
 public class ProposalApplicationService {
-    private final ProposalFactory factory;
     private final ProposalRepository repository;
     private final Clock clock;
     private final EventRegistry eventRegistry;
+    private final ReviewerAssignmentPolicy assignmentPolicy;
 
-    ProposalApplicationService(ProposalFactory factory, ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
-        this.factory = factory;
+    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry, ReviewerAssignmentPolicy assignmentPolicy) {
         this.repository = repository;
         this.clock = clock;
         this.eventRegistry = eventRegistry;
+        this.assignmentPolicy = assignmentPolicy;
     }
 
     @Transactional
     @CommandOperation
     @DrivingPort
     public void register(RegisterProposalCommand command) {
-        Proposal proposal = factory.create(command);
+        Proposal proposal = Proposal.register(command);
 
         repository.save(proposal);
     }
@@ -60,6 +60,17 @@ public class ProposalApplicationService {
         Optional<ProposalRejectedEvent> event = proposal.reject(reviewerId, clock);
 
         event.ifPresent(eventRegistry::publish);
+        repository.save(proposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void assign(UUID proposalId) {
+        Proposal proposal = repository.findById(proposalId);
+
+        proposal.assign(assignmentPolicy);
+
         repository.save(proposal);
     }
 }

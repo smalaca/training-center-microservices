@@ -6,5 +6,6 @@ import java.util.UUID;
 
 public record ProposalTestDto(
         UUID proposalId, UUID authorId, String title, String content, UUID correlationId, LocalDateTime registeredAt,
-        UUID reviewedById, LocalDateTime reviewedAt, ProposalStatus status, List<UUID> categoriesIds, UUID assignedReviewerId) {
+        UUID reviewedById, LocalDateTime reviewedAt, ProposalStatus status, List<UUID> categoriesIds, UUID assignedReviewerId,
+        LocalDateTime lastAssignmentDateTime) {
 }

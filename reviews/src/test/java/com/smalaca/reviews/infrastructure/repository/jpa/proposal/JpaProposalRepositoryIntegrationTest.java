@@ -107,6 +107,27 @@ class JpaProposalRepositoryIntegrationTest {
                 .isRejected();
     }
 
+    @Test
+    void shouldFindAssignedProposalById() {
+        ProposalTestDto expected = givenExisting(given.proposal().assigned());
+
+        Proposal actual = repository.findById(expected.proposalId());
+
+        assertThatProposal(actual)
+                .hasProposalId(expected.proposalId())
+                .hasAuthorId(expected.authorId())
+                .hasTitle(expected.title())
+                .hasContent(expected.content())
+                .hasCorrelationId(expected.correlationId())
+                .hasRegisteredAt(expected.registeredAt())
+                .hasCategoriesIds(expected.categoriesIds())
+                .hasAssignedReviewerIdNull()
+                .hasReviewedByIdNull()
+                .hasReviewedAtNull()
+                .hasLastAssignmentDateTime(expected.lastAssignmentDateTime())
+                .isQueued();
+    }
+
     private ProposalTestDto givenExisting(GivenProposal proposal) {
         ProposalTestDto expected = proposal.getDto();
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(proposal.getProposal()));

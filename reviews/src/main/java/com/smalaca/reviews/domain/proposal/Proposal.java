@@ -3,6 +3,7 @@ package com.smalaca.reviews.domain.proposal;
 import com.smalaca.domaindrivendesign.AggregateRoot;
 import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.reviews.domain.clock.Clock;
+import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import jakarta.persistence.CollectionTable;
@@ -68,7 +69,25 @@ public class Proposal {
     @Column(name = "ASSIGNED_REVIEWER_ID")
     private UUID assignedReviewerId;
 
+    @Column(name = "LAST_ASSIGNMENT_DATE_TIME")
+    private LocalDateTime lastAssignmentDateTime;
+
     private Proposal() {}
+
+    @Factory
+    public static Proposal register(RegisterProposalCommand command) {
+        Proposal proposal = new Proposal();
+        proposal.proposalId = command.proposalId();
+        proposal.authorId = command.authorId();
+        proposal.title = command.title();
+        proposal.content = command.content();
+        proposal.correlationId = command.commandId().correlationId();
+        proposal.registeredAt = command.commandId().creationDateTime();
+        proposal.categoriesIds = command.categoriesIds();
+        proposal.status = ProposalStatus.REGISTERED;
+
+        return proposal;
+    }
 
     public Optional<ProposalApprovedEvent> approve(UUID reviewerId, Clock clock) {
         if (isRejected()) {
@@ -102,71 +121,19 @@ public class Proposal {
         return Optional.of(ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
     }
 
+    public void assign(ReviewerAssignmentPolicy assignmentPolicy) {
+        Assignment assignment = assignmentPolicy.assign();
+        
+        status = assignment.status();
+        assignedReviewerId = assignment.reviewerId();
+        lastAssignmentDateTime = assignment.occurredAt();
+    }
+
     private boolean isRejected() {
         return status == ProposalStatus.REJECTED;
     }
 
     private boolean isApproved() {
         return status == ProposalStatus.APPROVED;
-    }
-
-    @Factory
-    static class Builder {
-        private UUID proposalId;
-        private UUID authorId;
-        private String title;
-        private String content;
-        private UUID correlationId;
-        private LocalDateTime registeredAt;
-        private List<UUID> categoriesIds;
-
-        Builder proposalId(UUID proposalId) {
-            this.proposalId = proposalId;
-            return this;
-        }
-
-        Builder authorId(UUID authorId) {
-            this.authorId = authorId;
-            return this;
-        }
-
-        Builder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        Builder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        Builder correlationId(UUID correlationId) {
-            this.correlationId = correlationId;
-            return this;
-        }
-
-        Builder registeredAt(LocalDateTime registeredAt) {
-            this.registeredAt = registeredAt;
-            return this;
-        }
-
-        Builder categoriesIds(List<UUID> categoriesIds) {
-            this.categoriesIds = categoriesIds;
-            return this;
-        }
-
-        Proposal build() {
-            Proposal proposal = new Proposal();
-            proposal.proposalId = this.proposalId;
-            proposal.authorId = this.authorId;
-            proposal.title = this.title;
-            proposal.content = this.content;
-            proposal.correlationId = this.correlationId;
-            proposal.registeredAt = this.registeredAt;
-            proposal.categoriesIds = this.categoriesIds;
-            proposal.status = ProposalStatus.REGISTERED;
-            proposal.assignedReviewerId = null;
-            return proposal;
-        }
     }
 }
