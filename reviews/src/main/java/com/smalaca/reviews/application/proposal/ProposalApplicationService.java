@@ -6,7 +6,6 @@ import com.smalaca.domaindrivendesign.ApplicationLayer;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.Proposal;
-import com.smalaca.reviews.domain.proposal.ProposalFactory;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
@@ -18,13 +17,11 @@ import java.util.UUID;
 
 @ApplicationLayer
 public class ProposalApplicationService {
-    private final ProposalFactory factory;
     private final ProposalRepository repository;
     private final Clock clock;
     private final EventRegistry eventRegistry;
 
-    ProposalApplicationService(ProposalFactory factory, ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
-        this.factory = factory;
+    ProposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
         this.repository = repository;
         this.clock = clock;
         this.eventRegistry = eventRegistry;
@@ -34,7 +31,7 @@ public class ProposalApplicationService {
     @CommandOperation
     @DrivingPort
     public void register(RegisterProposalCommand command) {
-        Proposal proposal = factory.create(command);
+        Proposal proposal = Proposal.register(command);
 
         repository.save(proposal);
     }
