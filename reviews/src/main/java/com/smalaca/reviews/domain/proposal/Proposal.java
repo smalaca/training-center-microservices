@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static jakarta.persistence.FetchType.EAGER;
@@ -122,7 +123,7 @@ public class Proposal {
     }
 
     public void assign(ReviewerAssignmentPolicy assignmentPolicy) {
-        Assignment assignment = assignmentPolicy.assign();
+        Assignment assignment = assignmentPolicy.assign(authorId, Set.copyOf(categoriesIds));
         
         status = assignment.status();
         assignedReviewerId = assignment.reviewerId();

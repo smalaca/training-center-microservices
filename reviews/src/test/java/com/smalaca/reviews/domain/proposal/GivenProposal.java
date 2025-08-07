@@ -3,6 +3,7 @@ package com.smalaca.reviews.domain.proposal;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.commandid.CommandId;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
+import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 import net.datafaker.Faker;
 
 import java.time.LocalDateTime;
@@ -14,12 +15,14 @@ import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REJECTED;
 import static java.util.UUID.randomUUID;
+import static org.mockito.Mockito.mock;
 
 public class GivenProposal {
     private static final Faker FAKER = new Faker();
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final Clock CLOCK = () -> NOW;
-    private static final ReviewerAssignmentPolicy REVIEWER_ASSIGNMENT_POLICY = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(CLOCK);
+    private static final TrainersCatalogue TRAINERS_CATALOGUE = mock(TrainersCatalogue.class);
+    private static final ReviewerAssignmentPolicy REVIEWER_ASSIGNMENT_POLICY = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(CLOCK, TRAINERS_CATALOGUE);
 
     private final UUID proposalId = randomUUID();
     private final UUID authorId = randomUUID();

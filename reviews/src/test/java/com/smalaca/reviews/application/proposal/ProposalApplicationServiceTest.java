@@ -15,6 +15,8 @@ import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion;
+import com.smalaca.reviews.domain.trainerscatalogue.Trainer;
+import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +51,8 @@ class ProposalApplicationServiceTest {
     private final ProposalRepository repository = mock(ProposalRepository.class);
     private final Clock clock = mock(Clock.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final ProposalApplicationService service = new ProposalApplicationServiceFactory().proposalApplicationService(repository, clock, eventRegistry);
+    private final TrainersCatalogue trainersCatalogue = mock(TrainersCatalogue.class);
+    private final ProposalApplicationService service = new ProposalApplicationServiceFactory().proposalApplicationService(repository, clock, eventRegistry, trainersCatalogue);
 
     private final GivenProposalFactory given = GivenProposalFactory.create();
 
@@ -72,9 +76,9 @@ class ProposalApplicationServiceTest {
                 .hasCorrelationId(command.commandId().correlationId())
                 .hasRegisteredAt(command.commandId().creationDateTime())
                 .hasCategoriesIds(command.categoriesIds())
-                .hasAssignedReviewerIdNull()
-                .hasReviewedByIdNull()
-                .hasReviewedAtNull();
+                .hasNoAssignedReviewerId()
+                .hasNoReviewedById()
+                .hasNoReviewedAt();
     }
 
     @Test
@@ -148,7 +152,22 @@ class ProposalApplicationServiceTest {
 
         thenProposalSaved()
                 .isQueued()
-                .hasAssignedReviewerIdNull()
+                .hasNoAssignedReviewerId()
+                .hasLastAssignmentDateTime(NOW);
+    }
+
+    @Test
+    void shouldAssignProposalWithAssignedStatusWhenPartialMatchFound() {
+        ProposalTestDto dto = givenExisting(given.proposal().registered());
+        UUID trainerId = randomUUID();
+        Trainer trainer = new Trainer(trainerId, new HashSet<>(dto.categoriesIds()));
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainer));
+
+        service.assign(dto.proposalId());
+
+        thenProposalSaved()
+                .isAssigned()
+                .hasAssignedReviewerId(trainerId)
                 .hasLastAssignmentDateTime(NOW);
     }
 

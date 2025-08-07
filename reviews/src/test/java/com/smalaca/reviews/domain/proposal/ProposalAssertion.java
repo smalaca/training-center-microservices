@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.APPROVED;
+import static com.smalaca.reviews.domain.proposal.ProposalStatus.ASSIGNED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REGISTERED;
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.REJECTED;
@@ -70,12 +71,16 @@ public class ProposalAssertion {
         return hasStatus(QUEUED);
     }
 
+    public ProposalAssertion isAssigned() {
+        return hasStatus(ASSIGNED);
+    }
+
     private ProposalAssertion hasStatus(ProposalStatus expected) {
         assertThat(actual).hasFieldOrPropertyWithValue("status", expected);
         return this;
     }
 
-    public ProposalAssertion hasReviewedByIdNull() {
+    public ProposalAssertion hasNoReviewedById() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewedById", null);
         return this;
     }
@@ -85,7 +90,7 @@ public class ProposalAssertion {
         return this;
     }
 
-    public ProposalAssertion hasReviewedAtNull() {
+    public ProposalAssertion hasNoReviewedAt() {
         assertThat(actual).hasFieldOrPropertyWithValue("reviewedAt", null);
         return this;
     }
@@ -110,8 +115,13 @@ public class ProposalAssertion {
         return this;
     }
 
-    public ProposalAssertion hasAssignedReviewerIdNull() {
+    public ProposalAssertion hasNoAssignedReviewerId() {
         assertThat(actual).hasFieldOrPropertyWithValue("assignedReviewerId", null);
+        return this;
+    }
+
+    public ProposalAssertion hasAssignedReviewerId(UUID expected) {
+        assertThat(actual).hasFieldOrPropertyWithValue("assignedReviewerId", expected);
         return this;
     }
 

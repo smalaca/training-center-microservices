@@ -5,6 +5,7 @@ import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.ReviewerAssignmentPolicy;
 import com.smalaca.reviews.domain.proposal.ReviewerAssignmentPolicyFactory;
+import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 public class ProposalApplicationServiceFactory {
 
     @Bean
-    public ProposalApplicationService proposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry) {
-        ReviewerAssignmentPolicy reviewerAssignmentPolicy = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(clock);
+    public ProposalApplicationService proposalApplicationService(ProposalRepository repository, Clock clock, EventRegistry eventRegistry, TrainersCatalogue trainersCatalogue) {
+        ReviewerAssignmentPolicy reviewerAssignmentPolicy = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(clock, trainersCatalogue);
         return new ProposalApplicationService(repository, clock, eventRegistry, reviewerAssignmentPolicy);
     }
 }

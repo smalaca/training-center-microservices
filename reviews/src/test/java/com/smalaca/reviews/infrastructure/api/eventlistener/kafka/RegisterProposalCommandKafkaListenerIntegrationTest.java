@@ -63,8 +63,8 @@ class RegisterProposalCommandKafkaListenerIntegrationTest {
                 .hasContent(command.content())
                 .hasCorrelationId(command.commandId().correlationId())
                 .hasRegisteredAt(command.commandId().creationDateTime())
-                .hasReviewedByIdNull()
-                .hasReviewedAtNull();
+                .hasNoReviewedById()
+                .hasNoReviewedAt();
         });
     }
 
