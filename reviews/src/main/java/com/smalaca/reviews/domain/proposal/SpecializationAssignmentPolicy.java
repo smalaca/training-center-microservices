@@ -5,7 +5,9 @@ import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.trainerscatalogue.Trainer;
 import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,42 +27,50 @@ class SpecializationAssignmentPolicy implements ReviewerAssignmentPolicy {
 
     @Override
     public Assignment assign(UUID authorId, Set<UUID> categoriesIds) {
-        List<Trainer> trainers = trainersCatalogue.findAllTrainers();
-        
-        // First, look for trainers who support all categories
-        for (Trainer trainer : trainers) {
-            if (trainer.categoryIds().containsAll(categoriesIds)) {
-                return new Assignment(trainer.id(), ASSIGNED, clock.now());
-            }
+        List<Trainer> availableTrainers = trainersCatalogue.findAllTrainers();
+
+        Optional<Trainer> perfectMatch = trainerWithPerfectMatch(availableTrainers, categoriesIds);
+
+        if (perfectMatch.isPresent()) {
+            return assignmentFor(perfectMatch.get());
         }
-        
-        // If no trainer supports all categories, find the one with the biggest supported amount
-        Trainer bestTrainer = null;
-        int maxMatchingCategories = 0;
-        
-        for (Trainer trainer : trainers) {
-            int matchingCategories = countMatchingCategories(trainer.categoryIds(), categoriesIds);
-            if (matchingCategories > maxMatchingCategories) {
-                maxMatchingCategories = matchingCategories;
-                bestTrainer = trainer;
-            }
+
+        Optional<Trainer> partialMatch = trainerWithBestPartialMatch(availableTrainers, categoriesIds);
+
+        if (partialMatch.isPresent()) {
+            return assignmentFor(partialMatch.get());
         }
-        
-        if (bestTrainer != null && maxMatchingCategories > 0) {
-            return new Assignment(bestTrainer.id(), ASSIGNED, clock.now());
-        }
-        
-        // If no trainer found, delegate to fallback policy
+
         return fallbackPolicy.assign(authorId, categoriesIds);
     }
-    
-    private int countMatchingCategories(Set<UUID> trainerCategories, Set<UUID> requiredCategories) {
-        int count = 0;
-        for (UUID categoryId : requiredCategories) {
-            if (trainerCategories.contains(categoryId)) {
-                count++;
-            }
-        }
-        return count;
+
+    private Assignment assignmentFor(Trainer trainer) {
+        return new Assignment(trainer.id(), ASSIGNED, clock.now());
     }
+
+    private Optional<Trainer> trainerWithPerfectMatch(List<Trainer> trainers, Set<UUID> requiredCategories) {
+        return trainers.stream()
+                .filter(trainer -> trainer.categoryIds().containsAll(requiredCategories))
+                .findFirst();
+    }
+
+    private Optional<Trainer> trainerWithBestPartialMatch(List<Trainer> trainers, Set<UUID> requiredCategories) {
+        return trainers.stream()
+                .map(trainer -> trainerMatchFor(trainer, requiredCategories))
+                .filter(match -> match.matchScore() > 0)
+                .max(Comparator.comparingInt(TrainerMatch::matchScore))
+                .map(TrainerMatch::trainer);
+    }
+
+    private TrainerMatch trainerMatchFor(Trainer trainer, Set<UUID> requiredCategories) {
+        return new TrainerMatch(trainer, countMatchingCategories(trainer.categoryIds(), requiredCategories));
+    }
+
+    private int countMatchingCategories(Set<UUID> trainerCategories, Set<UUID> requiredCategories) {
+        return (int) requiredCategories.stream()
+                .mapToLong(categoryId -> trainerCategories.contains(categoryId) ? 1 : 0)
+                .sum();
+    }
+
+    private record TrainerMatch(Trainer trainer, int matchScore) {}
 }
