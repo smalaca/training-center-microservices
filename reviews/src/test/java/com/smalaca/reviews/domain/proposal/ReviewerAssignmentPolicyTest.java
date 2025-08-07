@@ -11,11 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.smalaca.reviews.domain.proposal.ProposalStatus.ASSIGNED;
-import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
+import static com.smalaca.reviews.domain.proposal.AssignmentAssertion.assertThatAssignment;
 import static java.util.Collections.emptyList;
 import static java.util.UUID.randomUUID;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -39,9 +37,10 @@ class ReviewerAssignmentPolicyTest {
 
         Assignment assignment = policy.assign(AUTHOR_ID, categories);
 
-        assertThat(assignment.reviewerId()).isNull();
-        assertThat(assignment.status()).isEqualTo(QUEUED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasNoReviewerId()
+                .isQueued()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -56,9 +55,10 @@ class ReviewerAssignmentPolicyTest {
         
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
-        assertThat(assignment.reviewerId()).isEqualTo(trainerId);
-        assertThat(assignment.status()).isEqualTo(ASSIGNED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasReviewerId(trainerId)
+                .isAssigned()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -76,9 +76,10 @@ class ReviewerAssignmentPolicyTest {
         
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
-        assertThat(assignment.reviewerId()).isEqualTo(trainerId2);
-        assertThat(assignment.status()).isEqualTo(ASSIGNED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasReviewerId(trainerId2)
+                .isAssigned()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -96,9 +97,10 @@ class ReviewerAssignmentPolicyTest {
         
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
-        assertThat(assignment.reviewerId()).isEqualTo(trainerId1);
-        assertThat(assignment.status()).isEqualTo(ASSIGNED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasReviewerId(trainerId1)
+                .isAssigned()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -113,9 +115,10 @@ class ReviewerAssignmentPolicyTest {
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
         // Should delegate to NoAssignmentPolicy
-        assertThat(assignment.reviewerId()).isNull();
-        assertThat(assignment.status()).isEqualTo(QUEUED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasNoReviewerId()
+                .isQueued()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -127,9 +130,10 @@ class ReviewerAssignmentPolicyTest {
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
         // Should delegate to NoAssignmentPolicy
-        assertThat(assignment.reviewerId()).isNull();
-        assertThat(assignment.status()).isEqualTo(QUEUED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasNoReviewerId()
+                .isQueued()
+                .hasOccurredAt(NOW);
     }
 
     @Test
@@ -146,8 +150,9 @@ class ReviewerAssignmentPolicyTest {
         
         Assignment assignment = policy.assign(AUTHOR_ID, requiredCategories);
 
-        assertThat(assignment.reviewerId()).isEqualTo(perfectTrainerId);
-        assertThat(assignment.status()).isEqualTo(ASSIGNED);
-        assertThat(assignment.occurredAt()).isEqualTo(NOW);
+        assertThatAssignment(assignment)
+                .hasReviewerId(perfectTrainerId)
+                .isAssigned()
+                .hasOccurredAt(NOW);
     }
 }
