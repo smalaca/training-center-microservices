@@ -3,6 +3,7 @@ package com.smalaca.reviews.domain.proposal;
 import com.smalaca.domaindrivendesign.Policy;
 import com.smalaca.reviews.domain.clock.Clock;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
@@ -17,7 +18,7 @@ class NoAssignmentPolicy implements ReviewerAssignmentPolicy {
     }
 
     @Override
-    public Assignment assign() {
+    public Assignment assign(UUID authorId, Set<UUID> categoriesIds) {
         return new Assignment(NO_REVIEWER, QUEUED, clock.now());
     }
 }

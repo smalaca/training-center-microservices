@@ -15,6 +15,7 @@ import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion;
+import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,8 @@ class ProposalApplicationServiceTest {
     private final ProposalRepository repository = mock(ProposalRepository.class);
     private final Clock clock = mock(Clock.class);
     private final EventRegistry eventRegistry = mock(EventRegistry.class);
-    private final ProposalApplicationService service = new ProposalApplicationServiceFactory().proposalApplicationService(repository, clock, eventRegistry);
+    private final TrainersCatalogue trainersCatalogue = mock(TrainersCatalogue.class);
+    private final ProposalApplicationService service = new ProposalApplicationServiceFactory().proposalApplicationService(repository, clock, eventRegistry, trainersCatalogue);
 
     private final GivenProposalFactory given = GivenProposalFactory.create();
 
