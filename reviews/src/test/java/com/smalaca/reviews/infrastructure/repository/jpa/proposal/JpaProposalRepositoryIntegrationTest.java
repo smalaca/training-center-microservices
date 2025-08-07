@@ -62,9 +62,9 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
                 .hasCategoriesIds(expected.categoriesIds())
-                .hasAssignedReviewerIdNull()
-                .hasReviewedByIdNull()
-                .hasReviewedAtNull();
+                .hasNoAssignedReviewerId()
+                .hasNoReviewedById()
+                .hasNoReviewedAt();
     }
 
     @Test
@@ -81,7 +81,7 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
                 .hasCategoriesIds(expected.categoriesIds())
-                .hasAssignedReviewerIdNull()
+                .hasNoAssignedReviewerId()
                 .hasReviewedBy(expected.reviewedById())
                 .hasReviewedAt(expected.reviewedAt())
                 .isApproved();
@@ -101,7 +101,7 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
                 .hasCategoriesIds(expected.categoriesIds())
-                .hasAssignedReviewerIdNull()
+                .hasNoAssignedReviewerId()
                 .hasReviewedBy(expected.reviewedById())
                 .hasReviewedAt(expected.reviewedAt())
                 .isRejected();
@@ -121,9 +121,9 @@ class JpaProposalRepositoryIntegrationTest {
                 .hasCorrelationId(expected.correlationId())
                 .hasRegisteredAt(expected.registeredAt())
                 .hasCategoriesIds(expected.categoriesIds())
-                .hasAssignedReviewerIdNull()
-                .hasReviewedByIdNull()
-                .hasReviewedAtNull()
+                .hasNoAssignedReviewerId()
+                .hasNoReviewedById()
+                .hasNoReviewedAt()
                 .hasLastAssignmentDateTime(expected.lastAssignmentDateTime())
                 .isQueued();
     }

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalStatus.ASSIGNED;
-import static com.smalaca.reviews.domain.proposal.ProposalStatus.QUEUED;
 
 @Policy
 class SpecializationAssignmentPolicy implements ReviewerAssignmentPolicy {
@@ -31,7 +30,7 @@ class SpecializationAssignmentPolicy implements ReviewerAssignmentPolicy {
         // First, look for trainers who support all categories
         for (Trainer trainer : trainers) {
             if (trainer.categoryIds().containsAll(categoriesIds)) {
-                return new Assignment(trainer.id(), QUEUED, clock.now());
+                return new Assignment(trainer.id(), ASSIGNED, clock.now());
             }
         }
         
