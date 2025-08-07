@@ -73,7 +73,7 @@ public class Proposal {
     @Column(name = "LAST_ASSIGNMENT_DATE_TIME")
     private LocalDateTime lastAssignmentDateTime;
 
-    protected Proposal() {}
+    private Proposal() {}
 
     @Factory
     public static Proposal register(RegisterProposalCommand command) {
