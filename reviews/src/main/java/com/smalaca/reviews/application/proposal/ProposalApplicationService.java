@@ -13,6 +13,7 @@ import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -72,5 +73,17 @@ public class ProposalApplicationService {
         proposal.assign(assignmentPolicy);
 
         repository.save(proposal);
+    }
+
+    @Transactional
+    @CommandOperation
+    @DrivingPort
+    public void assignProposalsForScheduledAssignment() {
+        List<Proposal> proposals = repository.findProposalsForAssignment();
+        
+        for (Proposal proposal : proposals) {
+            proposal.assign(assignmentPolicy);
+            repository.save(proposal);
+        }
     }
 }

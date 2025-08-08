@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
@@ -132,5 +133,29 @@ class JpaProposalRepositoryIntegrationTest {
         ProposalTestDto expected = proposal.getDto();
         transactionTemplate.executeWithoutResult(transactionStatus -> repository.save(proposal.getProposal()));
         return expected;
+    }
+
+    @Test
+    void shouldFindProposalsForAssignmentWhenRegisteredAndQueuedWithOldAssignment() {
+        // Given: registered proposal (no lastAssignmentDateTime)
+        ProposalTestDto registeredProposal = givenExisting(given.proposal().registered());
+        
+        // Given: queued proposal with old assignment (more than a week ago)
+        ProposalTestDto queuedProposalOld = givenExisting(given.proposal().queuedWithLastAssignmentWeeksAgo(2));
+        
+        // Given: queued proposal with recent assignment (less than a week ago)
+        givenExisting(given.proposal().queuedWithLastAssignmentWeeksAgo(0));
+        
+        // Given: approved proposal (should not be found)
+        givenExisting(given.proposal().approved());
+
+        // When
+        List<Proposal> proposals = repository.findProposalsForAssignment();
+
+        // Then
+        assertThat(proposals).hasSize(2);
+        assertThat(proposals)
+                .extracting("proposalId")
+                .containsExactlyInAnyOrder(registeredProposal.proposalId(), queuedProposalOld.proposalId());
     }
 }

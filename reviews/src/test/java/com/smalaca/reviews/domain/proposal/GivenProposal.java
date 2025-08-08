@@ -77,6 +77,23 @@ public class GivenProposal {
         return this;
     }
 
+    public GivenProposal queuedWithLastAssignmentWeeksAgo(int weeksAgo) {
+        registered();
+        proposal.assign(REVIEWER_ASSIGNMENT_POLICY);
+        // Use reflection to set the lastAssignmentDateTime to a specific past time
+        lastAssignmentDateTime = NOW.minusWeeks(weeksAgo);
+        try {
+            java.lang.reflect.Field field = Proposal.class.getDeclaredField("lastAssignmentDateTime");
+            field.setAccessible(true);
+            field.set(proposal, lastAssignmentDateTime);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        status = QUEUED;
+
+        return this;
+    }
+
     public Proposal getProposal() {
         return proposal;
     }

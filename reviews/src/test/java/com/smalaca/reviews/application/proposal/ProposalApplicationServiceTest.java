@@ -261,6 +261,24 @@ class ProposalApplicationServiceTest {
         return givenExisting(given.proposal().rejected());
     }
 
+    @Test
+    void shouldAssignProposalsForScheduledAssignment() {
+        // Given
+        Proposal proposal1 = given.proposal().registered().getProposal();
+        Proposal proposal2 = given.proposal().queuedWithLastAssignmentWeeksAgo(2).getProposal();
+        List<Proposal> proposalsToAssign = List.of(proposal1, proposal2);
+        
+        given(repository.findProposalsForAssignment()).willReturn(proposalsToAssign);
+
+        // When
+        service.assignProposalsForScheduledAssignment();
+
+        // Then
+        then(repository).should().findProposalsForAssignment();
+        then(repository).should().save(proposal1);
+        then(repository).should().save(proposal2);
+    }
+
     private ProposalTestDto givenExisting(GivenProposal givenProposal) {
         Proposal proposal = givenProposal.getProposal();
         ProposalTestDto dto = givenProposal.getDto();
