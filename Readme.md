@@ -152,34 +152,35 @@ The following resources explain the evolution of this project and the reasoning 
 
 ### Examples
 
-| Category | Pattern/Concept | Miro Board | Code Example |
-|----------|-----------------|------------|--------------|
-| **🎯 Event Storming** | Big Picture | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752147493&cot=10) | - |
-| | Process Level | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764600778454494&cot=14) | - |
-| | Design Level | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622180593058&cot=14) | - |
-| **🏗️ DDD Strategic** | Domain Types | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752029601&cot=14) | - |
-| | Bounded Contexts | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752241331&cot=14) | - |
-| **🏗️ DDD Tactical** | Aggregate | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622865330539&cot=14) | [Offer Aggregate](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer) |
-| | Entity | - | [Participants](https://github.com/smalaca/training-center-microservices/blob/master/training-offer/src/main/java/com/smalaca/trainingoffer/domain/trainingoffer/Participants.java) |
-| | Value Object | - | [OfferNumber](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferNumber.java) |
-| | Repository | - | [OfferRepository](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferRepository.java) |
-| | Factory | - | [OfferFactory](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferFactory.java) |
-| | Domain Event | - | [Offer Events](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/events) |
-| | Domain Service | - | [TrainingOfferDomainService](https://github.com/smalaca/training-center-microservices/blob/master/training-offer/src/main/java/com/smalaca/trainingoffer/domain/trainingoffer/TrainingOfferDomainService.java) |
-| | Saga (Choreography) | - | [Training Program Events](https://github.com/smalaca/training-center-microservices/tree/master/training-programs/src/main/java/com/smalaca/trainingprograms/domain/trainingprogramproposal/events) |
-| | Saga (Orchestration) | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622866292462&cot=10) | [OfferAcceptanceSaga](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offeracceptancesaga/OfferAcceptanceSaga.java) |
-| **🏛️ Architecture** | Event-Driven | - | [Training Program Events](https://github.com/smalaca/training-center-microservices/tree/master/training-programs/src/main/java/com/smalaca/trainingprograms/domain/trainingprogramproposal/events) |
-| | Ports & Adapters | - | [Open Trainings Module](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings) |
-| | Outbox Pattern | - | [JpaOutboxMessageRepository](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/infrastructure/outbox/jpa/JpaOutboxMessageRepository.java) |
-| | Event Sourcing | - | [OfferAcceptanceSaga](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offeracceptancesaga/OfferAcceptanceSaga.java) |
-| | CQRS (Within Service) | - | [Application](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/application) vs [Query](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/query) |
+| Category | Pattern/Concept         | Miro Board | Code Example |
+|----------|-------------------------|------------|--------------|
+| **🎯 Event Storming** | Big Picture             | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752147493&cot=10) | - |
+| | Process Level           | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764600778454494&cot=14) | - |
+| | Design Level            | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622180593058&cot=14) | - |
+| **🏗️ DDD Strategic** | Domain Types            | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752029601&cot=14) | - |
+| | Bounded Contexts        | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622752241331&cot=14) | - |
+| **🏗️ DDD Tactical** | Aggregate               | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622865330539&cot=14) | [Offer Aggregate](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer) |
+| | Entity                  | - | [Participants](https://github.com/smalaca/training-center-microservices/blob/master/training-offer/src/main/java/com/smalaca/trainingoffer/domain/trainingoffer/Participants.java) |
+| | Value Object            | - | [OfferNumber](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferNumber.java) |
+| | Repository              | - | [OfferRepository](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferRepository.java) |
+| | Factory                 | - | [OfferFactory](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/OfferFactory.java) |
+| | Domain Event            | - | [Offer Events](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offer/events) |
+| | Domain Service          | - | [TrainingOfferDomainService](https://github.com/smalaca/training-center-microservices/blob/master/training-offer/src/main/java/com/smalaca/trainingoffer/domain/trainingoffer/TrainingOfferDomainService.java) |
+| | Policy                  | - | [ReviewerAssignmentPolicy](https://github.com/smalaca/training-center-microservices/blob/master/reviews/src/main/java/com/smalaca/reviews/domain/proposal/ReviewerAssignmentPolicy.java) |
+| | Saga (Choreography)     | - | [Training Program Events](https://github.com/smalaca/training-center-microservices/tree/master/training-programs/src/main/java/com/smalaca/trainingprograms/domain/trainingprogramproposal/events) |
+| | Saga (Orchestration)    | [View](https://miro.com/app/board/uXjVKVYAGuE=/?moveToWidget=3458764622866292462&cot=10) | [OfferAcceptanceSaga](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offeracceptancesaga/OfferAcceptanceSaga.java) |
+| **🏛️ Architecture** | Event-Driven            | - | [Training Program Events](https://github.com/smalaca/training-center-microservices/tree/master/training-programs/src/main/java/com/smalaca/trainingprograms/domain/trainingprogramproposal/events) |
+| | Ports & Adapters        | - | [Open Trainings Module](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings) |
+| | Outbox Pattern          | - | [JpaOutboxMessageRepository](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/infrastructure/outbox/jpa/JpaOutboxMessageRepository.java) |
+| | Event Sourcing          | - | [OfferAcceptanceSaga](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/main/java/com/smalaca/opentrainings/domain/offeracceptancesaga/OfferAcceptanceSaga.java) |
+| | CQRS (Within Service)   | - | [Application](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/application) vs [Query](https://github.com/smalaca/training-center-microservices/tree/master/open-trainings/src/main/java/com/smalaca/opentrainings/query) |
 | | CQRS (Between Services) | - | Commands: [training-programs](https://github.com/smalaca/training-center-microservices/tree/master/training-programs), [training-offer](https://github.com/smalaca/training-center-microservices/tree/master/training-offer) / Query: [trainings-catalogue](https://github.com/smalaca/training-center-microservices/tree/master/trainings-catalogue) |
-| **🧪 Testing** | Unit Tests | - | [OfferApplicationServiceTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/application/offer/OfferApplicationServiceTest.java) |
-| | Integration Tests | - | [JpaOfferRepositoryIntegrationTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/infrastructure/repository/jpa/offer/JpaOfferRepositoryIntegrationTest.java) |
-| | System Tests | - | [OfferRestControllerSystemTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/infrastructure/api/rest/offer/OfferRestControllerOfferAcceptanceSystemTest.java) |
-| **🔄 CI/CD** | CI Pipeline | - | [GitHub Actions](https://github.com/smalaca/training-center-microservices/blob/master/.github/workflows/open-trainings.yml) |
-| | Code Quality | - | [SonarCloud Analysis](https://sonarcloud.io/summary/overall?id=smalaca-github_training-center-microservices-open-trainings&branch=master) |
-| | Documentation | - | [ADR Records](https://github.com/smalaca/training-center-microservices/tree/master/documentation/architecture-decision-record/records) |
+| **🧪 Testing** | Unit Tests              | - | [OfferApplicationServiceTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/application/offer/OfferApplicationServiceTest.java) |
+| | Integration Tests       | - | [JpaOfferRepositoryIntegrationTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/infrastructure/repository/jpa/offer/JpaOfferRepositoryIntegrationTest.java) |
+| | System Tests            | - | [OfferRestControllerSystemTest](https://github.com/smalaca/training-center-microservices/blob/master/open-trainings/src/test/java/com/smalaca/opentrainings/infrastructure/api/rest/offer/OfferRestControllerOfferAcceptanceSystemTest.java) |
+| **🔄 CI/CD** | CI Pipeline             | - | [GitHub Actions](https://github.com/smalaca/training-center-microservices/blob/master/.github/workflows/open-trainings.yml) |
+| | Code Quality            | - | [SonarCloud Analysis](https://sonarcloud.io/summary/overall?id=smalaca-github_training-center-microservices-open-trainings&branch=master) |
+| | Documentation           | - | [ADR Records](https://github.com/smalaca/training-center-microservices/tree/master/documentation/architecture-decision-record/records) |
 
 ### Articles
 A chronological series of blog posts documenting the project journey:

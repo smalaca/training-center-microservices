@@ -18,11 +18,11 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 class ReviewerAssignmentPolicyTest {
-    private static final UUID CATEGORY_ONE = randomUUID();
-    private static final UUID CATEGORY_TWO = randomUUID();
-    private static final UUID CATEGORY_THREE = randomUUID();
+    private static final UUID CATEGORY_ONE = id();
+    private static final UUID CATEGORY_TWO = id();
+    private static final UUID CATEGORY_THREE = id();
     private static final Set<UUID> PROPOSAL_CATEGORIES = Set.of(CATEGORY_ONE, CATEGORY_TWO, CATEGORY_THREE);
-    private static final UUID AUTHOR_ID = randomUUID();
+    private static final UUID AUTHOR_ID = id();
     private static final LocalDateTime NOW = LocalDateTime.now();
     
     private final Clock clock = mock(Clock.class);
@@ -35,20 +35,8 @@ class ReviewerAssignmentPolicyTest {
     }
 
     @Test
-    void noAssignmentPolicyShouldAlwaysReturnQueuedAssignmentWithNullReviewer() {
-        given(trainersCatalogue.findAllTrainers()).willReturn(emptyList());
-
-        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
-
-        assertThatAssignment(assignment)
-                .isQueued()
-                .hasNoReviewerId()
-                .hasOccurredAt(NOW);
-    }
-
-    @Test
-    void specializationAssignmentPolicyShouldAssignTrainerWhoSupportsAllCategories() {
-        Trainer perfectTrainer = trainer(CATEGORY_ONE, CATEGORY_TWO, CATEGORY_THREE, randomUUID());
+    void shouldAssignTrainerWhoSupportsAllCategories() {
+        Trainer perfectTrainer = trainerWithCategories(CATEGORY_ONE, CATEGORY_TWO, CATEGORY_THREE, id());
         given(trainersCatalogue.findAllTrainers()).willReturn(List.of(perfectTrainer));
         
         Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
@@ -60,9 +48,9 @@ class ReviewerAssignmentPolicyTest {
     }
 
     @Test
-    void specializationAssignmentPolicyShouldAssignBestPartialMatchWhenNoPerfectMatch() {
-        Trainer partialTrainerOne = trainer(CATEGORY_ONE, randomUUID());
-        Trainer partialTrainerTwo = trainer(randomUUID(), CATEGORY_ONE, CATEGORY_TWO, randomUUID());
+    void shouldAssignTrainerWithBestPartialMatchWhenNoPerfectMatch() {
+        Trainer partialTrainerOne = trainerWithCategories(CATEGORY_ONE, id());
+        Trainer partialTrainerTwo = trainerWithCategories(id(), CATEGORY_ONE, CATEGORY_TWO, id());
         given(trainersCatalogue.findAllTrainers()).willReturn(List.of(partialTrainerOne, partialTrainerTwo));
         
         Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
@@ -74,9 +62,9 @@ class ReviewerAssignmentPolicyTest {
     }
 
     @Test
-    void specializationAssignmentPolicyShouldAssignFirstTrainerWhenMultipleHaveSamePartialMatch() {
-        Trainer partialTrainerOne = trainer(CATEGORY_ONE, randomUUID());
-        Trainer partialTrainerTwo = trainer(CATEGORY_TWO, randomUUID());
+    void shouldAssignFirstTrainerWhenMultipleHaveSamePartialMatch() {
+        Trainer partialTrainerOne = trainerWithCategories(CATEGORY_ONE, id());
+        Trainer partialTrainerTwo = trainerWithCategories(CATEGORY_TWO, id());
         given(trainersCatalogue.findAllTrainers()).willReturn(List.of(partialTrainerOne, partialTrainerTwo));
         
         Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
@@ -88,36 +76,11 @@ class ReviewerAssignmentPolicyTest {
     }
 
     @Test
-    void specializationAssignmentPolicyShouldDelegateToFallbackWhenNoTrainerSupportsAnyCategory() {
-        Trainer unrelatedTrainer = trainer(randomUUID(), randomUUID());
-        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(unrelatedTrainer));
-        
-        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
-
-        assertThatAssignment(assignment)
-                .isQueued()
-                .hasNoReviewerId()
-                .hasOccurredAt(NOW);
-    }
-
-    @Test
-    void specializationAssignmentPolicyShouldDelegateToFallbackWhenNoTrainersExist() {
-        given(trainersCatalogue.findAllTrainers()).willReturn(List.of());
-        
-        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
-
-        assertThatAssignment(assignment)
-                .isQueued()
-                .hasNoReviewerId()
-                .hasOccurredAt(NOW);
-    }
-
-    @Test
-    void specializationAssignmentPolicyShouldPreferPerfectMatchOverPartialMatch() {
-        Trainer partialTrainer = trainer(CATEGORY_ONE, randomUUID(), randomUUID());
-        Trainer perfectTrainer = trainer(CATEGORY_ONE, CATEGORY_TWO, CATEGORY_THREE);
+    void shouldPreferTrainerWithPerfectMatchOverPartialMatch() {
+        Trainer partialTrainer = trainerWithCategories(CATEGORY_ONE, id(), id());
+        Trainer perfectTrainer = trainerWithCategories(CATEGORY_ONE, CATEGORY_TWO, CATEGORY_THREE);
         given(trainersCatalogue.findAllTrainers()).willReturn(List.of(partialTrainer, perfectTrainer));
-        
+
         Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
 
         assertThatAssignment(assignment)
@@ -126,7 +89,97 @@ class ReviewerAssignmentPolicyTest {
                 .hasOccurredAt(NOW);
     }
 
-    private Trainer trainer(UUID... categories) {
-        return new Trainer(randomUUID(), Set.of(categories));
+    private Trainer trainerWithCategories(UUID... categories) {
+        return new Trainer(id(), Set.of(categories), Set.of(id(), id(), id(), id()));
+    }
+
+    @Test
+    void shouldAssignTrainerWithNoAssignments() {
+        Trainer trainerWithNoAssignments = trainerWithAssignments();
+        Trainer trainerWithAssignments = trainerWithAssignments(id());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithAssignments, trainerWithNoAssignments));
+        
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isAssigned()
+                .hasReviewerId(trainerWithNoAssignments.id())
+                .hasOccurredAt(NOW);
+    }
+
+    @Test
+    void shouldAssignTrainerWithLowestWorkloadWhenNoTrainerHasZeroAssignments() {
+        Trainer trainerWithOneAssignment = trainerWithAssignments(id());
+        Trainer trainerWithTwoAssignments = trainerWithAssignments(id(), id());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithTwoAssignments, trainerWithOneAssignment));
+        
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isAssigned()
+                .hasReviewerId(trainerWithOneAssignment.id())
+                .hasOccurredAt(NOW);
+    }
+
+    @Test
+    void shouldAssignTrainerWithTwoAssignmentsWhenOthersHaveThreeOrMore() {
+        Trainer trainerWithTwoAssignments = trainerWithAssignments(id(), id());
+        Trainer trainerWithThreeAssignments = trainerWithAssignments(id(), id(), id());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithThreeAssignments, trainerWithTwoAssignments));
+
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isAssigned()
+                .hasReviewerId(trainerWithTwoAssignments.id())
+                .hasOccurredAt(NOW);
+    }
+
+    @Test
+    void shouldAssignFirstTrainerWhenMultipleHaveSameLowestWorkload() {
+        Trainer firstTrainerWithOneAssignment = trainerWithAssignments(id());
+        Trainer secondTrainerWithOneAssignment = trainerWithAssignments(id());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(firstTrainerWithOneAssignment, secondTrainerWithOneAssignment));
+
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isAssigned()
+                .hasReviewerId(firstTrainerWithOneAssignment.id())
+                .hasOccurredAt(NOW);
+    }
+
+    @Test
+    void shouldBeQueuedWhenNotSpecializedTrainersWithReachedAssignmentsThreshold() {
+        Trainer trainerWithThreeAssignments = trainerWithAssignments(id(), id(), id());
+        Trainer trainerWithFourAssignments = trainerWithAssignments(id(), id(), id(), id());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithThreeAssignments, trainerWithFourAssignments));
+
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isQueued()
+                .hasNoReviewerId()
+                .hasOccurredAt(NOW);
+    }
+
+    @Test
+    void shouldBeQueuedWhenNoTrainersExist() {
+        given(trainersCatalogue.findAllTrainers()).willReturn(emptyList());
+
+        Assignment assignment = policy.assign(AUTHOR_ID, PROPOSAL_CATEGORIES);
+
+        assertThatAssignment(assignment)
+                .isQueued()
+                .hasNoReviewerId()
+                .hasOccurredAt(NOW);
+    }
+
+    private Trainer trainerWithAssignments(UUID... assignments) {
+        return new Trainer(id(), Set.of(id(), id()), Set.of(assignments));
+    }
+
+    private static UUID id() {
+        return randomUUID();
     }
 }
