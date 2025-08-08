@@ -160,7 +160,7 @@ class ProposalApplicationServiceTest {
     void shouldAssignProposalWithAssignedStatusWhenPartialMatchFound() {
         ProposalTestDto dto = givenExisting(given.proposal().registered());
         UUID trainerId = randomUUID();
-        Trainer trainer = new Trainer(trainerId, new HashSet<>(dto.categoriesIds()));
+        Trainer trainer = new Trainer(trainerId, new HashSet<>(dto.categoriesIds()), new HashSet<>());
         given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainer));
 
         service.assign(dto.proposalId());
@@ -168,6 +168,21 @@ class ProposalApplicationServiceTest {
         thenProposalSaved()
                 .isAssigned()
                 .hasAssignedReviewerId(trainerId)
+                .hasLastAssignmentDateTime(NOW);
+    }
+
+    @Test
+    void shouldAssignProposalWithAssignedStatusThanksToWorkloadBalanceAssignmentPolicy() {
+        ProposalTestDto dto = givenExisting(given.proposal().registered());
+        Trainer trainerWithNoAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>());
+        Trainer trainerWithAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>(List.of(randomUUID())));
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithAssignments, trainerWithNoAssignments));
+
+        service.assign(dto.proposalId());
+
+        thenProposalSaved()
+                .isAssigned()
+                .hasAssignedReviewerId(trainerWithNoAssignments.id())
                 .hasLastAssignmentDateTime(NOW);
     }
 

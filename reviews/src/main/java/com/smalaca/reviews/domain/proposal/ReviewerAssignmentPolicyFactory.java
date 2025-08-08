@@ -5,6 +5,9 @@ import com.smalaca.reviews.domain.trainerscatalogue.TrainersCatalogue;
 
 public class ReviewerAssignmentPolicyFactory {
     public ReviewerAssignmentPolicy reviewerAssignmentPolicy(Clock clock, TrainersCatalogue trainersCatalogue) {
-        return new SpecializationAssignmentPolicy(trainersCatalogue, clock, new NoAssignmentPolicy(clock));
+        NoAssignmentPolicy noAssignmentPolicy = new NoAssignmentPolicy(clock);
+        WorkloadBalanceAssignmentPolicy workloadBalanceAssignmentPolicy = new WorkloadBalanceAssignmentPolicy(trainersCatalogue, clock, noAssignmentPolicy);
+
+        return new SpecializationAssignmentPolicy(trainersCatalogue, clock, workloadBalanceAssignmentPolicy);
     }
 }
