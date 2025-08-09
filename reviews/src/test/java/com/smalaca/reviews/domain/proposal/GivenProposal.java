@@ -77,6 +77,17 @@ public class GivenProposal {
         return this;
     }
 
+    public GivenProposal assignedMinutesAgo(int minutes) {
+        registered();
+        Clock pastClock = () -> NOW.minusMinutes(minutes);
+        ReviewerAssignmentPolicy policy = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(pastClock, TRAINERS_CATALOGUE);
+        proposal.assign(policy);
+        lastAssignmentDateTime = NOW.minusMinutes(minutes);
+        status = QUEUED;
+
+        return this;
+    }
+
     public Proposal getProposal() {
         return proposal;
     }
