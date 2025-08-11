@@ -52,6 +52,7 @@ services:
       kafka-topics --create --topic training-programs-training-program-rejected-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-register-proposal-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-proposal-approved-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+      kafka-topics --create --topic reviews-proposal-assigned-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-proposal-rejected-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1
       "
 volumes:

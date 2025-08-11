@@ -3,6 +3,7 @@ package com.smalaca.reviews.infrastructure.eventregistry.kafka;
 import com.smalaca.architecture.portsandadapters.DrivenAdapter;
 import com.smalaca.reviews.domain.eventregistry.EventRegistry;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.schemaregistry.metadata.EventId;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,14 +15,17 @@ import org.springframework.stereotype.Component;
 class KafkaEventRegistry implements EventRegistry {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String proposalApprovedTopic;
+    private final String proposalAssignedTopic;
     private final String proposalRejectedTopic;
 
     KafkaEventRegistry(
             KafkaTemplate<String, Object> kafkaTemplate,
             @Value("${kafka.topics.reviews.events.proposal-approved}") String proposalApprovedTopic,
+            @Value("${kafka.topics.reviews.events.proposal-assigned}") String proposalAssignedTopic,
             @Value("${kafka.topics.reviews.events.proposal-rejected}") String proposalRejectedTopic) {
         this.kafkaTemplate = kafkaTemplate;
         this.proposalApprovedTopic = proposalApprovedTopic;
+        this.proposalAssignedTopic = proposalAssignedTopic;
         this.proposalRejectedTopic = proposalRejectedTopic;
     }
 
@@ -50,6 +54,20 @@ class KafkaEventRegistry implements EventRegistry {
                 eventId,
                 event.proposalId(),
                 event.reviewerId()
+        );
+    }
+
+    @Override
+    public void publish(ProposalAssignedEvent event) {
+        kafkaTemplate.send(proposalAssignedTopic, asProposalAssignedEvent(event));
+    }
+
+    private com.smalaca.schemaregistry.reviews.events.ProposalAssignedEvent asProposalAssignedEvent(ProposalAssignedEvent event) {
+        EventId eventId = convertEventId(event.eventId());
+        return new com.smalaca.schemaregistry.reviews.events.ProposalAssignedEvent(
+                eventId,
+                event.proposalId(),
+                event.assignedReviewerId()
         );
     }
 
