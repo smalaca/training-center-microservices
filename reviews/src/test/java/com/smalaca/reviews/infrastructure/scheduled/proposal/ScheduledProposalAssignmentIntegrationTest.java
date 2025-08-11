@@ -9,7 +9,7 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.never;
 @SpringBootIntegrationTest
 @TestPropertySource(properties = "scheduled.proposal.assignment.rate=100")
 class ScheduledProposalAssignmentIntegrationTest {
-    @SpyBean
+    @MockBean
     private ProposalApplicationService applicationService;
 
     @Autowired
