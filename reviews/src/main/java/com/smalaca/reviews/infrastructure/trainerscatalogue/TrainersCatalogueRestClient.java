@@ -9,7 +9,7 @@ import java.util.List;
 
 @Component
 @DrivenAdapter
-public class FakeTrainersCatalogue implements TrainersCatalogue {
+public class TrainersCatalogueRestClient implements TrainersCatalogue {
     @Override
     public List<Trainer> findAllTrainers() {
         return List.of();
