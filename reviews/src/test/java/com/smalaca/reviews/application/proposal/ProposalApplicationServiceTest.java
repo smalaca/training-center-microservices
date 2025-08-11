@@ -13,6 +13,8 @@ import com.smalaca.reviews.domain.proposal.UnsupportedProposalTransitionExceptio
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEventAssertion;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion;
 import com.smalaca.reviews.domain.trainerscatalogue.Trainer;
@@ -30,6 +32,7 @@ import java.util.UUID;
 
 import static com.smalaca.reviews.domain.proposal.ProposalAssertion.assertThatProposal;
 import static com.smalaca.reviews.domain.proposal.events.ProposalApprovedEventAssertion.assertThatProposalApprovedEvent;
+import static com.smalaca.reviews.domain.proposal.events.ProposalAssignedEventAssertion.assertThatProposalAssignedEvent;
 import static com.smalaca.reviews.domain.proposal.events.ProposalRejectedEventAssertion.assertThatProposalRejectedEvent;
 import static java.time.LocalDateTime.now;
 import static java.util.UUID.randomUUID;
@@ -145,7 +148,7 @@ class ProposalApplicationServiceTest {
     }
 
     @Test
-    void shouldAssignProposal() {
+    void shouldPutProposalToQueueWhenNoAssignment() {
         ProposalTestDto dto = givenExistingProposal();
 
         service.assign(dto.proposalId());
@@ -157,33 +160,79 @@ class ProposalApplicationServiceTest {
     }
 
     @Test
+    void shouldNotPublishProposalAssignedEventWhenProposalIsNotAssigned() {
+        ProposalTestDto dto = givenExistingProposal();
+
+        service.assign(dto.proposalId());
+
+        thenProposalAssignedEventNotPublished();
+    }
+
+    @Test
     void shouldAssignProposalWithAssignedStatusWhenPartialMatchFound() {
         ProposalTestDto dto = givenExisting(given.proposal().registered());
-        UUID trainerId = randomUUID();
-        Trainer trainer = new Trainer(trainerId, new HashSet<>(dto.categoriesIds()), new HashSet<>());
-        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainer));
+        Trainer trainer = givenTrainerWithSpecialization(dto);
 
         service.assign(dto.proposalId());
 
         thenProposalSaved()
                 .isAssigned()
-                .hasAssignedReviewerId(trainerId)
+                .hasAssignedReviewerId(trainer.id())
                 .hasLastAssignmentDateTime(NOW);
+    }
+
+    @Test
+    void shouldPublishProposalAssignedEventWhenProposalIsAssignedBySpecialization() {
+        ProposalTestDto dto = givenExisting(given.proposal().registered());
+        Trainer trainer = givenTrainerWithSpecialization(dto);
+
+        service.assign(dto.proposalId());
+
+        thenPublishedProposalAssignedEvent()
+                .hasEventIdWith(dto.correlationId(), NOW)
+                .hasProposalId(dto.proposalId())
+                .hasAssignedReviewerId(trainer.id());
+    }
+
+    private Trainer givenTrainerWithSpecialization(ProposalTestDto dto) {
+        Trainer trainer = new Trainer(randomUUID(), new HashSet<>(dto.categoriesIds()), new HashSet<>());
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainer));
+
+        return trainer;
     }
 
     @Test
     void shouldAssignProposalWithAssignedStatusThanksToWorkloadBalanceAssignmentPolicy() {
         ProposalTestDto dto = givenExisting(given.proposal().registered());
-        Trainer trainerWithNoAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>());
-        Trainer trainerWithAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>(List.of(randomUUID())));
-        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithAssignments, trainerWithNoAssignments));
+        Trainer trainer = givenTrainerWithoutAssignment();
 
         service.assign(dto.proposalId());
 
         thenProposalSaved()
                 .isAssigned()
-                .hasAssignedReviewerId(trainerWithNoAssignments.id())
+                .hasAssignedReviewerId(trainer.id())
                 .hasLastAssignmentDateTime(NOW);
+    }
+
+    @Test
+    void shouldPublishProposalAssignedEventWhenProposalIsAssignedByWorkloadBalance() {
+        ProposalTestDto dto = givenExisting(given.proposal().registered());
+        Trainer trainer = givenTrainerWithoutAssignment();
+
+        service.assign(dto.proposalId());
+
+        thenPublishedProposalAssignedEvent()
+                .hasEventIdWith(dto.correlationId(), NOW)
+                .hasProposalId(dto.proposalId())
+                .hasAssignedReviewerId(trainer.id());
+    }
+
+    private Trainer givenTrainerWithoutAssignment() {
+        Trainer trainerWithNoAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>());
+        Trainer trainerWithAssignments = new Trainer(randomUUID(), new HashSet<>(), new HashSet<>(List.of(randomUUID())));
+        given(trainersCatalogue.findAllTrainers()).willReturn(List.of(trainerWithAssignments, trainerWithNoAssignments));
+
+        return trainerWithNoAssignments;
     }
 
     @Test
@@ -247,6 +296,17 @@ class ProposalApplicationServiceTest {
         then(eventRegistry).should().publish(captor.capture());
 
         return assertThatProposalRejectedEvent(captor.getValue());
+    }
+
+    private void thenProposalAssignedEventNotPublished() {
+        then(eventRegistry).should(never()).publish(any(ProposalAssignedEvent.class));
+    }
+
+    private ProposalAssignedEventAssertion thenPublishedProposalAssignedEvent() {
+        ArgumentCaptor<ProposalAssignedEvent> captor = ArgumentCaptor.forClass(ProposalAssignedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+
+        return assertThatProposalAssignedEvent(captor.getValue());
     }
 
     private ProposalTestDto givenExistingProposal() {

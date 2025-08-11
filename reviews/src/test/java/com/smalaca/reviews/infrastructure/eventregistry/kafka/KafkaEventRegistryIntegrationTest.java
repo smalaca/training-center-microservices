@@ -1,6 +1,7 @@
 package com.smalaca.reviews.infrastructure.eventregistry.kafka;
 
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.smalaca.reviews.infrastructure.eventregistry.kafka.ProposalApprovedEventAssertion.assertThatProposalApprovedEvent;
+import static com.smalaca.reviews.infrastructure.eventregistry.kafka.ProposalAssignedEventAssertion.assertThatProposalAssignedEvent;
 import static com.smalaca.reviews.infrastructure.eventregistry.kafka.ProposalRejectedEventAssertion.assertThatProposalRejectedEvent;
 import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,17 +28,22 @@ import static org.awaitility.Awaitility.await;
 @EmbeddedKafka(partitions = 1, bootstrapServersProperty = "kafka.bootstrap-servers")
 @TestPropertySource(properties = {
         "kafka.topics.reviews.events.proposal-approved=" + KafkaEventRegistryIntegrationTest.PROPOSAL_APPROVED_EVENT_TOPIC,
+        "kafka.topics.reviews.events.proposal-assigned=" + KafkaEventRegistryIntegrationTest.PROPOSAL_ASSIGNED_EVENT_TOPIC,
         "kafka.topics.reviews.events.proposal-rejected=" + KafkaEventRegistryIntegrationTest.PROPOSAL_REJECTED_EVENT_TOPIC,
         "kafka.group-id=test-group"
 })
 @Import(ReviewsEventRegistryTestConsumer.class)
 class KafkaEventRegistryIntegrationTest {
     protected static final String PROPOSAL_APPROVED_EVENT_TOPIC = "proposal-approved-event-topic";
+    protected static final String PROPOSAL_ASSIGNED_EVENT_TOPIC = "proposal-assigned-event-topic";
     protected static final String PROPOSAL_REJECTED_EVENT_TOPIC = "proposal-rejected-event-topic";
+
     private static final UUID PROPOSAL_ID = UUID.randomUUID();
     private static final UUID REVIEWER_ID = UUID.randomUUID();
+    private static final UUID ASSIGNED_REVIEWER_ID = UUID.randomUUID();
     private static final UUID CORRELATION_ID = UUID.randomUUID();
     private static final LocalDateTime REVIEWED_AT = now();
+    private static final LocalDateTime ASSIGNED_AT = now();
 
     @Autowired
     private KafkaEventRegistry eventRegistry;
@@ -67,6 +74,23 @@ class KafkaEventRegistryIntegrationTest {
                     .hasEventIdFrom(event.eventId())
                     .hasProposalId(PROPOSAL_ID)
                     .hasReviewerId(REVIEWER_ID);
+        });
+    }
+
+    @Test
+    void shouldPublishProposalAssignedEvent() {
+        ProposalAssignedEvent event = ProposalAssignedEvent.create(PROPOSAL_ID, ASSIGNED_REVIEWER_ID, CORRELATION_ID, ASSIGNED_AT);
+
+        eventRegistry.publish(event);
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.reviews.events.ProposalAssignedEvent> actual = consumer.proposalAssignedEventFor(PROPOSAL_ID);
+            assertThat(actual).isPresent();
+
+            assertThatProposalAssignedEvent(actual.get())
+                    .hasEventIdFrom(event.eventId())
+                    .hasProposalId(PROPOSAL_ID)
+                    .hasAssignedReviewerId(ASSIGNED_REVIEWER_ID);
         });
     }
 
