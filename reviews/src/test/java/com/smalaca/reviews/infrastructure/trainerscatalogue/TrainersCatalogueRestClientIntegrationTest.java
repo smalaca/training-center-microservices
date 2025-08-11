@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WireMockTest(httpPort = 1234)
 class TrainersCatalogueRestClientIntegrationTest {
     private static final UUID TRAINER_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-    private static final UUID CATEGORY_ID_1 = UUID.fromString("550e8400-e29b-41d4-a716-446655440001");
-    private static final UUID CATEGORY_ID_2 = UUID.fromString("550e8400-e29b-41d4-a716-446655440002");
-    private static final UUID ASSIGNMENT_ID_1 = UUID.fromString("550e8400-e29b-41d4-a716-446655440003");
+    private static final UUID CATEGORY_ONE = UUID.fromString("550e8400-e29b-41d4-a716-446655440001");
+    private static final UUID CATEGORY_TWO = UUID.fromString("550e8400-e29b-41d4-a716-446655440002");
+    private static final UUID ASSIGNMENT_ID = UUID.fromString("550e8400-e29b-41d4-a716-446655440003");
 
     @Autowired
     private TrainersCatalogue trainersCatalogue;
@@ -36,11 +36,13 @@ class TrainersCatalogueRestClientIntegrationTest {
 
         List<Trainer> trainers = trainersCatalogue.findAllTrainers();
 
-        assertThat(trainers).hasSize(1);
-        Trainer trainer = trainers.get(0);
-        assertThat(trainer.id()).isEqualTo(TRAINER_ID);
-        assertThat(trainer.categoryIds()).containsExactlyInAnyOrder(CATEGORY_ID_1, CATEGORY_ID_2);
-        assertThat(trainer.assignmentsIds()).containsExactlyInAnyOrder(ASSIGNMENT_ID_1);
+        assertThat(trainers)
+                .hasSize(1)
+                .anySatisfy(trainer -> {
+                    assertThat(trainer.id()).isEqualTo(TRAINER_ID);
+                    assertThat(trainer.categoryIds()).containsExactlyInAnyOrder(CATEGORY_ONE, CATEGORY_TWO);
+                    assertThat(trainer.assignmentsIds()).containsExactlyInAnyOrder(ASSIGNMENT_ID);
+                });
     }
 
     @Test
