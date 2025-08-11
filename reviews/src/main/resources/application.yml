@@ -6,6 +6,11 @@ spring:
     serialization:
       indent_output: true
 
+scheduled:
+  proposal:
+    assignment:
+      rate: 60000
+
 kafka:
   bootstrap-servers: localhost:9092
   group-id: reviews
