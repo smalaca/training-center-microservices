@@ -6,6 +6,10 @@ spring:
     serialization:
       indent_output: true
 
+services:
+  trainers-catalogue:
+    url: http://localhost:9080
+
 scheduled:
   proposal:
     assignment:
