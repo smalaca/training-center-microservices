@@ -10,6 +10,7 @@ import com.smalaca.reviews.domain.proposal.ProposalRepository;
 import com.smalaca.reviews.domain.proposal.ReviewerAssignmentPolicy;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,8 +70,9 @@ public class ProposalApplicationService {
     public void assign(UUID proposalId) {
         Proposal proposal = repository.findById(proposalId);
 
-        proposal.assign(assignmentPolicy);
+        Optional<ProposalAssignedEvent> event = proposal.assign(assignmentPolicy);
 
+        event.ifPresent(eventRegistry::publish);
         repository.save(proposal);
     }
 }

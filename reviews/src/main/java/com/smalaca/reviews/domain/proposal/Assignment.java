@@ -25,4 +25,8 @@ public final class Assignment {
     LocalDateTime occurredAt() {
         return occurredAt;
     }
+
+    boolean hasReviewer() {
+        return reviewerId() != null;
+    }
 }

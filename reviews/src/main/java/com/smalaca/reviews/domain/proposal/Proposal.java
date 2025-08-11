@@ -5,6 +5,7 @@ import com.smalaca.domaindrivendesign.Factory;
 import com.smalaca.reviews.domain.clock.Clock;
 import com.smalaca.reviews.domain.proposal.commands.RegisterProposalCommand;
 import com.smalaca.reviews.domain.proposal.events.ProposalApprovedEvent;
+import com.smalaca.reviews.domain.proposal.events.ProposalAssignedEvent;
 import com.smalaca.reviews.domain.proposal.events.ProposalRejectedEvent;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -122,12 +123,22 @@ public class Proposal {
         return Optional.of(ProposalRejectedEvent.create(proposalId, reviewedById, correlationId, reviewedAt));
     }
 
-    public void assign(ReviewerAssignmentPolicy assignmentPolicy) {
+    public Optional<ProposalAssignedEvent> assign(ReviewerAssignmentPolicy assignmentPolicy) {
         Assignment assignment = assignmentPolicy.assign(authorId, Set.copyOf(categoriesIds));
         
         status = assignment.status();
         assignedReviewerId = assignment.reviewerId();
         lastAssignmentDateTime = assignment.occurredAt();
+
+        if (assignment.hasReviewer()) {
+            return Optional.of(proposalAssignedEvent(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    private ProposalAssignedEvent proposalAssignedEvent(Assignment assignment) {
+        return ProposalAssignedEvent.create(proposalId, assignment.reviewerId(), correlationId, assignment.occurredAt());
     }
 
     private boolean isRejected() {
