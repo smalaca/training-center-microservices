@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 interface ProposalViewRepository extends CrudRepository<ProposalView, UUID> {
-    @Query("SELECT p FROM ProposalView p WHERE p.status = 'QUEUED' AND p.lastAssignmentDateTime < :tenMinutesAgo")
-    Iterable<ProposalView> findAllQueuedOffersWithLastAssignmentOlderThan(@Param("tenMinutesAgo") LocalDateTime tenMinutesAgo);
+    @Query(value = "SELECT * FROM PROPOSALS p WHERE p.STATUS = 'QUEUED' AND p.LAST_ASSIGNMENT_DATE_TIME < :weekAgo", nativeQuery = true)
+    Iterable<ProposalView> findAllQueuedOffersWithLastAssignmentOlderThan(@Param("weekAgo") LocalDateTime weekAgo);
 }

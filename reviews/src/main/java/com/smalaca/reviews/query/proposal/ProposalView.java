@@ -21,18 +21,12 @@ public class ProposalView {
     @Column(name = "AUTHOR_ID")
     private UUID authorId;
 
-    @Column(name = "TITLE")
-    private String title;
-
     @Lob
     @Column(name = "CONTENT")
     private String content;
 
-    @Column(name = "CORRELATION_ID")
-    private UUID correlationId;
-
-    @Column(name = "REGISTERED_AT")
-    private LocalDateTime registeredAt;
+    @Column(name = "TITLE")
+    private String title;
 
     @Column(name = "REVIEWED_BY_ID")
     private UUID reviewedById;
@@ -45,7 +39,4 @@ public class ProposalView {
 
     @Column(name = "ASSIGNED_REVIEWER_ID")
     private UUID assignedReviewerId;
-
-    @Column(name = "LAST_ASSIGNMENT_DATE_TIME")
-    private LocalDateTime lastAssignmentDateTime;
 }

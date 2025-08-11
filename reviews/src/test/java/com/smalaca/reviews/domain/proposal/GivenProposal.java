@@ -77,12 +77,12 @@ public class GivenProposal {
         return this;
     }
 
-    public GivenProposal assignedMinutesAgo(int minutes) {
+    public GivenProposal assignedDaysAgo(int days) {
         registered();
-        Clock pastClock = () -> NOW.minusMinutes(minutes);
+        Clock pastClock = () -> NOW.minusDays(days);
         ReviewerAssignmentPolicy policy = new ReviewerAssignmentPolicyFactory().reviewerAssignmentPolicy(pastClock, TRAINERS_CATALOGUE);
         proposal.assign(policy);
-        lastAssignmentDateTime = NOW.minusMinutes(minutes);
+        lastAssignmentDateTime = NOW.minusDays(days);
         status = QUEUED;
 
         return this;

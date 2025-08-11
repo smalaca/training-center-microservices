@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProposalQueryService {
+    private static final int ONE_WEEK = 1;
+
     private final ProposalViewRepository repository;
     private final Clock clock;
 
@@ -16,6 +18,6 @@ public class ProposalQueryService {
 
     @QueryOperation
     public Iterable<ProposalView> findAllToAssign() {
-        return repository.findAllQueuedOffersWithLastAssignmentOlderThan(clock.now().minusMinutes(10));
+        return repository.findAllQueuedOffersWithLastAssignmentOlderThan(clock.now().minusWeeks(ONE_WEEK));
     }
 }

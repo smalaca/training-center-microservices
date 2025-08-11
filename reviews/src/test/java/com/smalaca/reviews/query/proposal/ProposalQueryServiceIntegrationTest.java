@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import static com.smalaca.reviews.query.proposal.ProposalViewAssertion.assertThatProposalView;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RepositoryTest
@@ -36,20 +37,32 @@ class ProposalQueryServiceIntegrationTest {
 
     @Test
     void shouldFindAllProposalsToAssign() {
-        transaction.execute(status -> { repository.save(given.proposal().assigned().getProposal()); return null; });
-        transaction.execute(status -> { repository.save(given.proposal().assignedMinutesAgo(9).getProposal()); return null; });
-        transaction.execute(status -> { repository.save(given.proposal().approved().getProposal()); return null; });
-        transaction.execute(status -> { repository.save(given.proposal().rejected().getProposal()); return null; });
-        ProposalTestDto dtoOne = transaction.execute(status -> givenExisting(given.proposal().assignedMinutesAgo(17)));
-        ProposalTestDto dtoTwo = transaction.execute(status -> givenExisting(given.proposal().assignedMinutesAgo(11)));
-        ProposalTestDto dtoThree = transaction.execute(status -> givenExisting(given.proposal().assignedMinutesAgo(22)));
+        transaction.executeWithoutResult(status -> repository.save(given.proposal().assigned().getProposal()));
+        transaction.executeWithoutResult(status -> repository.save(given.proposal().assignedDaysAgo(6).getProposal()));
+        transaction.executeWithoutResult(status -> repository.save(given.proposal().approved().getProposal()));
+        transaction.executeWithoutResult(status -> repository.save(given.proposal().rejected().getProposal()));
+        ProposalTestDto dtoOne = transaction.execute(status -> givenExisting(given.proposal().assignedDaysAgo(8)));
+        ProposalTestDto dtoTwo = transaction.execute(status -> givenExisting(given.proposal().assignedDaysAgo(11)));
+        ProposalTestDto dtoThree = transaction.execute(status -> givenExisting(given.proposal().assignedDaysAgo(22)));
 
         Iterable<ProposalView> actual = queryService.findAllToAssign();
 
         assertThat(actual).hasSize(3)
-                .anySatisfy(view -> assertThat(view.getProposalId()).isEqualTo(dtoOne.proposalId()))
-                .anySatisfy(view -> assertThat(view.getProposalId()).isEqualTo(dtoTwo.proposalId()))
-                .anySatisfy(view -> assertThat(view.getProposalId()).isEqualTo(dtoThree.proposalId()));
+                .anySatisfy(view -> assertThatProposalViewIsSameAs(view, dtoOne))
+                .anySatisfy(view -> assertThatProposalViewIsSameAs(view, dtoTwo))
+                .anySatisfy(view -> assertThatProposalViewIsSameAs(view, dtoThree));
+    }
+
+    private void assertThatProposalViewIsSameAs(ProposalView actual, ProposalTestDto expected) {
+        assertThatProposalView(actual)
+                .hasProposalId(expected.proposalId())
+                .hasAuthorId(expected.authorId())
+                .hasTitle(expected.title())
+                .hasContent(expected.content())
+                .isQueued()
+                .hasNoReviewedById()
+                .hasNoReviewedAt()
+                .hasNoAssignedReviewerId();
     }
 
     private ProposalTestDto givenExisting(GivenProposal proposal) {
