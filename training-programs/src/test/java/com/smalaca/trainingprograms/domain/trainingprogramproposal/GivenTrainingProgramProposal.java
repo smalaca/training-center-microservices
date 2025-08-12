@@ -49,7 +49,9 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal released() {
         proposed();
-        trainingProgramProposal.release(getReviewerId());
+        TrainingProgramProposalReviewSpecificationFactory specificationFactory = new TrainingProgramProposalReviewSpecificationFactory();
+        TrainingProgramProposalReviewSpecification specification = specificationFactory.reviewSpecification();
+        trainingProgramProposal.release(getReviewerId(), specification);
         status = RELEASED;
 
         return this;

@@ -7,16 +7,16 @@ import com.smalaca.trainingprograms.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecification;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecificationFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
-import org.springframework.stereotype.Service;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-@Service
 @ApplicationLayer
 public class TrainingProgramProposalApplicationService {
     private final TrainingProgramProposalFactory factory;
@@ -54,8 +54,11 @@ public class TrainingProgramProposalApplicationService {
     @DrivingPort
     public void release(UUID trainingProgramProposalId, UUID reviewerId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
+        
+        TrainingProgramProposalReviewSpecificationFactory specificationFactory = new TrainingProgramProposalReviewSpecificationFactory();
+        TrainingProgramProposalReviewSpecification specification = specificationFactory.reviewSpecification();
 
-        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId);
+        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId, specification);
 
         repository.save(trainingProgramProposal);
         eventRegistry.publish(event);

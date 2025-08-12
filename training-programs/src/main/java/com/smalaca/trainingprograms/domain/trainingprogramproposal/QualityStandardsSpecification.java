@@ -1,10 +1,10 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
-import com.smalaca.domaindrivendesign.DomainService;
+import com.smalaca.domaindrivendesign.Specification;
 
 import java.util.regex.Pattern;
 
-@DomainService
+@Specification
 public class QualityStandardsSpecification implements TrainingProgramProposalReviewSpecification {
     private static final Pattern LEARNING_OBJECTIVES_PATTERN = 
         Pattern.compile("(?i).*(?:learn|understand|master|apply|demonstrate|analyze|evaluate).*", Pattern.MULTILINE);
@@ -13,16 +13,16 @@ public class QualityStandardsSpecification implements TrainingProgramProposalRev
     private static final int MINIMUM_WORD_COUNT = 50;
     
     @Override
-    public boolean isSatisfiedBy(TrainingProgramProposal proposal) {
-        return hasGoodStructure(proposal)
-            && hasLearningObjectives(proposal)
-            && hasAdequateWordCount(proposal)
-            && hasProperFormatting(proposal);
+    public boolean isSatisfiedBy(TrainingProgramContent proposalDto) {
+        return hasGoodStructure(proposalDto)
+            && hasLearningObjectives(proposalDto)
+            && hasAdequateWordCount(proposalDto)
+            && hasProperFormatting(proposalDto);
     }
     
-    private boolean hasGoodStructure(TrainingProgramProposal proposal) {
-        return hasProperHeadings(proposal.getAgenda())
-            && hasLogicalFlow(proposal.getPlan());
+    private boolean hasGoodStructure(TrainingProgramContent proposalDto) {
+        return hasProperHeadings(proposalDto.agenda())
+            && hasLogicalFlow(proposalDto.plan());
     }
     
     private boolean hasProperHeadings(String content) {
@@ -41,18 +41,18 @@ public class QualityStandardsSpecification implements TrainingProgramProposalRev
             || plan.contains("Module") || plan.contains("Session");
     }
     
-    private boolean hasLearningObjectives(TrainingProgramProposal proposal) {
-        String content = proposal.getDescription();
+    private boolean hasLearningObjectives(TrainingProgramContent proposalDto) {
+        String content = proposalDto.description();
         if (content == null) {
             return false;
         }
         return LEARNING_OBJECTIVES_PATTERN.matcher(content).find();
     }
     
-    private boolean hasAdequateWordCount(TrainingProgramProposal proposal) {
-        String combinedContent = (proposal.getDescription() + " " + 
-                                proposal.getAgenda() + " " + 
-                                proposal.getPlan()).trim();
+    private boolean hasAdequateWordCount(TrainingProgramContent proposalDto) {
+        String combinedContent = (proposalDto.description() + " " + 
+                                proposalDto.agenda() + " " + 
+                                proposalDto.plan()).trim();
         if (combinedContent.isEmpty()) {
             return false;
         }
@@ -61,11 +61,11 @@ public class QualityStandardsSpecification implements TrainingProgramProposalRev
         return words.length >= MINIMUM_WORD_COUNT;
     }
     
-    private boolean hasProperFormatting(TrainingProgramProposal proposal) {
+    private boolean hasProperFormatting(TrainingProgramContent proposalDto) {
         // Check that content doesn't have excessive repetition or poor formatting
-        return !hasExcessiveRepetition(proposal.getDescription())
-            && !hasExcessiveRepetition(proposal.getAgenda())
-            && !hasExcessiveRepetition(proposal.getPlan());
+        return !hasExcessiveRepetition(proposalDto.description())
+            && !hasExcessiveRepetition(proposalDto.agenda())
+            && !hasExcessiveRepetition(proposalDto.plan());
     }
     
     private boolean hasExcessiveRepetition(String content) {

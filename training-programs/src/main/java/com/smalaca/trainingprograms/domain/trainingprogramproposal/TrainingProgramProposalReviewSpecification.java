@@ -1,12 +1,12 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
-import com.smalaca.domaindrivendesign.DomainService;
+import com.smalaca.domaindrivendesign.Specification;
 
-@DomainService
+@Specification
 public interface TrainingProgramProposalReviewSpecification {
-    boolean isSatisfiedBy(TrainingProgramProposal proposal);
+    boolean isSatisfiedBy(TrainingProgramContent proposalDto);
     
     default TrainingProgramProposalReviewSpecification and(TrainingProgramProposalReviewSpecification other) {
-        return proposal -> this.isSatisfiedBy(proposal) && other.isSatisfiedBy(proposal);
+        return proposalDto -> this.isSatisfiedBy(proposalDto) && other.isSatisfiedBy(proposalDto);
     }
 }
