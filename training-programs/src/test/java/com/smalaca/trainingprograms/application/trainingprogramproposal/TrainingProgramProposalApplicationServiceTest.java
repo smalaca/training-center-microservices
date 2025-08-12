@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramReleasedEventAssertion.assertThatTrainingProgramReleasedEvent;
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramRejectedEventAssertion.assertThatTrainingProgramRejectedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
@@ -177,6 +179,37 @@ class TrainingProgramProposalApplicationServiceTest {
                 .hasCategoriesIds(expected.categoriesIds())
                 .hasReviewerId(reviewerId)
                 .isRejected();
+    }
+
+    @Test
+    void shouldFailToReleaseTrainingProgramProposalWhenSpecificationNotMet() {
+        TrainingProgramProposedEvent event = givenExistingTrainingProgramProposedWithInsufficientContent();
+        UUID reviewerId = randomId();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, 
+            () -> service.release(event.trainingProgramProposalId(), reviewerId));
+
+        assertThat(exception.getMessage()).contains("Training program proposal does not meet the requirements for release");
+    }
+
+    private TrainingProgramProposedEvent givenExistingTrainingProgramProposedWithInsufficientContent() {
+        TrainingProgramProposedEvent event = createInsufficientContentEvent();
+        TrainingProgramProposal trainingProgramProposal = new TrainingProgramProposal(event);
+        given(repository.findById(event.trainingProgramProposalId())).willReturn(trainingProgramProposal);
+
+        return event;
+    }
+
+    private TrainingProgramProposedEvent createInsufficientContentEvent() {
+        CommandId commandId = new CommandId(randomId(), randomId(), randomId(), now());
+        CreateTrainingProgramProposalCommand command = new CreateTrainingProgramProposalCommand(
+                commandId, randomId(), "Short", // Name too short
+                "Short description", // Description too short (less than 100 chars)
+                "Brief agenda", // Agenda too short (less than 200 chars) 
+                "Basic plan", // Plan too short (less than 300 chars)
+                List.of()); // No categories
+        
+        return TrainingProgramProposedEvent.create(randomId(), command);
     }
 
     private TrainingProgramProposedEvent givenExistingTrainingProgramProposed() {

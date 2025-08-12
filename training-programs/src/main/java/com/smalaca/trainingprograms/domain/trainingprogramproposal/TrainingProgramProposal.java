@@ -76,6 +76,12 @@ public class TrainingProgramProposal {
     private TrainingProgramProposal() {}
 
     public TrainingProgramReleasedEvent release(UUID reviewerId) {
+        TrainingProgramProposalReviewSpecification specification = createReviewSpecification();
+        
+        if (!specification.isSatisfiedBy(this)) {
+            throw new IllegalStateException("Training program proposal does not meet the requirements for release");
+        }
+        
         this.reviewerId = reviewerId;
         status = RELEASED;
 
@@ -91,6 +97,13 @@ public class TrainingProgramProposal {
                 new ArrayList<>(categoriesIds)
         );
     }
+    
+    private TrainingProgramProposalReviewSpecification createReviewSpecification() {
+        ContentCompletenessSpecification contentCompleteness = new ContentCompletenessSpecification();
+        QualityStandardsSpecification qualityStandards = new QualityStandardsSpecification();
+        
+        return contentCompleteness.and(qualityStandards);
+    }
 
     private UUID trainingProgramId() {
         return UUID.randomUUID();
@@ -101,5 +114,26 @@ public class TrainingProgramProposal {
         status = REJECTED;
 
         return TrainingProgramRejectedEvent.create(trainingProgramProposalId, reviewerId);
+    }
+
+    // Getter methods for specification pattern
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getAgenda() {
+        return agenda;
+    }
+
+    public String getPlan() {
+        return plan;
+    }
+
+    public List<UUID> getCategoriesIds() {
+        return new ArrayList<>(categoriesIds);
     }
 }
