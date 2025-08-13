@@ -85,8 +85,7 @@ public class TrainingProgramProposal {
         if (!specification.isSatisfiedBy(content)) {
             return TrainingProgramProposalReleaseFailedEvent.create(
                 trainingProgramProposalId, 
-                reviewerId, 
-                "Training program proposal does not meet the requirements for release"
+                reviewerId
             );
         }
         

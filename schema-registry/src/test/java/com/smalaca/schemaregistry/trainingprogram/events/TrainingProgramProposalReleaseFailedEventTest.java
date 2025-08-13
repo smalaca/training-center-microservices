@@ -16,14 +16,12 @@ class TrainingProgramProposalReleaseFailedEventTest {
         EventId eventId = EventId.newEventId();
         UUID trainingProgramProposalId = UUID.randomUUID();
         UUID reviewerId = UUID.randomUUID();
-        String reason = faker.lorem().sentence();
 
         TrainingProgramProposalReleaseFailedEvent actual = new TrainingProgramProposalReleaseFailedEvent(
-                eventId, trainingProgramProposalId, reviewerId, reason);
+                eventId, trainingProgramProposalId, reviewerId);
 
         assertThat(actual.eventId()).isEqualTo(eventId);
         assertThat(actual.trainingProgramProposalId()).isEqualTo(trainingProgramProposalId);
         assertThat(actual.reviewerId()).isEqualTo(reviewerId);
-        assertThat(actual.reason()).isEqualTo(reason);
     }
 }

@@ -7,11 +7,11 @@ import java.util.UUID;
 
 @DomainEvent
 public record TrainingProgramProposalReleaseFailedEvent(
-        EventId eventId, UUID trainingProgramProposalId, UUID reviewerId, String reason) implements TrainingProgramProposalEvent {
+        EventId eventId, UUID trainingProgramProposalId, UUID reviewerId) implements TrainingProgramProposalEvent {
 
-    public static TrainingProgramProposalReleaseFailedEvent create(UUID trainingProgramProposalId, UUID reviewerId, String reason) {
+    public static TrainingProgramProposalReleaseFailedEvent create(UUID trainingProgramProposalId, UUID reviewerId) {
         return new TrainingProgramProposalReleaseFailedEvent(
-                EventId.newEventId(), trainingProgramProposalId, reviewerId, reason
+                EventId.newEventId(), trainingProgramProposalId, reviewerId
         );
     }
 }

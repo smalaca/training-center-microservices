@@ -196,7 +196,6 @@ class TrainingProgramProposalApplicationServiceTest {
         
         assertThat(failedEvent.trainingProgramProposalId()).isEqualTo(event.trainingProgramProposalId());
         assertThat(failedEvent.reviewerId()).isEqualTo(reviewerId);
-        assertThat(failedEvent.reason()).isEqualTo("Training program proposal does not meet the requirements for release");
     }
 
     @Test
