@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @DomainEvent
 public record TrainingProgramProposedEvent(
-        EventId eventId, UUID trainingProgramProposalId, String name, String description, String agenda, String plan, UUID authorId, List<UUID> categoriesIds) {
+        EventId eventId, UUID trainingProgramProposalId, String name, String description, String agenda, String plan, UUID authorId, List<UUID> categoriesIds) implements TrainingProgramProposalEvent {
 
     public static TrainingProgramProposedEvent create(UUID trainingProgramProposalId, CreateTrainingProgramProposalCommand command) {
         return new TrainingProgramProposedEvent(

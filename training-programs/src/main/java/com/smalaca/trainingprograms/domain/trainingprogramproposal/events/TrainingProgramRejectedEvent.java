@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @DomainEvent
 public record TrainingProgramRejectedEvent(
-        EventId eventId, UUID trainingProgramProposalId, UUID reviewerId) {
+        EventId eventId, UUID trainingProgramProposalId, UUID reviewerId) implements TrainingProgramProposalEvent {
 
     public static TrainingProgramRejectedEvent create(UUID trainingProgramProposalId, UUID reviewerId) {
         return new TrainingProgramRejectedEvent(
