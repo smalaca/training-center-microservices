@@ -8,7 +8,6 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecification;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecificationFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
@@ -22,11 +21,13 @@ public class TrainingProgramProposalApplicationService {
     private final TrainingProgramProposalFactory factory;
     private final EventRegistry eventRegistry;
     private final TrainingProgramProposalRepository repository;
+    private final TrainingProgramProposalReviewSpecification reviewSpecification;
 
-    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry, TrainingProgramProposalRepository repository) {
+    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry, TrainingProgramProposalRepository repository, TrainingProgramProposalReviewSpecification reviewSpecification) {
         this.factory = factory;
         this.eventRegistry = eventRegistry;
         this.repository = repository;
+        this.reviewSpecification = reviewSpecification;
     }
 
     @Transactional
@@ -54,11 +55,8 @@ public class TrainingProgramProposalApplicationService {
     @DrivingPort
     public void release(UUID trainingProgramProposalId, UUID reviewerId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
-        
-        TrainingProgramProposalReviewSpecificationFactory specificationFactory = new TrainingProgramProposalReviewSpecificationFactory();
-        TrainingProgramProposalReviewSpecification specification = specificationFactory.reviewSpecification();
 
-        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId, specification);
+        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId, reviewSpecification);
 
         repository.save(trainingProgramProposal);
         eventRegistry.publish(event);
