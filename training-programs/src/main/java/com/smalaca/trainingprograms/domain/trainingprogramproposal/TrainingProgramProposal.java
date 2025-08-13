@@ -1,6 +1,8 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
@@ -75,13 +77,17 @@ public class TrainingProgramProposal {
 
     private TrainingProgramProposal() {}
 
-    public TrainingProgramReleasedEvent release(UUID reviewerId, TrainingProgramProposalReviewSpecification specification) {
+    public TrainingProgramProposalEvent release(UUID reviewerId, TrainingProgramProposalReviewSpecification specification) {
         TrainingProgramContent content = new TrainingProgramContent(
             name, description, agenda, plan, new ArrayList<>(categoriesIds)
         );
         
         if (!specification.isSatisfiedBy(content)) {
-            throw new IllegalStateException("Training program proposal does not meet the requirements for release");
+            return TrainingProgramProposalReleaseFailedEvent.create(
+                trainingProgramProposalId, 
+                reviewerId, 
+                "Training program proposal does not meet the requirements for release"
+            );
         }
         
         this.reviewerId = reviewerId;

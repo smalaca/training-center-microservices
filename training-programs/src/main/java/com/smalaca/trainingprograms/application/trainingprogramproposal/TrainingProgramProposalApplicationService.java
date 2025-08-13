@@ -9,6 +9,7 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecification;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
@@ -56,9 +57,13 @@ public class TrainingProgramProposalApplicationService {
     public void release(UUID trainingProgramProposalId, UUID reviewerId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
 
-        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId, reviewSpecification);
+        TrainingProgramProposalEvent event = trainingProgramProposal.release(reviewerId, reviewSpecification);
 
-        repository.save(trainingProgramProposal);
+        // Only save the aggregate if the release was successful
+        if (event instanceof TrainingProgramReleasedEvent) {
+            repository.save(trainingProgramProposal);
+        }
+        
         eventRegistry.publish(event);
     }
 

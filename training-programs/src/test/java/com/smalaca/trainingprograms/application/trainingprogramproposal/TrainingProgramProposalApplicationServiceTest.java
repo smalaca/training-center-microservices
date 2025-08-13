@@ -6,9 +6,10 @@ import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgr
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -17,15 +18,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramProposedEventAssertion.assertThatTrainingProgramProposedEvent;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.assertj.core.api.Assertions.assertThat;
-import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramReleasedEventAssertion.assertThatTrainingProgramReleasedEvent;
 import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramRejectedEventAssertion.assertThatTrainingProgramRejectedEvent;
+import static com.smalaca.trainingprograms.application.trainingprogramproposal.TrainingProgramReleasedEventAssertion.assertThatTrainingProgramReleasedEvent;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalAssertion.assertThatTrainingProgramProposal;
 import static java.time.LocalDateTime.now;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 class TrainingProgramProposalApplicationServiceTest {
     private static final Faker FAKER = new Faker();
@@ -182,14 +184,29 @@ class TrainingProgramProposalApplicationServiceTest {
     }
 
     @Test
-    void shouldFailToReleaseTrainingProgramProposalWhenSpecificationNotMet() {
+    void shouldPublishTrainingProgramProposalReleaseFailedEventWhenSpecificationNotMet() {
         TrainingProgramProposedEvent event = givenExistingTrainingProgramProposedWithInsufficientContent();
         UUID reviewerId = randomId();
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, 
-            () -> service.release(event.trainingProgramProposalId(), reviewerId));
+        service.release(event.trainingProgramProposalId(), reviewerId);
 
-        assertThat(exception.getMessage()).contains("Training program proposal does not meet the requirements for release");
+        ArgumentCaptor<TrainingProgramProposalReleaseFailedEvent> captor = ArgumentCaptor.forClass(TrainingProgramProposalReleaseFailedEvent.class);
+        then(eventRegistry).should().publish(captor.capture());
+        TrainingProgramProposalReleaseFailedEvent failedEvent = captor.getValue();
+        
+        assertThat(failedEvent.trainingProgramProposalId()).isEqualTo(event.trainingProgramProposalId());
+        assertThat(failedEvent.reviewerId()).isEqualTo(reviewerId);
+        assertThat(failedEvent.reason()).isEqualTo("Training program proposal does not meet the requirements for release");
+    }
+
+    @Test
+    void shouldNotSaveAggregateWhenReleaseFailsDueToSpecificationNotMet() {
+        TrainingProgramProposedEvent event = givenExistingTrainingProgramProposedWithInsufficientContent();
+        UUID reviewerId = randomId();
+
+        service.release(event.trainingProgramProposalId(), reviewerId);
+
+        then(repository).should(never()).save(any(TrainingProgramProposal.class));
     }
 
     private TrainingProgramProposedEvent givenExistingTrainingProgramProposedWithInsufficientContent() {
