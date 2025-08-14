@@ -7,26 +7,27 @@ import com.smalaca.trainingprograms.domain.eventregistry.EventRegistry;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposal;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalFactory;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalRepository;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalReviewSpecification;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-@Service
 @ApplicationLayer
 public class TrainingProgramProposalApplicationService {
     private final TrainingProgramProposalFactory factory;
     private final EventRegistry eventRegistry;
     private final TrainingProgramProposalRepository repository;
+    private final TrainingProgramProposalReviewSpecification reviewSpecification;
 
-    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry, TrainingProgramProposalRepository repository) {
+    TrainingProgramProposalApplicationService(TrainingProgramProposalFactory factory, EventRegistry eventRegistry, TrainingProgramProposalRepository repository, TrainingProgramProposalReviewSpecification reviewSpecification) {
         this.factory = factory;
         this.eventRegistry = eventRegistry;
         this.repository = repository;
+        this.reviewSpecification = reviewSpecification;
     }
 
     @Transactional
@@ -55,7 +56,7 @@ public class TrainingProgramProposalApplicationService {
     public void release(UUID trainingProgramProposalId, UUID reviewerId) {
         TrainingProgramProposal trainingProgramProposal = repository.findById(trainingProgramProposalId);
 
-        TrainingProgramReleasedEvent event = trainingProgramProposal.release(reviewerId);
+        TrainingProgramProposalEvent event = trainingProgramProposal.release(reviewerId, reviewSpecification);
 
         repository.save(trainingProgramProposal);
         eventRegistry.publish(event);

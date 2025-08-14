@@ -6,6 +6,7 @@ import java.util.UUID;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASE_FAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrainingProgramProposalAssertion {
@@ -77,6 +78,10 @@ public class TrainingProgramProposalAssertion {
 
     public TrainingProgramProposalAssertion isRejected() {
         return hasStatus(REJECTED);
+    }
+
+    public TrainingProgramProposalAssertion isReleaseFailed() {
+        return hasStatus(RELEASE_FAILED);
     }
 
     public TrainingProgramProposalAssertion hasStatus(TrainingProgramProposalStatus expected) {

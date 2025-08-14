@@ -128,9 +128,13 @@ class ProposalApprovedEventKafkaListenerIntegrationTest {
     }
 
     private CreateTrainingProgramProposalCommand createTrainingProgramProposalCommand() {
+        CommandId commandId = new CommandId(randomUUID(), randomUUID(), randomUUID(), now());
         return new CreateTrainingProgramProposalCommand(
-                new CommandId(randomUUID(), randomUUID(), randomUUID(), now()),
-                randomUUID(), FAKER.book().title(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(), FAKER.lorem().paragraph(),
+                commandId, randomUUID(),
+                "Advanced Java Programming Course",
+                "This comprehensive course will teach you advanced Java programming concepts and techniques. You will learn about design patterns, concurrency, performance optimization, and modern Java features. Students will master advanced object-oriented programming principles and understand how to apply them in real-world scenarios.",
+                "# Day 1: Fundamentals\n* Advanced OOP concepts\n* Design patterns overview\n* SOLID principles in practice\n\n# Day 2: Concurrency\n* Threading and synchronization\n* Concurrent collections\n* CompletableFuture and reactive programming\n\n# Day 3: Performance\n* JVM tuning and garbage collection\n* Profiling and monitoring tools\n* Memory management best practices",
+                "Phase 1: Foundation Building\n1. Review core Java concepts and introduce advanced topics\n2. Hands-on exercises with design patterns\n3. Code review sessions and best practices discussion\n\nPhase 2: Advanced Topics\nStep 1: Deep dive into concurrency mechanisms\nStep 2: Practical exercises with threading\nStep 3: Performance analysis and optimization\n\nModule 3: Real-world Application\nSession 1: Project work applying learned concepts\nSession 2: Code review and feedback\nSession 3: Final presentations and wrap-up",
                 List.of(randomUUID(), randomUUID()));
     }
 
