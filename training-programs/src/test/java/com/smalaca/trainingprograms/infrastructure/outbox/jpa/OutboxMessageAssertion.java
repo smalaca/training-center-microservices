@@ -1,6 +1,8 @@
 package com.smalaca.trainingprograms.infrastructure.outbox.jpa;
 
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 
 import java.time.LocalDateTime;
@@ -54,6 +56,20 @@ class OutboxMessageAssertion {
                 .contains("\"agenda\" : \"" + expected.agenda())
                 .contains("\"plan\" : \"" + expected.plan())
                 .contains("\"authorId\" : \"" + expected.authorId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingProgramProposalReleaseFailedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"trainingProgramProposalId\" : \"" + expected.trainingProgramProposalId())
+                .contains("\"reviewerId\" : \"" + expected.reviewerId());
+        return this;
+    }
+
+    OutboxMessageAssertion hasPayloadThatContainsAllDataFrom(TrainingProgramRejectedEvent expected) {
+        assertThat(actual.getPayload())
+                .contains("\"trainingProgramProposalId\" : \"" + expected.trainingProgramProposalId())
+                .contains("\"reviewerId\" : \"" + expected.reviewerId());
         return this;
     }
 }
