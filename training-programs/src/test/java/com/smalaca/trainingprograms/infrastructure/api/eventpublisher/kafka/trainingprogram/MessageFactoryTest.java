@@ -4,9 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
-import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramReleasedEventAssertion.assertThatExternalTrainingProgramReleasedEvent;
+import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramProposalReleaseFailedEventAssertion.assertThatExternalTrainingProgramProposalReleaseFailedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramRejectedEventAssertion.assertThatExternalTrainingProgramRejectedEvent;
+import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramReleasedEventAssertion.assertThatExternalTrainingProgramReleasedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.RegisterProposalCommandAssertion.assertThatRegisterProposalCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -117,5 +119,21 @@ class MessageFactoryTest {
 
     private TrainingProgramRejectedEvent trainingProgramRejectedEvent() {
         return new TrainingProgramRejectedEvent(EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
+    }
+
+    @Test
+    void shouldConvertTrainingProgramProposalReleaseFailedEventToExternalTrainingProgramProposalReleaseFailedEvent() {
+        TrainingProgramProposalReleaseFailedEvent event = trainingProgramProposalReleaseFailedEvent();
+
+        com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposalReleaseFailedEvent actual = messageFactory.asExternalTrainingProgramProposalReleaseFailedEvent(event);
+
+        assertThatExternalTrainingProgramProposalReleaseFailedEvent(actual)
+                .hasTrainingProgramProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
+                .hasReviewerId(REVIEWER_ID)
+                .hasEventIdWithSameDataAs(EVENT_ID);
+    }
+
+    private TrainingProgramProposalReleaseFailedEvent trainingProgramProposalReleaseFailedEvent() {
+        return new TrainingProgramProposalReleaseFailedEvent(EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
     }
 }

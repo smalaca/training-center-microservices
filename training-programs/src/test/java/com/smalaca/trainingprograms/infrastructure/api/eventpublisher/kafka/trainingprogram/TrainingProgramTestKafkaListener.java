@@ -1,6 +1,7 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram;
 
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
+import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramReleasedEvent;
 import com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,6 +14,7 @@ import java.util.UUID;
 class TrainingProgramTestKafkaListener {
     private final Map<UUID, TrainingProgramReleasedEvent> trainingProgramReleasedEvents = new HashMap<>();
     private final Map<UUID, TrainingProgramRejectedEvent> trainingProgramRejectedEvents = new HashMap<>();
+    private final Map<UUID, TrainingProgramProposalReleaseFailedEvent> trainingProgramProposalReleaseFailedEvents = new HashMap<>();
     private final Map<UUID, RegisterProposalCommand> registerProposalCommands = new HashMap<>();
 
     @KafkaListener(
@@ -49,5 +51,17 @@ class TrainingProgramTestKafkaListener {
 
     Optional<TrainingProgramRejectedEvent> trainingProgramRejectedEventFor(UUID trainingProgramProposalId) {
         return Optional.ofNullable(trainingProgramRejectedEvents.get(trainingProgramProposalId));
+    }
+
+    @KafkaListener(
+            topics = "${kafka.topics.trainingprogram.events.training-program-proposal-release-failed}",
+            groupId = "test-training-programs-group",
+            containerFactory = "listenerContainerFactory")
+    public void consume(TrainingProgramProposalReleaseFailedEvent event) {
+        trainingProgramProposalReleaseFailedEvents.put(event.trainingProgramProposalId(), event);
+    }
+
+    Optional<TrainingProgramProposalReleaseFailedEvent> trainingProgramProposalReleaseFailedEventFor(UUID trainingProgramProposalId) {
+        return Optional.ofNullable(trainingProgramProposalReleaseFailedEvents.get(trainingProgramProposalId));
     }
 }

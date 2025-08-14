@@ -1,4 +1,4 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram;
 
-record Topics(String registerProposal, String trainingProgramReleased, String trainingProgramRejected) {
+record Topics(String registerProposal, String trainingProgramReleased, String trainingProgramRejected, String trainingProgramProposalReleaseFailed) {
 }

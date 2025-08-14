@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
@@ -66,6 +67,13 @@ class MessageFactory {
 
     com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent asExternalTrainingProgramRejectedEvent(TrainingProgramRejectedEvent event) {
         return new com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramRejectedEvent(
+                asExternalEventId(event.eventId()),
+                event.trainingProgramProposalId(),
+                event.reviewerId());
+    }
+
+    com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposalReleaseFailedEvent asExternalTrainingProgramProposalReleaseFailedEvent(TrainingProgramProposalReleaseFailedEvent event) {
+        return new com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposalReleaseFailedEvent(
                 asExternalEventId(event.eventId()),
                 event.trainingProgramProposalId(),
                 event.reviewerId());

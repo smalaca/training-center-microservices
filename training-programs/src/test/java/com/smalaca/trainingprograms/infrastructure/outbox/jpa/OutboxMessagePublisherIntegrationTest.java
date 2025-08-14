@@ -5,7 +5,10 @@ import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.infrastructure.api.eventlistener.spring.TrainingProgramProposalEventListener;
 import com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.TrainingProgramEventPublisher;
@@ -71,6 +74,10 @@ class OutboxMessagePublisherIntegrationTest {
         TrainingProgramProposedEvent eventThree = randomTrainingProgramProposedEvent();
         TrainingProgramReleasedEvent eventFour = randomTrainingProgramReleasedEvent();
         TrainingProgramReleasedEvent eventFive = randomTrainingProgramReleasedEvent();
+        TrainingProgramProposalReleaseFailedEvent eventSix = randomTrainingProgramProposalReleaseFailedEvent();
+        TrainingProgramProposalReleaseFailedEvent eventSeven = randomTrainingProgramProposalReleaseFailedEvent();
+        TrainingProgramRejectedEvent eventEight = randomTrainingProgramRejectedEvent();
+        TrainingProgramRejectedEvent eventNine = randomTrainingProgramRejectedEvent();
         notPublished(eventOne);
         published(randomTrainingProgramProposedEvent());
         published(randomTrainingProgramProposedEvent());
@@ -79,11 +86,19 @@ class OutboxMessagePublisherIntegrationTest {
         notPublished(eventFour);
         published(randomTrainingProgramReleasedEvent());
         notPublished(eventFive);
+        notPublished(eventSix);
+        published(randomTrainingProgramProposalReleaseFailedEvent());
+        notPublished(eventSeven);
+        notPublished(eventEight);
+        published(randomTrainingProgramRejectedEvent());
+        notPublished(eventNine);
 
         await()
                 .untilAsserted(() -> {
                     assertThat(listener.trainingProgramProposedEvents).contains(eventOne, eventTwo, eventThree);
                     assertThat(listener.trainingProgramReleasedEvents).contains(eventFour, eventFive);
+                    assertThat(listener.trainingProgramProposalReleaseFailedEvents).contains(eventSix, eventSeven);
+                    assertThat(listener.trainingProgramRejectedEvents).contains(eventEight, eventNine);
                 });
     }
 
@@ -97,11 +112,15 @@ class OutboxMessagePublisherIntegrationTest {
         notPublished(randomTrainingProgramReleasedEvent());
         published(randomTrainingProgramReleasedEvent());
         notPublished(randomTrainingProgramReleasedEvent());
+        notPublished(randomTrainingProgramProposalReleaseFailedEvent());
+        published(randomTrainingProgramProposalReleaseFailedEvent());
+        notPublished(randomTrainingProgramRejectedEvent());
+        published(randomTrainingProgramRejectedEvent());
 
         await()
                 .untilAsserted(() -> {
                     assertThat(repository.findAll())
-                            .hasSize(8)
+                            .hasSize(12)
                             .allSatisfy(actual -> assertThat(actual.isPublished()).isTrue());
                 });
     }
@@ -134,19 +153,25 @@ class OutboxMessagePublisherIntegrationTest {
         );
     }
 
-    private void published(TrainingProgramProposedEvent event) {
+    private TrainingProgramProposalReleaseFailedEvent randomTrainingProgramProposalReleaseFailedEvent() {
+        return TrainingProgramProposalReleaseFailedEvent.create(
+                UUID.randomUUID(),
+                UUID.randomUUID()
+        );
+    }
+
+    private TrainingProgramRejectedEvent randomTrainingProgramRejectedEvent() {
+        return TrainingProgramRejectedEvent.create(
+                UUID.randomUUID(),
+                UUID.randomUUID()
+        );
+    }
+
+    private void published(TrainingProgramProposalEvent event) {
         published(event.eventId(), event);
     }
 
-    private void notPublished(TrainingProgramProposedEvent event) {
-        notPublished(event.eventId(), event);
-    }
-
-    private void published(TrainingProgramReleasedEvent event) {
-        published(event.eventId(), event);
-    }
-
-    private void notPublished(TrainingProgramReleasedEvent event) {
+    private void notPublished(TrainingProgramProposalEvent event) {
         notPublished(event.eventId(), event);
     }
 

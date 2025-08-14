@@ -3,6 +3,7 @@ package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.tra
 import com.smalaca.schemaregistry.reviews.commands.RegisterProposalCommand;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.eventid.EventId;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramProposalReleaseFailedEventAssertion.assertThatExternalTrainingProgramProposalReleaseFailedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramReleasedEventAssertion.assertThatExternalTrainingProgramReleasedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.ExternalTrainingProgramRejectedEventAssertion.assertThatExternalTrainingProgramRejectedEvent;
 import static com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram.RegisterProposalCommandAssertion.assertThatRegisterProposalCommand;
@@ -32,7 +34,8 @@ import static org.awaitility.Awaitility.await;
 @TestPropertySource(properties = {
         "kafka.topics.reviews.commands.register-proposal=reviews-register-proposal-command-topic",
         "kafka.topics.trainingprogram.events.training-program-released=training-program-released-event-topic",
-        "kafka.topics.trainingprogram.events.training-program-rejected=training-program-rejected-event-topic"
+        "kafka.topics.trainingprogram.events.training-program-rejected=training-program-rejected-event-topic",
+        "kafka.topics.trainingprogram.events.training-program-proposal-release-failed=training-program-proposal-release-failed-event-topic"
 })
 @Import(TrainingProgramTestKafkaListener.class)
 class TrainingProgramEventPublisherIntegrationTest {
@@ -126,6 +129,21 @@ class TrainingProgramEventPublisherIntegrationTest {
         });
     }
 
+    @Test
+    void shouldPublishTrainingProgramProposalReleaseFailedEvent() {
+        publisher.consume(trainingProgramProposalReleaseFailedEvent());
+
+        await().untilAsserted(() -> {
+            Optional<com.smalaca.schemaregistry.trainingprogram.events.TrainingProgramProposalReleaseFailedEvent> actual = listener.trainingProgramProposalReleaseFailedEventFor(TRAINING_PROGRAM_PROPOSAL_ID);
+            assertThat(actual).isPresent();
+
+            assertThatExternalTrainingProgramProposalReleaseFailedEvent(actual.get())
+                    .hasTrainingProgramProposalId(TRAINING_PROGRAM_PROPOSAL_ID)
+                    .hasReviewerId(REVIEWER_ID)
+                    .hasEventIdWithSameDataAs(EVENT_ID);
+        });
+    }
+
     private TrainingProgramProposedEvent trainingProgramProposedEvent() {
         return new TrainingProgramProposedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, TRAINING_NAME, TRAINING_DESCRIPTION,
@@ -140,6 +158,11 @@ class TrainingProgramEventPublisherIntegrationTest {
 
     private TrainingProgramRejectedEvent trainingProgramRejectedEvent() {
         return new TrainingProgramRejectedEvent(
+                EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
+    }
+
+    private TrainingProgramProposalReleaseFailedEvent trainingProgramProposalReleaseFailedEvent() {
+        return new TrainingProgramProposalReleaseFailedEvent(
                 EVENT_ID, TRAINING_PROGRAM_PROPOSAL_ID, REVIEWER_ID);
     }
 }
