@@ -20,9 +20,39 @@ public class GivenTrainingProgramProposal {
     private UUID trainingProgramProposalId;
     private final UUID authorId = randomUUID();
     private final String name = FAKER.book().title();
-    private final String description = FAKER.lorem().paragraph();
-    private final String agenda = FAKER.lorem().paragraph();
-    private final String plan = FAKER.lorem().paragraph();
+    private final String description =
+            "This comprehensive course will teach you advanced Java programming concepts and techniques. " +
+            "You will learn about design patterns, concurrency, performance optimization, and modern Java features. " +
+            "Students will master advanced object-oriented programming principles and understand how to apply them in real-world scenarios." +
+            FAKER.lorem().paragraph();
+    private final String agenda =
+            "# Day 1: Fundamentals\n" +
+            "* Advanced OOP concepts\n" +
+            "* Design patterns overview\n" +
+            "* SOLID principles in practice\n" +
+            "\n# Day 2: Concurrency\n" +
+            "* Threading and synchronization\n" +
+            "* Concurrent collections\n" +
+            "* CompletableFuture and reactive programming\n" +
+            "\n# Day 3: Performance\n" +
+            "* JVM tuning and garbage collection\n" +
+            "* Profiling and monitoring tools\n" +
+            "* Memory management best practices" +
+            FAKER.lorem().paragraph();
+    private final String plan =
+            "Phase 1: Foundation Building\n" +
+            "1. Review core Java concepts and introduce advanced topics\n" +
+            "2. Hands-on exercises with design patterns\n" +
+            "3. Code review sessions and best practices discussion\n" +
+            "\nPhase 2: Advanced Topics\n" +
+            "Step 1: Deep dive into concurrency mechanisms\n" +
+            "Step 2: Practical exercises with threading\n" +
+            "Step 3: Performance analysis and optimization\n" +
+            "\nModule 3: Real-world Application\n" +
+            "Session 1: Project work applying learned concepts\n" +
+            "Session 2: Code review and feedback\n" +
+            "Session 3: Final presentations and wrap-up" +
+            FAKER.lorem().paragraph();
     private final List<UUID> categoriesIds = List.of(randomUUID(), randomUUID());
     private final TrainingProgramProposalFactory trainingProgramProposalFactory;
     private TrainingProgramProposalStatus status;
@@ -49,7 +79,8 @@ public class GivenTrainingProgramProposal {
 
     public GivenTrainingProgramProposal released() {
         proposed();
-        trainingProgramProposal.release(getReviewerId());
+        TrainingProgramProposalReviewSpecification specification = new TrainingProgramProposalReviewSpecificationFactory().trainingProgramProposalReviewSpecification();
+        trainingProgramProposal.release(getReviewerId(), specification);
         status = RELEASED;
 
         return this;

@@ -1,6 +1,8 @@
 package com.smalaca.trainingprograms.domain.trainingprogramproposal;
 
 import com.smalaca.domaindrivendesign.AggregateRoot;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.PROPOSED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.REJECTED;
+import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASE_FAILED;
 import static com.smalaca.trainingprograms.domain.trainingprogramproposal.TrainingProgramProposalStatus.RELEASED;
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -75,10 +78,23 @@ public class TrainingProgramProposal {
 
     private TrainingProgramProposal() {}
 
-    public TrainingProgramReleasedEvent release(UUID reviewerId) {
+    public TrainingProgramProposalEvent release(UUID reviewerId, TrainingProgramProposalReviewSpecification specification) {
         this.reviewerId = reviewerId;
-        status = RELEASED;
 
+        if (specification.isSatisfiedBy(asTrainingProgramContent())) {
+            status = RELEASED;
+            return trainingProgramReleasedEvent(reviewerId);
+        } else {
+            status = RELEASE_FAILED;
+            return trainingProgramProposalReleaseFailedEvent(reviewerId);
+        }
+    }
+
+    private TrainingProgramContent asTrainingProgramContent() {
+        return new TrainingProgramContent(name, description, agenda, plan, new ArrayList<>(categoriesIds));
+    }
+
+    private TrainingProgramReleasedEvent trainingProgramReleasedEvent(UUID reviewerId) {
         return TrainingProgramReleasedEvent.create(
                 trainingProgramProposalId,
                 trainingProgramId(),
@@ -90,6 +106,10 @@ public class TrainingProgramProposal {
                 reviewerId,
                 new ArrayList<>(categoriesIds)
         );
+    }
+
+    private TrainingProgramProposalReleaseFailedEvent trainingProgramProposalReleaseFailedEvent(UUID reviewerId) {
+        return TrainingProgramProposalReleaseFailedEvent.create(trainingProgramProposalId, reviewerId);
     }
 
     private UUID trainingProgramId() {
