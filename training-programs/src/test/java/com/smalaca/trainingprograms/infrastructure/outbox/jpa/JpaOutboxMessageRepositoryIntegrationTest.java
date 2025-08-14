@@ -3,7 +3,10 @@ package com.smalaca.trainingprograms.infrastructure.outbox.jpa;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import com.smalaca.trainingprograms.domain.commandid.CommandId;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.commands.CreateTrainingProgramProposalCommand;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
@@ -45,24 +48,20 @@ class JpaOutboxMessageRepositoryIntegrationTest {
 
     @Test
     void shouldFindAllOutboxMessages() {
-        TrainingProgramReleasedEvent trainingProgramReleasedEvent = publishReleasedEvent(randomTrainingProgramReleasedEvent());
-        TrainingProgramProposedEvent trainingProgramProposedEvent = publishProposedEvent(randomTrainingProgramProposedEvent());
+        TrainingProgramReleasedEvent trainingProgramReleasedEvent = publish(randomTrainingProgramReleasedEvent());
+        TrainingProgramProposedEvent trainingProgramProposedEvent = publish(randomTrainingProgramProposedEvent());
+        TrainingProgramProposalReleaseFailedEvent trainingProgramProposalReleaseFailedEvent = publish(randomTrainingProgramProposalReleaseFailedEvent());
+        TrainingProgramRejectedEvent trainingProgramRejectedEvent = publish(randomTrainingProgramRejectedEvent());
 
         assertThat(springRepository.findAll())
-                .hasSize(2)
+                .hasSize(4)
                 .anySatisfy(actual -> assertTrainingProgramReleasedEventSaved(actual, trainingProgramReleasedEvent))
-                .anySatisfy(actual -> assertTrainingProgramProposedEventSaved(actual, trainingProgramProposedEvent));
+                .anySatisfy(actual -> assertTrainingProgramProposedEventSaved(actual, trainingProgramProposedEvent))
+                .anySatisfy(actual -> assertTrainingProgramProposalReleaseFailedEventSaved(actual, trainingProgramProposalReleaseFailedEvent))
+                .anySatisfy(actual -> assertTrainingProgramRejectedEventSaved(actual, trainingProgramRejectedEvent));
     }
 
-    private <T extends TrainingProgramProposedEvent> T publishProposedEvent(T event) {
-        return transactionTemplate.execute(transactionStatus -> {
-            repository.publish(event);
-            messagesIds.add(event.eventId().eventId());
-            return event;
-        });
-    }
-
-    private <T extends TrainingProgramReleasedEvent> T publishReleasedEvent(T event) {
+    private <T extends TrainingProgramProposalEvent> T publish(T event) {
         return transactionTemplate.execute(transactionStatus -> {
             repository.publish(event);
             messagesIds.add(event.eventId().eventId());
@@ -98,6 +97,20 @@ class JpaOutboxMessageRepositoryIntegrationTest {
         );
     }
 
+    private TrainingProgramProposalReleaseFailedEvent randomTrainingProgramProposalReleaseFailedEvent() {
+        return TrainingProgramProposalReleaseFailedEvent.create(
+                randomId(),
+                randomId()
+        );
+    }
+
+    private TrainingProgramRejectedEvent randomTrainingProgramRejectedEvent() {
+        return TrainingProgramRejectedEvent.create(
+                randomId(),
+                randomId()
+        );
+    }
+
     private UUID randomId() {
         return UUID.randomUUID();
     }
@@ -115,6 +128,22 @@ class JpaOutboxMessageRepositoryIntegrationTest {
                 .hasMessageId(expected.eventId().eventId())
                 .hasOccurredOn(expected.eventId().creationDateTime())
                 .hasMessageType("com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertTrainingProgramProposalReleaseFailedEventSaved(OutboxMessage actual, TrainingProgramProposalReleaseFailedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent")
+                .hasPayloadThatContainsAllDataFrom(expected);
+    }
+
+    private void assertTrainingProgramRejectedEventSaved(OutboxMessage actual, TrainingProgramRejectedEvent expected) {
+        assertThatOutboxMessage(actual)
+                .hasMessageId(expected.eventId().eventId())
+                .hasOccurredOn(expected.eventId().creationDateTime())
+                .hasMessageType("com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent")
                 .hasPayloadThatContainsAllDataFrom(expected);
     }
 }
