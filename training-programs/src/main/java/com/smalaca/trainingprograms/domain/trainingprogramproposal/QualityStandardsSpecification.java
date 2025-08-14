@@ -4,6 +4,10 @@ import com.smalaca.domaindrivendesign.Specification;
 
 import java.util.regex.Pattern;
 
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
 @Specification
 class QualityStandardsSpecification implements TrainingProgramProposalReviewSpecification {
     private static final Pattern LEARNING_OBJECTIVES_PATTERN =
@@ -49,18 +53,13 @@ class QualityStandardsSpecification implements TrainingProgramProposalReviewSpec
     private boolean hasNoExcessiveRepetition(String content) {
         String[] words = content.toLowerCase().split("\\s+");
 
-        int maxOccurrences = 0;
-        for (String word : words) {
-            if (isMeaningful(word)) {
-                int count = 0;
-                for (String w : words) {
-                    if (w.equals(word)) {
-                        count++;
-                    }
-                }
-                maxOccurrences = Math.max(maxOccurrences, count);
-            }
-        }
+        long maxOccurrences = stream(words)
+                .filter(this::isMeaningful)
+                .collect(groupingBy(word -> word, counting()))
+                .values()
+                .stream()
+                .max(Long::compareTo)
+                .orElse(0L);
 
         return hasNoExcessiveRepetitionRatio(maxOccurrences, words);
     }
@@ -69,7 +68,7 @@ class QualityStandardsSpecification implements TrainingProgramProposalReviewSpec
         return word.length() > 3;
     }
 
-    private boolean hasNoExcessiveRepetitionRatio(int maxOccurrences, String[] words) {
+    private boolean hasNoExcessiveRepetitionRatio(long maxOccurrences, String[] words) {
         return maxOccurrences <= words.length * EXCESSIVE_REPETITION_RATIO;
     }
 }
