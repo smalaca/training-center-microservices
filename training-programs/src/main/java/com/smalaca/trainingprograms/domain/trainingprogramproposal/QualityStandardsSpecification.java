@@ -70,6 +70,6 @@ class QualityStandardsSpecification implements TrainingProgramProposalReviewSpec
     }
 
     private boolean hasNoExcessiveRepetitionRatio(int maxOccurrences, String[] words) {
-        return !(maxOccurrences > words.length * EXCESSIVE_REPETITION_RATIO);
+        return maxOccurrences <= words.length * EXCESSIVE_REPETITION_RATIO;
     }
 }
