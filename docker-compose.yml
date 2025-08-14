@@ -50,6 +50,7 @@ services:
       kafka-topics --create --topic training-offer-no-available-training-places-left-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-fact
       kafka-topics --create --topic training-programs-training-program-released-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic training-programs-training-program-rejected-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
+      kafka-topics --create --topic training-programs-training-program-proposal-release-failed-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-register-proposal-command-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-proposal-approved-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&
       kafka-topics --create --topic reviews-proposal-assigned-event-topic --bootstrap-server kafka:9092 --partitions 1 --replication-factor 1 &&

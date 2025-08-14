@@ -14,8 +14,9 @@ public class TrainingProgramEventPublisherFactory {
             @Value("${kafka.topics.reviews.commands.register-proposal}") String registerProposalCommandTopic,
             @Value("${kafka.topics.trainingprogram.events.training-program-released}") String trainingProgramReleasedTopic,
             @Value("${kafka.topics.trainingprogram.events.training-program-rejected}") String trainingProgramRejectedTopic,
+            @Value("${kafka.topics.trainingprogram.events.training-program-proposal-release-failed}") String trainingProgramProposalReleaseFailedTopic,
             ObjectMapper objectMapper) {
-        Topics topics = new Topics(registerProposalCommandTopic, trainingProgramReleasedTopic, trainingProgramRejectedTopic);
+        Topics topics = new Topics(registerProposalCommandTopic, trainingProgramReleasedTopic, trainingProgramRejectedTopic, trainingProgramProposalReleaseFailedTopic);
 
         return new TrainingProgramEventPublisher(kafkaTemplate, topics, new MessageFactory(objectMapper));
     }

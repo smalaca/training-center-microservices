@@ -1,5 +1,6 @@
 package com.smalaca.trainingprograms.infrastructure.api.eventpublisher.kafka.trainingprogram;
 
+import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposalReleaseFailedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramProposedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramReleasedEvent;
 import com.smalaca.trainingprograms.domain.trainingprogramproposal.events.TrainingProgramRejectedEvent;
@@ -30,5 +31,10 @@ public class TrainingProgramEventPublisher {
     @EventListener
     public void consume(TrainingProgramRejectedEvent event) {
         kafkaTemplate.send(topics.trainingProgramRejected(), messageFactory.asExternalTrainingProgramRejectedEvent(event));
+    }
+
+    @EventListener
+    public void consume(TrainingProgramProposalReleaseFailedEvent event) {
+        kafkaTemplate.send(topics.trainingProgramProposalReleaseFailed(), messageFactory.asExternalTrainingProgramProposalReleaseFailedEvent(event));
     }
 }
