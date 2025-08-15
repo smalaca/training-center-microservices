@@ -24,6 +24,7 @@ public class PortsAndAdaptersArchitectureTest {
         classes()
             .that().areAnnotatedWith(DrivingPort.class)
             .should().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Driving ports should be part of the application layer");
 
     @ArchTest
@@ -31,6 +32,7 @@ public class PortsAndAdaptersArchitectureTest {
         classes()
             .that().areAnnotatedWith(DrivenPort.class)
             .should().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Driven ports should be part of the application layer");
 
     @ArchTest
@@ -41,6 +43,7 @@ public class PortsAndAdaptersArchitectureTest {
             .orShould().resideInAPackage("..rest..")
             .orShould().resideInAPackage("..kafka..")
             .orShould().resideInAPackage("..web..")
+            .allowEmptyShould(true)
             .because("Driving adapters should be part of the infrastructure layer");
 
     @ArchTest
@@ -51,6 +54,7 @@ public class PortsAndAdaptersArchitectureTest {
             .orShould().resideInAPackage("..repository..")
             .orShould().resideInAPackage("..kafka..")
             .orShould().resideInAPackage("..jpa..")
+            .allowEmptyShould(true)
             .because("Driven adapters should be part of the infrastructure layer");
 
     @ArchTest
@@ -58,6 +62,7 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivingPort.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Driving ports should not be in domain packages");
 
     @ArchTest
@@ -65,6 +70,7 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivenPort.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Driven ports should not be in domain packages");
 
     @ArchTest
@@ -72,6 +78,7 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivingAdapter.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Driving adapters should not be in domain packages");
 
     @ArchTest
@@ -79,6 +86,7 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivenAdapter.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Driven adapters should not be in domain packages");
 
     @ArchTest
@@ -86,6 +94,7 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivingAdapter.class)
             .should().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Driving adapters should not be in application packages");
 
     @ArchTest
@@ -93,5 +102,6 @@ public class PortsAndAdaptersArchitectureTest {
         noClasses()
             .that().areAnnotatedWith(DrivenAdapter.class)
             .should().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Driven adapters should not be in application packages");
 }

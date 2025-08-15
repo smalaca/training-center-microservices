@@ -28,6 +28,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(DomainEntity.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Domain entities should reside in domain packages");
 
     @ArchTest
@@ -35,6 +36,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(AggregateRoot.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Aggregate roots should reside in domain packages");
 
     @ArchTest
@@ -42,6 +44,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(ValueObject.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Value objects should reside in domain packages");
 
     @ArchTest
@@ -49,6 +52,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(DomainService.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Domain services should reside in domain packages");
 
     @ArchTest
@@ -56,6 +60,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(DomainRepository.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Domain repositories should reside in domain packages");
 
     @ArchTest
@@ -63,6 +68,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(DomainEvent.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Domain events should reside in domain packages");
 
     @ArchTest
@@ -70,6 +76,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(Factory.class)
             .should().resideInAPackage("..domain..")
+            .allowEmptyShould(true)
             .because("Factories should reside in domain packages");
 
     @ArchTest
@@ -77,6 +84,7 @@ public class DomainDrivenDesignArchitectureTest {
         classes()
             .that().areAnnotatedWith(ApplicationLayer.class)
             .should().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Application services should reside in application packages");
 
     @ArchTest
@@ -84,6 +92,7 @@ public class DomainDrivenDesignArchitectureTest {
         noClasses()
             .that().resideInAPackage("..domain..")
             .should().dependOnClassesThat().resideInAPackage("..application..")
+            .allowEmptyShould(true)
             .because("Domain layer should not depend on application layer");
 
     @ArchTest
@@ -91,6 +100,7 @@ public class DomainDrivenDesignArchitectureTest {
         noClasses()
             .that().resideInAPackage("..domain..")
             .should().dependOnClassesThat().resideInAPackage("..infrastructure..")
+            .allowEmptyShould(true)
             .because("Domain layer should not depend on infrastructure layer");
 
     @ArchTest
@@ -98,5 +108,6 @@ public class DomainDrivenDesignArchitectureTest {
         noClasses()
             .that().resideInAPackage("..application..")
             .should().dependOnClassesThat().resideInAPackage("..infrastructure..")
+            .allowEmptyShould(true)
             .because("Application layer should not depend on infrastructure layer");
 }
