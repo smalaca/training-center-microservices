@@ -204,9 +204,9 @@ A chronological series of blog posts documenting the project journey:
    1. [The Secret Geometry Behind Your Architecture](https://letstalkaboutjava.blogspot.com/2025/08/the-secret-geometry-behind-your.html)
    2. [Understanding the Problem and Solution Spaces](https://letstalkaboutjava.blogspot.com/2025/08/understanding-problem-and-solution.html)
 5. **Domain-Driven Design Introduction**
-   1. Domain-Driven Design for dummies
+   1. [The Two Faces of DDD: Strategy vs. Tactics](https://letstalkaboutjava.blogspot.com/2025/08/the-two-faces-of-ddd-strategy-vs-tactics.html)
 5. **Discovering Language Boundaries**
-   1. Ubiquitous Language demystified
+   1. [Ubiquitous Language - Boundaries, Words, and the Hidden Cost of Ignoring Them](https://letstalkaboutjava.blogspot.com/2025/08/ubiquitous-language-boundaries-words.html)
    2. Discovering Language Boundaries
    3. Domain and Subdomains
 6. **Architecture Decision Record**
