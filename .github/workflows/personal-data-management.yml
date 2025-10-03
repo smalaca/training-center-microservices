@@ -54,10 +54,10 @@ jobs:
         working-directory: ./personal-data-management
         run: mvn clean verify
 
-      - name: SonarCloud Scan
-        working-directory: ./personal-data-management
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v5.3.1
+        with:
+          projectBaseDir: ./personal-data-management
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-personal-data-management
+          SONAR_HOST_URL: https://sonarcloud.io

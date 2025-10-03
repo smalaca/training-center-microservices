@@ -46,10 +46,10 @@ jobs:
         working-directory: ./schema-registry
         run: mvn clean verify
 
-      - name: SonarCloud Scan
-        working-directory: ./schema-registry
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v5.3.1
+        with:
+          projectBaseDir: ./schema-registry
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-schema-registry
+          SONAR_HOST_URL: https://sonarcloud.io

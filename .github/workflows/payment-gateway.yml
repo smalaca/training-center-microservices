@@ -50,10 +50,10 @@ jobs:
         working-directory: ./payment-gateway
         run: mvn clean verify
 
-      - name: SonarCloud Scan
-        working-directory: ./payment-gateway
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v5.3.1
+        with:
+          projectBaseDir: ./payment-gateway
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=smalaca-github_training-center-microservices-payment-gateway
+          SONAR_HOST_URL: https://sonarcloud.io
