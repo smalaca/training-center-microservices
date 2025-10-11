@@ -5,12 +5,14 @@ import com.smalaca.opentrainings.client.opentrainings.offer.RestOfferTestRespons
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.offer.SpringOfferCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -34,7 +36,10 @@ class OfferRestControllerSystemTest {
 
     @Autowired
     private OpenTrainingsTestClient client;
-    
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
+
     private GivenOfferFactory given;
 
     @BeforeEach

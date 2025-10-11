@@ -45,6 +45,9 @@ class OutboxMessagePublisherIntegrationTest {
     @MockBean
     private OrderPivotalEventPublisher publisher;
 
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
+
     private OutboxMessageMapper factory;
 
     private final List<UUID> messageIds = new ArrayList<>();

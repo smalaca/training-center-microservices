@@ -9,6 +9,7 @@ import com.smalaca.opentrainings.domain.order.OrderTestDto;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.opentrainings.infrastructure.repository.jpa.order.SpringOrderCrudRepository;
 import com.smalaca.test.type.SystemTest;
 import org.junit.jupiter.api.AfterEach;
@@ -45,6 +46,9 @@ class OrderRestControllerSystemTest {
 
     @MockBean
     private PaymentGateway paymentGateway;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     private GivenOrderFactory given;
 
