@@ -11,7 +11,7 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import com.smalaca.opentrainings.domain.order.events.OrderEvent;
 
 @DrivenAdapter
-class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry, CommandRegistry {
+public class JpaOutboxMessageRepository implements EventRegistry, OfferAcceptanceSagaEventRegistry, CommandRegistry {
     private final SpringOutboxMessageCrudRepository repository;
     private final OutboxMessageMapper outboxMessageMapper;
 

@@ -4,12 +4,14 @@ import com.smalaca.opentrainings.application.order.OrderApplicationService;
 import com.smalaca.opentrainings.domain.order.GivenOrderFactory;
 import com.smalaca.opentrainings.domain.order.OrderRepository;
 import com.smalaca.opentrainings.domain.order.OrderTestDto;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.opentrainings.query.order.OrderQueryService;
 import com.smalaca.opentrainings.query.order.OrderView;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -38,6 +40,9 @@ class ScheduledOrdersTerminationIntegrationTest {
     private TransactionTemplate transaction;
 
     private GivenOrderFactory given;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     @BeforeEach
     void init() {

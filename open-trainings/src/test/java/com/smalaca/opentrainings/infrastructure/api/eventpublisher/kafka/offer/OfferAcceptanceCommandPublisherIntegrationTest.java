@@ -9,11 +9,13 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.ReturnDisco
 import com.smalaca.opentrainings.domain.offeracceptancesaga.commands.UseDiscountCodeCommand;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceRequestedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.context.EmbeddedKafka;
@@ -42,6 +44,9 @@ class OfferAcceptanceCommandPublisherIntegrationTest {
 
     @Autowired
     private OfferAcceptanceTestKafkaListener consumer;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     @BeforeEach
     void init() {

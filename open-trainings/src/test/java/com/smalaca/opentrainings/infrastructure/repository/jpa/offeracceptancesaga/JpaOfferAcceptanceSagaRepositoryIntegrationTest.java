@@ -11,11 +11,13 @@ import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptan
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.OfferAcceptanceSagaEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceChangedEvent;
 import com.smalaca.opentrainings.domain.offeracceptancesaga.events.TrainingPriceNotChangedEvent;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -48,6 +50,9 @@ class JpaOfferAcceptanceSagaRepositoryIntegrationTest {
 
     @Autowired
     private TransactionTemplate transactionTemplate;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     private final List<UUID> eventIds = new ArrayList<>();
 

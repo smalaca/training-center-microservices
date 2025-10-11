@@ -4,12 +4,14 @@ import com.smalaca.opentrainings.application.offer.OfferApplicationService;
 import com.smalaca.opentrainings.domain.offer.GivenOfferFactory;
 import com.smalaca.opentrainings.domain.offer.OfferRepository;
 import com.smalaca.opentrainings.domain.offer.OfferTestDto;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.opentrainings.query.offer.OfferQueryService;
 import com.smalaca.opentrainings.query.offer.OfferView;
 import com.smalaca.test.type.SpringBootIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -36,6 +38,9 @@ class ScheduledOffersTerminationIntegrationTest {
 
     @Autowired
     private TransactionTemplate transaction;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     private GivenOfferFactory given;
 

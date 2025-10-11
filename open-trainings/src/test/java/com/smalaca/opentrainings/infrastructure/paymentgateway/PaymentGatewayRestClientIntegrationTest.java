@@ -5,10 +5,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentGateway;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentRequest;
 import com.smalaca.opentrainings.domain.paymentgateway.PaymentResponse;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.test.type.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -28,6 +30,9 @@ class PaymentGatewayRestClientIntegrationTest {
 
     @Autowired
     private PaymentGateway paymentGateway;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     @Test
     void shouldReturnSuccessfulResponseFromPaymentGateway() {

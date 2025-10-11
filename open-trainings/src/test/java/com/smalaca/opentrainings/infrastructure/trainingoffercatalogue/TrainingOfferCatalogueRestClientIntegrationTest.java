@@ -5,10 +5,12 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import com.smalaca.opentrainings.domain.price.Price;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingDto;
 import com.smalaca.opentrainings.domain.trainingoffercatalogue.TrainingOfferCatalogue;
+import com.smalaca.opentrainings.infrastructure.outbox.jpa.JpaOutboxMessageRepository;
 import com.smalaca.test.type.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -30,6 +32,9 @@ class TrainingOfferCatalogueRestClientIntegrationTest {
 
     @Autowired
     private TrainingOfferCatalogue trainingOfferCatalogue;
+
+    @MockBean
+    private JpaOutboxMessageRepository jpaOutboxMessageRepository;
 
     @Test
     void shouldReturnTrainingDetailsFromCatalogue() {
