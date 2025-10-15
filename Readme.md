@@ -208,7 +208,8 @@ A chronological series of blog posts documenting the project journey:
    1. [The Two Faces of DDD: Strategy vs. Tactics](https://letstalkaboutjava.blogspot.com/2025/08/the-two-faces-of-ddd-strategy-vs-tactics.html)
 5. **Discovering Language Boundaries**
    1. [Ubiquitous Language - Boundaries, Words, and the Hidden Cost of Ignoring Them](https://letstalkaboutjava.blogspot.com/2025/08/ubiquitous-language-boundaries-words.html)
-   2. Discovering Language Boundaries
+   2. [Speaking Many Languages in One System](https://letstalkaboutjava.blogspot.com/2025/10/speaking-many-languages-in-one-system.html)
+   3. [Ubiquitous Language in Action: Boundaries Made of Words](https://letstalkaboutjava.blogspot.com/2025/10/ubiquitous-language-in-action.html)
    3. Domain and Subdomains
 6. **Architecture Decision Record**
    1. What ADR is?
