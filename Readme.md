@@ -210,7 +210,8 @@ A chronological series of blog posts documenting the project journey:
    1. [Ubiquitous Language - Boundaries, Words, and the Hidden Cost of Ignoring Them](https://letstalkaboutjava.blogspot.com/2025/08/ubiquitous-language-boundaries-words.html)
    2. [Speaking Many Languages in One System](https://letstalkaboutjava.blogspot.com/2025/10/speaking-many-languages-in-one-system.html)
    3. [Ubiquitous Language in Action: Boundaries Made of Words](https://letstalkaboutjava.blogspot.com/2025/10/ubiquitous-language-in-action.html)
-   3. Domain and Subdomains
+   4. [Core, Supporting, Generic – How to Stop Treating All Domains the Same](https://letstalkaboutjava.blogspot.com/2025/10/core-supporting-generic-how-to-stop.html)
+   5. [So… Which Part of Your System Is Actually Worth Building?](https://letstalkaboutjava.blogspot.com/2025/11/so-which-part-of-your-system-is.html)
 6. **Architecture Decision Record**
    1. What ADR is?
    2. Monolith or Microservices?
