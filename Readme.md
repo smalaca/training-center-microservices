@@ -261,12 +261,16 @@ A chronological series of blog posts documenting the project journey:
   - [Production-Ready Microservices](https://www.oreilly.com/library/view/production-ready-microservices/9781491965962/) by Susan J. Fowler
   - [Strategic Monoliths and Microservices: Driving Innovation Using Purposeful Architecture](https://www.oreilly.com/library/view/strategic-monoliths-and/9780137355600/) by Vaughn Vernon, Tomasz Jaskula
 - **Software Architecture**
+  - [Architecture for Flow: Adaptive Systems with Domain-Driven Design, Wardley Mapping, and Team Topologies](https://www.oreilly.com/library/view/architecture-for-flow/9780137392759/) by Susanne Kaiser
   - [Balancing Coupling in Software Design](https://www.oreilly.com/library/view/balancing-coupling-in/9780137353514/) by Vlad Khononov
   - [Building Evolutionary Architectures](https://www.oreilly.com/library/view/building-evolutionary-architectures/9781492097532/) by Neal Ford, Rebecca Parsons, Patrick Kua, Pramod Sadalage
   - [Clean Architecture](https://www.oreilly.com/library/view/clean-architecture-a/9780134494272/) by Robert C. Martin
   - [Designing Data-Intensive Applications](https://www.oreilly.com/library/view/designing-data-intensive-applications/9781491903063/) by Martin Kleppmann
   - [Event Processing. Designing IT Systems for Agile Companies](https://www.oreilly.com/library/view/event-processing-designing/9780071633505/) by K. Chandy, W. Roy Schulte
+  - [Software Architecture: The Hard Parts](https://www.oreilly.com/library/view/software-architecture-the/9781492086888/) by Neal Ford, Mark Richards, Pramod Sadalage, Zhamak Dehghani
+  - [The Software Architect Elevator](https://www.oreilly.com/library/view/the-software-architect/9781492077534/) by Gregor Hohpe
 - **Software Development**
+  - [Growing Object-Oriented Software, Guided by Tests](https://learning.oreilly.com/library/view/growing-object-oriented-software/9780321574442/) by Steve Freeman, Nat Pryce
   - [Release It!](https://www.oreilly.com/library/view/release-it/9781680500264/) by Michael T. Nygard
   - [The Phoenix Project](https://www.oreilly.com/library/view/the-phoenix-project/9781457191350/) by Gene Kim, Kevin Behr, George Spafford
 - **Testing**
