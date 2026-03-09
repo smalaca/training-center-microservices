@@ -186,66 +186,31 @@ The following resources explain the evolution of this project and the reasoning 
 
 ### Articles
 A chronological series of blog posts documenting the project journey:
-1. **Introduction**
-   1. [Rise Above! Elevating Your Code Craftsmanship](https://letstalkaboutjava.blogspot.com/2024/04/rise-above-elevating-your-code.html)
-   2. [Elevating Your Code Craftsmanship: Questions and Answers](https://letstalkaboutjava.blogspot.com/2024/05/elevating-your-code-craftsmanship.html)
-2. **Event Storming Introduction**
-   1. [The Power of Post-Its: Deciphering Business Processes with Event Storming](https://letstalkaboutjava.blogspot.com/2024/05/the-power-of-post-its-deciphering.html)
-   2. [Setting the Stage: Preparing for Your Event Storming Workshop](https://letstalkaboutjava.blogspot.com/2024/05/setting-stage-preparing-for-your-event.html)
-   3. [Event Storming Workshops: A Closer Look at Different Approaches](https://letstalkaboutjava.blogspot.com/2024/05/event-storming-workshops-closer-look-at.html)
-   4. [Event Storming Workshops: Tips and Tricks](https://letstalkaboutjava.blogspot.com/2024/06/event-storming-workshops-tips-and-tricks.html)
-3. **Big Picture Event Storming**
-   1. [Navigating the Storm: A Guide to Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/navigating-storm-guide-to-big-picture.html)
-   2. [Taming the Storm: How Chaotic Exploration Shapes Big Picture Event Storming](https://letstalkaboutjava.blogspot.com/2024/06/taming-storm-how-chaotic-exploration.html)
-   3. [Event Storming Big Picture — How to enforce the Timeline?](https://letstalkaboutjava.blogspot.com/2025/07/event-storming-big-picture-how-to.html)
-   4. [So… Which Event Goes First?](https://letstalkaboutjava.blogspot.com/2025/07/so-which-event-goes-first.html)
-   5. [Big Challenges of Event Storming Big Picture](https://letstalkaboutjava.blogspot.com/2025/07/big-challenges-of-event-storming-big.html)
-   6. [After the Big Picture: Turning Insights into Action](https://letstalkaboutjava.blogspot.com/2025/07/after-big-picture-turning-insights-into.html)
-4. **Software Architecture Introduction**
-   1. [The Secret Geometry Behind Your Architecture](https://letstalkaboutjava.blogspot.com/2025/08/the-secret-geometry-behind-your.html)
-   2. [Understanding the Problem and Solution Spaces](https://letstalkaboutjava.blogspot.com/2025/08/understanding-problem-and-solution.html)
-5. **Domain-Driven Design Introduction**
-   1. [The Two Faces of DDD: Strategy vs. Tactics](https://letstalkaboutjava.blogspot.com/2025/08/the-two-faces-of-ddd-strategy-vs-tactics.html)
-5. **Discovering Language Boundaries**
-   1. [Ubiquitous Language - Boundaries, Words, and the Hidden Cost of Ignoring Them](https://letstalkaboutjava.blogspot.com/2025/08/ubiquitous-language-boundaries-words.html)
-   2. [Speaking Many Languages in One System](https://letstalkaboutjava.blogspot.com/2025/10/speaking-many-languages-in-one-system.html)
-   3. [Ubiquitous Language in Action: Boundaries Made of Words](https://letstalkaboutjava.blogspot.com/2025/10/ubiquitous-language-in-action.html)
-   4. [Core, Supporting, Generic – How to Stop Treating All Domains the Same](https://letstalkaboutjava.blogspot.com/2025/10/core-supporting-generic-how-to-stop.html)
-   5. [So… Which Part of Your System Is Actually Worth Building?](https://letstalkaboutjava.blogspot.com/2025/11/so-which-part-of-your-system-is.html)
-6. **Architecture Decision Record**
-   1. What ADR is?
-   2. Monolith or Microservices?
-7. **Defining initial Bounded Contexts**
-   1. Problem and Solution Space
-   2. What Bounded Context is?
-   3. Defining Bounded Contexts
-8. **Process Level Event Storming**
-   1. What is the goal of it?
-   2. Process Level Example: Releasing Training Program
-   3. Process Level Example: Purchase Open and Dedicated Training
-   4. Updating Bounded Contexts
-9. **Defining Context Mapping**
-   1. What context maps are?
-   2. Team collaboration and context maps
-   3. Architecture and context maps
-   4. Made decision and ADRs
-10. **Design Level Event Storming**
-    1. Why we need it?
-    2. Open Training Purchase
-11. **Architecture of the Code**
-    1. Short story about the architecture types.
-    2. How to pick the right architecture for your context?
-    3. Open Training Purchase and Decision
-12. **Command Query Responsibility Segregation** 
-    1. CQRS for dummies
-    2. Data Model vs. Domain Model
-    3. Anemic Domain Model - where to use it?
-    4. Trainings Catalogue and Decision
-13. **Design Level - how to convert sticky notes into code?**
-    1. Port and Adapters in details
-    2. Port and Adapters - various implementation 
-    3. Application layer - what is that
-    4. ...
+1. **Event Storming Foundations** 
+   1. [Event Storming Foundations: Understanding events as immutable business facts (Part 1)]()
+   2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)]()
+   3. [Event Storming Foundations: Choosing your workshop type (Part 3)]()
+   4. [Event Storming Foundations: Facilitating beyond the basics (Part 4)]()
+2. **Event Storming Big Picture** 
+   1. [Event Storming Big Picture: The big picture workshop explained (Part 1)]()
+   2. [Event Storming Big Picture: Exploring the chaos (Part 2)]()
+   3. [Event Storming Big Picture: Enforcing the timeline (Part 3)]()
+   4. [Event Storming Big Picture: Choosing the first event (Part 4)]()
+   5. [Event Storming Big Picture: Keeping the workshop on track (Part 5)]()
+   6. [Event Storming Big Picture: Turning insights into action (Part 6)]()
+3. **Software Architecture Introduction**
+   1. [The good, the bad and the boundaries]()
+   2. [Mind the gap between problem and solution spaces]()
+4. **Domain-Driven Design Introduction**
+   1. [The strategic and tactical sides of Domain-Driven Design]()
+5. **Strategic Domain-Driven Design: Ubiquitous Language**
+   1. [Ubiquitous Language: Stopping the translation game (Part 1)]()
+   2. [Ubiquitous Language: Words that reveal domains (Part 2)]()
+   3. [Ubiquitous Language: Structuring knowledge into domains (Part 3)]()
+6. **Strategic Domain-Driven Design: Domain Types**
+   1. [Domain Types: Identifying core, supporting, and generic domains (Part 1)]()
+   2. [Domain Types: Build, buy, or outsource? (Part 2)]()
+7. ... TBD
 
 ### Books worth reading
 - **Domain-Driven Design**
