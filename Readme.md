@@ -188,7 +188,7 @@ The following resources explain the evolution of this project and the reasoning 
 A chronological series of blog posts documenting the project journey.
 If you want you can also explore my blog [Mind The Architecture](https://www.sebastianmalaca.com/).
 
-1. **Event Storming Foundations** 
+1. **[Event Storming Foundations](https://www.sebastianmalaca.com/event-storming-foundations/)** 
    1. [Event Storming Foundations: Understanding events as immutable business facts (Part 1)](https://www.sebastianmalaca.com/event-storming-foundations-understanding-events-as-immutable-business-facts-part-1/)
    2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)](https://www.sebastianmalaca.com/event-storming-foundations-preparing-for-a-successful-workshop-part-2/)
    3. [Event Storming Foundations: Choosing your workshop type (Part 3)](https://www.sebastianmalaca.com/event-storming-foundations-choosing-your-workshop-type-part-3/)
