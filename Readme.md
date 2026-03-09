@@ -185,7 +185,9 @@ The following resources explain the evolution of this project and the reasoning 
 | | Code Quality                 | - | [SonarCloud Analysis](https://sonarcloud.io/summary/overall?id=smalaca-github_training-center-microservices-open-trainings&branch=master)                                                                                                                                                                                                             |
 
 ### Articles
-A chronological series of blog posts documenting the project journey:
+A chronological series of blog posts documenting the project journey.
+If you want you can also explore my blog [Mind The Architecture](https://www.sebastianmalaca.com/).
+
 1. **Event Storming Foundations** 
    1. [Event Storming Foundations: Understanding events as immutable business facts (Part 1)]()
    2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)]()
