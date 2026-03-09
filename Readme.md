@@ -189,10 +189,10 @@ A chronological series of blog posts documenting the project journey.
 If you want you can also explore my blog [Mind The Architecture](https://www.sebastianmalaca.com/).
 
 1. **Event Storming Foundations** 
-   1. [Event Storming Foundations: Understanding events as immutable business facts (Part 1)]()
-   2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)]()
-   3. [Event Storming Foundations: Choosing your workshop type (Part 3)]()
-   4. [Event Storming Foundations: Facilitating beyond the basics (Part 4)]()
+   1. [Event Storming Foundations: Understanding events as immutable business facts (Part 1)](https://www.sebastianmalaca.com/event-storming-foundations-understanding-events-as-immutable-business-facts-part-1/)
+   2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)](https://www.sebastianmalaca.com/event-storming-foundations-preparing-for-a-successful-workshop-part-2/)
+   3. [Event Storming Foundations: Choosing your workshop type (Part 3)](https://www.sebastianmalaca.com/event-storming-foundations-choosing-your-workshop-type-part-3/)
+   4. [Event Storming Foundations: Facilitating beyond the basics (Part 4)](https://www.sebastianmalaca.com/event-storming-foundations-facilitating-beyond-the-basics-part-4/)
 2. **Event Storming Big Picture** 
    1. [Event Storming Big Picture: The big picture workshop explained (Part 1)]()
    2. [Event Storming Big Picture: Exploring the chaos (Part 2)]()
