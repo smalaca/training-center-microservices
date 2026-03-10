@@ -193,13 +193,13 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    2. [Event Storming Foundations: Preparing for a successful workshop (Part 2)](https://www.sebastianmalaca.com/event-storming-foundations-preparing-for-a-successful-workshop-part-2/)
    3. [Event Storming Foundations: Choosing your workshop type (Part 3)](https://www.sebastianmalaca.com/event-storming-foundations-choosing-your-workshop-type-part-3/)
    4. [Event Storming Foundations: Facilitating beyond the basics (Part 4)](https://www.sebastianmalaca.com/event-storming-foundations-facilitating-beyond-the-basics-part-4/)
-2. **Event Storming Big Picture** 
-   1. [Event Storming Big Picture: The big picture workshop explained (Part 1)]()
-   2. [Event Storming Big Picture: Exploring the chaos (Part 2)]()
-   3. [Event Storming Big Picture: Enforcing the timeline (Part 3)]()
-   4. [Event Storming Big Picture: Choosing the first event (Part 4)]()
-   5. [Event Storming Big Picture: Keeping the workshop on track (Part 5)]()
-   6. [Event Storming Big Picture: Turning insights into action (Part 6)]()
+2. **[Event Storming Big Picture](https://www.sebastianmalaca.com/event-storming-big-picture/)** 
+   1. [Event Storming Big Picture: The big picture workshop explained (Part 1)](https://www.sebastianmalaca.com/event-storming-big-picture-the-big-picture-workshop-explained-part-1/)
+   2. [Event Storming Big Picture: Exploring the chaos (Part 2)](https://www.sebastianmalaca.com/event-storming-big-picture-exploring-the-chaos-part-2/)
+   3. [Event Storming Big Picture: Enforcing the timeline (Part 3)](https://www.sebastianmalaca.com/event-storming-big-picture-enforcing-the-timeline-part-3/)
+   4. [Event Storming Big Picture: Choosing the first event (Part 4)](https://www.sebastianmalaca.com/event-storming-big-picture-choosing-the-first-event-part-4/)
+   5. [Event Storming Big Picture: Keeping the workshop on track (Part 5)](https://www.sebastianmalaca.com/event-storming-big-picture-keeping-the-workshop-on-track-part-5/)
+   6. [Event Storming Big Picture: Turning insights into action (Part 6)](https://www.sebastianmalaca.com/event-storming-big-picture-turning-insights-into-action-part-6/)
 3. **Software Architecture Introduction**
    1. [The good, the bad and the boundaries]()
    2. [Mind the gap between problem and solution spaces]()
