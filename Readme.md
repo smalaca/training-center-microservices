@@ -201,17 +201,17 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    5. [Event Storming Big Picture: Keeping the workshop on track (Part 5)](https://www.sebastianmalaca.com/event-storming-big-picture-keeping-the-workshop-on-track-part-5/)
    6. [Event Storming Big Picture: Turning insights into action (Part 6)](https://www.sebastianmalaca.com/event-storming-big-picture-turning-insights-into-action-part-6/)
 3. **Software Architecture Introduction**
-   1. [The good, the bad and the boundaries]()
-   2. [Mind the gap between problem and solution spaces]()
+   1. [The good, the bad and the boundaries](https://www.sebastianmalaca.com/the-good-the-bad-and-the-boundaries/)
+   2. [Mind the gap between problem and solution spaces](https://www.sebastianmalaca.com/mind-the-gap-between-problem-and-solution-spaces/)
 4. **Domain-Driven Design Introduction**
-   1. [The strategic and tactical sides of Domain-Driven Design]()
+   1. [The strategic and tactical sides of Domain-Driven Design](https://www.sebastianmalaca.com/the-strategic-and-tactical-sides-of-domain-driven-design/)
 5. **Strategic Domain-Driven Design: Ubiquitous Language**
-   1. [Ubiquitous Language: Stopping the translation game (Part 1)]()
-   2. [Ubiquitous Language: Words that reveal domains (Part 2)]()
-   3. [Ubiquitous Language: Structuring knowledge into domains (Part 3)]()
+   1. [Ubiquitous Language: Stopping the translation game (Part 1)](https://www.sebastianmalaca.com/ubiquitous-language-stopping-the-translation-game-part-1/)
+   2. [Ubiquitous Language: Words that reveal domains (Part 2)](https://www.sebastianmalaca.com/ubiquitous-language-words-that-reveal-domains-part-2/)
+   3. [Ubiquitous Language: Structuring knowledge into domains (Part 3)](https://www.sebastianmalaca.com/ubiquitous-language-structuring-knowledge-into-domains-part-3/)
 6. **Strategic Domain-Driven Design: Domain Types**
-   1. [Domain Types: Identifying core, supporting, and generic domains (Part 1)]()
-   2. [Domain Types: Build, buy, or outsource? (Part 2)]()
+   1. [Domain Types: Identifying core, supporting, and generic domains (Part 1)](https://www.sebastianmalaca.com/domain-types-identifying-core-supporting-and-generic-domains-part-1/)
+   2. [Domain Types: Build, buy, or outsource? (Part 2)](https://www.sebastianmalaca.com/domain-types-build-buy-or-outsource-part-2/)
 7. ... TBD
 
 ### Books worth reading
