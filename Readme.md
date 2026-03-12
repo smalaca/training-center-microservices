@@ -205,11 +205,11 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    2. [Mind the gap between problem and solution spaces](https://www.sebastianmalaca.com/mind-the-gap-between-problem-and-solution-spaces/)
 4. **Domain-Driven Design Introduction**
    1. [The strategic and tactical sides of Domain-Driven Design](https://www.sebastianmalaca.com/the-strategic-and-tactical-sides-of-domain-driven-design/)
-5. **Strategic Domain-Driven Design: Ubiquitous Language**
+5. **[Strategic Domain-Driven Design: Ubiquitous Language](https://www.sebastianmalaca.com/strategic-domain-driven-design-ubiquitous-language/)**
    1. [Ubiquitous Language: Stopping the translation game (Part 1)](https://www.sebastianmalaca.com/ubiquitous-language-stopping-the-translation-game-part-1/)
    2. [Ubiquitous Language: Words that reveal domains (Part 2)](https://www.sebastianmalaca.com/ubiquitous-language-words-that-reveal-domains-part-2/)
    3. [Ubiquitous Language: Structuring knowledge into domains (Part 3)](https://www.sebastianmalaca.com/ubiquitous-language-structuring-knowledge-into-domains-part-3/)
-6. **Strategic Domain-Driven Design: Domain Types**
+6. **[Strategic Domain-Driven Design: Domain Types](https://www.sebastianmalaca.com/strategic-domain-driven-design-domain-types/)**
    1. [Domain Types: Identifying core, supporting, and generic domains (Part 1)](https://www.sebastianmalaca.com/domain-types-identifying-core-supporting-and-generic-domains-part-1/)
    2. [Domain Types: Build, buy, or outsource? (Part 2)](https://www.sebastianmalaca.com/domain-types-build-buy-or-outsource-part-2/)
 7. ... TBD
