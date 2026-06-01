@@ -54,6 +54,7 @@ public class TrainingOffer {
 
     public TrainingOffer(TrainingOfferPublishedEvent event) {
         this.trainingOfferId = event.trainingOfferId();
+        UUID trainingOfferId2 = event.trainingOfferId();
         this.trainingOfferDraftId = event.trainingOfferDraftId();
         this.trainerId = event.trainerId();
         this.trainingProgramId = event.trainingProgramId();
