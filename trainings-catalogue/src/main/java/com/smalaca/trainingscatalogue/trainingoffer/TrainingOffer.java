@@ -19,9 +19,6 @@ public class TrainingOffer {
     @Id
     @Column(name = "TRAINING_OFFER_ID")
     private UUID trainingOfferId;
-    @Id
-    @Column(name = "TRAINING_OFFER_ID_2")
-    private UUID trainingOfferId2;
 
     @Column(name = "TRAINING_OFFER_DRAFT_ID")
     private UUID trainingOfferDraftId;
@@ -57,7 +54,6 @@ public class TrainingOffer {
 
     public TrainingOffer(TrainingOfferPublishedEvent event) {
         this.trainingOfferId = event.trainingOfferId();
-        this.trainingOfferId2 = event.trainingOfferId();
         this.trainingOfferDraftId = event.trainingOfferDraftId();
         this.trainerId = event.trainerId();
         this.trainingProgramId = event.trainingProgramId();
