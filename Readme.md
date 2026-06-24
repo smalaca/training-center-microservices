@@ -25,17 +25,17 @@ This repository demonstrates how to build and maintain a modern microservices ar
 ## 📑 Table of Contents
 This documentation provides insights into the tools, techniques, and decisions made throughout the project:
 
-1. [Getting Started](#getting-started) - Setup and installation instructions
-2. [Technology Stack](#technology-stack) - Core technologies used in the project
-3. [Project Artifacts](#project-artifacts) - Event storming outputs and architecture decisions
-4. [Business Overview](#business-overview) - Domain understanding and requirements
+1. [Getting Started](#-getting-started) - Setup and installation instructions
+2. [Technology Stack](#-technology-stack) - Core technologies used in the project
+3. [Project Artifacts](#-project-artifacts) - Event storming outputs and architecture decisions
+4. [Business Overview](#-business-overview) - Domain understanding and requirements
    1. [Brief Description](#brief-description)
    2. [High-level Requirements](#high-level-requirements)
-5. [Educational Resources](#educational-resources)
+5. [Educational Resources](#-educational-resources)
    1. [Articles](#articles) - Blog posts explaining project evolution
    2. [Books Worth Reading](#books-worth-reading)
    3. [External Resources](#external-resources)
-6. [Contributing](#contributing) - Guidelines for contributors
+6. [Contributing](#-contributing) - Guidelines for contributors
 
 ## 🚀 Getting Started
 
@@ -47,8 +47,8 @@ This documentation provides insights into the tools, techniques, and decisions m
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/training-center.git
-   cd training-center
+   git clone https://github.com/smalaca/training-center-microservices.git
+   cd training-center-microservices
    ```
 
 2. Build the project:
@@ -103,7 +103,7 @@ All event storming sessions are documented in our [Miro Board](https://miro.com/
 - **Process Level Event Storming** - Detailed workflow mapping
 
 ### Architecture Decisions
-We document significant architectural decisions in our [Architecture Decision Records (ADRs)](/documentation/architecture-decision-record) to provide context for future development.
+We document significant architectural decisions in our [Architecture Decision Records (ADRs)](documentation/architecture-decision-record/records) to provide context for future development.
 
 ## 🏢 Business Overview
 
