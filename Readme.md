@@ -25,17 +25,17 @@ This repository demonstrates how to build and maintain a modern microservices ar
 ## 📑 Table of Contents
 This documentation provides insights into the tools, techniques, and decisions made throughout the project:
 
-1. [Getting Started](#getting-started) - Setup and installation instructions
-2. [Technology Stack](#technology-stack) - Core technologies used in the project
-3. [Project Artifacts](#project-artifacts) - Event storming outputs and architecture decisions
-4. [Business Overview](#business-overview) - Domain understanding and requirements
+1. [Getting Started](#-getting-started) - Setup and installation instructions
+2. [Technology Stack](#-technology-stack) - Core technologies used in the project
+3. [Project Artifacts](#-project-artifacts) - Event storming outputs and architecture decisions
+4. [Business Overview](#-business-overview) - Domain understanding and requirements
    1. [Brief Description](#brief-description)
    2. [High-level Requirements](#high-level-requirements)
-5. [Educational Resources](#educational-resources)
+5. [Educational Resources](#-educational-resources)
    1. [Articles](#articles) - Blog posts explaining project evolution
    2. [Books Worth Reading](#books-worth-reading)
    3. [External Resources](#external-resources)
-6. [Contributing](#contributing) - Guidelines for contributors
+6. [Contributing](#-contributing) - Guidelines for contributors
 
 ## 🚀 Getting Started
 
@@ -47,8 +47,8 @@ This documentation provides insights into the tools, techniques, and decisions m
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/training-center.git
-   cd training-center
+   git clone https://github.com/smalaca/training-center-microservices.git
+   cd training-center-microservices
    ```
 
 2. Build the project:
@@ -96,14 +96,14 @@ This documentation provides insights into the tools, techniques, and decisions m
 ## 📋 Project Artifacts
 
 ### Event Storming
-All event storming sessions are documented in our [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254), which includes:
+All event storming sessions are documented in our [Miro Board](https://miro.com/app/board/uXjVIgjwy0M=/?share_link_id=937482921645), which includes:
 - **Big Picture Event Storming** - Holistic view of the domain
 - **Bounded Contexts** - Service boundary identification
 - **Core/Supporting/Generic Domains** - Domain categorization
 - **Process Level Event Storming** - Detailed workflow mapping
 
 ### Architecture Decisions
-We document significant architectural decisions in our [Architecture Decision Records (ADRs)](/documentation/architecture-decision-record) to provide context for future development.
+We document significant architectural decisions in our [Architecture Decision Records (ADRs)](documentation/architecture-decision-record/records) to provide context for future development.
 
 ## 🏢 Business Overview
 
@@ -214,6 +214,7 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    2. [Domain Types: Build, buy, or outsource? (Part 2)](https://www.sebastianmalaca.com/domain-types-build-buy-or-outsource-part-2/)
    3. [Domain Types: What if you build nothing? (Part 3)](https://www.sebastianmalaca.com/domain-types-what-if-you-build-nothing-part-3/)
    4. [Domain Types: The architecture your subdomain deserves (Part 4)](https://www.sebastianmalaca.com/domain-types-the-architecture-your-subdomain-deserves-part-4/)
+   5. [Domain Types: Ownership is not random (Part 5)](https://www.sebastianmalaca.com/domain-types-ownership-is-not-random-part-5/)
 7. ... TBD
 
 ### Books worth reading
