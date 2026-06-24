@@ -96,7 +96,7 @@ This documentation provides insights into the tools, techniques, and decisions m
 ## 📋 Project Artifacts
 
 ### Event Storming
-All event storming sessions are documented in our [Miro Board](https://miro.com/app/board/uXjVKVYAGuE=/?share_link_id=139271017254), which includes:
+All event storming sessions are documented in our [Miro Board](https://miro.com/app/board/uXjVIgjwy0M=/?share_link_id=937482921645), which includes:
 - **Big Picture Event Storming** - Holistic view of the domain
 - **Bounded Contexts** - Service boundary identification
 - **Core/Supporting/Generic Domains** - Domain categorization
