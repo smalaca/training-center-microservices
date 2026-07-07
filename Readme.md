@@ -215,7 +215,7 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    3. [Domain Types: What if you build nothing? (Part 3)](https://www.sebastianmalaca.com/domain-types-what-if-you-build-nothing-part-3/)
    4. [Domain Types: The architecture your subdomain deserves (Part 4)](https://www.sebastianmalaca.com/domain-types-the-architecture-your-subdomain-deserves-part-4/)
    5. [Domain Types: Ownership is not random (Part 5)](https://www.sebastianmalaca.com/domain-types-ownership-is-not-random-part-5/)
-   6. [Domain Types: How much should you trust AI? (Part 6)]()https://www.sebastianmalaca.com/domain-types-how-much-should-you-trust-ai/
+   6. [Domain Types: How much should you trust AI? (Part 6)](https://www.sebastianmalaca.com/domain-types-how-much-should-you-trust-ai/)
 7. ... TBD
 
 ### Books worth reading
