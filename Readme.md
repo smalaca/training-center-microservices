@@ -217,7 +217,10 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
    5. [Domain Types: Ownership is not random (Part 5)](https://www.sebastianmalaca.com/domain-types-ownership-is-not-random-part-5/)
    6. [Domain Types: How much should you trust AI? (Part 6)](https://www.sebastianmalaca.com/domain-types-how-much-should-you-trust-ai/)
    7. [Domain Types: Three Myths About Domain Types (Part 7)](https://www.sebastianmalaca.com/domain-types-three-myths-about-domain-types/)
-7. ... TBD
+7. **Model**
+   1. [All Models Are Wrong, But Some Are Useful](https://www.sebastianmalaca.com/all-models-are-wrong-but-some-are-useful/)
+   2. [Understanding Essential and Accidental Complexity](https://www.sebastianmalaca.com/understanding-essential-and-accidental-complexity/)
+9. ... TBD
 
 ### Books worth reading
 - **Domain-Driven Design**
