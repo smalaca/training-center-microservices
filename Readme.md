@@ -220,7 +220,7 @@ If you want you can also explore my blog [Mind The Architecture](https://www.seb
 7. **Model**
    1. [All Models Are Wrong, But Some Are Useful](https://www.sebastianmalaca.com/all-models-are-wrong-but-some-are-useful/)
    2. [Understanding Essential and Accidental Complexity](https://www.sebastianmalaca.com/understanding-essential-and-accidental-complexity/)
-8. **[Strategic Domain-Driven Design: Bounded Context]()
+8. **[Strategic Domain-Driven Design: Bounded Contexts](www.sebastianmalaca.com/strategic-domain-driven-design-bounded-contexts/)**
    1. [Subdomains vs. Bounded Contexts: similar boundaries, different purposes](https://www.sebastianmalaca.com/subdomains-vs-bounded-contexts-similar-boundaries-different-purposes/)
    2. [Bounded Contexts Are Not Services](https://www.sebastianmalaca.com/bounded-contexts-are-not-services/)
    3. Is it time to modify boundaries of your bounded contexts?
